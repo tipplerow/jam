@@ -1,0 +1,36 @@
+########################################################################
+# Shell functions
+########################################################################
+
+AddJar()
+{
+    RequireFile $1
+
+    if [ -z "$CLASSPATH" ]
+    then
+	CLASSPATH="$1"
+    else
+	CLASSPATH="${CLASSPATH}:$1"
+    fi
+}
+
+AddLib()
+{
+    for JarFile in `find $1 -name *.jar -print`
+    do
+	AddJar $JarFile
+    done
+}
+
+RequireFile()
+{
+    if [ ! -f "$1" ]
+    then
+	echo "`basename $0`: Missing required file [$1]; exiting."
+	exit 1
+    fi
+}
+
+# Local Variables:
+# mode: sh
+# End:

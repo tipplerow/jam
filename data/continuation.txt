@@ -1,0 +1,17 @@
+# Comment line
+line 1
+
+line 2 # trailing comment...
+
+      line 3
+
+
+# and continuation lines...
+
+   abc \
+
+def \
+
+         ghi
+
+

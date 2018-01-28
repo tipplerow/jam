@@ -1,0 +1,200 @@
+<project name="build_common" basedir="." default="compile">
+ <!-- Environment variable XYZ may be dereferenced by ${env.XYZ} -->
+ <property environment="env"/>
+
+ <!-- Local build directories -->
+ <property name="dir.bin"     value="bin"/>
+ <property name="dir.build"   value="build"/>
+ <property name="dir.classes" value="build/classes"/>
+ <property name="dir.test"    value="build/test"/>
+ <property name="dir.conf"    value="conf"/>
+ <property name="dir.src"     value="src"/>
+ <property name="dir.jni"     value="jni"/>
+ <property name="dir.doc"     value="doc"/>
+ <property name="dir.apidoc"  value="doc/apidocs"/>
+ <property name="dir.lib"     value="lib"/>
+
+ <property name="jar.project" value="${dir.lib}/${ant.project.name}.jar"/>
+
+ <!-- Shared installation directories -->
+ <property name="dir.css"     value="${env.JAM_HOME}/css"/>
+ <property name="dir.install" value="${env.JAM_HOME}/install"/>
+ <property name="dir.jlib"    value="${env.JAM_HOME}/jlib"/>
+
+ <path id="classpath.run">
+   <path refid="classpath.build.${ant.project.name}"/>
+   <pathelement location="${jar.project}"/>
+ </path>
+
+ <target name="all">
+   <antcall target="clean"/>
+   <antcall target="lib"/>
+   <antcall target="doc"/>
+   <antcall target="test"/>
+ </target>
+
+ <target name="clean">
+   <delete dir="${dir.build}"/>
+   <delete dir="${dir.lib}"/>
+   <delete dir="${dir.apidoc}"/>
+   <delete>
+     <fileset dir="." defaultexcludes="no">
+       <include name="**/*~"/>
+     </fileset>
+   </delete>
+ </target>
+
+ <target name="init">
+   <mkdir dir="${dir.classes}"/>
+   <mkdir dir="${dir.test}"/>
+   <mkdir dir="${dir.lib}"/>
+   <mkdir dir="${dir.apidoc}"/>
+ </target>
+
+ <target name="compile" depends="init">
+   <javac
+      srcdir="${dir.src}"
+      destdir="${dir.classes}"
+      classpathref="classpath.build.${ant.project.name}"
+      includeAntRuntime="false"
+      debug="true">
+     <compilerarg value="-Xlint:unchecked"/>
+     <compilerarg value="-Xlint:deprecation"/>
+   </javac>
+ </target>
+
+ <target name="jar" depends="compile">
+   <jar destfile="${jar.project}" basedir="${dir.classes}"/>
+ </target>
+
+ <target name="jni-header" depends="compile">
+   <mkdir dir="${dir.jni}"/>
+   <javah class="${javah.class.list}" classpath="${javah.classpath}" outputFile="${javah.header}" verbose="yes"/>
+ </target>
+
+ <target name="jni-shared" depends="compile">
+   <exec executable="make" dir="${dir.jni}">
+     <arg line="shlib"/>
+   </exec>
+ </target>
+
+ <target name="jni-static" depends="compile">
+   <exec executable="make" dir="${dir.jni}">
+     <arg line="lib"/>
+   </exec>
+ </target>
+
+ <target name="jni"/>
+ <!--
+     JNI projects should redefine the jni target as follows:
+
+     <target name="jni">
+       <antcall target="jni-header"/>
+       <antcall target="jni-shared"/>
+       <antcall target="jni-static"/>
+     </target>
+ -->
+
+ <target name="lib">
+   <antcall target="jar"/>
+   <antcall target="jni"/>
+ </target>
+
+ <target name="test" depends="lib">
+   <junit fork="true" printsummary="yes" haltonerror="yes" haltonfailure="yes" threads="8">
+     <assertions>
+       <enable/>
+     </assertions>
+     <sysproperty key="java.library.path" value="${jni.library.path}:${env.LD_LIBRARY_PATH}"/>
+     <sysproperty key="${ant.project.name}.home" value="${basedir}"/>
+     <classpath>
+       <path refid="classpath.run"/>
+     </classpath>
+
+     <formatter type="brief" usefile="false"/>
+
+     <batchtest todir="${dir.test}">
+       <fileset dir="${dir.src}">
+	 <include name="**/junit/*Test.java"/>
+       </fileset>
+     </batchtest>
+   </junit>
+ </target>
+
+ <target name="doc" depends="compile">
+   <javadoc sourcepath="${dir.src}" destdir="${dir.apidoc}" stylesheetfile="${dir.css}/ApacheCommonsMath3.css" linksource="yes">
+     <classpath>
+       <path refid="classpath.run"/>
+     </classpath>
+     <link href="http://docs.oracle.com/javase/8/docs/api"/>
+     <link href="http://google.github.io/guava/releases/21.0/api/docs"/>
+   </javadoc>
+ </target>
+
+ <target name="install" depends="clean, test">
+   <antcall target="install-bin"/>
+   <antcall target="install-conf"/>
+   <antcall target="install-doc"/>
+   <antcall target="install-lib"/>
+   <antcall target="install-header"/>
+ </target>
+
+ <target name="install-bin">
+   <copy todir="${dir.install}" overwrite="false">
+     <filelist dir="." files="build.xml"/>
+   </copy>
+   <copy todir="${dir.install}/${dir.bin}" overwrite="false">
+     <fileset dir="${dir.bin}"/>
+   </copy>
+   <chmod dir="${dir.install}/${dir.bin}" includes="**/*.sh" perm="+x"/>
+ </target>
+
+ <target name="install-conf">
+   <copy todir="${dir.install}/${dir.conf}" overwrite="false">
+     <fileset dir="${dir.conf}"/>
+   </copy>
+ </target>
+
+ <target name="install-doc" depends="doc">
+   <copy todir="${dir.install}/${dir.doc}" overwrite="false">
+     <fileset dir="${dir.doc}"/>
+   </copy>
+ </target>
+
+ <target name="install-lib" depends="jar">
+   <copy todir="${dir.install}/${dir.lib}" overwrite="false">
+     <fileset dir="${dir.lib}"/>
+   </copy>
+ </target>
+
+ <target name="install-header"/>
+
+ <!--
+     JNI projects should redefine the install-header target as follows:
+
+     <target name="install-header" depends="compile">
+       <exec executable="make" dir="${dir.jni}">
+         <arg line="install_hdr"/>
+       </exec>
+     </target>
+
+ -->
+
+ <target name="run" depends="lib">
+   <java classname="${run.classname}" classpathref="classpath.run" fork="true">
+     <sysproperty key="java.library.path" value="${jni.library.path}:${env.LD_LIBRARY_PATH}"/>
+     <sysproperty key="${ant.project.name}.home" value="${basedir}"/>
+     <assertions>
+       <enable/>
+     </assertions>
+   </java>
+ </target>
+
+ <target name="app">
+   <java classname="${app.classname}" classpathref="classpath.run" fork="true">
+     <sysproperty key="java.library.path" value="${jni.library.path}:${env.LD_LIBRARY_PATH}"/>
+     <sysproperty key="${ant.project.name}.home" value="${basedir}"/>
+     <arg line="${app.arg.line}"/>
+   </java>
+ </target>
+</project>
