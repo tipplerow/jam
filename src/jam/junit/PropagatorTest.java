@@ -11,7 +11,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class PropagatorTest {
-    private static final Replicator firstCell = Replicator.founder();
+    private static final Replicator firstCell = Replicator.create();
 
     @Test public void testFirst() {
         assertEquals(0, firstCell.getIndex());
@@ -35,10 +35,10 @@ public class PropagatorTest {
 
     private List<Replicator> createLineage(int size) {
         List<Replicator> lineage = new ArrayList<Replicator>(size);
-        lineage.add(Replicator.founder());
+        lineage.add(Replicator.create());
 
         for (int index = 1; index < size; ++index)
-            lineage.add(lineage.get(index - 1).daughter());
+            lineage.add(lineage.get(index - 1).replicate());
 
         return lineage;
     }

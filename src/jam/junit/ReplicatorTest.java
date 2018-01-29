@@ -10,7 +10,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ReplicatorTest {
-    private static final Replicator FIRST = Replicator.founder();
+    private static final Replicator FIRST = Replicator.create();
 
     @Test public void testFirst() {
         assertEquals(0, FIRST.getIndex());
@@ -19,7 +19,7 @@ public class ReplicatorTest {
     }
 
     @Test public void testDaughter() {
-        Replicator step1 = FIRST.daughter();
+        Replicator step1 = FIRST.replicate();
 
         assertTrue(FIRST.isAlive());
         assertEquals(1, step1.getIndex());
@@ -28,8 +28,8 @@ public class ReplicatorTest {
 
         List<Replicator> step2 = new ArrayList<Replicator>();
 
-        step2.add(FIRST.daughter());
-        step2.add(step1.daughter());
+        step2.add(FIRST.replicate());
+        step2.add(step1.replicate());
 
         assertTrue(FIRST.isAlive());
         assertTrue(step1.isAlive());

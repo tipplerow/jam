@@ -20,16 +20,16 @@ public class Replicator extends Propagator {
      *
      * @return a new founding replicator.
      */
-    public static Replicator founder() {
+    public static Replicator create() {
         return new Replicator(null);
     }
 
     /**
-     * Creates a copy of this replicator.
+     * Creates a (daughter) copy of this replicator.
      *
-     * @return a copy of this replicator.
+     * @return a (daughter) copy of this replicator.
      */
-    public Replicator daughter() {
+    public Replicator replicate() {
         return new Replicator(this);
     }
 
