@@ -4,8 +4,8 @@ package jam.junit;
 import java.util.Arrays;
 import java.util.Set;
 
-import jam.tumor.Mutation;
-import jam.tumor.MutationList;
+import jam.tumor.mutation.Mutation;
+import jam.tumor.mutation.MutationList;
 
 import org.junit.*;
 import static org.junit.Assert.*;

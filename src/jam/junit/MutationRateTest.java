@@ -4,7 +4,7 @@ package jam.junit;
 import com.google.common.collect.Multiset;
 
 import jam.dist.PoissonDistribution;
-import jam.tumor.MutationRate;
+import jam.tumor.mutation.MutationRate;
 import jam.util.MultisetUtil;
 
 import org.junit.*;

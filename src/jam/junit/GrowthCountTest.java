@@ -3,7 +3,7 @@ package jam.junit;
 
 import java.util.Arrays;
 
-import jam.tumor.GrowthCount;
+import jam.tumor.mutation.GrowthCount;
 
 import org.junit.*;
 import static org.junit.Assert.*;

@@ -6,8 +6,8 @@ import java.util.Collection;
 
 import jam.math.DoubleUtil;
 import jam.math.Probability;
-import jam.tumor.GrowthCount;
-import jam.tumor.GrowthRate;
+import jam.tumor.mutation.GrowthCount;
+import jam.tumor.mutation.GrowthRate;
 
 import org.junit.*;
 import static org.junit.Assert.*;
