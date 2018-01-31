@@ -83,6 +83,30 @@ public final class MutationList extends AbstractList<Mutation> {
     }
 
     /**
+     * Evaluates the net effect of the mutations in this list on a
+     * given growth rate.
+     *
+     * <p><b>The current implementation assumes that all mutations
+     * operate independently and thows an exception if any mutations
+     * are synergistic or antagonistic.</b>
+     *
+     * @param rate the original growth rate.
+     *
+     * @return the new growth rate after the effects of all mutations
+     * have been applied; the original rate is unchanged.
+     */
+    public GrowthRate apply(GrowthRate rate) {
+        for (Mutation mutation : list) {
+            if (mutation.isIndependent())
+                rate = mutation.apply(rate);
+            else
+                throw new IllegalStateException("Synergistic or antagonistic mutations are not yet suppported.");
+        }
+
+        return rate;
+    }
+
+    /**
      * Appends new mutations to this list and returns the result in a
      * new mutation list; this list is unchanged.
      *
