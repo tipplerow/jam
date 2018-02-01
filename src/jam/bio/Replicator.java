@@ -4,15 +4,17 @@ package jam.bio;
 import java.util.Arrays;
 import java.util.List;
 
+import jam.lang.OrdinalIndex;
+
 /**
  * Represents a biological entity that lives forever and clones itself
  * (produces one copy of itself) at each time step.
  */
 public class Replicator extends Propagator {
-    private static int instanceCount = 0;
+    private static OrdinalIndex ordinalIndex = OrdinalIndex.create();
 
     private Replicator(Replicator parent) {
-        super(instanceCount++, parent);
+        super(ordinalIndex.next(), parent);
     }
 
     /**

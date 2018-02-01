@@ -4,6 +4,7 @@ package jam.tumor.mutation;
 import java.util.Collection;
 
 import jam.lang.Ordinal;
+import jam.lang.OrdinalIndex;
 
 /**
  * Represents a mutation that alters the growth rate of a propagating
@@ -19,12 +20,7 @@ import jam.lang.Ordinal;
 public abstract class Mutation extends Ordinal {
     private final int creationTime;
 
-    // Number of instances created...
-    private static int instanceCount = 0;
-
-    private static int nextIndex() {
-        return instanceCount++;
-    }
+    private static OrdinalIndex ordinalIndex = OrdinalIndex.create();
 
     /**
      * The single mutation responsible for transformation to malignancy.
@@ -38,7 +34,7 @@ public abstract class Mutation extends Ordinal {
      * the mutation is created).
      */
     protected Mutation(int creationTime) {
-        super(nextIndex());
+        super(ordinalIndex.next());
         this.creationTime = creationTime;
     }
 
