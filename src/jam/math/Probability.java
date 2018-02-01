@@ -30,6 +30,11 @@ public final class Probability extends DomainDouble implements Comparable<Probab
     public static final Probability ONE = valueOf(1.0);
 
     /**
+     * A globally sharable instance representing the probability of one-half.
+     */
+    public static final Probability ONE_HALF = valueOf(0.5);
+
+    /**
      * Creates a new event probability.
      *
      * @param value the probability of the event occurring.
