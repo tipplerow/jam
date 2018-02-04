@@ -1,29 +1,32 @@
 #!/bin/sh
 ########################################################################
-# Usage: jam-run.sh project [-D<name>=<value> ...] class [ARGUMENTS]
+# Usage: jam-run.sh PROJECT_HOME [-D<name>=<value> ...] class [ARGUMENTS]
 ########################################################################
 
 SCRIPT=`basename $0`
 
 if [ $# -lt 2 ]
 then
-    echo "Usage: $SCRIPT project [-D<name>=<value> ...] class [ARGUMENTS]"
+    echo "Usage: $SCRIPT PROJECT_HOME [-D<name>=<value> ...] class [ARGUMENTS]"
     exit 1
 fi
 
-PROJECT_NAME=$1
+if [ -z "${JAM_HOME}" ]
+then
+    echo "Environment variable JAM_HOME must be set; exiting."
+    exit 1
+fi
+
+PROJECT_HOME=$1
 shift
 
-TIPPLEROW_ROOT=$(cd `dirname $0`/../..; pwd)
-export TIPPLEROW_ROOT=$TIPPLEROW_ROOT
+. ${JAM_HOME}/bin/shell.lib
 
-. ${TIPPLEROW_ROOT}/jam/bin/shell.lib
-
-AddLib ${TIPPLEROW_ROOT}/jlib
-AddJar ${TIPPLEROW_ROOT}/jam/lib/jam.jar
-AddJar ${TIPPLEROW_ROOT}/${PROJECT_NAME}/lib/${PROJECT_NAME}.jar
+AddLib ${JAM_HOME}/jlib
+AddLib ${JAM_HOME}/lib
+AddLib ${PROJECT_HOME}/lib
 
 export CLASSPATH=$CLASSPATH
-LOG4J_CONF=${TIPPLEROW_ROOT}/${PROJECT_NAME}/conf/log4j.xml
+LOG4J_CONF=${PROJECT_HOME}/conf/log4j.xml
 
 java -Dlog4j.configurationFile=${LOG4J_CONF} "$@"
