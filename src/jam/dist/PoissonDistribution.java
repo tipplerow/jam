@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.apache.commons.math3.special.Gamma;
 
 import jam.math.DoubleComparator;
+import jam.math.DoubleRange;
 import jam.math.IntRange;
 import jam.math.JamRandom;
 
@@ -23,6 +24,11 @@ public abstract class PoissonDistribution extends AbstractDiscreteDistribution {
     private static final double NORMAL_MEAN_LIMIT = 50.0;
 
     /**
+     * The range of valid mean values.
+     */
+    public static final DoubleRange MEAN_RANGE = DoubleRange.POSITIVE;
+
+    /**
      * Creates a discrete Poisson distribution.
      *
      * @param mean the mean of the distribution.
@@ -30,7 +36,7 @@ public abstract class PoissonDistribution extends AbstractDiscreteDistribution {
      * @throws IllegalArgumentException unless the mean is positive.
      */
     protected PoissonDistribution(double mean) {
-        validateMean(mean);
+        MEAN_RANGE.validate("Mean", mean);
         this.mean = mean;
     }
 
