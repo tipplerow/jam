@@ -1,9 +1,13 @@
 
 package jam.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.function.ToDoubleFunction;
+
+import jam.math.JamRandom;
 
 /**
  * Provides utility methods operating on collections.
@@ -131,6 +135,42 @@ public final class CollectionUtil {
      */
     public static <V> double min(Collection<V> collection, ToDoubleFunction<? super V> mapper) {
         return collection.stream().mapToDouble(mapper).min().orElse(Double.NaN);
+    }
+
+    /**
+     * Selects a random sample <em>with replacement</em> from a
+     * collection.
+     *
+     * <p>Since the sampling is done with replacement, items may be
+     * selected more than once: the result may contain duplicates.
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param collection the collection to sample from.
+     *
+     * @param count the number of items to select (which may be
+     * greater than the collection size).
+     *
+     * @param random the random number source.
+     *
+     * @return a new random-access list containing the sampled items;
+     * the may contain duplicate items.
+     *
+     * @throws IllegalArgumentException if the sample count is
+     * negative.
+     */
+    public static <V> List<V> sample(Collection<V> collection, int count, JamRandom random) {
+        //
+        // Copy the collection into a random-access list for efficient
+        // indexing...
+        //
+        List<V> pooled  = new ArrayList<V>(collection);
+        List<V> sampled = new ArrayList<V>(count);
+
+        for (int index = 0; index < count; ++index)
+            sampled.add(ListUtil.select(pooled, random));
+
+        return sampled;
     }
 
     /**

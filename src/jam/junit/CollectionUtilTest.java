@@ -4,12 +4,15 @@ package jam.junit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import jam.util.CollectionUtil;
+import jam.util.MultisetUtil;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -81,6 +84,17 @@ public class CollectionUtilTest extends NumericTestBase {
         assertDouble(3.0, CollectionUtil.min(Arrays.asList("abc"), s -> s.length()));
         assertDouble(2.0, CollectionUtil.min(Arrays.asList("abc", "de"), s -> s.length()));
         assertDouble(1.0, CollectionUtil.min(Arrays.asList("abc", "de", "f", "ghijk"), s -> s.length()));
+    }
+
+    @Test public void testSample() {
+        Set<String>  strings = new HashSet<String>(Arrays.asList("A", "B", "C", "D", "E"));
+        List<String> sampled = CollectionUtil.sample(strings, 100000, random());
+
+        Multiset<String> counts = HashMultiset.create();
+        counts.addAll(sampled);
+
+        for (String s : strings)
+            assertEquals(0.20, MultisetUtil.frequency(counts, s), 0.002);
     }
 
     @Test public void testSum() {
