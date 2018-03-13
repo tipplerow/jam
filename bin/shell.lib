@@ -22,6 +22,17 @@ AddLib()
     done
 }
 
+AssertIdentical()
+{
+    cmp $1 $2 > /dev/null
+
+    if [ $? -ne 0 ]
+    then
+        echo "ASSERTION ERROR: $1 and $2 differ; exiting."
+        exit 1
+    fi
+}
+
 RequireFile()
 {
     if [ ! -f "$1" ]
