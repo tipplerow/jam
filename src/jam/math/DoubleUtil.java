@@ -60,6 +60,19 @@ public final class DoubleUtil {
     }
 
     /**
+     * Identifies floating-point values that are round (integral)
+     * values.
+     *
+     * @param x the number to examine.
+     *
+     * @return {@code true} iff the input value is a round (integral)
+     * number.
+     */
+    public static boolean isRound(double x) {
+        return DoubleComparator.DEFAULT.EQ(x, round(x, 0));
+    }
+
+    /**
      * Computes the logarithm with an arbitrary base.
      *
      * @param x the value to take the logarithm of.

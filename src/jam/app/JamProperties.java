@@ -9,6 +9,8 @@ import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.math.DoubleRange;
 import jam.math.IntRange;
+import jam.math.LongRange;
+import jam.math.LongUtil;
 import jam.util.EnumUtil;
 import jam.util.RegexUtil;
 import jam.util.StringUtil;
@@ -174,6 +176,45 @@ public final class JamProperties {
     }
 
     /**
+     * Returns a required system property converted to a long value.
+     *
+     * @param propertyName the name of the system property.
+     *
+     * @return the long value of the system property.
+     *
+     * @throws RuntimeException unless the system property is defined
+     * and is formatted as a proper long value.
+     */
+    public static long getRequiredLong(String propertyName) {
+	return LongUtil.parseLong(getRequired(propertyName));
+    }
+
+    /**
+     * Validates and returns a required system property converted to a
+     * long value.
+     *
+     * @param propertyName the name of the system property.
+     *
+     * @param validRange the valid range of property values.
+     *
+     * @return the long value of the system property.
+     *
+     * @throws RuntimeException unless the system property is defined
+     * and is formatted as a proper long value in the given range.
+     */
+    public static long getRequiredLong(String propertyName, LongRange validRange) {
+	return validate(propertyName, validRange, getRequiredLong(propertyName));
+    }
+
+    private static long validate(String propertyName, LongRange validRange, long value) {
+        if (!validRange.contains(value))
+            throw JamException.runtime("Property [%s = %d] is outside the valid range %s", 
+                                       propertyName, value, validRange.format());
+
+        return value;
+    }
+
+    /**
      * Returns an optional system property.
      *
      * @param propertyName the name of the system property.
@@ -297,6 +338,41 @@ public final class JamProperties {
      */
     public static int getOptionalInt(String propertyName, IntRange validRange, int defaultValue) {
 	return validate(propertyName, validRange, getOptionalInt(propertyName, defaultValue));
+    }
+
+    /**
+     * Returns an optional system property converted to a long value.
+     *
+     * @param propertyName the name of the system property.
+     *
+     * @param defaultValue the default value to assign if the system
+     * property has not been set.
+     *
+     * @return the long value of the system property, if it is set,
+     * or the default value otherwise.
+     */
+    public static long getOptionalLong(String propertyName, long defaultValue) {
+	return isSet(propertyName) ? getRequiredLong(propertyName) : defaultValue;
+    }
+
+    /**
+     * Returns an optional system property converted to a long value.
+     *
+     * @param propertyName the name of the system property.
+     *
+     * @param validRange the valid range of property values.
+     *
+     * @param defaultValue the default value to assign if the system
+     * property has not been set.
+     *
+     * @return the long value of the system property, if it is set,
+     * or the default value otherwise.
+     *
+     * @throws RuntimeException unless the value lies in the given
+     * range.
+     */
+    public static long getOptionalLong(String propertyName, LongRange validRange, long defaultValue) {
+	return validate(propertyName, validRange, getOptionalLong(propertyName, defaultValue));
     }
 
     /**
