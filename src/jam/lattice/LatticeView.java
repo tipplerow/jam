@@ -180,6 +180,16 @@ public interface LatticeView<T> {
     }
 
     /**
+     * Identifies empty latticess.
+     *
+     * @return {@code true} iff there are no occupants on this
+     * lattice.
+     */
+    public default boolean isEmpty() {
+        return countOccupants() == 0;
+    }
+
+    /**
      * Identifies empty lattice sites.
      *
      * @param coord the absolute coordinate of the site to examine.

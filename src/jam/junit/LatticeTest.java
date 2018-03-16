@@ -36,12 +36,16 @@ public class LatticeTest {
         Coord center = Coord.at(8, 8, 8);
         List<Coord> neighbors = neighborhood.getNeighbors(center);
 
+        assertTrue(lattice.isEmpty());
         lattice.occupy("A", neighbors.get(0));
+        assertFalse(lattice.isEmpty());
+
         lattice.occupy("B", neighbors.get(1));
         lattice.occupy("C", neighbors.get(1));
         lattice.occupy("D", neighbors.get(2));
         lattice.occupy("E", neighbors.get(2));
         lattice.occupy("F", neighbors.get(2));
+
 
         Map<Coord, Integer> occupants = lattice.countOccupants(center, neighborhood);
         assertEquals(neighborhood.size(), occupants.size());
@@ -90,10 +94,12 @@ public class LatticeTest {
         //
         // The input lattice should be empty...
         //
+        assertTrue(lattice.isEmpty());
         assertEquals(0, lattice.countOccupants());
 
         String center = "CENTER";
         lattice.occupy(center, Coord.at(10, 15, 20));
+        assertFalse(lattice.isEmpty());
 
         assertEquals(26, lattice.countAvailable(center, Neighborhood.MOORE));
         assertEquals(6, lattice.countAvailable(center, Neighborhood.VON_NEUMANN));
