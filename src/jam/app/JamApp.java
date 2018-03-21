@@ -3,9 +3,12 @@ package jam.app;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Map;
+import java.util.TreeMap;
 
 import jam.io.FileUtil;
 import jam.io.IOUtil;
+import jam.lang.JamException;
 
 /**
  * Provides a common framework for all applications that read system
@@ -14,6 +17,7 @@ import jam.io.IOUtil;
 public abstract class JamApp {
     private final String[] propertyFiles;
     private final File reportDir;
+    private final Map<String, PrintWriter> writerMap = new TreeMap<String, PrintWriter>();
 
     /**
      * Name of the system property which specifies the directory in
@@ -81,13 +85,33 @@ public abstract class JamApp {
     /**
      * Opens a writer for a file located in the report directory.
      *
+     * <p>This class maintains a map of all print writers created by
+     * this method (indexed by base name) and will close all writers
+     * when the {@code closeWriters()} method is called.
+     *
      * @param baseName the base name for the report file.
      *
      * @return a writer for the specified file.
      *
-     * @throws RuntimeException unless the file is open for writing.
+     * @throws RuntimeException unless the base name is unique and the
+     * file is open for writing.
      */
     public PrintWriter openWriter(String baseName) {
-        return IOUtil.openWriter(getReportFile(baseName), false);
+        if (writerMap.containsKey(baseName))
+            throw JamException.runtime("Duplicate base name: [%s]", baseName);
+
+        PrintWriter writer = IOUtil.openWriter(getReportFile(baseName), false);
+        writerMap.put(baseName, writer);
+
+        return writer;
+    }
+
+    /**
+     * Closes all writers that were created by the {@code openWriter}
+     * method.
+     */
+    public void closeWriters() {
+        for (PrintWriter writer : writerMap.values())
+            IOUtil.close(writer);
     }
 }
