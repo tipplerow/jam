@@ -80,6 +80,15 @@ public class ListUtilTest {
 
         for (int k = 0; k < N; k++)
             assertTrue(expected - tolerance < count[k] && count[k] < expected + tolerance);
+
+        list = List.of(123);
+        assertEquals(Integer.valueOf(123), ListUtil.select(list, random));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSelectEmpty() {
+        List<Integer> list = new ArrayList<Integer>();
+        ListUtil.select(list, random);
     }
 
     @Test public void testShuffle() {

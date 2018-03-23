@@ -156,8 +156,16 @@ public final class ListUtil {
      * @param random the random number source.
      *
      * @return an element selected at random.
+     *
+     * @throws IllegalArgumentException if the list is empty.
      */
     public static <V> V select(List<V> list, JamRandom random) {
+        if (list.isEmpty())
+            throw new IllegalArgumentException("Empty list.");
+
+        if (list.size() == 1)
+            return list.get(0);
+        
         return list.get(random.nextInt(list.size()));
     }
     
