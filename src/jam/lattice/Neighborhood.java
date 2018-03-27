@@ -4,6 +4,7 @@ package jam.lattice;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.math.JamRandom;
 import jam.util.ListUtil;
 import jam.util.ListView;
 
@@ -88,15 +89,6 @@ public enum Neighborhood {
     public abstract ListView<Coord> viewBasis();
 
     /**
-     * Returns the number of sites in this neighborhood.
-     *
-     * @return the number of sites in this neighborhood.
-     */
-    public int size() {
-        return viewBasis().size();
-    }
-
-    /**
      * Generates a list of neighbors surrounding a central coordinate.
      *
      * @param center the central coordinate.
@@ -110,5 +102,41 @@ public enum Neighborhood {
             neighbors.add(center.plus(basis));
 
         return neighbors;
+    }
+
+    /**
+     * Selects one of the basis vectors in this neighborhood at
+     * random, with each basis vector being equally likely.
+     *
+     * @param source a random number generator.
+     *
+     * @return a basis vector selected at random.
+     */
+    public Coord randomBasisVector(JamRandom source) {
+        return ListUtil.select(viewBasis(), source);
+    }
+
+    /**
+     * Selects a neighboring coordinate at random, with each neighbor
+     * being equally likely.
+     *
+     * @param center the central coordinate in the neighborhood.
+     *
+     * @param source a random number generator.
+     *
+     * @return a neighboring coordinate selected at random; the
+     * central coordinate is unchanged.
+     */
+    public Coord randomNeighbor(Coord center, JamRandom source) {
+        return center.plus(randomBasisVector(source));
+    }
+
+    /**
+     * Returns the number of sites in this neighborhood.
+     *
+     * @return the number of sites in this neighborhood.
+     */
+    public int size() {
+        return viewBasis().size();
     }
 }
