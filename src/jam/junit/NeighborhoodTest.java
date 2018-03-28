@@ -3,13 +3,17 @@ package jam.junit;
 
 import java.util.List;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+
 import jam.lattice.Coord;
 import jam.lattice.Neighborhood;
+import jam.util.MultisetUtil;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class NeighborhoodTest {
+public class NeighborhoodTest extends NumericTestBase {
     @Test public void testMoore() {
         assertEquals(26, Neighborhood.MOORE.size());
         assertEquals(26, Neighborhood.MOORE.viewBasis().size());
@@ -51,6 +55,16 @@ public class NeighborhoodTest {
         assertTrue(neighbors.contains(Coord.at(0, 3, 4)));
         assertTrue(neighbors.contains(Coord.at(1, 3, 4)));
         assertTrue(neighbors.contains(Coord.at(2, 3, 4)));
+    }
+
+    @Test public void testRandom() {
+        Multiset<Coord> coords = HashMultiset.create();
+
+        for (int trial = 0; trial < 1000000; ++trial)
+            coords.add(Neighborhood.MOORE.randomBasisVector(random()));
+
+        for (Coord coord : Neighborhood.MOORE.viewBasis())
+            assertEquals(1.0 / 26.0, MultisetUtil.frequency(coords, coord), 0.001);
     }
 
     @Test public void testVonNeumann() {
