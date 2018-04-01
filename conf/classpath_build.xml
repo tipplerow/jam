@@ -11,5 +11,6 @@
       <include name="junit/junit-4.11.jar"/>
       <include name="junit/hamcrest-core-1.3.jar"/>
     </fileset>
+    <fileset file="${dir.jlib}/../../fastutil/fastutil-8.1.1.jar"/>
   </path>
 </project>
