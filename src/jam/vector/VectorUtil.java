@@ -107,6 +107,39 @@ public final class VectorUtil {
     }
 
     /**
+     * Creates an equally-spaced sequence between two end points.
+     *
+     * @param first the first point in the sequence.
+     *
+     * @param last the last point in the sequence.
+     *
+     * @param steps the number of points in the sequence.
+     *
+     * @return an array of length {@code N} with element {@code k}
+     * equal to {@code first + k * (last - first) / (steps - 1)}.
+     *
+     * @throws IllegalArgumentException if the number of steps is less
+     * than two.
+     */
+    public static double[] sequence(double first, double last, int steps) {
+        if (steps < 2)
+            throw new IllegalArgumentException("At least two steps are required.");
+
+        double step  = first;
+        double width = (last - first) / (steps - 1);
+
+        double[] result = new double[steps];
+        result[0] = step;
+
+        for (int k = 1; k < steps; ++k) {
+            step += width;
+            result[k] = step;
+        }
+
+        return result;
+    }
+
+    /**
      * Converts one or more floating-point values into an array.
      *
      * @param first the first (required) value.
