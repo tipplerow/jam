@@ -77,6 +77,27 @@ public class VectorUtilTest extends NumericTestBase {
 	VectorUtil.create(-1, -1.1);
     }
 
+    @Test public void testSequence() {
+        double[] sequence = VectorUtil.sequence(1.0, 3.0, 5);
+
+        assertEquals(5, sequence.length);
+        assertDouble(1.0, sequence[0]);
+        assertDouble(1.5, sequence[1]);
+        assertDouble(2.0, sequence[2]);
+        assertDouble(2.5, sequence[3]);
+        assertDouble(3.0, sequence[4]);
+    }
+
+    @Test public void testSequenceLog() {
+        double[] sequence = VectorUtil.sequenceLog(0.01, 10.0, 4);
+
+        assertEquals(4, sequence.length);
+        assertDouble( 0.01, sequence[0]);
+        assertDouble( 0.1,  sequence[1]);
+        assertDouble( 1.0,  sequence[2]);
+        assertDouble(10.0,  sequence[3]);
+    }
+
     @Test public void testListToArray() {
         ArrayList<Double> arrayList = new ArrayList<Double>();
         LinkedList<Double> linkedList = new LinkedList<Double>();

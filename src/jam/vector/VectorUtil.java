@@ -115,7 +115,7 @@ public final class VectorUtil {
      *
      * @param steps the number of points in the sequence.
      *
-     * @return an array of length {@code N} with element {@code k}
+     * @return an array of length {@code steps} with element {@code k}
      * equal to {@code first + k * (last - first) / (steps - 1)}.
      *
      * @throws IllegalArgumentException if the number of steps is less
@@ -135,6 +135,35 @@ public final class VectorUtil {
             step += width;
             result[k] = step;
         }
+
+        return result;
+    }
+
+    /**
+     * Creates a sequence where the <em>logarithms</em> of the points
+     * are equally spaced.
+     *
+     * @param first the first point in the sequence.
+     *
+     * @param last the last point in the sequence.
+     *
+     * @param steps the number of points in the sequence.
+     *
+     * @return an array of length {@code steps} with elements
+     * logarithmically spaced between the first and last values.
+     *
+     * @throws IllegalArgumentException unless the end points are
+     * positive and the number of steps is greater than one.
+     */
+    public static double[] sequenceLog(double first, double last, int steps) {
+        if (!DoubleComparator.DEFAULT.isPositive(first)
+            || !DoubleComparator.DEFAULT.isPositive(last))
+            throw new IllegalArgumentException("End points must be positive.");
+
+        double[] result = sequence(Math.log(first), Math.log(last), steps);
+
+        for (int k = 0; k < result.length; ++k)
+            result[k] = Math.exp(result[k]);
 
         return result;
     }
