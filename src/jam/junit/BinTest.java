@@ -27,6 +27,22 @@ public class BinTest extends NumericTestBase {
         assertEquals(DoubleRange.closed(    2.5, 3.0), bins.get(3).getRange());
     }
 
+    @Test public void testSpanLog() {
+        List<Bin> bins = Bin.spanLog(0.01, 10.0, 3);
+
+        assertEquals(3, bins.size());
+
+        for (Bin bin : bins)
+            assertEquals(0, bin.getCount());
+
+        for (Bin bin : bins)
+            assertFalse(bin.isFrozen());
+
+        assertEquals(DoubleRange.leftClosed(0.01, 0.1), bins.get(0).getRange());
+        assertEquals(DoubleRange.leftClosed(0.1,  1.0), bins.get(1).getRange());
+        assertEquals(DoubleRange.closed(    1.0, 10.0), bins.get(2).getRange());
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.BinTest");
     }

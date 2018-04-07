@@ -199,6 +199,16 @@ public final class DoubleRange {
         if (upperBound < lowerBound)
             throw new IllegalArgumentException("Inconsistent interval bounds.");
     }
+
+    @Override public boolean equals(Object that) {
+        return (that instanceof DoubleRange) && equalsRange((DoubleRange) that);
+    }
+
+    private boolean equalsRange(DoubleRange that) {
+        return this.rangeType.equals(that.rangeType)
+            && DoubleComparator.DEFAULT.EQ(this.lowerBound, that.lowerBound)
+            && DoubleComparator.DEFAULT.EQ(this.upperBound, that.upperBound);
+    }
     
     @Override public String toString() {
         return "DoubleRange(" + format() + ")";
