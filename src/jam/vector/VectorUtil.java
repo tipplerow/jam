@@ -26,7 +26,7 @@ public final class VectorUtil {
      * {@code k == -1}; (2) if {@code target < array[N - 1]} (where
      * {@code N} is the array length), then {@code array[k] <= target
      * && target < array[k + 1]}; (3) if {@code target == array[N - 1]},
-     * then {@code k == N - 1}; and (4) if {@code target > array[N - 1},
+     * then {@code k == N - 1}; and (4) if {@code target > array[N - 1]},
      * then {@code k == N}.
      */
     public static int bracket(double[] array, double target) {

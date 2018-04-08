@@ -2,6 +2,7 @@
 package jam.hist;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import jam.math.DoubleRange;
@@ -106,7 +107,7 @@ public final class Bin {
      *
      * @param upper the upper bound of the range to span.
      *
-     * @param nbin the number of equally-sized bins to create.
+     * @param nbin the number of bins to create.
      *
      * @return a list containing the empty bins arranged in ascending
      * order.
@@ -142,6 +143,22 @@ public final class Bin {
     }
 
     /**
+     * Computes the total number of counts in a collection of bins.
+     *
+     * @param bins the bins to aggregate.
+     *
+     * @return the total number of counts in the collection of bins.
+     */
+    public static long computeTotalCount(Collection<Bin> bins) {
+        long total = 0;
+
+        for (Bin bin : bins)
+            total += bin.count;
+
+        return total;
+    }
+
+    /**
      * Add one count to this bin.
      *
      * @throws IllegalStateException if this bin has been frozen.
@@ -155,6 +172,17 @@ public final class Bin {
      */
     public void freeze() {
         frozen = true;
+    }
+
+    /**
+     * Freezes a collection of bins: forbids further modification of
+     * the counts.
+     *
+     * @param bins the bins to freeze.
+     */
+    public static void freeze(Collection<Bin> bins) {
+        for (Bin bin : bins)
+            bin.freeze();
     }
 
     /**
