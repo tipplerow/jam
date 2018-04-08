@@ -47,6 +47,35 @@ public final class Bin {
     }
 
     /**
+     * Creates a contiguous sequence of bins with fixed breakpoints.
+     *
+     * @param brkpts the breakpoints for the bins, in ascending order.
+     *
+     * @return a list containing {@code brkpts.length - 1} bins, 
+     * with bin {@code k} having bounds {@code brkpts[k]} and 
+     * {@code brkpts[k + 1]}.
+     *
+     * @throws IllegalArgumentException unless two or more breakpoints
+     * are given in ascending order.
+     */
+    public static List<Bin> create(double... brkpts) {
+        int nbin = brkpts.length - 1;
+
+        if (nbin < 1)
+            throw new IllegalArgumentException("At least one bin is required.");
+
+        List<Bin> bins = new ArrayList<Bin>(nbin);
+
+        // All bins but the last are half-open (left-closed)...
+        for (int k = 0; k < nbin - 1; ++k)
+            bins.add(new Bin(DoubleRange.leftClosed(brkpts[k], brkpts[k + 1])));
+
+        // The final bin is fully closed...
+        bins.add(new Bin(DoubleRange.closed(brkpts[nbin - 1], brkpts[nbin])));
+        return bins;
+    }
+
+    /**
      * Creates a sequence of empty, equally-sized bins that span a
      * specified floating-point range.
      *
@@ -60,13 +89,13 @@ public final class Bin {
      * arranged in ascending order.
      *
      * @throws IllegalArgumentException unless the input range has
-     * finite size and the number of bins is greater than one.
+     * finite size and the number of bins is positive.
      */
     public static List<Bin> span(double lower, double upper, int nbin) {
         if (upper <= lower)
             throw new IllegalArgumentException("Invalid range.");
 
-        return span(VectorUtil.sequence(lower, upper, nbin + 1));
+        return create(VectorUtil.sequence(lower, upper, nbin + 1));
     }
 
     /**
@@ -84,30 +113,13 @@ public final class Bin {
      *
      * @throws IllegalArgumentException unless the input range has
      * finite size, is strictly positive, and the number of bins is
-     * greater than one.
+     * positive.
      */
     public static List<Bin> spanLog(double lower, double upper, int nbin) {
         if (upper <= lower)
             throw new IllegalArgumentException("Invalid range.");
 
-        return span(VectorUtil.sequenceLog(lower, upper, nbin + 1));
-    }
-
-    private static List<Bin> span(double[] brkpts) {
-        int nbin = brkpts.length - 1;
-        
-        if (nbin < 2)
-            throw new IllegalArgumentException("Two or more bins are required.");
-
-        List<Bin> bins = new ArrayList<Bin>(nbin);
-
-        // All bins but the last are half-open (left-closed)...
-        for (int k = 0; k < nbin - 1; ++k)
-            bins.add(new Bin(DoubleRange.leftClosed(brkpts[k], brkpts[k + 1])));
-
-        // The final bin is fully closed...
-        bins.add(new Bin(DoubleRange.closed(brkpts[nbin - 1], brkpts[nbin])));
-        return bins;
+        return create(VectorUtil.sequenceLog(lower, upper, nbin + 1));
     }
 
     /**
