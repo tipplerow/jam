@@ -2,13 +2,23 @@
 package jam.math;
 
 /**
- * Represents a point in a two-dimensional space.
+ * Represents an immutable point in a two-dimensional space.
  */
 public final class Point2 {
-    private final double x;
-    private final double y;
+    /** The immutable x-coordinate. */
+    public final double x;
 
-    private Point2(double x, double y) {
+    /** The immutable y-coordinate. */
+    public final double y;
+
+    /**
+     * Creates a new two-dimensional point at a fixed location.
+     *
+     * @param x the x-coordinate.
+     *
+     * @param y the y-coordinate.
+     */
+    public Point2(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -24,24 +34,6 @@ public final class Point2 {
      */
     public static Point2 at(double x, double y) {
         return new Point2(x, y);
-    }
-
-    /**
-     * Returns the x-coordinate of this point.
-     *
-     * @return the x-coordinate of this point.
-     */
-    public double x() {
-        return x;
-    }
-
-    /**
-     * Returns the y-coordinate of this point.
-     *
-     * @return the y-coordinate of this point.
-     */
-    public double y() {
-        return y;
     }
 
     @Override public boolean equals(Object that) {

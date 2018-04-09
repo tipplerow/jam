@@ -18,11 +18,11 @@ public class Point2Test extends NumericTestBase {
     }
 
     @Test public void testXY() {
-        assertDouble(0.0, p1a.x());
-        assertDouble(1.0, p1a.y());
+        assertDouble(0.0, p1a.x);
+        assertDouble(1.0, p1a.y);
 
-        assertDouble(1.0, p2.x());
-        assertDouble(0.0, p2.y());
+        assertDouble(1.0, p2.x);
+        assertDouble(0.0, p2.y);
     }
 
     public static void main(String[] args) {

@@ -58,9 +58,9 @@ public final class Line2 {
      */
     public static Point2 computeReferencePoint(Point2 point, double slope) {
         if (isVertical(slope))
-            return Point2.at(point.x(), 0.0);
+            return Point2.at(point.x, 0.0);
         else
-            return Point2.at(0.0, point.y() - slope * point.x());
+            return Point2.at(0.0, point.y - slope * point.x);
     }
 
     private static boolean isVertical(double slope) {
@@ -83,11 +83,11 @@ public final class Line2 {
         if (pointA.equals(pointB))
             throw new IllegalArgumentException("Identical points.");
 
-        double xa = pointA.x();
-        double xb = pointB.x();
+        double xa = pointA.x;
+        double xb = pointB.x;
 
-        double ya = pointA.y();
-        double yb = pointB.y();
+        double ya = pointA.y;
+        double yb = pointB.y;
 
         if (DoubleComparator.DEFAULT.EQ(xa, xb))
             return Double.POSITIVE_INFINITY;
@@ -142,7 +142,7 @@ public final class Line2 {
      * @return {@code true} iff the given point lies on this line.
      */
     public boolean contains(Point2 pt) {
-        return contains(pt.x(), pt.y());
+        return contains(pt.x, pt.y);
     }
     
     /**
@@ -156,7 +156,7 @@ public final class Line2 {
      */
     public boolean contains(double x, double y) {
         if (isVertical())
-            return DoubleComparator.DEFAULT.EQ(x, this.point.x());
+            return DoubleComparator.DEFAULT.EQ(x, this.point.x);
         else
             return DoubleComparator.DEFAULT.EQ(y, this.getY(x));
     }
@@ -191,7 +191,7 @@ public final class Line2 {
         if (isHorizontal())
             return Double.NaN;
         else
-            return point.x() + (y - point.y()) / slope;
+            return point.x + (y - point.y) / slope;
     }
 
     /**
@@ -206,7 +206,7 @@ public final class Line2 {
         if (isVertical())
             return Double.NaN;
         else
-            return point.y() + slope * (x - point.x());
+            return point.y + slope * (x - point.x);
     }
 
     /**
@@ -240,11 +240,11 @@ public final class Line2 {
 
     @Override public String toString() {
         if (isVertical())
-            return "x = " + point.x();
+            return "x = " + point.x;
         else if (isHorizontal())
-            return "y = " + point.y();
+            return "y = " + point.y;
         else
-            return "y = " + point.y() + formatSlope() + " * x";
+            return "y = " + point.y + formatSlope() + " * x";
     }
 
     private String formatSlope() {
