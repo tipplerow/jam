@@ -1,34 +1,34 @@
 
 package jam.junit;
 
-import jam.math.Line2;
-import jam.math.Point2;
+import jam.math.Line2D;
+import jam.math.Point2D;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class Line2Test extends NumericTestBase {
+public class Line2DTest extends NumericTestBase {
     // Lines with y = 1 + 0.5 * x...
-    private static final Line2 line1 = new Line2(Point2.at(5.0, 3.5), 0.5);
-    private static final Line2 line2 = Line2.through(Point2.at(-6.0, -2.0), Point2.at(8.0, 5.0));
+    private static final Line2D line1 = new Line2D(Point2D.at(5.0, 3.5), 0.5);
+    private static final Line2D line2 = Line2D.through(Point2D.at(-6.0, -2.0), Point2D.at(8.0, 5.0));
 
     // Lines with y = 4 - 2 * x...
-    private static final Line2 line3 = new Line2(Point2.at(3.0, -2.0), -2.0);
-    private static final Line2 line4 = Line2.through(Point2.at(-1.0, 6.0), Point2.at(5.0, -6.0));
+    private static final Line2D line3 = new Line2D(Point2D.at(3.0, -2.0), -2.0);
+    private static final Line2D line4 = Line2D.through(Point2D.at(-1.0, 6.0), Point2D.at(5.0, -6.0));
 
     // Horizontal lines at y = 3...
-    private static final Line2 h1 = Line2.through(Point2.at(1.0, 3.0), Point2.at(-2.0, 3.0));
-    private static final Line2 h2 = Line2.horizontal(3.0);
+    private static final Line2D h1 = Line2D.through(Point2D.at(1.0, 3.0), Point2D.at(-2.0, 3.0));
+    private static final Line2D h2 = Line2D.horizontal(3.0);
 
     // Horizontal line at y = 4...
-    private static final Line2 h3 = Line2.horizontal(4.0);
+    private static final Line2D h3 = Line2D.horizontal(4.0);
 
     // Vertical lines at x = 1...
-    private static final Line2 v1 = Line2.through(Point2.at(1.0, 3.0), Point2.at(1.0, -2.0));
-    private static final Line2 v2 = Line2.vertical(1.0);
+    private static final Line2D v1 = Line2D.through(Point2D.at(1.0, 3.0), Point2D.at(1.0, -2.0));
+    private static final Line2D v2 = Line2D.vertical(1.0);
 
     // Vertical line at x = 4...
-    private static final Line2 v3 = Line2.vertical(4.0);
+    private static final Line2D v3 = Line2D.vertical(4.0);
 
     @Test public void testContains() {
         assertTrue(line1.contains(0.0, 1.0));
@@ -82,14 +82,14 @@ public class Line2Test extends NumericTestBase {
     }
 
     @Test public void testGetPoint() {
-        assertEquals(Point2.at(0.0, 1.0), line1.getPoint());
-        assertEquals(Point2.at(0.0, 4.0), line3.getPoint());
+        assertEquals(Point2D.at(0.0, 1.0), line1.getPoint());
+        assertEquals(Point2D.at(0.0, 4.0), line3.getPoint());
 
-        assertEquals(Point2.at(0.0, 3.0), h1.getPoint());
-        assertEquals(Point2.at(0.0, 4.0), h3.getPoint());
+        assertEquals(Point2D.at(0.0, 3.0), h1.getPoint());
+        assertEquals(Point2D.at(0.0, 4.0), h3.getPoint());
 
-        assertEquals(Point2.at(1.0, 0.0), v1.getPoint());
-        assertEquals(Point2.at(4.0, 0.0), v3.getPoint());
+        assertEquals(Point2D.at(1.0, 0.0), v1.getPoint());
+        assertEquals(Point2D.at(4.0, 0.0), v3.getPoint());
     }
 
     @Test public void testGetSlope() {
@@ -127,29 +127,29 @@ public class Line2Test extends NumericTestBase {
     }
 
     @Test public void testInterpolate() {
-        Point2 p1 = Point2.at(-1.0, 1.0);
-        Point2 p2 = Point2.at( 5.0, 1.0);
-        Point2 p3 = Point2.at( 5.0, 4.0);
+        Point2D p1 = Point2D.at(-1.0, 1.0);
+        Point2D p2 = Point2D.at( 5.0, 1.0);
+        Point2D p3 = Point2D.at( 5.0, 4.0);
 
-        assertDouble(1.0, Line2.interpolate(p1, p2, -2.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2, -1.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2,  0.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2,  1.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2,  2.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2,  3.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2,  4.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2,  5.0));
-        assertDouble(1.0, Line2.interpolate(p1, p2,  6.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2, -2.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2, -1.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2,  0.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2,  1.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2,  2.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2,  3.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2,  4.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2,  5.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p2,  6.0));
 
-        assertDouble(0.5, Line2.interpolate(p1, p3, -2.0));
-        assertDouble(1.0, Line2.interpolate(p1, p3, -1.0));
-        assertDouble(1.5, Line2.interpolate(p1, p3,  0.0));
-        assertDouble(2.0, Line2.interpolate(p1, p3,  1.0));
-        assertDouble(2.5, Line2.interpolate(p1, p3,  2.0));
-        assertDouble(3.0, Line2.interpolate(p1, p3,  3.0));
-        assertDouble(3.5, Line2.interpolate(p1, p3,  4.0));
-        assertDouble(4.0, Line2.interpolate(p1, p3,  5.0));
-        assertDouble(4.5, Line2.interpolate(p1, p3,  6.0));
+        assertDouble(0.5, Line2D.interpolate(p1, p3, -2.0));
+        assertDouble(1.0, Line2D.interpolate(p1, p3, -1.0));
+        assertDouble(1.5, Line2D.interpolate(p1, p3,  0.0));
+        assertDouble(2.0, Line2D.interpolate(p1, p3,  1.0));
+        assertDouble(2.5, Line2D.interpolate(p1, p3,  2.0));
+        assertDouble(3.0, Line2D.interpolate(p1, p3,  3.0));
+        assertDouble(3.5, Line2D.interpolate(p1, p3,  4.0));
+        assertDouble(4.0, Line2D.interpolate(p1, p3,  5.0));
+        assertDouble(4.5, Line2D.interpolate(p1, p3,  6.0));
     }
 
     @Test public void testIsHorizontal() {
@@ -175,6 +175,6 @@ public class Line2Test extends NumericTestBase {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.junit.Line2Test");
+        org.junit.runner.JUnitCore.main("jam.junit.Line2DTest");
     }
 }

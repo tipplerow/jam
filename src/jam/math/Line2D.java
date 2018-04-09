@@ -8,13 +8,13 @@ package jam.math;
  * For vertical lines, the reference point is the x-intercept.  For
  * all other lines, the reference point is the y-intercept.
  */
-public final class Line2 {
+public final class Line2D {
     //
     // The reference point is (x-intercept, 0) for vertical lines, 
     // (0, y-intercept) for all others...
     //
-    private final Point2 point;
-    private final double slope;
+    private final Point2D point;
+    private final double  slope;
 
     /**
      * Creates a new line from a point and a slope.
@@ -23,7 +23,7 @@ public final class Line2 {
      *
      * @param slope the slope of the line.
      */
-    public Line2(Point2 point, double slope) {
+    public Line2D(Point2D point, double slope) {
         this.point = computeReferencePoint(point, slope);
         this.slope = slope;
     }
@@ -39,8 +39,8 @@ public final class Line2 {
      *
      * @throws IllegalArgumentException if the points are identical.
      */
-    public static Line2 through(Point2 pointA, Point2 pointB) {
-        return new Line2(pointA, computeSlope(pointA, pointB));
+    public static Line2D through(Point2D pointA, Point2D pointB) {
+        return new Line2D(pointA, computeSlope(pointA, pointB));
     }
 
     /**
@@ -56,11 +56,11 @@ public final class Line2 {
      * @return the reference point for the line defined by the given
      * point and slope.
      */
-    public static Point2 computeReferencePoint(Point2 point, double slope) {
+    public static Point2D computeReferencePoint(Point2D point, double slope) {
         if (isVertical(slope))
-            return Point2.at(point.x, 0.0);
+            return Point2D.at(point.x, 0.0);
         else
-            return Point2.at(0.0, point.y - slope * point.x);
+            return Point2D.at(0.0, point.y - slope * point.x);
     }
 
     private static boolean isVertical(double slope) {
@@ -79,7 +79,7 @@ public final class Line2 {
      *
      * @throws IllegalArgumentException if the points are identical.
      */
-    public static double computeSlope(Point2 pointA, Point2 pointB) {
+    public static double computeSlope(Point2D pointA, Point2D pointB) {
         if (pointA.equals(pointB))
             throw new IllegalArgumentException("Identical points.");
 
@@ -102,8 +102,8 @@ public final class Line2 {
      *
      * @return a new horizontal line with the specified y-coordinate.
      */
-    public static Line2 horizontal(double y) {
-        return new Line2(Point2.at(0.0, y), 0.0);
+    public static Line2D horizontal(double y) {
+        return new Line2D(Point2D.at(0.0, y), 0.0);
     }
 
     /**
@@ -113,8 +113,8 @@ public final class Line2 {
      *
      * @return a new vertical line with the specified x-coordinate.
      */
-    public static Line2 vertical(double x) {
-        return new Line2(Point2.at(x, 0.0), Double.POSITIVE_INFINITY);
+    public static Line2D vertical(double x) {
+        return new Line2D(Point2D.at(x, 0.0), Double.POSITIVE_INFINITY);
     }
 
     /**
@@ -129,8 +129,8 @@ public final class Line2 {
      * @return the y-coordinate correspoinding to the given
      * x-coordinate.
      */
-    public static double interpolate(Point2 pointA, Point2 pointB, double x) {
-        Line2 line = through(pointA, pointB);
+    public static double interpolate(Point2D pointA, Point2D pointB, double x) {
+        Line2D line = through(pointA, pointB);
         return line.getY(x);
     }
 
@@ -141,7 +141,7 @@ public final class Line2 {
      *
      * @return {@code true} iff the given point lies on this line.
      */
-    public boolean contains(Point2 pt) {
+    public boolean contains(Point2D pt) {
         return contains(pt.x, pt.y);
     }
     
@@ -166,7 +166,7 @@ public final class Line2 {
      *
      * @return a reference point on this line.
      */
-    public Point2 getPoint() {
+    public Point2D getPoint() {
         return point;
     }
 
@@ -228,10 +228,10 @@ public final class Line2 {
     }
 
     @Override public boolean equals(Object that) {
-        return (that instanceof Line2) && equalsLine((Line2) that);
+        return (that instanceof Line2D) && equalsLine((Line2D) that);
     }
 
-    private boolean equalsLine(Line2 that) {
+    private boolean equalsLine(Line2D that) {
         if (this.isVertical())
             return that.isVertical() && this.contains(that.point);
         else

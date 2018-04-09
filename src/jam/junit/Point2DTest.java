@@ -1,15 +1,15 @@
 
 package jam.junit;
 
-import jam.math.Point2;
+import jam.math.Point2D;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class Point2Test extends NumericTestBase {
-    private final Point2 p1a = Point2.at(0.0, 1.0);
-    private final Point2 p1b = Point2.at(0.0, 1.0);
-    private final Point2 p2  = Point2.at(1.0, 0.0);
+public class Point2DTest extends NumericTestBase {
+    private final Point2D p1a = Point2D.at(0.0, 1.0);
+    private final Point2D p1b = Point2D.at(0.0, 1.0);
+    private final Point2D p2  = Point2D.at(1.0, 0.0);
 
     @Test public void testEquals() {
         assertTrue(p1a.equals(p1a));
@@ -26,6 +26,6 @@ public class Point2Test extends NumericTestBase {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.junit.Point2Test");
+        org.junit.runner.JUnitCore.main("jam.junit.Point2DTest");
     }
 }

@@ -4,7 +4,7 @@ package jam.math;
 /**
  * Represents an immutable point in a two-dimensional space.
  */
-public final class Point2 {
+public final class Point2D {
     /** The immutable x-coordinate. */
     public final double x;
 
@@ -18,7 +18,7 @@ public final class Point2 {
      *
      * @param y the y-coordinate.
      */
-    public Point2(double x, double y) {
+    public Point2D(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -32,15 +32,15 @@ public final class Point2 {
      *
      * @return the two-dimensional point at {@code (x, y)}.
      */
-    public static Point2 at(double x, double y) {
-        return new Point2(x, y);
+    public static Point2D at(double x, double y) {
+        return new Point2D(x, y);
     }
 
     @Override public boolean equals(Object that) {
-        return (that instanceof Point2) && equalsPoint((Point2) that);
+        return (that instanceof Point2D) && equalsPoint((Point2D) that);
     }
 
-    private boolean equalsPoint(Point2 that) {
+    private boolean equalsPoint(Point2D that) {
         return DoubleComparator.DEFAULT.EQ(this.x, that.x) 
             && DoubleComparator.DEFAULT.EQ(this.y, that.y);
     }
