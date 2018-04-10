@@ -142,12 +142,36 @@ public final class DoubleRange {
     }
 
     /**
+     * Returns the lower predicate for this range.
+     *
+     * <p>The lower predicate evaluates to {@code true} for double
+     * values that are either in this range or above it.
+     *
+     * @return the lower predicate for this range.
+     */
+    public DoublePredicate getLowerPredicate() {
+        return lowerPredicate;
+    }
+
+    /**
      * Returns the upper bound of this range.
      *
      * @return the upper bound of this range.
      */
     public double getUpperBound() {
 	return upperBound;
+    }
+
+    /**
+     * Returns the upper predicate for this range.
+     *
+     * <p>The upper predicate evaluates to {@code true} for double
+     * values that are either in this range or below it.
+     *
+     * @return the upper predicate for this range.
+     */
+    public DoublePredicate getUpperPredicate() {
+        return upperPredicate;
     }
 
     /**

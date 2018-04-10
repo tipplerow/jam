@@ -34,6 +34,12 @@ public class DoubleRangeTest extends NumericTestBase {
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
 
         assertDouble(3.0, range.getWidth());
+
+        assertFalse(range.getLowerPredicate().test(-5.0));
+        assertTrue( range.getUpperPredicate().test(-5.0));
+
+        assertTrue( range.getLowerPredicate().test(5.0));
+        assertFalse(range.getUpperPredicate().test(5.0));
     }
 
     @Test public void testLeftClosed() {
@@ -57,6 +63,12 @@ public class DoubleRangeTest extends NumericTestBase {
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
 
         assertDouble(3.0, range.getWidth());
+
+        assertFalse(range.getLowerPredicate().test(-5.0));
+        assertTrue( range.getUpperPredicate().test(-5.0));
+
+        assertTrue( range.getLowerPredicate().test(5.0));
+        assertFalse(range.getUpperPredicate().test(5.0));
     }
 
     @Test public void testLeftOpen() {
@@ -80,6 +92,12 @@ public class DoubleRangeTest extends NumericTestBase {
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
 
         assertDouble(3.0, range.getWidth());
+
+        assertFalse(range.getLowerPredicate().test(-5.0));
+        assertTrue( range.getUpperPredicate().test(-5.0));
+
+        assertTrue( range.getLowerPredicate().test(5.0));
+        assertFalse(range.getUpperPredicate().test(5.0));
     }
 
     @Test public void testOpen() {
@@ -103,6 +121,12 @@ public class DoubleRangeTest extends NumericTestBase {
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
 
         assertDouble(3.0, range.getWidth());
+
+        assertFalse(range.getLowerPredicate().test(-5.0));
+        assertTrue( range.getUpperPredicate().test(-5.0));
+
+        assertTrue( range.getLowerPredicate().test(5.0));
+        assertFalse(range.getUpperPredicate().test(5.0));
     }
 
     @Test public void testEmpty() {
