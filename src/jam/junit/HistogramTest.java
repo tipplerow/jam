@@ -3,30 +3,87 @@ package jam.junit;
 
 import java.util.List;
 
+import jam.dist.NormalDistribution;
 import jam.hist.Bin;
 import jam.hist.Histogram;
 import jam.math.DoubleRange;
+import jam.math.Point2D;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class HistogramTest extends NumericTestBase {
-    @Test public void testDoubles() {
-        Histogram hist = Histogram.compute(1.0, 5.0, 4, new double[] { -1.0, 1.1, 2.2, 2.3, 3.4, 3.5, 3.6, 5.5 });
+    @Test public void testLinear() {
+        double[] data =
+            new double[] { 0.99999999,
+                           1.0, 1.5, 2.0,
+                           2.1, 3.0,
+                           3.1,
+                           4.1, 4.2, 4.9, 5.0,
+                           5.00000001 };
+
+        Histogram hist = Histogram.compute(1.0, 5.0, 4, data);
+        List<Bin> bins = hist.viewBins();
+
+        assertEquals(10, hist.getTotalCount());
+        assertEquals(4, bins.size());
+
+        assertEquals(DoubleRange.closed(  1.0, 2.0), bins.get(0).getRange());
+        assertEquals(DoubleRange.leftOpen(2.0, 3.0), bins.get(1).getRange());
+        assertEquals(DoubleRange.leftOpen(3.0, 4.0), bins.get(2).getRange());
+        assertEquals(DoubleRange.leftOpen(4.0, 5.0), bins.get(3).getRange());
+
+        assertEquals(3, bins.get(0).getCount());
+        assertEquals(2, bins.get(1).getCount());
+        assertEquals(1, bins.get(2).getCount());
+        assertEquals(4, bins.get(3).getCount());
+    }
+
+    @Test public void testLog() {
+        double[] data =
+            new double[] { 0.0099999999,
+                           0.01, 0.02, 0.1,
+                           0.11, 1.0,
+                           10.0,
+                           10.00000001 };
+
+        Histogram hist = Histogram.computeLog(0.01, 10.0, 3, data);
         List<Bin> bins = hist.viewBins();
 
         assertEquals(6, hist.getTotalCount());
-        assertEquals(4, bins.size());
-        
-        assertEquals(DoubleRange.leftClosed(1.0, 2.0), bins.get(0).getRange());
-        assertEquals(DoubleRange.leftClosed(2.0, 3.0), bins.get(1).getRange());
-        assertEquals(DoubleRange.leftClosed(3.0, 4.0), bins.get(2).getRange());
-        assertEquals(DoubleRange.closed(    4.0, 5.0), bins.get(3).getRange());
+        assertEquals(3, bins.size());
 
-        assertEquals(1, bins.get(0).getCount());
+        assertEquals(DoubleRange.closed(  0.01, 0.1), bins.get(0).getRange());
+        assertEquals(DoubleRange.leftOpen(0.1,  1.0), bins.get(1).getRange());
+        assertEquals(DoubleRange.leftOpen(1.0, 10.0), bins.get(2).getRange());
+
+        assertEquals(3, bins.get(0).getCount());
         assertEquals(2, bins.get(1).getCount());
-        assertEquals(3, bins.get(2).getCount());
-        assertEquals(0, bins.get(3).getCount());
+        assertEquals(1, bins.get(2).getCount());
+    }
+
+    @Test public void testNormal() {
+        double[]  obs  = NormalDistribution.STANDARD.sample(random(), 1000000);
+        Histogram hist = Histogram.compute(-4.0, 4.0, 16, obs);
+
+        List<Point2D> cdf = hist.getCDF();
+        List<Point2D> pdf = hist.getPDF();
+
+        for (Point2D pt : cdf)
+            assertEquals(NormalDistribution.STANDARD.cdf(pt.x), pt.y, 0.001);
+
+        for (Point2D pt : pdf)
+            assertEquals(NormalDistribution.STANDARD.pdf(pt.x), pt.y, 0.005);
+
+        hist = Histogram.compute(-4.0, 4.0, 64, obs);
+        cdf  = hist.getCDF();
+        pdf  = hist.getPDF();
+
+        for (Point2D pt : cdf)
+            assertEquals(NormalDistribution.STANDARD.cdf(pt.x), pt.y, 0.01);
+
+        for (Point2D pt : pdf)
+            assertEquals(NormalDistribution.STANDARD.pdf(pt.x), pt.y, 0.05);
     }
 
     public static void main(String[] args) {

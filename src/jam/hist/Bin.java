@@ -1,13 +1,11 @@
 
 package jam.hist;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import jam.math.DoubleRange;
+import jam.math.DoubleUtil;
 import jam.math.LongRange;
-import jam.vector.VectorUtil;
 
 /**
  * Represents one bin in a histogram.
@@ -17,15 +15,6 @@ public final class Bin {
 
     private long count = 0;
     private boolean frozen = false;
-
-    /**
-     * Creates an empty bin with a specified range.
-     *
-     * @param range the range covered by the bin.
-     */
-    public Bin(DoubleRange range) {
-        this(range, 0, false);
-    }
 
     /**
      * Creates a bin with a specified range and count.
@@ -48,79 +37,14 @@ public final class Bin {
     }
 
     /**
-     * Creates a contiguous sequence of bins with fixed breakpoints.
+     * Creates an empty bin with a specified range.
      *
-     * @param brkpts the breakpoints for the bins, in ascending order.
+     * @param range the range covered by the bin.
      *
-     * @return a list containing {@code brkpts.length - 1} bins, 
-     * with bin {@code k} having bounds {@code brkpts[k]} and 
-     * {@code brkpts[k + 1]}.
-     *
-     * @throws IllegalArgumentException unless two or more breakpoints
-     * are given in ascending order.
+     * @return the new empty bin.
      */
-    public static List<Bin> create(double... brkpts) {
-        int nbin = brkpts.length - 1;
-
-        if (nbin < 1)
-            throw new IllegalArgumentException("At least one bin is required.");
-
-        List<Bin> bins = new ArrayList<Bin>(nbin);
-
-        // All bins but the last are half-open (left-closed)...
-        for (int k = 0; k < nbin - 1; ++k)
-            bins.add(new Bin(DoubleRange.leftClosed(brkpts[k], brkpts[k + 1])));
-
-        // The final bin is fully closed...
-        bins.add(new Bin(DoubleRange.closed(brkpts[nbin - 1], brkpts[nbin])));
-        return bins;
-    }
-
-    /**
-     * Creates a sequence of empty, equally-sized bins that span a
-     * specified floating-point range.
-     *
-     * @param lower the lower bound of the range to span.
-     *
-     * @param upper the upper bound of the range to span.
-     *
-     * @param nbin the number of equally-sized bins to create.
-     *
-     * @return a list containing the empty, equally-sized bins
-     * arranged in ascending order.
-     *
-     * @throws IllegalArgumentException unless the input range has
-     * finite size and the number of bins is positive.
-     */
-    public static List<Bin> span(double lower, double upper, int nbin) {
-        if (upper <= lower)
-            throw new IllegalArgumentException("Invalid range.");
-
-        return create(VectorUtil.sequence(lower, upper, nbin + 1));
-    }
-
-    /**
-     * Creates a sequence of empty bins that span a floating-point
-     * range uniformly <em>in logarithmic space</em>.
-     *
-     * @param lower the lower bound of the range to span.
-     *
-     * @param upper the upper bound of the range to span.
-     *
-     * @param nbin the number of bins to create.
-     *
-     * @return a list containing the empty bins arranged in ascending
-     * order.
-     *
-     * @throws IllegalArgumentException unless the input range has
-     * finite size, is strictly positive, and the number of bins is
-     * positive.
-     */
-    public static List<Bin> spanLog(double lower, double upper, int nbin) {
-        if (upper <= lower)
-            throw new IllegalArgumentException("Invalid range.");
-
-        return create(VectorUtil.sequenceLog(lower, upper, nbin + 1));
+    public static Bin empty(DoubleRange range) {
+        return new Bin(range, 0, false);
     }
 
     /**
@@ -159,6 +83,44 @@ public final class Bin {
     }
 
     /**
+     * Orders an observation relative to this bin.
+     *
+     * @param obs an observation to order.
+     *
+     * @return (1) a negative integer, if the observation lies in a
+     * bin to the left of this bin; (2) zero if the observation lies
+     * in this bin itself; or (3) a positive integer otherwise (the
+     * observation lies in a bin to the right of this bin.
+     */
+    public int compare(double obs) {
+        if (contains(obs))
+            return 0;
+
+        if (range.getLowerPredicate().test(obs)) {
+            //
+            // The observation is greater than or equal to the lower
+            // range, but not within it, so it must lie to the right
+            // of this bin...
+            //
+            return 1;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Identifies observations that fall in this bin.
+     *
+     * @param obs an observation to test.
+     *
+     * @return {@code true} iff the specified observation falls in
+     * this bin.
+     */
+    public boolean contains(double obs) {
+        return range.contains(obs);
+    }
+
+    /**
      * Add one count to this bin.
      *
      * @throws IllegalStateException if this bin has been frozen.
@@ -192,6 +154,17 @@ public final class Bin {
      */
     public long getCount() {
         return count;
+    }
+
+    /**
+     * Returns the fraction of observations in this bin.
+     *
+     * @param total the total number of observations.
+     *
+     * @return the fraction of observations in this bin.
+     */
+    public double getFrequency(long total) {
+        return DoubleUtil.ratio(count, total);
     }
 
     /**
