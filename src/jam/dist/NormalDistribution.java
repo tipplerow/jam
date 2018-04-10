@@ -15,6 +15,12 @@ public final class NormalDistribution extends AbstractRealDistribution {
     private final double stdev;
 
     /**
+     * The standard normal distribution with zero mean and unit
+     * variance.
+     */
+    public static final NormalDistribution STANDARD = new NormalDistribution(0.0, 1.0);
+
+    /**
      * Creates a normal probability distribution.
      *
      * @param mean the mean of the distribution.
