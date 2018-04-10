@@ -6,7 +6,7 @@ import jam.math.DoubleRange;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class DoubleRangeTest {
+public class DoubleRangeTest extends NumericTestBase {
     private static final double LOWER = -2.0;
     private static final double UPPER =  1.0;
 
@@ -32,6 +32,8 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.NaN));
 	assertFalse(range.contains(Double.NEGATIVE_INFINITY));
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
+
+        assertDouble(3.0, range.getWidth());
     }
 
     @Test public void testLeftClosed() {
@@ -53,6 +55,8 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.NaN));
 	assertFalse(range.contains(Double.NEGATIVE_INFINITY));
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
+
+        assertDouble(3.0, range.getWidth());
     }
 
     @Test public void testLeftOpen() {
@@ -74,6 +78,8 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.NaN));
 	assertFalse(range.contains(Double.NEGATIVE_INFINITY));
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
+
+        assertDouble(3.0, range.getWidth());
     }
 
     @Test public void testOpen() {
@@ -95,6 +101,8 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.NaN));
 	assertFalse(range.contains(Double.NEGATIVE_INFINITY));
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
+
+        assertDouble(3.0, range.getWidth());
     }
 
     @Test public void testEmpty() {
@@ -107,6 +115,8 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.NaN));
 	assertFalse(range.contains(Double.NEGATIVE_INFINITY));
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
+
+        assertDouble(0.0, range.getWidth());
     }
 
     @Test public void testFractional() {
@@ -120,6 +130,8 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.NaN));
 	assertFalse(range.contains(Double.NEGATIVE_INFINITY));
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
+
+        assertDouble(1.0, range.getWidth());
     }
 
     @Test public void testInfinite() {
@@ -132,6 +144,7 @@ public class DoubleRangeTest {
 	assertTrue(range.contains(Double.POSITIVE_INFINITY));
 
 	assertFalse(range.contains(Double.NaN));
+        assertTrue(Double.isInfinite(range.getWidth()));
     }
 
     @Test public void testNegative() {
@@ -146,6 +159,7 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
 
 	assertFalse(range.contains(Double.NaN));
+        assertTrue(Double.isInfinite(range.getWidth()));
     }
 
     @Test public void testNonNegative() {
@@ -160,6 +174,7 @@ public class DoubleRangeTest {
 	assertTrue( range.contains(Double.POSITIVE_INFINITY));
 
 	assertFalse(range.contains(Double.NaN));
+        assertTrue(Double.isInfinite(range.getWidth()));
     }
 
     @Test public void testNonPositive() {
@@ -174,6 +189,7 @@ public class DoubleRangeTest {
 	assertFalse(range.contains(Double.POSITIVE_INFINITY));
 
 	assertFalse(range.contains(Double.NaN));
+        assertTrue(Double.isInfinite(range.getWidth()));
     }
 
     @Test public void testPositive() {
@@ -188,6 +204,7 @@ public class DoubleRangeTest {
 	assertTrue( range.contains(Double.POSITIVE_INFINITY));
 
 	assertFalse(range.contains(Double.NaN));
+        assertTrue(Double.isInfinite(range.getWidth()));
     }
 
     @Test public void testValidateOkay() {

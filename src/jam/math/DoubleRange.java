@@ -151,6 +151,15 @@ public final class DoubleRange {
     }
 
     /**
+     * Returns the width of this range.
+     *
+     * @return the width of this range.
+     */
+    public double getWidth() {
+	return upperBound - lowerBound;
+    }
+
+    /**
      * Returns the type of this range.
      *
      * @return the type of this range.
