@@ -416,7 +416,7 @@ public final class StatUtil {
             if (!Double.isNaN(value))
                 notnan.add(value);
 
-        return new JamVector(notnan);
+        return JamVector.copyOf(notnan);
     }
 
     /**
@@ -472,7 +472,7 @@ public final class StatUtil {
             if (DoubleUtil.isFinite(value))
                 finite.add(value);
 
-        return new JamVector(finite);
+        return JamVector.copyOf(finite);
     }
 
     /**

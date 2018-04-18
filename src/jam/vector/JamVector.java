@@ -64,21 +64,26 @@ public final class JamVector extends AbstractVector {
     }
 
     /**
-     * Creates a vector from a raw floating-point sequence.
+     * Creates a vector from a raw array.
      *
      * @param elements the elements to initialize the vector.
+     *
+     * @return a new vector with elements copied from the input
+     * array.
      */
-    public JamVector(double[] elements) {
-        this(new DenseVector(VectorUtil.copy(elements)));
+    public static JamVector copyOf(double[] elements) {
+        return new JamVector(new DenseVector(VectorUtil.copy(elements)));
     }
 
     /**
      * Creates a vector as a copy of another view.
      *
      * @param view the vector view to copy.
+     *
+     * @return a new vector with elements copied from the input view.
      */
-    public JamVector(VectorView view) {
-        this(new DenseVector(view.toNumeric()));
+    public static JamVector copyOf(VectorView view) {
+        return new JamVector(new DenseVector(view.toNumeric()));
     }
 
     /**
@@ -86,9 +91,11 @@ public final class JamVector extends AbstractVector {
      * {@code ArrayDoubleList}.
      *
      * @param list the list to copy.
+     *
+     * @return a new vector with elements copied from the input list.
      */
-    public JamVector(ArrayDoubleList list) {
-        this(new DenseVector(list.toArray()));
+    public static JamVector copyOf(ArrayDoubleList list) {
+        return new JamVector(new DenseVector(list.toArray()));
     }
 
     /**
@@ -96,9 +103,12 @@ public final class JamVector extends AbstractVector {
      * {@code Double} values, in the order returned by the iterator.
      *
      * @param collection the collection to copy.
+     *
+     * @return a new vector with elements copied from the input
+     * collection.
      */
-    public JamVector(Collection<Double> collection) {
-        this(DoubleUtil.toArray(collection));
+    public static JamVector copyOf(Collection<Double> collection) {
+        return copyOf(DoubleUtil.toArray(collection));
     }
 
     /**
@@ -106,7 +116,8 @@ public final class JamVector extends AbstractVector {
      *
      * @param elements the elements to initialize the vector.
      *
-     * @return a new vector with the specified elements.
+     * @return a new vector with elements copied from the input
+     * sequence.
      */
     public static JamVector valueOf(double... elements) {
         return new JamVector(new DenseVector(VectorUtil.copy(elements)));
@@ -333,7 +344,7 @@ public final class JamVector extends AbstractVector {
      * same length.
      */
     public static double dot(VectorView v1, VectorView v2) {
-        return new JamVector(v1).dot(v2);
+        return JamVector.copyOf(v1).dot(v2);
     }
 
     /**
@@ -409,7 +420,7 @@ public final class JamVector extends AbstractVector {
      * @return the difference between the vector and scalar values.
      */
     public static JamVector minus(VectorView vector, double scalar) {
-        return new JamVector(vector).minus(scalar);
+        return JamVector.copyOf(vector).minus(scalar);
     }
 
     /**
@@ -426,7 +437,7 @@ public final class JamVector extends AbstractVector {
      * same length.
      */
     public static JamVector minus(VectorView v1, VectorView v2) {
-        return new JamVector(v1).minus(v2);
+        return JamVector.copyOf(v1).minus(v2);
     }
 
     /**
@@ -521,7 +532,7 @@ public final class JamVector extends AbstractVector {
      * @return the sum of the vector and scalar values.
      */
     public static JamVector plus(VectorView vector, double scalar) {
-        return new JamVector(vector).plus(scalar);
+        return JamVector.copyOf(vector).plus(scalar);
     }
 
     /**
@@ -538,7 +549,7 @@ public final class JamVector extends AbstractVector {
      * same length.
      */
     public static JamVector plus(VectorView v1, VectorView v2) {
-        return new JamVector(v1).plus(v2);
+        return JamVector.copyOf(v1).plus(v2);
     }
 
     /**
@@ -600,7 +611,7 @@ public final class JamVector extends AbstractVector {
      * @return the product of the vector and scalar values.
      */
     public static JamVector times(VectorView vector, double scalar) {
-        return new JamVector(vector).times(scalar);
+        return JamVector.copyOf(vector).times(scalar);
     }
 
     /**
@@ -612,7 +623,7 @@ public final class JamVector extends AbstractVector {
      * @return a new unit vector along the direction of the input vector.
      */
     public static JamVector unit(VectorView vector) {
-        JamVector result = new JamVector(vector);
+        JamVector result = JamVector.copyOf(vector);
         result.unitize();
         return result;
     }

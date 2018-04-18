@@ -71,7 +71,7 @@ public class JamVectorTest extends NumericTestBase {
 
     @Test public void testConstructorBareArray() {
         double[] bare = new double[] { 1.0, 2.0, 3.0 };
-        JamVector jam = new JamVector(bare);
+        JamVector jam = JamVector.copyOf(bare);
 
         assertEquals(3, jam.length());
         assertDouble(1.0, jam.get(0));
@@ -89,7 +89,7 @@ public class JamVectorTest extends NumericTestBase {
 
     @Test public void testConstructorView() {
         JamVector orig = JamVector.valueOf(1.0, 2.0, 3.0);
-        JamVector copy = new JamVector(orig);
+        JamVector copy = JamVector.copyOf(orig);
 
         assertEquals(3, copy.length());
         assertDouble(1.0, copy.get(0));
@@ -112,7 +112,7 @@ public class JamVectorTest extends NumericTestBase {
         list.add(2.0);
         list.add(3.0);
 
-        JamVector actual   = new JamVector(list);
+        JamVector actual   = JamVector.copyOf(list);
         JamVector expected = JamVector.valueOf(1.0, 2.0, 3.0);
             
         assertEquals(expected, actual);
@@ -308,7 +308,7 @@ public class JamVectorTest extends NumericTestBase {
     }
 
     @Test public void testNormalize() {
-        JamVector vec = new JamVector(DENSE3);
+        JamVector vec = JamVector.copyOf(DENSE3);
         vec.normalize();
 
         assertDouble(1.0 / 6.0, vec.get(0));

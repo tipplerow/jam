@@ -410,7 +410,7 @@ public final class JamMatrix extends MatrixView {
      * diagonal of this matrix.
      */
     public JamVector getDiagonal() {
-        return new JamVector(viewDiagonal());
+        return JamVector.copyOf(viewDiagonal());
     }
 
     /**
@@ -425,7 +425,7 @@ public final class JamMatrix extends MatrixView {
      * bounds.
      */
     public JamVector getRow(int row) {
-        return new JamVector(viewRow(row));
+        return JamVector.copyOf(viewRow(row));
     }
 
     /**
@@ -440,7 +440,7 @@ public final class JamMatrix extends MatrixView {
      * bounds.
      */
     public JamVector getColumn(int col) {
-        return new JamVector(viewColumn(col));
+        return JamVector.copyOf(viewColumn(col));
     }
 
     /**

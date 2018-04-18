@@ -190,7 +190,7 @@ public final class JamEigen {
         if (indexes.length != 1)
             throw new IllegalStateException("Eigenvector decomposition does not have a unique unit eigenvalue.");
 
-        JamVector result = new JamVector(viewVector(indexes[0]));
+        JamVector result = JamVector.copyOf(viewVector(indexes[0]));
 
         if (normalize)
             result.normalize();

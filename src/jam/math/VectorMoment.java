@@ -94,7 +94,7 @@ public final class VectorMoment {
     }
 
     private static JamVector centered(VectorView vector, VectorView CM) {
-        JamVector result = new JamVector(vector);
+        JamVector result = JamVector.copyOf(vector);
         result.subtract(CM);
         return result;
     }
@@ -134,7 +134,7 @@ public final class VectorMoment {
             CM[2] += weight * entry.getElement().z;
         }
 
-        return new JamVector(CM);
+        return JamVector.copyOf(CM);
     }
 
     private static JamMatrix computeRG(Multiset<Coord> coords, JamVector CM) {

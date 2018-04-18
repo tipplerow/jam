@@ -107,7 +107,7 @@ public class JamEigenTest extends NumericTestBase {
 	// Basic eigenvalue definition...
 	for (int k = 0; k < N; k++) {
 	    double    value  = eigen.getValue(k);
-	    JamVector vector = new JamVector(eigen.viewVector(k));
+	    JamVector vector = JamVector.copyOf(eigen.viewVector(k));
 
 	    JamVector actual   = matrix.times(vector);
 	    JamVector expected = vector.times(value);

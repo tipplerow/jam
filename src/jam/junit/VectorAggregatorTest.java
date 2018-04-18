@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class VectorAggregatorTest extends NumericTestBase {
     private static final JamVector vector =
-	new JamVector(new double[] { -2.0, -1.0, Double.NaN, 10.0, 20.0 });
+	JamVector.valueOf(-2.0, -1.0, Double.NaN, 10.0, 20.0);
 
     @Test public void testMin() {
         assertDouble(-2.0, VectorAggregator.min(vector));

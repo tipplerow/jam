@@ -55,7 +55,7 @@ public final class HypersphericalDistribution extends AbstractMultivariateDistri
         validateCenter(center);
 
         this.radius = radius;
-        this.center = new JamVector(center); // Defensive copy
+        this.center = JamVector.copyOf(center); // Defensive copy
         this.covar  = computeCovar(center.length(), radius);
     }
 
