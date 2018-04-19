@@ -66,6 +66,16 @@ public abstract class JamApp {
     }
 
     /**
+     * Closes all writers that were created by the {@code openWriter}
+     * method and all other {@code Closeable} objects registered via
+     * {@code autoClose(Closeable)}.
+     */
+    public void autoClose() {
+        for (Closeable closeable : autoClose)
+            IOUtil.close(closeable);
+    }
+
+    /**
      * Registers an object to be closed by the {@code close()} method.
      *
      * <p>Report writers opened by the {@code openWriter()} method are
@@ -121,15 +131,5 @@ public abstract class JamApp {
 
         autoClose(writer);
         return writer;
-    }
-
-    /**
-     * Closes all writers that were created by the {@code openWriter}
-     * method and all other {@code Closeable} objects registered via
-     * {@code autoClose()}.
-     */
-    public void close() {
-        for (Closeable closeable : autoClose)
-            IOUtil.close(closeable);
     }
 }
