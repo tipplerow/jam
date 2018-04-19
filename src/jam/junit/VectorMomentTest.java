@@ -10,6 +10,7 @@ import com.google.common.collect.Multiset;
 import jam.lattice.Coord;
 import jam.math.JamRandom;
 import jam.math.RandomWalk;
+import jam.math.StatUtil;
 import jam.math.VectorMoment;
 import jam.matrix.JamMatrix;
 import jam.vector.JamVector;
@@ -129,6 +130,13 @@ public class VectorMomentTest extends NumericTestBase {
         assertTrue(mom.anisotropy() < 0.0001);
 
         assertEquals(Math.sqrt(12.0), mom.scalar(), 0.01);
+
+        JamVector normR2 = new JamVector(nvec);
+
+        for (int k = 0; k < nvec; ++k)
+            normR2.set(k, Math.pow(mom.normR(vectors[k]), 2));
+
+        assertDouble(1.0, StatUtil.mean(normR2));
     }
 
     @Test public void testRandomWalk() {

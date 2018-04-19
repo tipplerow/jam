@@ -260,6 +260,22 @@ public final class VectorMoment {
     }
 
     /**
+     * Computes a <em>normalized radial distance</em> for a point:
+     * the Euclidean distance of the point from the center of mass
+     * divided by the scalar radius of gyration.
+     *
+     * @param point the point of interest.
+     *
+     * @return the normalized radial distance for the given point.
+     *
+     * @throws IllegalArgumentException unless the dimensions of the
+     * point match those of this vector moment.
+     */
+    public double normR(VectorView point) {
+        return Distance.euclidean(point, CM) / scalar();
+    }
+
+    /**
      * Returns the scalar radius of gyration: the square root of the
      * sum of squares of the diagonal values.
      *
