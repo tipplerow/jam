@@ -1,8 +1,11 @@
 
 package jam.app;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -17,6 +20,7 @@ import jam.lang.JamException;
 public abstract class JamApp {
     private final String[] propertyFiles;
     private final File reportDir;
+    private final Collection<Closeable> autoClose = new ArrayList<Closeable>();
     private final Map<String, PrintWriter> writerMap = new TreeMap<String, PrintWriter>();
 
     /**
@@ -62,6 +66,18 @@ public abstract class JamApp {
     }
 
     /**
+     * Registers an object to be closed by the {@code close()} method.
+     *
+     * <p>Report writers opened by the {@code openWriter()} method are
+     * automatically registered.
+     *
+     * @param closeable the object to the closed.
+     */
+    public void autoClose(Closeable closeable) {
+        autoClose.add(closeable);
+    }
+
+    /**
      * Returns the directory where report files will be written.
      *
      * @return the directory where report files will be written.
@@ -87,7 +103,7 @@ public abstract class JamApp {
      *
      * <p>This class maintains a map of all print writers created by
      * this method (indexed by base name) and will close all writers
-     * when the {@code closeWriters()} method is called.
+     * when the {@code close()} method is called.
      *
      * @param baseName the base name for the report file.
      *
@@ -103,15 +119,17 @@ public abstract class JamApp {
         PrintWriter writer = IOUtil.openWriter(getReportFile(baseName), false);
         writerMap.put(baseName, writer);
 
+        autoClose(writer);
         return writer;
     }
 
     /**
      * Closes all writers that were created by the {@code openWriter}
-     * method.
+     * method and all other {@code Closeable} objects registered via
+     * {@code autoClose()}.
      */
-    public void closeWriters() {
-        for (PrintWriter writer : writerMap.values())
-            IOUtil.close(writer);
+    public void close() {
+        for (Closeable closeable : autoClose)
+            IOUtil.close(closeable);
     }
 }
