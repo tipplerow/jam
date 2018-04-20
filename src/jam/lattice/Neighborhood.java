@@ -2,8 +2,13 @@
 package jam.lattice;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import jam.math.DoubleUtil;
 import jam.math.JamRandom;
 import jam.util.ListUtil;
 import jam.util.ListView;
@@ -129,6 +134,61 @@ public enum Neighborhood {
      */
     public Coord randomNeighbor(Coord center, JamRandom source) {
         return center.plus(randomBasisVector(source));
+    }
+
+    /**
+     * Selects distinct neighboring coordinates at random, with each
+     * neighbor being equally likely.
+     *
+     * @param center the central coordinate in the neighborhood.
+     *
+     * @param count the number of distinct neighbors to select.
+     *
+     * @param source a random number generator.
+     *
+     * @return the neighboring coordinates selected at random; the
+     * central coordinate is unchanged.
+     *
+     * @throws IllegalArgumentException if the number of neighbors is
+     * negative or is larger than the size of this neighborhood.
+     */
+    public Collection<Coord> randomNeighbors(Coord center, int count, JamRandom source) {
+        if (count < 0)
+            throw new IllegalArgumentException("Neighbor count is negative.");
+
+        if (count == 0)
+            return Collections.emptyList();
+
+        if (count == 1)
+            return List.of(randomNeighbor(center, source));
+
+        if (DoubleUtil.ratio(count, size()) < 0.25)
+            return sampleNeighbors(center, count, source);
+
+        if (count > size())
+            throw new IllegalArgumentException("Neighbor count exceeds the size of the neighborhood.");
+
+        return shuffleNeighbors(center, count, source);
+    }
+
+    private Set<Coord> sampleNeighbors(Coord center, int count, JamRandom source) {
+        Set<Coord> neighbors = new HashSet<Coord>(count);
+
+        while (neighbors.size() < count) {
+            Coord neighbor = randomNeighbor(center, source);
+
+            if (!neighbors.contains(neighbor))
+                neighbors.add(neighbor);
+        }
+
+        return neighbors;
+    }
+
+    private List<Coord> shuffleNeighbors(Coord center, int count, JamRandom source) {
+        List<Coord> neighbors = getNeighbors(center);
+        ListUtil.shuffle(neighbors, source);
+
+        return neighbors.subList(0, count);
     }
 
     /**

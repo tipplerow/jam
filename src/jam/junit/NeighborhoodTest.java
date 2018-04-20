@@ -1,7 +1,9 @@
 
 package jam.junit;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -57,7 +59,7 @@ public class NeighborhoodTest extends NumericTestBase {
         assertTrue(neighbors.contains(Coord.at(2, 3, 4)));
     }
 
-    @Test public void testRandom() {
+    @Test public void testRandomBasisVector() {
         Multiset<Coord> coords = HashMultiset.create();
 
         for (int trial = 0; trial < 1000000; ++trial)
@@ -65,6 +67,18 @@ public class NeighborhoodTest extends NumericTestBase {
 
         for (Coord coord : Neighborhood.MOORE.viewBasis())
             assertEquals(1.0 / 26.0, MultisetUtil.frequency(coords, coord), 0.001);
+    }
+
+    @Test public void testRandomNeighbors() {
+        for (int trial = 0; trial < 100; ++trial) {
+            for (int count = 0; count <= 26; ++ count) {
+                Set<Coord> neighbors =
+                    new HashSet<Coord>(Neighborhood.MOORE.randomNeighbors(Coord.ORIGIN, count, random()));
+
+                // Assert that all neighbors are unique...
+                assertEquals(count, neighbors.size());
+            }
+        }
     }
 
     @Test public void testVonNeumann() {
