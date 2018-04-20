@@ -2,7 +2,9 @@
 package jam.math;
 
 import java.util.Collection;
+import java.util.List;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import jam.lattice.Coord;
@@ -97,6 +99,22 @@ public final class VectorMoment {
         JamVector result = JamVector.copyOf(vector);
         result.subtract(CM);
         return result;
+    }
+
+    /**
+     * Computes the generalized center of mass and gyration tensor for
+     * a collection of lattice coordinates.
+     *
+     * @param coords the coordinates on which to operate.
+     *
+     * @return a {@code VectorMoment} instance containing the computed
+     * center of mass and gyration tensor.
+     *
+     * @throws IllegalArgumentException unless there is at least one
+     * coordinate.
+     */
+    public static VectorMoment compute(List<Coord> coords) {
+        return compute(HashMultiset.create(coords));
     }
 
     /**
