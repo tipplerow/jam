@@ -1,6 +1,8 @@
 
 package jam.sim;
 
+import jam.math.IntRange;
+
 /**
  * Records data from a single time step of one simulation trial.
  */
@@ -16,6 +18,8 @@ public abstract class StepRecord extends TrialRecord {
      */
     protected StepRecord(int trialIndex, int timeStep) {
         super(trialIndex);
+
+        IntRange.NON_NEGATIVE.validate("Time step", timeStep);
         this.timeStep = timeStep;
     }
 

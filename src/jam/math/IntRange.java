@@ -156,8 +156,22 @@ public final class IntRange implements Iterable<Integer> {
      * within this range.
      */
     public void validate(int value) {
+        validate("Value", value);
+    }
+
+    /**
+     * Ensures that an integer value lies within this range.
+     *
+     * @param name the name to use in the exception message.
+     *
+     * @param value the value to test.
+     *
+     * @throws IllegalArgumentException unless the input value lies
+     * within this range.
+     */
+    public void validate(String name, int value) {
         if (!contains(value))
-            throw new IllegalArgumentException("Value [" + value + "] is outside the allowed range " + this + ".");
+            throw new IllegalArgumentException(name + " [" + value + "] is outside the allowed range " + this + ".");
     }
 
     /**

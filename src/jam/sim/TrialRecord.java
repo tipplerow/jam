@@ -1,6 +1,8 @@
 
 package jam.sim;
 
+import jam.math.IntRange;
+
 /**
  * Records data from a single simulation trial.
  */
@@ -13,6 +15,7 @@ public abstract class TrialRecord {
      * @param trialIndex the index of the trial described by the record.
      */
     protected TrialRecord(int trialIndex) {
+        IntRange.NON_NEGATIVE.validate("Trial index", trialIndex);
         this.trialIndex = trialIndex;
     }
 
