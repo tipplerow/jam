@@ -156,8 +156,22 @@ public final class LongRange implements Iterable<Long> {
      * within this range.
      */
     public void validate(long value) {
+        validate("Value", value);
+    }
+
+    /**
+     * Ensures that a long integer value lies within this range.
+     *
+     * @param name the name to use in the exception message.
+     *
+     * @param value the value to test.
+     *
+     * @throws IllegalArgumentException unless the input value lies
+     * within this range.
+     */
+    public void validate(String name, long value) {
         if (!contains(value))
-            throw new IllegalArgumentException("Value [" + value + "] is outside the allowed range " + this + ".");
+            throw new IllegalArgumentException(name + " [" + value + "] is outside the allowed range " + this + ".");
     }
 
     /**
