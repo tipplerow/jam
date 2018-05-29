@@ -2,16 +2,19 @@
 package jam.sim;
 
 import jam.app.JamApp;
+import jam.app.JamProperties;
 
 /**
  * Provides a base class for discrete-time simulation applications.
  */
 public abstract class DiscreteTimeSimulation extends JamApp {
-    // The global trial index...
-    private static int trialIndex;
+    // The number of trials already executed in the current
+    // simulation...
+    private int trialCount = 0;
 
-    // The global time step index...
-    private static int timeStep;
+    // The number of time steps already executed during the
+    // current trial...
+    private int timeStep = 0;
 
     /**
      * Creates a new simulation instance and reads system properties
@@ -28,30 +31,60 @@ public abstract class DiscreteTimeSimulation extends JamApp {
     }
 
     /**
-     * Returns the (global) index of the current trial.
+     * Returns the offset to apply to the trial counter to generate a
+     * global (across different simulation runs) trial index.
      *
-     * <p><b>The first trial is assigned index zero.</b>
+     * <p>This base class implementation simply returns zero.
      *
-     * @return the (global) index of the current trial.
+     * @return the trial index offset.
      */
-    public static int getTrialIndex() {
-        return trialIndex;
+    protected int getTrialIndexOffset() {
+        return 0;
     }
 
     /**
-     * Returns the (global) index of the current time step.
+     * Returns the total number of trials to execute.
      *
-     * @return the (global) index of the current time step.
+     * @return the total number of trials to execute.
      */
-    public static int getTimeStep() {
+    public abstract int getTrialTarget();
+
+    /**
+     * Returns the number of trials that have been executed in the
+     * current simulation.
+     *
+     * @return the number of trials that have been executed in the
+     * current simulation.
+     */
+    public int getTrialCount() {
+        return trialCount;
+    }
+
+    /**
+     * Returns the index of the current time step in the active trial.
+     *
+     * @return the index of the current time step in the active trial.
+     */
+    public int getTimeStep() {
         return timeStep;
+    }
+
+    /**
+     * Returns the global (across different simulation runs) index of
+     * the current trial: the sum of the trial count and the <em>trial
+     * index offset</em>.
+     *
+     * @return the global index of the current trial.
+     */
+    public int getTrialIndex() {
+        return getTrialCount() + getTrialIndexOffset();
     }
 
     /**
      * Runs a complete simulation.
      */
     public void runSimulation() {
-        trialIndex = 0;
+        trialCount = 0;
         initializeSimulation();
         
         while (continueSimulation()) {
@@ -61,7 +94,7 @@ public abstract class DiscreteTimeSimulation extends JamApp {
             // consistent with the indexing of collection items...
             //
             runTrial();
-            ++trialIndex;
+            ++trialCount;
         }
 
         finalizeSimulation();
@@ -80,10 +113,16 @@ public abstract class DiscreteTimeSimulation extends JamApp {
      * Decides whether or not to continue the current simulation
      * (execute another trial).
      *
+     * <p>This base class implementation continues iff the number of
+     * executed trials is less than the number requested (returned by
+     * {@code getTrialTarget()}).
+     *
      * @return {@code true} if the current simulation should be
      * continued.
      */
-    protected abstract boolean continueSimulation();
+    protected boolean continueSimulation() {
+        return getTrialCount() < getTrialTarget();
+    }
 
     /**
      * Executes tasks after all simulation trials have finished:
