@@ -3,6 +3,7 @@ package jam.junit;
 
 import com.google.common.collect.HashMultiset;
 
+import jam.app.JamProperties;
 import jam.dist.EmpiricalDiscreteDistribution;
 import jam.math.DoubleUtil;
 import jam.math.StatUtil;
@@ -14,7 +15,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class JamRandomTest {
-    private static final JamRandom SOURCE = JamRandom.global(20071202);
+    private static final JamRandom SOURCE = JamRandom.generator(20071202);
 
     @Test public void testAccept() {
         assertEquals(0.1, computeAcceptanceRate(SOURCE, 0.1, 10000), 0.01);
@@ -56,6 +57,14 @@ public class JamRandomTest {
             observations.add(SOURCE.discretize(x));
 
         return EmpiricalDiscreteDistribution.compute(observations);
+    }
+
+    @Test public void testGlobal() {
+        assertNull(System.getProperty(JamRandom.SEED_PROPERTY));
+
+        JamRandom global = JamRandom.global();
+
+        assertEquals(global.getSeed(), JamProperties.getRequiredLong(JamRandom.SEED_PROPERTY));
     }
 
     @Test public void testNextDouble() {

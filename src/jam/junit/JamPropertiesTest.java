@@ -6,7 +6,6 @@ import java.util.Map;
 import jam.app.JamProperties;
 import jam.math.DoubleRange;
 import jam.math.IntRange;
-import jam.math.JamRandom;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -24,8 +23,6 @@ public class JamPropertiesTest {
         System.setProperty("jam.boolean.bogus", "123");
         System.setProperty("jam.enum.ghi", "GHI");
         System.setProperty("jam.enum.xyz", "XYZ");
-
-        System.setProperty(JamRandom.SEED_PROPERTY, "2112"); // Unusual seed, just for testing...
     }
 
     @Test public void testAll() {
@@ -35,7 +32,7 @@ public class JamPropertiesTest {
         assertTrue(properties.containsKey("user.name"));
 
         assertTrue(properties.containsKey("jam.home"));
-        assertTrue(properties.containsKey(JamRandom.SEED_PROPERTY));
+        assertTrue(properties.containsKey("jam.int.good"));
     }
 
     @Test public void testFilter() {
@@ -45,27 +42,36 @@ public class JamPropertiesTest {
         assertFalse(properties.containsKey("user.name"));
 
         assertTrue(properties.containsKey("jam.home"));
-        assertTrue(properties.containsKey(JamRandom.SEED_PROPERTY));
+        assertTrue(properties.containsKey("jam.int.good"));
     }
 
     @Test public void testLoadFile() {
-        JamProperties.loadFile("conf/jam.properties", false);
-        assertEquals(System.getenv("JAM_HOME"), JamProperties.getRequired("jam.home"));
+        //
+        // Temporary override of a property defined in the
+        // "conf/jam.properties" file...
+        //
+        String propName      = "jam.home";
+        String propFileValue = System.getenv("JAM_HOME");
+        String propOverride  = "foo";
 
+        System.setProperty(propName, propOverride);
+        
         // Ensure that the original system property was not
         // overwritten by the value from the properties file...
-        assertEquals("2112", JamProperties.getRequired(JamRandom.SEED_PROPERTY));
+        JamProperties.loadFile("conf/jam.properties", false);
+        assertEquals(propOverride, JamProperties.getRequired(propName));
 
-        // Now check that the property was overwritten...
+        // Now reload with a true override flag and check that the
+        // property was overwritten...
         JamProperties.loadFile("conf/jam.properties", true);
-        assertEquals("20071202", JamProperties.getRequired(JamRandom.SEED_PROPERTY));
+        assertEquals(propFileValue, JamProperties.getRequired(propName));
     }
 
     @Test public void testRequiredPresent() {
         //
         // Just needs not to throw an exception...
         //
-        JamProperties.getRequired(JamRandom.SEED_PROPERTY);
+        JamProperties.getRequired("jam.int.good");
     }
 
     @Test(expected = RuntimeException.class)
@@ -74,12 +80,12 @@ public class JamPropertiesTest {
     }
 
     @Test public void testIsSet() {
-        assertTrue(JamProperties.isSet(JamRandom.SEED_PROPERTY));
+        assertTrue(JamProperties.isSet("jam.int.good"));
         assertFalse(JamProperties.isSet("no_such_property"));
     }
 
     @Test public void testIsUnset() {
-        assertFalse(JamProperties.isUnset(JamRandom.SEED_PROPERTY));
+        assertFalse(JamProperties.isUnset("jam.int.good"));
         assertTrue(JamProperties.isUnset("no_such_property"));
     }
 

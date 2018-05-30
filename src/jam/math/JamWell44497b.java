@@ -4,13 +4,15 @@ package jam.math;
 import org.apache.commons.math3.random.Well44497b;
 
 final class JamWell44497b extends JamRandom {
+    private long seed;
     private final Well44497b random;
 
     // Number of iterations for the "warmup" phase...
     private static final int WARMUP_PERIOD = 100000;
 
     JamWell44497b(long seed) {
-        random = new Well44497b(seed);
+        this.seed = seed;
+        this.random = new Well44497b(seed);
         warmup();
     }
 
@@ -39,7 +41,12 @@ final class JamWell44497b extends JamRandom {
         return random.nextGaussian();
     }
 
+    @Override public long getSeed() {
+        return seed;
+    }
+
     @Override public void setSeed(long seed) {
+        this.seed = seed;
         random.setSeed(seed);
     }
 }

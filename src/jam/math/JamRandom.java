@@ -1,13 +1,16 @@
 
 package jam.math;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.math3.random.Well44497b;
 
 import jam.app.JamLogger;
 import jam.app.JamProperties;
+import jam.io.IOUtil;
 
 /**
  * Provides a generic interface for random number generation and a
@@ -30,7 +33,7 @@ public abstract class JamRandom {
      * Name of the system property specifying the seed for the global
      * instance.
      */
-    public static final String SEED_PROPERTY = "jam.math.JamRandom.seed";
+    public static final String SEED_PROPERTY = "jam.math.randomSeed";
 
     /**
      * Creates a new generator with a seed that is unlikely to be
@@ -54,16 +57,14 @@ public abstract class JamRandom {
     }
 
     /**
-     * Returns the global shared instance.
+     * Returns the global shared instance, creating it on demand.
      *
-     * <p>If the global instance has not been accessed previously,
-     * this method creates the global instance with a seed given by
-     * the system property named {@code jam.math.JamRandom.seed}.
+     * <p>If the system property {@code jam.math.randomSeed} is set,
+     * the seed for the global instance is taken from that property;
+     * otherwise, the seed is selected by the {@code randomSeed()}
+     * method and written to the {@code jam.math.randomSeed} property.
      *
      * @return the global shared instance.
-     *
-     * @throws IllegalStateException unless the instance has been
-     * initialized.
      */
     public static JamRandom global() {
         if (global == null)
@@ -72,18 +73,21 @@ public abstract class JamRandom {
         return global;
     }
 
-    private static int globalSeed() {
-        return JamProperties.getRequiredInt(SEED_PROPERTY);
+    private static long globalSeed() {
+        return JamProperties.getOptionalLong(SEED_PROPERTY, randomSeed());
     }
 
     /**
-     * Initializes or resets the global shared instance.
+     * Initializes or resets the global shared instance and stores the
+     * seed in the {@code jam.math.randomSeed} system property.
      *
      * @param seed the global seed.
      *
      * @return the global shared instance.
      */
     public static JamRandom global(long seed) {
+        System.setProperty(SEED_PROPERTY, Long.toString(seed));
+
         global = new JamWell44497b(seed);
         return global;
     }
@@ -115,7 +119,7 @@ public abstract class JamRandom {
 		JamLogger.warn("Failed to read [%s]; using system time.", DEV_URANDOM);
 	    }
 	    finally {
-		IOUtils.closeQuietly(stream);
+		IOUtil.close(stream);
 	    }
 	}
 
@@ -298,6 +302,13 @@ public abstract class JamRandom {
 
         return eventIndex;
     }
+
+    /**
+     * Returns the value used to seed the generator.
+     *
+     * @return the value used to seed the generator.
+     */
+    public abstract long getSeed();
 
     /**
      * Resets the seed of the generator.
