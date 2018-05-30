@@ -2,6 +2,11 @@
 package jam.app;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import jam.io.DataReader;
@@ -41,6 +46,58 @@ public final class JamProperties {
 
     private static final Pattern COMMENT_PATTERN = RegexUtil.PYTHON_COMMENT;
     private static final Pattern KEY_VALUE_DELIM = Pattern.compile("=");
+
+    /**
+     * Returns a read-only view of all system properties, with the
+     * keys arranged in alphabetical order.
+     *
+     * @return a read-only view of all system properties, with the
+     * keys arranged in alphabetical order.
+     */
+    public static Map<String, String> all() {
+        Map<String, String> properties = new TreeMap<String, String>();
+
+        for (Object key : System.getProperties().keySet()) {
+            String name  = (String) key;
+            String value = System.getProperty(name);
+
+            properties.put(name, value);
+        }
+
+        return Collections.unmodifiableMap(properties);
+    }
+
+    /**
+     * Returns a read-only view of a subset of system properties, with
+     * the keys arranged in alphabetical order.
+     *
+     * @param prefixes properties will be omitted unless their name
+     * begins with one of the prefixes.
+     *
+     * @return a read-only view of a subset of system properties, with
+     * the keys arranged in alphabetical order.
+     */
+    public static Map<String, String> filter(String... prefixes) {
+        Map<String, String> properties = new TreeMap<String, String>(all());
+        Iterator<String> nameIterator = properties.keySet().iterator();
+
+        while (nameIterator.hasNext()) {
+            String name = nameIterator.next();
+
+            if (!startsWith(name, prefixes))
+                nameIterator.remove();
+        }
+
+        return Collections.unmodifiableMap(properties);
+    }
+
+    private static boolean startsWith(String name, String... prefixes) {
+        for (String prefix : prefixes)
+            if (name.startsWith(prefix))
+                return true;
+
+        return false;
+    }
 
     /**
      * Returns a required system property.
@@ -589,5 +646,52 @@ public final class JamProperties {
         // First and last characters are quotation marks...
         //
         return propertyValue.substring(1, propertyValue.length() - 1);
+    }
+
+    /**
+     * Writes system properties to a file.
+     *
+     * <p>Property names may be filtered by a list of desired prefixes
+     * to eliminate the standard properties assigned by the JVM.
+     *
+     * @param file the path to the output file.
+     *
+     * @param prefixes optional prefixes used to filter the property
+     * names: properties will be omitted unless their name begins with
+     * one of the prefixes.
+     */
+    public static void writeProperties(File file, String... prefixes) {
+        PrintWriter writer = IOUtil.openWriter(file, false);
+
+        try {
+            writeProperties(writer, prefixes);
+        }
+        finally {
+            IOUtil.close(writer);
+        }
+    }
+
+    /**
+     * Writes system properties to an output stream.
+     *
+     * <p>Property names may be filtered by a list of desired prefixes
+     * to eliminate the standard properties assigned by the JVM.
+     *
+     * @param writer the output destination.
+     *
+     * @param prefixes optional prefixes used to filter the property
+     * names: properties will be omitted unless their name begins with
+     * one of the prefixes.
+     */
+    public static void writeProperties(PrintWriter writer, String... prefixes) {
+        Map<String, String> properties;
+
+        if (prefixes.length > 0)
+            properties = filter(prefixes);
+        else
+            properties = all();
+
+        for (String name : properties.keySet())
+            writer.println(name + " = " + properties.get(name));
     }
 }

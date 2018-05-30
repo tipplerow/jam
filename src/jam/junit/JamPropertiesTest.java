@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.util.Map;
+
 import jam.app.JamProperties;
 import jam.math.DoubleRange;
 import jam.math.IntRange;
@@ -24,6 +26,26 @@ public class JamPropertiesTest {
         System.setProperty("jam.enum.xyz", "XYZ");
 
         System.setProperty(JamRandom.SEED_PROPERTY, "2112"); // Unusual seed, just for testing...
+    }
+
+    @Test public void testAll() {
+        Map<String, String> properties = JamProperties.all();
+
+        assertTrue(properties.containsKey("file.separator"));
+        assertTrue(properties.containsKey("user.name"));
+
+        assertTrue(properties.containsKey("jam.home"));
+        assertTrue(properties.containsKey(JamRandom.SEED_PROPERTY));
+    }
+
+    @Test public void testFilter() {
+        Map<String, String> properties = JamProperties.filter("jam.");
+
+        assertFalse(properties.containsKey("file.separator"));
+        assertFalse(properties.containsKey("user.name"));
+
+        assertTrue(properties.containsKey("jam.home"));
+        assertTrue(properties.containsKey(JamRandom.SEED_PROPERTY));
     }
 
     @Test public void testLoadFile() {
