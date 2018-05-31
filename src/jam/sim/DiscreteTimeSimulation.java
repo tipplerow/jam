@@ -20,13 +20,11 @@ public abstract class DiscreteTimeSimulation extends JamApp {
      * Creates a new simulation instance and reads system properties
      * from a set of property files.
      *
-     * @param propertyFiles one or more files containing the system
-     * properties that define the simulation parameters.
-     *
-     * @throws IllegalArgumentException unless at least one property
-     * file is specified.
+     * @param propertyFiles files containing system properties that
+     * define the application parameters (may be empty if properties
+     * are specfied elsewhere).
      */
-    protected DiscreteTimeSimulation(String[] propertyFiles) {
+    protected DiscreteTimeSimulation(String... propertyFiles) {
         super(propertyFiles);
     }
 

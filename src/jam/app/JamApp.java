@@ -5,6 +5,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,7 +28,8 @@ public abstract class JamApp {
      * Name of the system property which specifies the directory in
      * which to write the report files.  If this is not specified, the
      * report files will be written into the directory containing the
-     * first property file.
+     * first property file (or the current working directory if there
+     * were no property files specified).
      */
     public static final String REPORT_DIR_PROPERTY = "jam.app.reportDir";
 
@@ -35,18 +37,15 @@ public abstract class JamApp {
      * Creates a new application instance and reads system properties
      * from a set of property files.
      *
-     * @param propertyFiles one or more files containing the system
-     * properties that define the application parameters.
-     *
-     * @throws IllegalArgumentException unless at least one property
-     * file is specified.
+     * @param propertyFiles files containing system properties that
+     * define the application parameters (may be empty if properties
+     * are specfied elsewhere).
      */
-    protected JamApp(String[] propertyFiles) {
-        if (propertyFiles.length < 1)
-            throw new IllegalArgumentException("At least one property file is required.");
+    protected JamApp(String... propertyFiles) {
+        this.propertyFiles = Arrays.copyOf(propertyFiles, propertyFiles.length);
 
-        this.propertyFiles = propertyFiles;
-        JamProperties.loadFiles(propertyFiles, false);
+        if (propertyFiles.length > 0)
+            JamProperties.loadFiles(propertyFiles, false);
 
         this.reportDir = resolveReportDir();
     }
@@ -60,9 +59,13 @@ public abstract class JamApp {
 
     private String getDefaultReportDir() {
         //
-        // Parent directory of the first property file...
+        // Parent directory of the first property file or the working
+        // directory...
         //
-        return FileUtil.getParentName(new File(propertyFiles[0]));
+        if (propertyFiles.length > 0)
+            return FileUtil.getParentName(new File(propertyFiles[0]));
+        else
+            return ".";
     }
 
     /**
