@@ -15,6 +15,27 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class IOUtilTest {
+    @Test public void testGZip() throws IOException {
+        File file = new File("test.gz");
+        file.deleteOnExit();
+
+        PrintWriter writer = IOUtil.openWriter(file);
+
+        String line1 = "abcdefg";
+        String line2 = "hijklmn";
+
+        writer.println(line1);
+        writer.println(line2);
+        writer.close();
+
+        BufferedReader reader = IOUtil.openReader(file);
+
+        assertEquals(line1, reader.readLine());
+        assertEquals(line2, reader.readLine());
+        assertNull(reader.readLine());
+
+        reader.close();
+    }
 
     @Test public void testOpenReader() throws IOException {
         BufferedReader reader = IOUtil.openReader("data/lines123.txt");

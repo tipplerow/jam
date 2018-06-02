@@ -48,6 +48,10 @@ public final class IOUtil {
      * <p>This method is provided to encapsulate and centralize the
      * standard chaining of readers.
      *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate reader
+     * will be returned.
+     *
      * @param fileName the name of the file to read.
      *
      * @return a reader for the specified file.
@@ -64,6 +68,10 @@ public final class IOUtil {
      * <p>This method is provided to encapsulate and centralize the
      * standard chaining of readers.
      *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate reader
+     * will be returned.
+     *
      * @param file the file to read.
      *
      * @return a reader for the specified file.
@@ -71,16 +79,38 @@ public final class IOUtil {
      * @throws RuntimeException unless the file is open for reading.
      */
     public static BufferedReader openReader(File file) {
-        BufferedReader reader = null;
+        if (ZipUtil.isGZipFile(file))
+            return ZipUtil.openGZipReader(file);
 
         try {
-            reader = new BufferedReader(new FileReader(file));
+            return new BufferedReader(new FileReader(file));
         }
         catch (IOException ioex) {
             throw JamException.runtime(ioex);
         }
-        
-	return reader;
+    }
+
+    /**
+     * Opens a writer for a file, creates any subdirectories in the
+     * file path that do not already exist, and truncates the file if
+     * it already exists.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate writer
+     * will be returned.
+     *
+     * @param fileName the name of the file to write (and truncate if
+     * it already exists).
+     *
+     * @return a writer for the specified file.
+     *
+     * @throws RuntimeException unless the file is open for writing.
+     */
+    public static PrintWriter openWriter(String fileName) {
+        return openWriter(fileName, false);
     }
 
     /**
@@ -89,6 +119,10 @@ public final class IOUtil {
      *
      * <p>This method is provided to encapsulate and centralize the
      * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate writer
+     * will be returned.
      *
      * @param fileName the name of the file to write.
      *
@@ -104,11 +138,38 @@ public final class IOUtil {
     }
 
     /**
+     * Opens a writer for a file, creates any subdirectories in the
+     * file path that do not already exist, and truncates the contents
+     * of the file if it already exists.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate writer
+     * will be returned.
+     *
+     * @param file the file to write (and truncate if it already
+     * exists).
+     *
+     * @return a writer for the specified file.
+     *
+     * @throws RuntimeException unless the file is open for writing.
+     */
+    public static PrintWriter openWriter(File file) {
+        return openWriter(file, false);
+    }
+
+    /**
      * Opens a writer for a file and creates any subdirectories in
      * the file path that do not already exist.
      *
      * <p>This method is provided to encapsulate and centralize the
      * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate writer
+     * will be returned.
      *
      * @param file the file to write.
      *
@@ -120,17 +181,16 @@ public final class IOUtil {
      * @throws RuntimeException unless the file is open for writing.
      */
     public static PrintWriter openWriter(File file, boolean append) {
-        PrintWriter writer = null;
+        if (ZipUtil.isGZipFile(file))
+            return ZipUtil.openGZipWriter(file);
 
         try {
             FileUtil.ensureParentDirs(file);
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(file, append)));
+            return new PrintWriter(new BufferedWriter(new FileWriter(file, append)));
         }
         catch (IOException ioex) {
             throw JamException.runtime(ioex);
         }
-
-        return writer;
     }
 
     /**

@@ -129,7 +129,7 @@ public abstract class JamApp {
         if (writerMap.containsKey(baseName))
             throw JamException.runtime("Duplicate base name: [%s]", baseName);
 
-        PrintWriter writer = IOUtil.openWriter(getReportFile(baseName), false);
+        PrintWriter writer = IOUtil.openWriter(getReportFile(baseName));
         writerMap.put(baseName, writer);
 
         autoClose(writer);
