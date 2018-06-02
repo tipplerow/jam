@@ -18,6 +18,26 @@ public final class FileUtil {
     private FileUtil() {}
 
     /**
+     * Creates the parent directories of a file if they do not already
+     * exist (e.g., before attempting to open a new file for writing).
+     *
+     * @param file the file of interest.
+     *
+     * @throws RuntimeException if the parent directories did not
+     * already exist and could not be created.
+     */
+    public static void ensureParentDirs(File file) {
+	File parent = FileUtil.getParentFile(file);
+
+	if (!parent.exists()) {
+	    boolean success = parent.mkdirs();
+
+	    if (!success)
+		throw JamException.runtime("Failed to create parent directory [%s].", parent.getAbsolutePath());
+	}
+    }
+
+    /**
      * Returns the canonical path of the specified file but never
      * throws checked exceptions.
      *

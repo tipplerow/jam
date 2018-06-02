@@ -9,6 +9,15 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class FileUtilTest {
+    @Test public void testEnsureParentDirs() {
+        File dir  = new File("foo");
+        File file = new File(dir, "foo.txt");
+
+        assertFalse(dir.exists());
+        FileUtil.ensureParentDirs(file);
+        assertTrue(dir.exists());
+        assertTrue(dir.delete());
+    }
 
     @Test public void testGetParentName() {
         assertEquals(".", FileUtil.getParentName(new File("foo.txt")));

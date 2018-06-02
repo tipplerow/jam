@@ -120,25 +120,17 @@ public final class IOUtil {
      * @throws RuntimeException unless the file is open for writing.
      */
     public static PrintWriter openWriter(File file, boolean append) {
-	File parent = FileUtil.getParentFile(file);
-
-	if (!parent.exists()) {
-	    boolean success = parent.mkdirs();
-
-	    if (!success)
-		throw JamException.runtime("Failed to create parent directory [%s].", parent.getAbsolutePath());
-	}
-
-	PrintWriter writer = null;
+        PrintWriter writer = null;
 
         try {
+            FileUtil.ensureParentDirs(file);
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file, append)));
         }
         catch (IOException ioex) {
             throw JamException.runtime(ioex);
         }
 
-	return writer;
+        return writer;
     }
 
     /**
