@@ -14,6 +14,7 @@ import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.math.DoubleRange;
 import jam.math.IntRange;
+import jam.math.IntUtil;
 import jam.math.LongRange;
 import jam.math.LongUtil;
 import jam.util.EnumUtil;
@@ -204,7 +205,7 @@ public final class JamProperties {
      * and is formatted as a proper integer.
      */
     public static int getRequiredInt(String propertyName) {
-	return Integer.parseInt(getRequired(propertyName));
+	return IntUtil.parseInt(getRequired(propertyName));
     }
 
     /**

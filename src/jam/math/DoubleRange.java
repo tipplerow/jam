@@ -37,6 +37,16 @@ public final class DoubleRange {
      * The range containing all real numbers: {@code [-Inf, +Inf]}.
      */
     public static DoubleRange INFINITE = closed(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+    /**
+     * The range of valid {@code int} values.
+     */
+    public static DoubleRange INTEGERS = closed(Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+    /**
+     * The range of valid {@code long} values.
+     */
+    public static DoubleRange LONGS = closed(Long.MIN_VALUE, Long.MAX_VALUE);
     
     /**
      * The range containing all negative real numbers: {@code [-Inf, 0.0)}.

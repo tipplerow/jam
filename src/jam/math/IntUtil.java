@@ -43,6 +43,35 @@ public final class IntUtil {
     }
 
     /**
+     * Parses a string representation of an integer value.
+     *
+     * <p>In addition to all formats accepted by the built-in 
+     * {@code Integer.parseInt}, this method supports scientific
+     * notation (e.g., {@code 1.23E9}) provided that the value is
+     * an exact integer value (has no fractional part).
+     *
+     * @param string the string to parse.
+     *
+     * @return the integer value represented by the given string.
+     *
+     * @throws RuntimeException unless the string is properly
+     * formatted.
+     */
+    public static int parseInt(String string) {
+        try {
+            return Integer.parseInt(string);
+        }
+        catch (NumberFormatException ex) {
+            double result = DoubleUtil.parseDouble(string);
+
+            if (DoubleUtil.isInt(result))
+                return (int) result;
+            else
+                throw ex;
+        }
+    }
+
+    /**
      * Parses a delimited string of integer values.
      *
      * @param string the delimited string to parse.
@@ -59,7 +88,7 @@ public final class IntUtil {
         int[] elements = new int[fields.length];
 
         for (int index = 0; index < fields.length; index++)
-            elements[index] = Integer.parseInt(fields[index].trim());
+            elements[index] = parseInt(fields[index].trim());
 
         return elements;
     }

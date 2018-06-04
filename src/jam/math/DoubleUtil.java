@@ -60,6 +60,32 @@ public final class DoubleUtil {
     }
 
     /**
+     * Identifies floating-point values that are equal to {@code int}
+     * values (within a small tolerance).
+     *
+     * @param x the number to examine.
+     *
+     * @return {@code true} iff the input value is equal to an 
+     * {@code int} value.
+     */
+    public static boolean isInt(double x) {
+        return isRound(x) && DoubleRange.INTEGERS.contains(x);
+    }
+
+    /**
+     * Identifies floating-point values that are equal to {@code long}
+     * values (within a small tolerance).
+     *
+     * @param x the number to examine.
+     *
+     * @return {@code true} iff the input value is equal to a
+     * {@code long} value.
+     */
+    public static boolean isLong(double x) {
+        return isRound(x) && DoubleRange.LONGS.contains(x);
+    }
+
+    /**
      * Identifies floating-point values that are round (integral)
      * values.
      *

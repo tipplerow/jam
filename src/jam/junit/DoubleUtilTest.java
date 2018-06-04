@@ -31,6 +31,32 @@ public class DoubleUtilTest extends NumericTestBase {
         assertFalse(DoubleUtil.isFinite(Double.NEGATIVE_INFINITY));
     }
 
+    @Test public void testIsInt() {
+        assertFalse(DoubleUtil.isInt(-Math.pow(2.0, 31) - 1.0));
+        assertTrue( DoubleUtil.isInt(-Math.pow(2.0, 31)));
+        assertTrue( DoubleUtil.isInt(-Math.pow(2.0, 31) + 1.0));
+
+        assertFalse(DoubleUtil.isInt(-1.0E-10));
+        assertTrue( DoubleUtil.isInt( 0.0));
+        assertFalse(DoubleUtil.isInt( 1.0E-10));
+
+        assertTrue( DoubleUtil.isInt(Math.pow(2.0, 31) - 2.0));
+        assertTrue( DoubleUtil.isInt(Math.pow(2.0, 31) - 1.0));
+        assertFalse(DoubleUtil.isInt(Math.pow(2.0, 31)));
+    }
+
+    @Test public void testIsLong() {
+        assertFalse(DoubleUtil.isLong(-Math.pow(2.0, 64)));
+        assertTrue( DoubleUtil.isLong(-Math.pow(2.0, 62)));
+
+        assertFalse(DoubleUtil.isLong(-1.0E-10));
+        assertTrue( DoubleUtil.isLong( 0.0));
+        assertFalse(DoubleUtil.isLong( 1.0E-10));
+
+        assertTrue( DoubleUtil.isLong(Math.pow(2.0, 62)));
+        assertFalse(DoubleUtil.isLong(Math.pow(2.0, 64)));
+    }
+
     @Test public void testLog() {
         double x = 1.23456;
 
