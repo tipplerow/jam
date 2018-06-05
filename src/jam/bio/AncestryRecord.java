@@ -35,12 +35,15 @@ public final class AncestryRecord {
      * @return the ancestry record for the given propagator.
      */
     public static AncestryRecord create(Propagator propagator) {
-        List<? extends Propagator> ancestors = propagator.traceLineage();
-        LongList lineage = new LongArrayList(ancestors.size());
+        Propagator ancestor = propagator;
+        LongArrayList lineage = new LongArrayList();
 
-        for (Propagator ancestor : ancestors)
+        while (ancestor != null) {
             lineage.add(ancestor.getIndex());
+            ancestor = ancestor.getParent();
+        }
 
+        lineage.trim();
         return new AncestryRecord(lineage);
     }
 
@@ -73,7 +76,7 @@ public final class AncestryRecord {
      * @return the index of the youngest propagator.
      */
     public long getChildIndex() {
-        return lineage.getLong(lineage.size() - 1);
+        return lineage.getLong(0);
     }
 
     /**
@@ -82,12 +85,15 @@ public final class AncestryRecord {
      * @return the index of the founding propagator.
      */
     public long getFounderIndex() {
-        return lineage.getLong(0);
+        return lineage.getLong(lineage.size() - 1);
     }
 
     /**
      * Returns a read-only view of the lineage described by this
      * record.
+     *
+     * <p>The lineage is arranaged in <em>reverse chronological
+     * order</em>, with child first and founder last.
      *
      * @return a read-only view of the lineage described by this
      * record.

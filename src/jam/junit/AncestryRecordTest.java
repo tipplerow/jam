@@ -26,8 +26,8 @@ public class AncestryRecordTest {
 
     @Test public void testFormat() {
         assertEquals("0",     rec0.format());
-        assertEquals("0,1",   rec1.format());
-        assertEquals("0,1,2", rec2.format());
+        assertEquals("1,0",   rec1.format());
+        assertEquals("2,1,0", rec2.format());
     }
 
     @Test public void testFounderIndex() {
@@ -38,14 +38,14 @@ public class AncestryRecordTest {
 
     @Test public void testLineage() {
         assertTrue(Arrays.equals(rec0.viewLineage().toLongArray(), new long[] { 0 }));
-        assertTrue(Arrays.equals(rec1.viewLineage().toLongArray(), new long[] { 0, 1 }));
-        assertTrue(Arrays.equals(rec2.viewLineage().toLongArray(), new long[] { 0, 1, 2 }));
+        assertTrue(Arrays.equals(rec1.viewLineage().toLongArray(), new long[] { 1, 0 }));
+        assertTrue(Arrays.equals(rec2.viewLineage().toLongArray(), new long[] { 2, 1, 0 }));
     }
 
     @Test public void testParse() {
         assertEquals(rec0, AncestryRecord.parse("0"));
-        assertEquals(rec1, AncestryRecord.parse("0, 1"));
-        assertEquals(rec2, AncestryRecord.parse("0, 1, 2"));
+        assertEquals(rec1, AncestryRecord.parse("1, 0"));
+        assertEquals(rec2, AncestryRecord.parse("2, 1, 0"));
     }
 
     public static void main(String[] args) {
