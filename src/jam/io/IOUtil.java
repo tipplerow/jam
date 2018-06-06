@@ -72,6 +72,28 @@ public final class IOUtil {
      * file will assumed to be a GZIP file and an appropriate reader
      * will be returned.
      *
+     * @param directory the directory in which the file resides.
+     *
+     * @param baseName the base name of the file to read.
+     *
+     * @return a reader for the specified file.
+     *
+     * @throws RuntimeException unless the file is open for reading.
+     */
+    public static BufferedReader openReader(File directory, String baseName) {
+        return openReader(new File(directory, baseName));
+    }
+
+    /**
+     * Opens a reader for a file.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate reader
+     * will be returned.
+     *
      * @param file the file to read.
      *
      * @return a reader for the specified file.
@@ -158,6 +180,32 @@ public final class IOUtil {
      */
     public static PrintWriter openWriter(File file) {
         return openWriter(file, false);
+    }
+
+    /**
+     * Opens a writer for a file, creates any subdirectories in the
+     * file path that do not already exist, and truncates the contents
+     * of the file if it already exists.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate writer
+     * will be returned.
+     *
+     * @param directory the directory in which to write the file.
+     * exists).
+     *
+     * @param baseName the base name of the file to write (and
+     * truncate if it already exists).
+     *
+     * @return a writer for the specified file.
+     *
+     * @throws RuntimeException unless the file is open for writing.
+     */
+    public static PrintWriter openWriter(File directory, String baseName) {
+        return openWriter(new File(directory, baseName), false);
     }
 
     /**
