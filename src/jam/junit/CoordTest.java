@@ -7,6 +7,20 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class CoordTest {
+    @Test public void testCompare() {
+        runCompareTest(Coord.at(0, 0, 0), Coord.at(1, -9, -9));
+        runCompareTest(Coord.at(0, 0, 0), Coord.at(0,  1, -9));
+        runCompareTest(Coord.at(0, 0, 0), Coord.at(0,  0,  1));
+    }
+
+    private void runCompareTest(Coord lesser, Coord greater) {
+        assertTrue(lesser.compareTo(lesser) == 0);
+        assertTrue(greater.compareTo(greater) == 0);
+
+        assertTrue(lesser.compareTo(greater) < 0);
+        assertTrue(greater.compareTo(lesser) > 0);
+    }
+
     @Test public void testComputeSquaredDistance() {
 	Coord coord1 = Coord.at(1, 2, 3);
 	Coord coord2 = Coord.at(1, 2, 4);

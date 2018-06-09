@@ -13,8 +13,12 @@ import jam.vector.JamVector;
  * <p><b>Immutability.</b> Once created, the coordinate components are
  * fixed and cannot be changed. This allows standard coordinates (e.g.,
  * the origin, allowed bond vectors) to be shared globally.
+ *
+ * <p><b>Natural ordering.</b> The {@code compareTo(Coord)} method
+ * compares the {@code x}, {@code y}, and {@code z} coordinates in
+ * that order.
  */
-public final class Coord {
+public final class Coord implements Comparable<Coord> {
     /** The discrete x-coordinate. */
     public final int x;
 
@@ -187,6 +191,20 @@ public final class Coord {
      */
     public JamVector toVector() {
 	return JamVector.valueOf(x, y, z);
+    }
+
+    @Override public int compareTo(Coord that) {
+        int cmpX = Integer.compare(this.x, that.x);
+
+        if (cmpX != 0)
+            return cmpX;
+
+        int cmpY = Integer.compare(this.y, that.y);
+
+        if (cmpY != 0)
+            return cmpY;
+
+        return Integer.compare(this.z, that.z);
     }
 
     @Override public int hashCode() {
