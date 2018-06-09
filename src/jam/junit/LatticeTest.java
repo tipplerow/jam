@@ -3,6 +3,7 @@ package jam.junit;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jam.lattice.Coord;
 import jam.lattice.Lattice;
@@ -508,6 +509,38 @@ public class LatticeTest {
         assertTrue(lattice.viewOccupants(coord1A).isEmpty());
         assertTrue(lattice.viewOccupants(coord1B).isEmpty());
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
+    }
+
+    @Test public void testMapOccupiedSites() {
+        Lattice<String> lattice = Lattice.sparseMO(period);
+
+        Map<Coord, Set<String>> siteMap = lattice.mapOccupiedSites();
+        assertTrue(siteMap.isEmpty());
+
+        lattice.occupy("ABC", coord2);
+        lattice.occupy("DEF", coord2);
+
+        siteMap = lattice.mapOccupiedSites();
+
+        assertEquals(1, siteMap.size());
+        assertEquals(2, siteMap.get(coord2).size());
+        assertTrue(siteMap.get(coord2).contains("ABC"));
+        assertTrue(siteMap.get(coord2).contains("DEF"));
+
+        lattice.occupy("FOO", coord3);
+        lattice.occupy("BAR", coord3);
+        lattice.occupy("CAR", coord3);
+
+        siteMap = lattice.mapOccupiedSites();
+
+        assertEquals(2, siteMap.size());
+        assertEquals(2, siteMap.get(coord2).size());
+        assertEquals(3, siteMap.get(coord3).size());
+        assertTrue(siteMap.get(coord2).contains("ABC"));
+        assertTrue(siteMap.get(coord2).contains("DEF"));
+        assertTrue(siteMap.get(coord3).contains("FOO"));
+        assertTrue(siteMap.get(coord3).contains("BAR"));
+        assertTrue(siteMap.get(coord3).contains("CAR"));
     }
 
     public static void main(String[] args) {

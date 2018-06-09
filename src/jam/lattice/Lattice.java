@@ -14,7 +14,7 @@ import java.util.Set;
  * locations should always be tracked as absolute coordinates; this
  * lattice class will convert to periodic images as necessary.
  */
-public class Lattice<T> implements LatticeView<T> {
+public class Lattice<T> extends LatticeView<T> {
     private final Period period;
     private final LatticeImpl<T> impl;
     private final Map<T, Coord> locations = new HashMap<T, Coord>();

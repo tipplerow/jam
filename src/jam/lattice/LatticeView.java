@@ -4,6 +4,7 @@ package jam.lattice;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,7 +12,7 @@ import java.util.Set;
 /**
  * Provides a read-only view of a periodic lattice.
  */
-public interface LatticeView<T> {
+public abstract class LatticeView<T> {
     /**
      * Identifies occupants on this lattice.
      *
@@ -52,7 +53,7 @@ public interface LatticeView<T> {
      * @return the number of occupants at the neighboring lattice
      * sites <em>and all of their periodic images</em>.
      */
-    public default Map<Coord, Integer> countOccupants(Coord center, Neighborhood neighborhood) {
+    public Map<Coord, Integer> countOccupants(Coord center, Neighborhood neighborhood) {
         Map<Coord, Integer> occupants = new HashMap<Coord, Integer>(neighborhood.size());
 
         for (Coord neighbor : neighborhood.getNeighbors(center))
@@ -73,7 +74,7 @@ public interface LatticeView<T> {
      * @return the number of neighboring lattice sites that can
      * accommodate new occupants.
      */
-    public default int countAvailable(Coord center, Neighborhood neighborhood) {
+    public int countAvailable(Coord center, Neighborhood neighborhood) {
         int available = 0;
 
         for (Coord neighbor : neighborhood.getNeighbors(center))
@@ -95,7 +96,7 @@ public interface LatticeView<T> {
      * @return the number of neighboring lattice sites that can
      * accommodate new occupants.
      */
-    public default int countAvailable(T occupant, Neighborhood neighborhood) {
+    public int countAvailable(T occupant, Neighborhood neighborhood) {
         Coord coord = locate(occupant);
 
         if (coord != null)
@@ -116,7 +117,7 @@ public interface LatticeView<T> {
      * @return a list containing the absolute coordinates of all
      * neighboring sites that are available for new occupants.
      */
-    public default List<Coord> findAvailable(Coord center, Neighborhood neighborhood) {
+    public List<Coord> findAvailable(Coord center, Neighborhood neighborhood) {
         List<Coord> neighbors = neighborhood.getNeighbors(center);
         List<Coord> available = new ArrayList<Coord>(neighbors.size());
 
@@ -139,7 +140,7 @@ public interface LatticeView<T> {
      * @return a list containing the absolute coordinates of all
      * neighboring sites that are available for new occupants.
      */
-    public default List<Coord> findAvailable(T occupant, Neighborhood neighborhood) {
+    public List<Coord> findAvailable(T occupant, Neighborhood neighborhood) {
         Coord coord = locate(occupant);
 
         if (coord != null)
@@ -163,7 +164,7 @@ public interface LatticeView<T> {
      *
      * @return the periodic image of the input coordinate.
      */
-    public default Image imageOf(Coord coord) {
+    public Image imageOf(Coord coord) {
 	return getPeriod().computeImage(coord);
     }
 
@@ -175,7 +176,7 @@ public interface LatticeView<T> {
      * @return {@code true} iff the specified site contains fewer
      * occupants than its capacity.
      */
-    public default boolean isAvailable(Coord coord) {
+    public boolean isAvailable(Coord coord) {
         return countOccupants(coord) < siteCapacity();
     }
 
@@ -185,7 +186,7 @@ public interface LatticeView<T> {
      * @return {@code true} iff there are no occupants on this
      * lattice.
      */
-    public default boolean isEmpty() {
+    public boolean isEmpty() {
         return countOccupants() == 0;
     }
 
@@ -197,7 +198,7 @@ public interface LatticeView<T> {
      * @return {@code true} iff the specified coordinate <em>and all
      * of its periodic images</em> are unoccupied.
      */
-    public default boolean isEmpty(Coord coord) {
+    public boolean isEmpty(Coord coord) {
         return countOccupants(coord) == 0;
     }
 
@@ -209,7 +210,7 @@ public interface LatticeView<T> {
      * @return {@code true} iff there is at least one occupant at the
      * specified coordinate <em>or any of its periodic images</em>.
      */
-    public default boolean isOccupied(Coord coord) {
+    public boolean isOccupied(Coord coord) {
         return countOccupants(coord) > 0;
     }
 
@@ -228,7 +229,7 @@ public interface LatticeView<T> {
      * @return {@code true} iff the named occupant resides at the
      * specified absolute coordinate.
      */
-    public default boolean isOccupiedBy(Coord coord, T occupant) {
+    public boolean isOccupiedBy(Coord coord, T occupant) {
         return coord.equals(locate(occupant));
     }
 
@@ -243,7 +244,7 @@ public interface LatticeView<T> {
      * @return {@code true} iff one or more neighbors of the central
      * site are availble.
      */
-    public default boolean hasAvailableNeighbor(Coord center, Neighborhood neighborhood) {
+    public boolean hasAvailableNeighbor(Coord center, Neighborhood neighborhood) {
         for (Coord basis : neighborhood.viewBasis())
             if (isAvailable(center.plus(basis)))
                 return true;
@@ -263,7 +264,7 @@ public interface LatticeView<T> {
      * @return {@code true} iff the occupant resides on this lattice
      * and one or more of its neighboring sites are availble.
      */
-    public default boolean hasAvailableNeighbor(T occupant, Neighborhood neighborhood) {
+    public boolean hasAvailableNeighbor(T occupant, Neighborhood neighborhood) {
         Coord coord = locate(occupant);
 
         if (coord != null)
@@ -282,6 +283,35 @@ public interface LatticeView<T> {
      * lattice.
      */
     public abstract Coord locate(T occupant);
+
+    /**
+     * Returns a mapping from occupied sites to their occupants.
+     *
+     * @return a map whose keys are the coordinates of all occupied
+     * lattice sites with values containing all occupants of those
+     * sites.
+     */
+    public Map<Coord, Set<T>> mapOccupiedSites() {
+        Map<Coord, Set<T>> siteMap = new HashMap<Coord, Set<T>>();
+
+        for (T occupant : viewOccupants()) {
+            Coord coord = locate(occupant);
+
+            if (coord == null)
+                throw new IllegalStateException("Could not map lattice occupant.");
+
+            Set<T> occupantList = siteMap.get(coord);
+
+            if (occupantList == null) {
+                occupantList = new HashSet<T>();
+                siteMap.put(coord, occupantList);
+            }
+
+            occupantList.add(occupant);
+        }
+
+        return siteMap;
+    }
 
     /**
      * Returns the maximum number of occupants that can be
