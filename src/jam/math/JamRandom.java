@@ -150,8 +150,8 @@ public abstract class JamRandom {
      *
      * @return the discretized value.
      */
-    public int discretize(double x) {
-        int k = (int) Math.floor(x);
+    public long discretize(double x) {
+        long k = (long) Math.floor(x);
 
         if (accept(x - k))
             return k + 1;

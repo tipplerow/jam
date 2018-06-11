@@ -54,7 +54,7 @@ public class JamRandomTest {
         HashMultiset<Integer> observations = HashMultiset.create();
 
         for (int k = 0; k < 100000; ++k)
-            observations.add(SOURCE.discretize(x));
+            observations.add((int) SOURCE.discretize(x));
 
         return EmpiricalDiscreteDistribution.compute(observations);
     }
