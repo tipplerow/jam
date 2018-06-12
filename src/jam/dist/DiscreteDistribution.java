@@ -12,6 +12,20 @@ import jam.math.JamRandom;
  */
 public interface DiscreteDistribution {
     /**
+     * Creates a <em>nearly equivalent</em> pre-computed probability
+     * distribution over the effective range of this distribution.
+     *
+     * <p>The CDF and PDF of the cached distribution may differ from
+     * those in the true distribution by one part per billion.
+     *
+     * @return a new discrete distribution with the PDF and CDF
+     * pre-computed over the effective range of this distribution.
+     */
+    public default DiscreteDistribution cache() {
+        return CompactDiscreteDistribution.cache(this);
+    }
+
+    /**
      * Computes the cumulative distribution function at a point.  For
      * a random variable {@code X} drawn from this distribution, this
      * method returns the probability {@code P(X <= k)}.

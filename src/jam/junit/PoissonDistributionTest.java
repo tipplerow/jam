@@ -68,6 +68,12 @@ public class PoissonDistributionTest extends DiscreteDistributionTestBase {
             assertEquals(jam.pdf(k), apache.probability(k), TOLERANCE);
     }
 
+    @Test public void testCache() {
+        cacheTest(jam005, 1.0e-12, false);
+        cacheTest(jam025, 1.0e-09, false);
+        cacheTest(jam095, 1.0e-09, false);
+    }
+
     @Test public void testEffectiveRange() {
         checkEffectiveRange(0.001);
         checkEffectiveRange(0.002);

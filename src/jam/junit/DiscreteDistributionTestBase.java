@@ -20,6 +20,26 @@ public abstract class DiscreteDistributionTestBase extends NumericTestBase {
         super(tolerance);
     }
 
+    public void cacheTest(DiscreteDistribution dist, double tolerance, boolean verbose) {
+        DiscreteDistribution cache = dist.cache();
+
+        double maxErrCDF = 0.0;
+        double maxErrPDF = 0.0;
+
+        for (int k : dist.effectiveRange()) {
+            maxErrCDF = Math.max(maxErrCDF, Math.abs(cache.cdf(k) - dist.cdf(k)));
+            maxErrPDF = Math.max(maxErrPDF, Math.abs(cache.pdf(k) - dist.pdf(k)));
+        }
+
+        if (verbose) {
+            System.out.println(String.format("Maximum CDF error: %.2g", maxErrCDF));
+            System.out.println(String.format("Maximum PDF error: %.2g", maxErrPDF));
+        }
+
+        assertTrue(maxErrCDF <= tolerance);
+        assertTrue(maxErrPDF <= tolerance);
+    }
+
     public void effectiveRangeTest(DiscreteDistribution distribution, double tolerance, boolean verbose) {
         IntRange effectiveRange = distribution.effectiveRange();
         double   omittedMass    = 1.0 - distribution.cdf(effectiveRange);

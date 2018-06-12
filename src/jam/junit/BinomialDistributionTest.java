@@ -113,6 +113,15 @@ public class BinomialDistributionTest extends DiscreteDistributionTestBase {
             assertEquals(jam.pdf(k), apache.probability(k), 1.0E-06);
     }
 
+    @Test public void testCache() {
+        cacheTest(jam_01_20, 1.0e-12, false);
+        cacheTest(jam_01_60, 1.0e-12, false);
+        cacheTest(jam_05_10, 1.0e-12, false);
+        cacheTest(jam_05_50, 1.0e-12, false);
+        cacheTest(jam_30_50, 1.0e-12, false);
+        cacheTest(jam_30_90, 1.0e-12, false);
+    }
+
     @Test public void testEffectiveRange() {
         checkEffectiveRange(0);
         checkEffectiveRange(1);

@@ -12,6 +12,7 @@ import jam.math.DoubleUtil;
 import jam.math.IntRange;
 import jam.math.IntUtil;
 import jam.math.Probability;
+import jam.vector.JamVector;
 import jam.vector.VectorUtil;
 import jam.vector.VectorView;
 
@@ -27,6 +28,30 @@ public final class DiscretePDF extends DiscreteDistributionFunction {
 
     private static void validate(double[] values) {
         Probability.validate(VectorView.wrap(values));
+    }
+
+    /**
+     * Computes the PDF and CDF of another discrete distribution over
+     * its effective range and returns a new cached distribution that
+     * is <em>nearly equivalent</em> to the input distribution.
+     *
+     * <p>The new distribution will differ from the input distribution
+     * by less than one part per billion.
+     *
+     * @param dist the distribution to cache.
+     *
+     * @return a new distribution with the PDF and CDF pre-computed
+     * over the effective range of the input distribution.
+     */
+    public static DiscretePDF cache(DiscreteDistribution dist) {
+        IntRange  range = dist.effectiveRange();
+        JamVector PDF   = new JamVector(range.size());
+
+        for (int k = 0; k < PDF.length(); ++k)
+            PDF.set(k, dist.pdf(range.lower() + k));
+
+        PDF.normalize();
+        return create(range.lower(), PDF);
     }
 
     /**

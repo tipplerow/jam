@@ -7,7 +7,7 @@ import jam.math.JamRandom;
 /**
  * Represents a univariate probability distribution taking integer
  * values over a compact (finite) range with prescribed (explicitly
- * pre-calculated) probabilities
+ * pre-calculated) probabilities.
  */
 public class CompactDiscreteDistribution extends AbstractDiscreteDistribution {
     private final DiscretePDF pdf;
@@ -22,6 +22,22 @@ public class CompactDiscreteDistribution extends AbstractDiscreteDistribution {
     public CompactDiscreteDistribution(DiscretePDF pdf) {
         this.pdf = pdf;
         this.cdf = DiscreteCDF.compute(pdf);
+    }
+
+    /**
+     * Creates a <em>nearly equivalent</em> pre-computed probability
+     * distribution over the effective range of another distribution.
+     *
+     * <p>The CDF and PDF of the cached distribution may differ from
+     * those in the true distribution by one part per billion.
+     *
+     * @param dist the distribution to cache.
+     *
+     * @return a new distribution with the PDF and CDF pre-computed
+     * over the effective range of the input distribution.
+     */
+    public static CompactDiscreteDistribution cache(DiscreteDistribution dist) {
+        return new CompactDiscreteDistribution(DiscretePDF.cache(dist));
     }
 
     /**
