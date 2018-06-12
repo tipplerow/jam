@@ -19,12 +19,23 @@ public final class OrdinalIndex {
     }
 
     /**
-     * Returns the index of the next object to be indexed.
+     * Returns the index of the next object to be indexed (and
+     * increments the underlying counter).
      *
      * @return the index of the next object to be indexed.
      */
     public long next() {
         return count++;
+    }
+
+    /**
+     * Returns the index of the next object to be indexed (but leaves
+     * the underlying counter unchanged).
+     *
+     * @return the index of the next object to be indexed.
+     */
+    public long peek() {
+        return count;
     }
 
     @Override public boolean equals(Object that) {
