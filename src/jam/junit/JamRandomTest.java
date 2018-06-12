@@ -18,8 +18,10 @@ public class JamRandomTest {
     private static final JamRandom SOURCE = JamRandom.generator(20071202);
 
     @Test public void testAccept() {
+        assertEquals(0.0, computeAcceptanceRate(SOURCE, 0.0, 10000), 1.0E-15);
         assertEquals(0.1, computeAcceptanceRate(SOURCE, 0.1, 10000), 0.01);
         assertEquals(0.8, computeAcceptanceRate(SOURCE, 0.8, 10000), 0.01);
+        assertEquals(1.0, computeAcceptanceRate(SOURCE, 1.0, 10000), 1.0E-15);
     }
 
     private double computeAcceptanceRate(JamRandom random, double acceptanceProb, int sampleSize) {

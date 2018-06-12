@@ -29,6 +29,16 @@ public abstract class JamRandom {
     // Source for nearly unique seeds...
     private static final File DEV_URANDOM = new File("/dev/urandom");
 
+    // In the accept() method, any event probability smaller than this
+    // will be automatically rejected without sampling the next double
+    // value...
+    private static final double MIN_ACCEPT_PROB = 1.0E-14;
+
+    // In the accept() method, any event probability greater than this
+    // will be automatically accepted without sampling the next double
+    // value...
+    private static final double MAX_REJECT_PROB = 1.0 - MIN_ACCEPT_PROB;
+
     /**
      * Name of the system property specifying the seed for the global
      * instance.
@@ -135,7 +145,12 @@ public abstract class JamRandom {
      * @return the randomly generated acceptance decision.
      */
     public boolean accept(double acceptanceProb) {
-        return nextDouble() < acceptanceProb;
+        if (acceptanceProb < MIN_ACCEPT_PROB)
+            return false;
+        else if (acceptanceProb < MAX_REJECT_PROB)
+            return nextDouble() < acceptanceProb;
+        else
+            return true;
     }
     
     /**
