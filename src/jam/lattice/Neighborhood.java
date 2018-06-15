@@ -19,12 +19,22 @@ import jam.util.ListView;
  */
 public enum Neighborhood {
     /**
-     * The Moore neighborhood of 6 first-nearest, 12 second-nearest,
+     * The Moore neighborhood of six first-nearest, 12 second-nearest,
      * and eight third-nearest neighbors (26 in all).
      */
     MOORE {
         @Override public ListView<Coord> viewBasis() {
             return NEAREST_123;
+        }
+    },
+
+    /**
+     * The six first-nearest and 12 second-nearest neighbors (18 in
+     * all).
+     */
+    NEAR_NEXT {
+        @Override public ListView<Coord> viewBasis() {
+            return NEAREST_12;
         }
     },
 
@@ -80,6 +90,10 @@ public enum Neighborhood {
                         Coord.at(-1,  1,  1),
                         Coord.at( 1,  1,  1),
                         Coord.at( 1, -1,  1));
+
+    // This must be declared here to void an "illegal forward reference"...
+    private static final ListView<Coord> NEAREST_12 =
+        ListView.create(ListUtil.cat(FIRST_NEAREST, SECOND_NEAREST));
 
     // This must be declared here to void an "illegal forward reference"...
     private static final ListView<Coord> NEAREST_123 =
