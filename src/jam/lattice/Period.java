@@ -106,6 +106,15 @@ public final class Period {
     }
 
     /**
+     * Returns the length of the longest edge of the periodic box.
+     *
+     * @return the length of the longest edge of the periodic box.
+     */
+    public int getMaxLength() {
+        return Math.max(nx, Math.max(ny, nz));
+    }
+
+    /**
      * Returns the periodic length along the x-direction.
      *
      * @return the periodic length along the x-direction.

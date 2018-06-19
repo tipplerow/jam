@@ -50,6 +50,12 @@ public class PeriodTest {
 	assertEquals(image3, period.computeImage(coord3));
     }
 
+    @Test public void testGetMaxLength() {
+	Period period = new Period(10, 20, 30);
+	assertEquals(30, period.getMaxLength());
+    }
+
+
     @Test public void testGetSiteCount() {
 	Period period = new Period(10, 20, 30);
 	assertEquals(6000, period.getSiteCount());
