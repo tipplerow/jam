@@ -60,6 +60,21 @@ public final class Coord implements Comparable<Coord> {
     }
 
     /**
+     * Returns the discrete lattice coordinate nearest a point in
+     * continuous space.
+     *
+     * @param x the continuous x-coordinate.
+     * @param y the continuous y-coordinate.
+     * @param z the continuous z-coordinate.
+     *
+     * @return the discrete lattice coordinate nearest the given point
+     * in continuous space.
+     */
+    public static Coord nearest(double x, double y, double z) {
+        return at((int) Math.round(x), (int) Math.round(y), (int) Math.round(z));
+    }
+
+    /**
      * Writes this coordinate in CSV format.
      *
      * @return a string representation of this coordinate in CSV format.
@@ -113,6 +128,25 @@ public final class Coord implements Comparable<Coord> {
 	int dz = coord1.z - coord2.z;
 
 	return (dx * dx) + (dy * dy) + (dz * dz);
+    }
+
+    /**
+     * Returns the distance between this coordinate and a point in
+     * continuous space.
+     *
+     * @param x the continuous x-coordinate.
+     * @param y the continuous y-coordinate.
+     * @param z the continuous z-coordinate.
+     *
+     * @return the distance between this coordinate and the given
+     * point in continuous space.
+     */
+    public double distance(double x, double y, double z) {
+	double dx = x - this.x;
+	double dy = y - this.y;
+	double dz = z - this.z;
+
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     /**

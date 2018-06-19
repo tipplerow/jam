@@ -2,11 +2,12 @@
 package jam.junit;
 
 import jam.lattice.Coord;
+import jam.lattice.Neighborhood;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class CoordTest {
+public class CoordTest extends NumericTestBase {
     @Test public void testCompare() {
         runCompareTest(Coord.at(0, 0, 0), Coord.at(1, -9, -9));
         runCompareTest(Coord.at(0, 0, 0), Coord.at(0,  1, -9));
@@ -94,6 +95,25 @@ public class CoordTest {
 
 	assertEquals(coord, Coord.parseCSV(coord.formatCSV()));
 	assertEquals(coord, Coord.parseCSV("  -123456789,  987654321  ,  0 "));
+    }
+
+    @Test public void testNearest() {
+        for (int k = 0; k < 10000; ++k)
+            validateNearest();
+    }
+
+    private void validateNearest() {
+        double x = random().nextDouble();
+        double y = random().nextDouble();
+        double z = random().nextDouble();
+
+        Coord  nearest  = Coord.nearest(x, y, z);
+        double distance = nearest.distance(x, y, z);
+
+        assertTrue(nearest.distance(x, y, z) <= Math.sqrt(3.0) / 2.0);
+
+        for (Coord neighbor : Neighborhood.MOORE.getNeighbors(nearest))
+            assertTrue(neighbor.distance(x, y, z) >= distance);
     }
 
     public static void main(String[] args) {
