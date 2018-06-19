@@ -39,7 +39,7 @@ public final class Coord implements Comparable<Coord> {
      * @param x the discrete x-coordinate.
      * @param y the discrete y-coordinate.
      * @param z the discrete z-coordinate.
-     */
+    */
     public Coord(int x, int y, int z) {
 	this.x = x;
 	this.y = y;
@@ -183,9 +183,22 @@ public final class Coord implements Comparable<Coord> {
      * coordinate is unchanged.
      */
     public Coord plus(Coord that) {
-	return new Coord(this.x + that.x,
-			 this.y + that.y,
-			 this.z + that.z);
+	return plus(that.x, that.y, that.z);
+    }
+
+    /**
+     * Computes the sum of this (vector) coordinate and another.
+     *
+     * @param x the discrete x-coordinate.
+     * @param y the discrete y-coordinate.
+     * @param z the discrete z-coordinate.
+     *
+     * @return a new coordinate whose components are the sum of the
+     * components of this coordinate and the input coordinates; this
+     * coordinate is unchanged.
+     */
+    public Coord plus(int x, int y, int z) {
+	return new Coord(this.x + x, this.y + y, this.z + z);
     }
 
     /**
@@ -198,9 +211,22 @@ public final class Coord implements Comparable<Coord> {
      * coordinate is unchanged.
      */
     public Coord minus(Coord that) {
-	return new Coord(this.x - that.x,
-			 this.y - that.y,
-			 this.z - that.z);
+	return minus(that.x, that.y, that.z);
+    }
+
+    /**
+     * Computes the difference of this (vector) coordinate and another.
+     *
+     * @param x the discrete x-coordinate.
+     * @param y the discrete y-coordinate.
+     * @param z the discrete z-coordinate.
+     *
+     * @return a new coordinate whose components are the difference of
+     * the components of this coordinate and the input coordinates; this 
+     * coordinate is unchanged.
+     */
+    public Coord minus(int x, int y, int z) {
+        return plus(-x, -y, -z);
     }
 
     /**
