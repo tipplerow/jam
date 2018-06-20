@@ -25,7 +25,7 @@ public abstract class Propagator extends Ordinal {
     /**
      * Possible replication states of a propagator.
      */
-    public enum State { ALIVE, SENESCENT, DEAD };
+    public enum State { ACTIVE, SENESCENT, DEAD };
 
     /**
      * Creates all propagators.
@@ -102,12 +102,12 @@ public abstract class Propagator extends Ordinal {
     }
 
     /**
-     * Identifies propagators that are still alive.
+     * Identifies propagators that are still actively dividing.
      *
-     * @return {@code true} iff this propagator is still alive.
+     * @return {@code true} iff this propagator is still active.
      */
-    public final boolean isAlive() {
-        return getState().equals(State.ALIVE);
+    public final boolean isActive() {
+        return getState().equals(State.ACTIVE);
     }
 
     /**

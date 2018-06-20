@@ -36,7 +36,7 @@ public class Replicator extends Propagator {
     }
 
     @Override public State getState() {
-        return State.ALIVE;
+        return State.ACTIVE;
     }
 
     @Override public Replicator getFounder() {

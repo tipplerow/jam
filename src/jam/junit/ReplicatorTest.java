@@ -21,7 +21,7 @@ public class ReplicatorTest {
     @Test public void testDaughter() {
         Replicator step1 = FIRST.replicate();
 
-        assertTrue(FIRST.isAlive());
+        assertTrue(FIRST.isActive());
         assertEquals(1, step1.getIndex());
         assertEquals(1, step1.getGeneration());
         assertEquals(FIRST, step1.getParent());
@@ -31,8 +31,8 @@ public class ReplicatorTest {
         step2.add(FIRST.replicate());
         step2.add(step1.replicate());
 
-        assertTrue(FIRST.isAlive());
-        assertTrue(step1.isAlive());
+        assertTrue(FIRST.isActive());
+        assertTrue(step1.isActive());
         assertEquals(2, step2.size());
 
         assertEquals(2, step2.get(0).getIndex());
