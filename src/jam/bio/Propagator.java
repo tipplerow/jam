@@ -14,7 +14,7 @@ import jam.lang.Ordinal;
  *
  * <p>This class hierarcy is defined in the context of discrete-time
  * simulation: Propagators advance through time in discrete steps; at
- * each step, a propagator may produce offspring, become dormant, or
+ * each step, a propagator may produce offspring, become senescent, or
  * die (e.g., by apoptosis).
  */
 public abstract class Propagator extends Ordinal {
@@ -25,7 +25,7 @@ public abstract class Propagator extends Ordinal {
     /**
      * Possible replication states of a propagator.
      */
-    public enum State { ALIVE, DORMANT, DEAD };
+    public enum State { ALIVE, SENESCENT, DEAD };
 
     /**
      * Creates all propagators.
@@ -111,12 +111,13 @@ public abstract class Propagator extends Ordinal {
     }
 
     /**
-     * Identifies propagators that have entered a dormant state.
+     * Identifies propagators that have entered a senescent state.
      *
-     * @return {@code true} iff this propagator is in a dormant state.
+     * @return {@code true} iff this propagator is in a senescent
+     * state.
      */
-    public final boolean isDormant() {
-        return getState().equals(State.DORMANT);
+    public final boolean isSenescent() {
+        return getState().equals(State.SENESCENT);
     }
 
     /**
