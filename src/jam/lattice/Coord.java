@@ -2,6 +2,7 @@
 package jam.lattice;
 
 import jam.vector.JamVector;
+import jam.vector.VectorView;
 
 /**
  * Represents a discrete absolute position in three dimensions.
@@ -57,6 +58,28 @@ public final class Coord implements Comparable<Coord> {
      */
     public static Coord at(int x, int y, int z) {
         return new Coord(x, y, z);
+    }
+
+    /**
+     * Returns the discrete lattice coordinate nearest a point in
+     * continuous space.
+     *
+     * @param point the continuous 3D-vector coordinate.
+     *
+     * @return the discrete lattice coordinate nearest the given point
+     * in continuous space.
+     *
+     * @throws IllegalArgumentException unless the input vector is
+     * three dimensional.
+     */
+    public static Coord nearest(VectorView point) {
+        validatePoint(point);
+        return nearest(point.getDouble(0), point.getDouble(1), point.getDouble(2));
+    }
+
+    private static void validatePoint(VectorView point) {
+        if (point.length() != 3)
+            throw new IllegalArgumentException("A three-dimensional point is required.");
     }
 
     /**
@@ -128,6 +151,23 @@ public final class Coord implements Comparable<Coord> {
 	int dz = coord1.z - coord2.z;
 
 	return (dx * dx) + (dy * dy) + (dz * dz);
+    }
+
+    /**
+     * Returns the distance between this coordinate and a point in
+     * continuous space.
+     *
+     * @param point the continuous 3D-vector coordinate.
+     *
+     * @return the distance between this coordinate and the given
+     * point in continuous space.
+     *
+     * @throws IllegalArgumentException unless the input vector is
+     * three dimensional.
+     */
+    public double distance(VectorView point) {
+        validatePoint(point);
+        return distance(point.getDouble(0), point.getDouble(1), point.getDouble(2));
     }
 
     /**

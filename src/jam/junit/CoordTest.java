@@ -3,6 +3,7 @@ package jam.junit;
 
 import jam.lattice.Coord;
 import jam.lattice.Neighborhood;
+import jam.vector.JamVector;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -107,8 +108,10 @@ public class CoordTest extends NumericTestBase {
         double y = random().nextDouble();
         double z = random().nextDouble();
 
-        Coord  nearest  = Coord.nearest(x, y, z);
-        double distance = nearest.distance(x, y, z);
+        JamVector point = JamVector.valueOf(x, y, z);
+
+        Coord  nearest  = Coord.nearest(point);
+        double distance = nearest.distance(point);
 
         assertTrue(nearest.distance(x, y, z) <= Math.sqrt(3.0) / 2.0);
 
