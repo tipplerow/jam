@@ -1,6 +1,7 @@
 
 package jam.lattice;
 
+import jam.util.RegexUtil;
 import jam.vector.JamVector;
 import jam.vector.VectorView;
 
@@ -125,7 +126,7 @@ public final class Coord implements Comparable<Coord> {
      * properly formatted CSV representation of a coordinate.
      */
     public static Coord parseCSV(String s) {
-	String[] fields = s.split(",");
+	String[] fields = RegexUtil.COMMA.split(s);
 
 	if (fields.length != 3)
 	    throw new IllegalArgumentException(String.format("Invalid coordinate format [%s].", s));
