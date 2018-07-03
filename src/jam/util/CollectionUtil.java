@@ -34,6 +34,25 @@ public final class CollectionUtil {
     }
 
     /**
+     * Determines whether every object in a collection is unique
+     * (appears exactly once).
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param collection the collection to examine.
+     *
+     * @return {@code true} iff every object in the input collection
+     * is unique.
+     */
+    public static <V> boolean allUnique(Collection<V> collection) {
+        //
+        // We need to iterate over all elements anyway, so returning
+        // !anyDuplicates(collection) would not be any faster...
+        //
+        return countUnique(collection) == collection.size();
+    }
+
+    /**
      * Determines whether a collection contains any duplicate
      * elements.
      *

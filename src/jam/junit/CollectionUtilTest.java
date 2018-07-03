@@ -34,6 +34,29 @@ public class CollectionUtilTest extends NumericTestBase {
         assertEquals(1, set.count("C"));
     }
 
+    @Test public void testAllUnique() {
+        List<String> list = new ArrayList<String>();
+        assertTrue(CollectionUtil.allUnique(list));
+
+        list.add("ABC");
+        assertTrue(CollectionUtil.allUnique(list));
+
+        list.add("DEF");
+        assertTrue(CollectionUtil.allUnique(list));
+
+        list.add("GHI");
+        assertTrue(CollectionUtil.allUnique(list));
+
+        list.add("DEF");
+        assertFalse(CollectionUtil.allUnique(list));
+
+        list.add("JKL");
+        assertFalse(CollectionUtil.allUnique(list));
+
+        list.add("ABC");
+        assertFalse(CollectionUtil.allUnique(list));
+    }
+
     @Test public void testAnyDuplicates() {
         List<String> list = new ArrayList<String>();
         assertFalse(CollectionUtil.anyDuplicates(list));
