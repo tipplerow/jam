@@ -34,6 +34,29 @@ public class CollectionUtilTest extends NumericTestBase {
         assertEquals(1, set.count("C"));
     }
 
+    @Test public void testAnyDuplicates() {
+        List<String> list = new ArrayList<String>();
+        assertFalse(CollectionUtil.anyDuplicates(list));
+
+        list.add("ABC");
+        assertFalse(CollectionUtil.anyDuplicates(list));
+
+        list.add("DEF");
+        assertFalse(CollectionUtil.anyDuplicates(list));
+
+        list.add("GHI");
+        assertFalse(CollectionUtil.anyDuplicates(list));
+
+        list.add("DEF");
+        assertTrue(CollectionUtil.anyDuplicates(list));
+
+        list.add("JKL");
+        assertTrue(CollectionUtil.anyDuplicates(list));
+
+        list.add("ABC");
+        assertTrue(CollectionUtil.anyDuplicates(list));
+    }
+
     @Test public void testAverage() {
         assertTrue(Double.isNaN(CollectionUtil.average(emptyList, s -> s.length())));
         assertDouble(3.0, CollectionUtil.average(Arrays.asList("abc"), s -> s.length()));

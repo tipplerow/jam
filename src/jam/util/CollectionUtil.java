@@ -34,6 +34,30 @@ public final class CollectionUtil {
     }
 
     /**
+     * Determines whether a collection contains any duplicate
+     * elements.
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param collection the collection to examine.
+     *
+     * @return {@code true} iff the input collection contains one or
+     * more duplicate elements.
+     */
+    public static <V> boolean anyDuplicates(Collection<V> collection) {
+        HashSet<V> unique = new HashSet<V>(collection.size());
+
+        for (V object : collection) {
+            if (unique.contains(object))
+                return true;
+            else
+                unique.add(object);
+        }
+
+        return false;
+    }
+
+    /**
      * Computes the average of an attribute over a collection of
      * objects.
      *
