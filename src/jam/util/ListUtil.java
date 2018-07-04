@@ -126,6 +126,9 @@ public final class ListUtil {
         if (list.isEmpty())
             throw new NoSuchElementException();
 
+        // Linked lists maintain references to the first and last
+        // elements, so this operation is constant time for array
+        // lists and linked lists...
         return list.get(list.size() - 1);
     }
 
