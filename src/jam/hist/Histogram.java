@@ -9,12 +9,19 @@ import java.util.function.Function;
 
 import jam.math.DoubleRange;
 import jam.math.Point2D;
+import jam.math.UnivariateFunction;
+import jam.math.SplineFunction;
 import jam.util.ListUtil;
 import jam.vector.VectorUtil;
 
 public final class Histogram {
     private final List<Bin> bins;
     private final long total;
+
+    // On-demand calculation of the cumulative distribution and
+    // density functions...
+    private UnivariateFunction cdf = null;
+    private UnivariateFunction pdf = null;
 
     private Histogram(List<Bin> bins) {
         Bin.freeze(bins);
@@ -299,22 +306,45 @@ public final class Histogram {
      * @return the cumulative distribution function described by this
      * histogram.
      */
-    public List<Point2D> getCDF() {
-        List<Point2D> cdf = new ArrayList<Point2D>(bins.size());
+    public UnivariateFunction getCDF() {
+        if (cdf == null)
+            cdf = computeCDF();
+
+        return cdf;
+    }
+
+    private UnivariateFunction computeCDF() {
+        List<Point2D> knots = new ArrayList<Point2D>(bins.size() + 3);
 
         double x = bins.get(0).getRange().getUpperBound();
         double y = bins.get(0).getFrequency(total);
 
-        cdf.add(Point2D.at(x, y));
+        knots.add(Point2D.at(x, y));
 
         for (int k = 1; k < bins.size(); ++k) {
             x = bins.get(k).getRange().getUpperBound();
-            y = bins.get(k).getFrequency(total) + cdf.get(k - 1).y;
+            y = bins.get(k).getFrequency(total) + knots.get(k - 1).y;
 
-            cdf.add(Point2D.at(x, y));
+            knots.add(Point2D.at(x, y));
         }
 
-        return cdf;
+        // Add one knot point with zero probability at the lower bound
+        // of the first bin to truncate the distribution, and another
+        // knot point with zero probability somewhere to the left so
+        // that zero probability is extrapolated to negative infinity.
+        double x0 = ListUtil.first(bins).getRange().getLowerBound();
+        double w0 = ListUtil.first(bins).getRange().getWidth();
+
+        knots.add(Point2D.at(x0 - w0, 0.0));
+        knots.add(Point2D.at(x0,      0.0));
+
+        // Now add one more knot above the last bin so that unit
+        // probability is extrapolated to positive infinity...
+        double xN = ListUtil.last(bins).getRange().getUpperBound();
+        double wN = ListUtil.last(bins).getRange().getWidth();
+
+        knots.add(Point2D.at(xN + wN, 1.0));
+        return SplineFunction.linear(knots);
     }
 
     /**
@@ -330,17 +360,45 @@ public final class Histogram {
      * @return the probability density function described by this
      * histogram.
      */
-    public List<Point2D> getPDF() {
-        List<Point2D> pdf = new ArrayList<Point2D>(bins.size());
+    public UnivariateFunction getPDF() {
+        if (pdf == null)
+            pdf = computePDF();
+
+        return pdf;
+    }
+
+    private UnivariateFunction computePDF() {
+        List<Point2D> knots = new ArrayList<Point2D>(bins.size() + 4);
+
+        // Let "m0" and "w0" be the midpoint and width of the first
+        // bin.  We add one knot point with zero density at (m0 - w0)
+        // so that the PDF is normalized under linear interpolation.
+        // (A small amount of probability density will "leak out"
+        // below the lower bound of the first bin, but this is typical
+        // of discrete kernal estimation.)  We then add a second bin
+        // with zero density at (m0 - 2 * w0) so that zero probability
+        // density is extrapolated to negative infinity.
+        double m0 = ListUtil.first(bins).getMidPoint();
+        double w0 = ListUtil.first(bins).getRange().getWidth();
+
+        knots.add(Point2D.at(m0 - 2.0 * w0, 0.0));
+        knots.add(Point2D.at(m0 - w0,       0.0));
 
         for (Bin bin : bins) {
             double x = bin.getMidPoint();
             double y = bin.getFrequency(total) / bin.getRange().getWidth();
 
-            pdf.add(Point2D.at(x, y));
+            knots.add(Point2D.at(x, y));
         }
 
-        return pdf;
+        // Now repeat the appropriate treatment for the upper boundary...
+        double mN = ListUtil.last(bins).getMidPoint();
+        double wN = ListUtil.last(bins).getRange().getWidth();
+
+        knots.add(Point2D.at(mN + wN,       0.0));
+        knots.add(Point2D.at(mN + 2.0 * wN, 0.0));
+
+        return SplineFunction.linear(knots);
     }
 
     /**

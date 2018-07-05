@@ -8,6 +8,7 @@ import jam.hist.Bin;
 import jam.hist.Histogram;
 import jam.math.DoubleRange;
 import jam.math.Point2D;
+import jam.math.UnivariateFunction;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -66,24 +67,44 @@ public class HistogramTest extends NumericTestBase {
         double[]  obs  = NormalDistribution.STANDARD.sample(random(), 1000000);
         Histogram hist = Histogram.compute(-4.0, 4.0, 16, obs);
 
-        List<Point2D> cdf = hist.getCDF();
-        List<Point2D> pdf = hist.getPDF();
+        UnivariateFunction cdf = hist.getCDF();
+        UnivariateFunction pdf = hist.getPDF();
 
-        for (Point2D pt : cdf)
-            assertEquals(NormalDistribution.STANDARD.cdf(pt.x), pt.y, 0.001);
+        for (double x = -5.0; x <= 5.0; x += 0.1) {
+            double actual   = cdf.evaluate(x);
+            double expected = NormalDistribution.STANDARD.cdf(x);
+            double error    = Math.abs(actual - expected);
 
-        for (Point2D pt : pdf)
-            assertEquals(NormalDistribution.STANDARD.pdf(pt.x), pt.y, 0.005);
+            assertTrue(error < 0.01);
+        }
+
+        for (double x = -5.0; x <= 5.0; x += 0.1) {
+            double actual   = pdf.evaluate(x);
+            double expected = NormalDistribution.STANDARD.pdf(x);
+            double error    = Math.abs(actual - expected);
+
+            assertTrue(error < 0.02);
+        }
 
         hist = Histogram.compute(-4.0, 4.0, 64, obs);
         cdf  = hist.getCDF();
         pdf  = hist.getPDF();
 
-        for (Point2D pt : cdf)
-            assertEquals(NormalDistribution.STANDARD.cdf(pt.x), pt.y, 0.01);
+        for (double x = -5.0; x <= 5.0; x += 0.1) {
+            double actual   = cdf.evaluate(x);
+            double expected = NormalDistribution.STANDARD.cdf(x);
+            double error    = Math.abs(actual - expected);
 
-        for (Point2D pt : pdf)
-            assertEquals(NormalDistribution.STANDARD.pdf(pt.x), pt.y, 0.05);
+            assertTrue(error < 0.001);
+        }
+
+        for (double x = -5.0; x <= 5.0; x += 0.1) {
+            double actual   = pdf.evaluate(x);
+            double expected = NormalDistribution.STANDARD.pdf(x);
+            double error    = Math.abs(actual - expected);
+
+            assertTrue(error < 0.004);
+        }
     }
 
     public static void main(String[] args) {
