@@ -1,6 +1,8 @@
 
 package jam.math;
 
+import java.util.Comparator;
+
 /**
  * Represents an immutable point in a two-dimensional space.
  */
@@ -22,6 +24,28 @@ public final class Point2D {
         this.x = x;
         this.y = y;
     }
+
+    /**
+     * A comparator to sort points into ascending order by their
+     * x-coordinate.
+     */
+    public static final Comparator<Point2D> X_COMPARATOR =
+        new Comparator<Point2D>() {
+            @Override public int compare(Point2D p1, Point2D p2) {
+                return Double.compare(p1.x, p2.x);
+            }
+        };
+
+    /**
+     * A comparator to sort points into ascending order by their
+     * y-coordinate.
+     */
+    public static final Comparator<Point2D> Y_COMPARATOR =
+        new Comparator<Point2D>() {
+            @Override public int compare(Point2D p1, Point2D p2) {
+                return Double.compare(p1.y, p2.y);
+            }
+        };
 
     /**
      * Returns the two-dimensional point at a fixed location.
