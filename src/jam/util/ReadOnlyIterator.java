@@ -13,8 +13,8 @@ import java.util.Iterator;
 public final class ReadOnlyIterator<E> implements Iterator<E> {
     private final Iterator<E> iterator;
 
-    private ReadOnlyIterator(Collection<E> collection) {
-        this.iterator = collection.iterator();
+    private ReadOnlyIterator(Iterator<E> iterator) {
+        this.iterator = iterator;
     }
 
     /**
@@ -27,7 +27,20 @@ public final class ReadOnlyIterator<E> implements Iterator<E> {
      * @return a new read-only iterator for the given collection.
      */
     public static <E> Iterator<E> create(Collection<E> collection) {
-        return new ReadOnlyIterator<E>(collection);
+        return create(collection.iterator());
+    }
+
+    /**
+     * Creates a read-only view of an iterator.
+     *
+     * @param <E> the type of object returned by the iterator.
+     *
+     * @param iterator the iterator to force as read-only.
+     *
+     * @return a new read-only view of the given iterator.
+     */
+    public static <E> Iterator<E> create(Iterator<E> iterator) {
+        return new ReadOnlyIterator<E>(iterator);
     }
 
     @Override public boolean hasNext() {
