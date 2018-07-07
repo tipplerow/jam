@@ -7,8 +7,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import jam.lang.ObjectUtil;
 
@@ -186,6 +188,49 @@ public final class SetUtil {
 
 	addAll(set, elements);
 	return set;
+    }
+
+    /**
+     * Creates a hash set by applying a function (or lambda
+     * expression) to every element in a collection.
+     *
+     * @param <T> element type for the source collection.
+     *
+     * @param <R> element type for the result set.
+     *
+     * @param source the collection to process.
+     *
+     * @param function the function (or lambda expression) to apply.
+     *
+     * @return a new hash set containing the results of each function
+     * applied to the elements in the collection.
+     */
+    public static <T, R> HashSet<R> newHashSet(Collection<T> source, Function<T, R> function) {
+        return newHashSet(source.iterator(), function);
+    }
+
+    /**
+     * Creates a hash set by applying a function (or lambda
+     * expression) to every element in an iteration.
+     *
+     * @param <T> element type for the source iterator.
+     *
+     * @param <R> element type for the result set.
+     *
+     * @param source the iterator to process.
+     *
+     * @param function the function (or lambda expression) to apply.
+     *
+     * @return a new hash set containing the results of each function
+     * applied to the elements in the iteration.
+     */
+    public static <T, R> HashSet<R> newHashSet(Iterator<T> source, Function<T, R> function) {
+        HashSet<R> result = new HashSet<R>();
+
+        while (source.hasNext())
+            result.add(function.apply(source.next()));
+
+        return result;
     }
 
     /**

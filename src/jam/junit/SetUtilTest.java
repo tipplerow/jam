@@ -132,6 +132,13 @@ public class SetUtilTest {
         assertEquals(4, set3.size());
     }
 
+    @Test public void testNewHashSetFunction() {
+        Set<String> strings = Set.of("A", "BC", "DEF");
+        Set<Integer> lengths = SetUtil.newHashSet(strings, x -> Integer.valueOf(x.length()));
+
+        assertEquals(Set.of(1, 2, 3), lengths);
+    }
+
     @Test public void testUnion() {
         EnumSet<MyEnum> set1 = SetUtil.newEnumSet(MyEnum.class, MyEnum.A, MyEnum.B);
         HashSet<MyEnum> set2 = SetUtil.newHashSet(MyEnum.B, MyEnum.C);
