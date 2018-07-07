@@ -117,6 +117,25 @@ public final class CollectionUtil {
     }
 
     /**
+     * Counts the number of items returned by an iterator (and moves
+     * the iterator to the end of the underlying collection).
+     *
+     * @param iterator an iterator to process.
+     *
+     * @return the number of items that remained in the iteration.
+     */
+    public static int count(Iterator<?> iterator) {
+        int count = 0;
+
+        while (iterator.hasNext()) {
+            ++count;
+            iterator.next();
+        }
+
+        return count;
+    }
+
+    /**
      * Counts the number of elements in common between two collections
      * (the size of their intersection).
      *

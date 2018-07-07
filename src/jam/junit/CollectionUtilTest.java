@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -99,6 +100,11 @@ public class CollectionUtilTest extends NumericTestBase {
         assertDouble(3.0, CollectionUtil.average(Arrays.asList("abc"), s -> s.length()));
         assertDouble(2.5, CollectionUtil.average(Arrays.asList("abc", "de"), s -> s.length()));
         assertDouble(2.0, CollectionUtil.average(Arrays.asList("abc", "de", "f"), s -> s.length()));
+    }
+
+    @Test public void testCountIterator() {
+        assertEquals(0, CollectionUtil.count(List.of().iterator()));
+        assertEquals(2, CollectionUtil.count(List.of("abc", "def").iterator()));
     }
 
     @Test public void testCountCommon() {
