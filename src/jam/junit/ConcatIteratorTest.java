@@ -49,6 +49,18 @@ public class ConcatIteratorTest extends NumericTestBase {
         assertEquals("I", iterator.next());
 
         assertFalse(iterator.hasNext());
+        
+        iterator = ConcatIterator.over(List.of(list1, list2, list3));
+
+        assertEquals("A", iterator.next());
+        assertEquals("B", iterator.next());
+        assertEquals("C", iterator.next());
+        assertEquals("D", iterator.next());
+        assertEquals("F", iterator.next()); // "E" was removed...
+        assertEquals("G", iterator.next());
+        assertEquals("H", iterator.next());
+        assertEquals("I", iterator.next());
+        assertFalse(iterator.hasNext());
     }
 
     @Test public void testEmpty() {
@@ -57,6 +69,79 @@ public class ConcatIteratorTest extends NumericTestBase {
 
         assertFalse(iter1.hasNext());
         assertFalse(iter2.hasNext());
+    }
+
+    @Test public void testFirstEmpty() {
+        List<String> list1 = List.of();
+        List<String> list2 = List.of("A", "B");
+
+        Iterator<String> iterator = ConcatIterator.over(List.of(list1, list2));
+
+        assertTrue(iterator.hasNext());
+        assertEquals("A", iterator.next());
+
+        assertTrue(iterator.hasNext());
+        assertEquals("B", iterator.next());
+
+        assertFalse(iterator.hasNext());
+
+        iterator = ConcatIterator.over(List.of(list1, list2));
+
+        assertEquals("A", iterator.next());
+        assertEquals("B", iterator.next());
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test public void testMiddleEmpty() {
+        List<String> list1 = List.of("A", "B");
+        List<String> list2 = List.of();
+        List<String> list3 = List.of("C");
+
+        Iterator<String> iterator = ConcatIterator.over(List.of(list1, list2, list3));
+
+        assertTrue(iterator.hasNext());
+        assertEquals("A", iterator.next());
+
+        assertTrue(iterator.hasNext());
+        assertEquals("B", iterator.next());
+
+        assertTrue(iterator.hasNext());
+        assertEquals("C", iterator.next());
+
+        assertFalse(iterator.hasNext());
+
+        iterator = ConcatIterator.over(List.of(list1, list2, list3));
+
+        assertEquals("A", iterator.next());
+        assertEquals("B", iterator.next());
+        assertEquals("C", iterator.next());
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test public void testLastEmpty() {
+        List<String> list1 = List.of("A", "B");
+        List<String> list2 = List.of("C");
+        List<String> list3 = List.of();
+
+        Iterator<String> iterator = ConcatIterator.over(List.of(list1, list2, list3));
+
+        assertTrue(iterator.hasNext());
+        assertEquals("A", iterator.next());
+
+        assertTrue(iterator.hasNext());
+        assertEquals("B", iterator.next());
+
+        assertTrue(iterator.hasNext());
+        assertEquals("C", iterator.next());
+
+        assertFalse(iterator.hasNext());
+
+        iterator = ConcatIterator.over(List.of(list1, list2, list3));
+
+        assertEquals("A", iterator.next());
+        assertEquals("B", iterator.next());
+        assertEquals("C", iterator.next());
+        assertFalse(iterator.hasNext());
     }
 
     public static void main(String[] args) {

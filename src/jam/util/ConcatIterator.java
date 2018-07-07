@@ -21,20 +21,23 @@ public final class ConcatIterator<E> implements Iterator<E> {
     // Iterators remaining to be processed...
     private final Queue<Iterator<E>> queue;
 
+    private ConcatIterator(LinkedList<Iterator<E>> queue) {
+        this.queue = queue;
+        assignActive();
+    }
+
     @SuppressWarnings("unchecked")
-    private ConcatIterator(LinkedList<Iterator<E>> iterators) {
-        if (iterators.isEmpty()) {
+    private void assignActive() {
+        if (queue.isEmpty()) {
             //
             // The active iterator should never be null, so provide an
             // empty one...
             //
-            this.active = (Iterator<E>) Collections.emptyList().iterator();
+            active = (Iterator<E>) Collections.emptyList().iterator();
         }
         else {
-            this.active = iterators.removeFirst();
+            active = queue.remove();
         }
-
-        this.queue  = iterators;
     }
 
     /**
@@ -49,7 +52,13 @@ public final class ConcatIterator<E> implements Iterator<E> {
      * the underlying iterators in their collection order.
      */
     public static <E> Iterator<E> concat(Collection<Iterator<E>> iterators) {
-        return new ConcatIterator<E>(new LinkedList<Iterator<E>>(iterators));
+        LinkedList<Iterator<E>> queue = new LinkedList<Iterator<E>>();
+
+        for (Iterator<E> iterator : iterators)
+            if (iterator.hasNext())
+                queue.add(iterator);
+
+        return new ConcatIterator<E>(queue);
     }
 
     /**
@@ -64,12 +73,16 @@ public final class ConcatIterator<E> implements Iterator<E> {
      * given collections in their collection order.
      */
     public static <E> Iterator<E> over(Collection<Collection<E>> collections) {
-        LinkedList<Iterator<E>> iterators = new LinkedList<Iterator<E>>();
+        LinkedList<Iterator<E>> queue = new LinkedList<Iterator<E>>();
 
-        for (Collection<E> collection : collections)
-            iterators.add(collection.iterator());
+        for (Collection<E> collection : collections) {
+            Iterator<E> iterator = collection.iterator();
 
-        return new ConcatIterator<E>(iterators);
+            if (iterator.hasNext())
+                queue.add(iterator);
+        }
+
+        return new ConcatIterator<E>(queue);
     }
 
     @Override public boolean hasNext() {
