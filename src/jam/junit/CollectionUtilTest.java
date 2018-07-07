@@ -20,7 +20,21 @@ import static org.junit.Assert.*;
 public class CollectionUtilTest extends NumericTestBase {
     private final List<String> emptyList = Arrays.asList();
 
-    @Test public void testAddAll() {
+    @Test public void testAddAll1() {
+        List<String> list1 = Arrays.asList("A");
+        List<String> list2 = Arrays.asList("A", "B");
+        List<String> list3 = Arrays.asList("A", "B", "C");
+
+        List<String> concat = new ArrayList<String>();
+
+        CollectionUtil.addAll(concat, list1.iterator());
+        CollectionUtil.addAll(concat, list2.iterator());
+        CollectionUtil.addAll(concat, list3.iterator());
+
+        assertEquals(List.of("A", "A", "B", "A", "B", "C"), concat);
+    }
+
+    @Test public void testAddAll2() {
         List<String> list1 = Arrays.asList("A");
         List<String> list2 = Arrays.asList("A", "B");
         List<String> list3 = Arrays.asList("A", "B", "C");

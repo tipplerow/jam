@@ -4,6 +4,7 @@ package jam.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.ToDoubleFunction;
 
@@ -13,6 +14,26 @@ import jam.math.JamRandom;
  * Provides utility methods operating on collections.
  */
 public final class CollectionUtil {
+    /**
+     * Adds every item returned by an iterator to an existing
+     * collection.
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param destination the existing collection.
+     *
+     * @param iterator an iterator over items to be added to the collection.
+     * added.
+     *
+     * @return the destination collection.
+     */
+    public static <V> Collection<V> addAll(Collection<V> destination, Iterator<? extends V> iterator) {
+        while (iterator.hasNext())
+            destination.add(iterator.next());
+
+        return destination;
+    }
+
     /**
      * Adds every item in a collection of collections into another
      * collection.
