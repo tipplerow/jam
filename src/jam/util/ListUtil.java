@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -147,6 +148,25 @@ public final class ListUtil {
         @Override public LinkedList<E> newInstance() {
             return new LinkedList<E>();
         }
+    }
+
+    /**
+     * Copies the contents of an iteration into a new array list.
+     *
+     * @param <E> the element type.
+     *
+     * @param iterator the iterator to process.
+     *
+     * @return a new array list containing the items returned by the
+     * given iterator.
+     */
+    public static <E> ArrayList<E> newArrayList(Iterator<E> iterator) {
+        ArrayList<E> list = new ArrayList<E>();
+
+        while (iterator.hasNext())
+            list.add(iterator.next());
+
+        return list;
     }
 
     /**

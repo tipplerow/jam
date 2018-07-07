@@ -4,6 +4,7 @@ package jam.junit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -60,6 +61,13 @@ public class ListUtilTest {
     @Test public void testLast() {
         assertEquals("abc", ListUtil.last(Arrays.asList("abc")));
         assertEquals("ghi", ListUtil.last(Arrays.asList("abc", "def", "ghi")));
+    }
+
+    @Test public void testNewArrayListIterator() {
+        Iterator<String> iterator = List.of("abc", "def", "ghi").iterator();
+        ArrayList<String> list = ListUtil.newArrayList(iterator);
+
+        assertEquals(list, List.of("abc", "def", "ghi"));
     }
 
     @Test public void testSelect() {
