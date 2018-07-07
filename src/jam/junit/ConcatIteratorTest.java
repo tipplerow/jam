@@ -5,18 +5,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import jam.util.ConcatenatingIterator;
+import jam.util.ConcatIterator;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class ConcatenatingIteratorTest extends NumericTestBase {
+public class ConcatIteratorTest extends NumericTestBase {
     @Test public void testAll() {
         List<String> list1 = List.of("A", "B", "C");
         List<String> list2 = new LinkedList<String>(List.of("D", "E"));
         List<String> list3 = List.of("F", "G", "H", "I");
 
-        Iterator<String> iterator = ConcatenatingIterator.over(List.of(list1, list2, list3));
+        Iterator<String> iterator = ConcatIterator.over(List.of(list1, list2, list3));
 
         assertTrue(iterator.hasNext());
         assertEquals("A", iterator.next());
@@ -52,14 +52,14 @@ public class ConcatenatingIteratorTest extends NumericTestBase {
     }
 
     @Test public void testEmpty() {
-        Iterator<String> iter1 = ConcatenatingIterator.cat(List.of());
-        Iterator<String> iter2 = ConcatenatingIterator.over(List.of());
+        Iterator<String> iter1 = ConcatIterator.concat(List.of());
+        Iterator<String> iter2 = ConcatIterator.over(List.of());
 
         assertFalse(iter1.hasNext());
         assertFalse(iter2.hasNext());
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.junit.ConcatenatingIteratorTest");
+        org.junit.runner.JUnitCore.main("jam.junit.ConcatIteratorTest");
     }
 }

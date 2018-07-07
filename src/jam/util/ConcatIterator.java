@@ -14,7 +14,7 @@ import java.util.Queue;
  *
  * @param E the type of object stored in the collections.
  */
-public final class ConcatenatingIterator<E> implements Iterator<E> {
+public final class ConcatIterator<E> implements Iterator<E> {
     // The active iterator...
     private Iterator<E> active;
 
@@ -22,7 +22,7 @@ public final class ConcatenatingIterator<E> implements Iterator<E> {
     private final Queue<Iterator<E>> queue;
 
     @SuppressWarnings("unchecked")
-    private ConcatenatingIterator(LinkedList<Iterator<E>> iterators) {
+    private ConcatIterator(LinkedList<Iterator<E>> iterators) {
         if (iterators.isEmpty()) {
             //
             // The active iterator should never be null, so provide an
@@ -48,8 +48,8 @@ public final class ConcatenatingIterator<E> implements Iterator<E> {
      * @return a new concatenating iterator that will traverse through
      * the underlying iterators in their collection order.
      */
-    public static <E> Iterator<E> cat(Collection<Iterator<E>> iterators) {
-        return new ConcatenatingIterator<E>(new LinkedList<Iterator<E>>(iterators));
+    public static <E> Iterator<E> concat(Collection<Iterator<E>> iterators) {
+        return new ConcatIterator<E>(new LinkedList<Iterator<E>>(iterators));
     }
 
     /**
@@ -69,7 +69,7 @@ public final class ConcatenatingIterator<E> implements Iterator<E> {
         for (Collection<E> collection : collections)
             iterators.add(collection.iterator());
 
-        return new ConcatenatingIterator<E>(iterators);
+        return new ConcatIterator<E>(iterators);
     }
 
     @Override public boolean hasNext() {
