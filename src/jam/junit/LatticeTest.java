@@ -9,7 +9,6 @@ import jam.lattice.Coord;
 import jam.lattice.Lattice;
 import jam.lattice.Neighborhood;
 import jam.lattice.Period;
-import jam.util.SetUtil;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -246,9 +245,9 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1B));
         assertTrue(lattice.viewOccupants(coord2).isEmpty());
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
@@ -263,9 +262,9 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1B));
         assertTrue(lattice.viewOccupants(coord2).isEmpty());
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
@@ -280,9 +279,9 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1B));
         assertTrue(lattice.viewOccupants(coord2).isEmpty());
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
@@ -297,10 +296,10 @@ public class LatticeTest {
         assertFalse(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
         assertTrue(lattice.viewOccupants(coord1A).isEmpty());
         assertTrue(lattice.viewOccupants(coord1B).isEmpty());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord2));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord2));
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
 	lattice.occupy(occ2, coord1B);
@@ -314,10 +313,10 @@ public class LatticeTest {
         assertFalse(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1, occ2), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1B));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord2));
+        assertEquals(Set.of(occ1, occ2), lattice.viewOccupants());
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord2));
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
 	lattice.vacate(occ1);
@@ -332,10 +331,10 @@ public class LatticeTest {
         assertFalse(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ2, occ3), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1B));
-        assertEquals(SetUtil.fixed(occ3), lattice.viewOccupants(coord2));
+        assertEquals(Set.of(occ2, occ3), lattice.viewOccupants());
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ3), lattice.viewOccupants(coord2));
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
     }
 
@@ -398,9 +397,9 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1B));
         assertTrue(lattice.viewOccupants(coord2).isEmpty());
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
@@ -416,9 +415,9 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1B));
         assertTrue(lattice.viewOccupants(coord2).isEmpty());
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
@@ -434,9 +433,9 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord1B));
         assertTrue(lattice.viewOccupants(coord2).isEmpty());
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
@@ -452,10 +451,10 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants());
+        assertEquals(Set.of(occ1), lattice.viewOccupants());
         assertTrue(lattice.viewOccupants(coord1A).isEmpty());
         assertTrue(lattice.viewOccupants(coord1B).isEmpty());
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord2));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord2));
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
         // Add a second at a previous location...
@@ -470,10 +469,10 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ1, occ2), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1B));
-        assertEquals(SetUtil.fixed(occ1), lattice.viewOccupants(coord2));
+        assertEquals(Set.of(occ1, occ2), lattice.viewOccupants());
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ1), lattice.viewOccupants(coord2));
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
         // Replace an occupant...
@@ -489,10 +488,10 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertTrue(lattice.isAvailable(coord3));
 
-        assertEquals(SetUtil.fixed(occ2, occ3), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1A));
-        assertEquals(SetUtil.fixed(occ2), lattice.viewOccupants(coord1B));
-        assertEquals(SetUtil.fixed(occ3), lattice.viewOccupants(coord2));
+        assertEquals(Set.of(occ2, occ3), lattice.viewOccupants());
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1A));
+        assertEquals(Set.of(occ2), lattice.viewOccupants(coord1B));
+        assertEquals(Set.of(occ3), lattice.viewOccupants(coord2));
         assertTrue(lattice.viewOccupants(coord3).isEmpty());
 
         // Now put all occupants on a single site...
@@ -503,8 +502,8 @@ public class LatticeTest {
         assertTrue(lattice.isAvailable(coord2));
         assertEquals(3, lattice.countOccupants());
         
-        assertEquals(SetUtil.fixed(occ1, occ2, occ3), lattice.viewOccupants());
-        assertEquals(SetUtil.fixed(occ1, occ2, occ3), lattice.viewOccupants(coord2));
+        assertEquals(Set.of(occ1, occ2, occ3), lattice.viewOccupants());
+        assertEquals(Set.of(occ1, occ2, occ3), lattice.viewOccupants(coord2));
         
         assertTrue(lattice.viewOccupants(coord1A).isEmpty());
         assertTrue(lattice.viewOccupants(coord1B).isEmpty());

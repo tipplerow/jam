@@ -4,8 +4,6 @@ package jam.lattice;
 import java.util.Collections;
 import java.util.Set;
 
-import jam.util.SetUtil;
-
 /**
  * Provides the framework for lattice implementations that allow only
  * a single occupant (SO) per site.
@@ -69,6 +67,6 @@ public abstract class SOLattice<T> extends LatticeImpl<T> {
         if (occupant == null)
             return Collections.emptySet();
         else
-            return SetUtil.fixed(occupant);
+            return Set.of(occupant);
     }
 }

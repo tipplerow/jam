@@ -94,32 +94,6 @@ public final class SetUtil {
      *
      * @return an optimized immutable set for the given elements.
      */
-    @SuppressWarnings("unchecked")
-    public static <E> Set<E> fixed(E... elements) {
-        switch (elements.length) {
-        case 0:
-            return Collections.emptySet();
-
-        case 1:
-            Set<E> set = new TreeSet<E>();
-            set.add(elements[0]);
-            return Collections.unmodifiableSet(set);
-
-        default:
-            return fixed(Arrays.asList(elements));
-        }
-    }
-
-    /**
-     * Returns an immutable set with an implementation that is
-     * optimized for the number of elements.
-     *
-     * @param <E> the element type.
-     *
-     * @param elements the elements to add to the set.
-     *
-     * @return an optimized immutable set for the given elements.
-     */
     public static <E> Set<E> fixed(Collection<E> elements) {
         if (elements.isEmpty())
             return Collections.emptySet();
