@@ -148,7 +148,11 @@ public final class Period {
      * @return the product of the linear dimensions.
      */
     public long getSiteCount() {
-	return nx * ny * nz;
+        //
+        // Must convert the dimensions to long because their product
+        // might exceed the maximum integer value...
+        //
+	return ((long) nx) * ((long) ny) * ((long) nz);
     }
 
     @Override public int hashCode() {
