@@ -1,8 +1,10 @@
 
 package jam.junit;
 
+import jam.dist.HypersphericalDistribution;
 import jam.lattice.Coord;
 import jam.lattice.Neighborhood;
+import jam.math.DoubleUtil;
 import jam.vector.JamVector;
 
 import org.junit.*;
@@ -117,6 +119,20 @@ public class CoordTest extends NumericTestBase {
 
         for (Coord neighbor : Neighborhood.MOORE.getNeighbors(nearest))
             assertTrue(neighbor.distance(x, y, z) >= distance);
+    }
+
+    @Test public void testHypersphericalNearest() {
+        int sampleCount = 1000000;
+        int[] nearestLen = new int[4];
+        HypersphericalDistribution hyperDist = new HypersphericalDistribution(3, Math.sqrt(3.0) / 2.0);
+
+        for (int k = 0; k < sampleCount; ++k)
+            ++nearestLen[Coord.nearest(hyperDist.sample(random())).getSquaredLength()];
+
+        assertEquals(0.0,   DoubleUtil.ratio(nearestLen[0], sampleCount), 1.0E-12);
+        assertEquals(0.733, DoubleUtil.ratio(nearestLen[1], sampleCount), 0.001);
+        assertEquals(0.267, DoubleUtil.ratio(nearestLen[2], sampleCount), 0.001);
+        assertEquals(0.0,   DoubleUtil.ratio(nearestLen[3], sampleCount), 1.0E-12);
     }
 
     public static void main(String[] args) {
