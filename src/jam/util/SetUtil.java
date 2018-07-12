@@ -65,6 +65,84 @@ public final class SetUtil {
     }
 
     /**
+     * Counts the number of elements shared by two sets (the size of
+     * their intersection).
+     *
+     * @param s1 the first set.
+     *
+     * @param s2 the second set.
+     *
+     * @return the number of elements shared by the two sets (the size
+     * of their intersection).
+     */
+    public static int countShared(Set<?> s1, Set<?> s2) {
+        //
+        // More efficient to iterate over the smaller set...
+        //
+        Set<?> larger;
+        Set<?> smaller;
+
+        if (s1.size() > s2.size()) {
+            larger  = s1;
+            smaller = s2;
+        }
+        else {
+            larger  = s2;
+            smaller = s1;
+        }
+
+        int result = 0;
+
+        for (Object obj : smaller)
+            if (larger.contains(obj))
+                ++result;
+
+        return result;
+    }
+
+    /**
+     * Counts the number of unique elements bewteen two sets (the size
+     * of their union).
+     *
+     * @param s1 the first set.
+     *
+     * @param s2 the second set.
+     *
+     * @return the number of unique elements bewteen the two sets (the
+     * size of their union).
+     *
+     * @throws IllegalStateException if the size of the union exceeds
+     * {@code Integer.MAX_VALUE}.
+     */
+    public static int countUnique(Set<?> s1, Set<?> s2) {
+        //
+        // More efficient to iterate over the smaller set...
+        //
+        Set<?> larger;
+        Set<?> smaller;
+
+        if (s1.size() > s2.size()) {
+            larger  = s1;
+            smaller = s2;
+        }
+        else {
+            larger  = s2;
+            smaller = s1;
+        }
+
+        long result = larger.size();
+
+        for (Object obj : smaller)
+            if (!larger.contains(obj))
+                ++result;
+
+        if (result <= Integer.MAX_VALUE)
+            return (int) result;
+        else
+            throw new IllegalStateException("Integer overflow.");
+    }
+
+    /**
      * Generates the difference of a set and another collection; the
      * input objects are unchanged.
      *

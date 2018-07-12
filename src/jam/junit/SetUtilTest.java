@@ -58,6 +58,44 @@ public class SetUtilTest {
         assertEquals("ZZZ", cloned.last());
     }
 
+    @Test public void testCountShared() {
+        Set<String> s0 = Set.of();
+        Set<String> s1 = Set.of("A", "B", "C", "D", "E");
+        Set<String> s2 = Set.of("D", "E", "F", "G", "H");
+        Set<String> s3 = Set.of("H", "I");
+
+        assertEquals(0, SetUtil.countShared(s0, s1));
+        assertEquals(0, SetUtil.countShared(s1, s0));
+
+        assertEquals(2, SetUtil.countShared(s1, s2));
+        assertEquals(2, SetUtil.countShared(s2, s1));
+
+        assertEquals(1, SetUtil.countShared(s2, s3));
+        assertEquals(1, SetUtil.countShared(s3, s2));
+
+        assertEquals(0, SetUtil.countShared(s1, s3));
+        assertEquals(0, SetUtil.countShared(s3, s1));
+    }
+
+    @Test public void testCountUnique() {
+        Set<String> s0 = Set.of();
+        Set<String> s1 = Set.of("A", "B", "C", "D", "E");
+        Set<String> s2 = Set.of("D", "E", "F", "G", "H");
+        Set<String> s3 = Set.of("H", "I");
+
+        assertEquals(5, SetUtil.countUnique(s0, s1));
+        assertEquals(5, SetUtil.countUnique(s1, s0));
+
+        assertEquals(8, SetUtil.countUnique(s1, s2));
+        assertEquals(8, SetUtil.countUnique(s2, s1));
+
+        assertEquals(6, SetUtil.countUnique(s2, s3));
+        assertEquals(6, SetUtil.countUnique(s3, s2));
+
+        assertEquals(7, SetUtil.countUnique(s1, s3));
+        assertEquals(7, SetUtil.countUnique(s3, s1));
+    }
+
     @Test public void testDifference() {
         EnumSet<MyEnum> set1 = SetUtil.newEnumSet(MyEnum.class, MyEnum.A, MyEnum.B, MyEnum.C);
         HashSet<MyEnum> set2 = SetUtil.newHashSet(MyEnum.C, MyEnum.D, MyEnum.E);
