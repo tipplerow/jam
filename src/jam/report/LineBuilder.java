@@ -84,6 +84,26 @@ public final class LineBuilder {
         builder.append(lng);
     }
 
+    /**
+     * Appends a {@code Object} field to the line.
+     *
+     * @param o {@code Object} field to append.
+     */
+    public void append(Object o) {
+        newField();
+        builder.append(o);
+    }
+
+    /**
+     * Appends a {@code String} field to the line.
+     *
+     * @param s {@code String} field to append.
+     */
+    public void append(String s) {
+        newField();
+        builder.append(s);
+    }
+
     @Override public String toString() {
         return builder.toString();
     }

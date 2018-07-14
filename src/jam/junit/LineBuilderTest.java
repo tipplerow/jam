@@ -25,6 +25,12 @@ public class LineBuilderTest {
 
         builder.append(3.45E-8, "%14.10f");
         assertEquals("123,345,1.23,3.45E-8,  0.0000000345", builder.toString());
+
+        builder.append("FOO");
+        assertEquals("123,345,1.23,3.45E-8,  0.0000000345,FOO", builder.toString());
+
+        builder.append(Integer.valueOf(-5));
+        assertEquals("123,345,1.23,3.45E-8,  0.0000000345,FOO,-5", builder.toString());
     }
 
     public static void main(String[] args) {
