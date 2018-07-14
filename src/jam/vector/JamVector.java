@@ -250,6 +250,38 @@ public final class JamVector extends AbstractVector {
     }
 
     /**
+     * Computes the cosine of the angle between this vector and
+     * another.
+     *
+     * @param that the vector in relation to this.
+     *
+     * @return the cosine of the angle between this vector and the
+     * input vector.
+     *
+     * @throws IllegalArgumentException unless the input vector has
+     * the same length as this vector.
+     */
+    public double cosine(VectorView that) {
+        return cosine(this, that);
+    }
+
+    /**
+     * Computes the dot product of two vectors.
+     *
+     * @param v1 the first vector factor.
+     *
+     * @param v2 the second vector factor.
+     *
+     * @return the dot product of the two vectors.
+     *
+     * @throws IllegalArgumentException unless the vectors have the
+     * same length.
+     */
+    public static double cosine(VectorView v1, VectorView v2) {
+        return unit(v1).dot(unit(v2));
+    }
+
+    /**
      * Computes the vector cross product of this vector and another
      * and returns the result in a new {@code JamVector}; this vector
      * is unchanged.

@@ -141,6 +141,23 @@ public class JamVectorTest extends NumericTestBase {
         assertDouble(2.0, orig.get(1));
     }
 
+    @Test public void testCosine() {
+        VectorView v1 = JamVector.valueOf( 1.0,  1.0, 0.0);
+        VectorView v2 = JamVector.valueOf(-2.0,  2.0, 0.0);
+        VectorView v3 = JamVector.valueOf(-3.0, -3.0, 0.0);
+        VectorView v4 = JamVector.valueOf( 4.0, -4.0, 0.0);
+
+        assertDouble( 1.0, JamVector.cosine(v1, v1));
+        assertDouble( 0.0, JamVector.cosine(v1, v2));
+        assertDouble(-1.0, JamVector.cosine(v1, v3));
+        assertDouble( 0.0, JamVector.cosine(v1, v4));
+
+        VectorView x = JamVector.valueOf(1.0, 2.0, 3.0);
+        VectorView y = JamVector.valueOf(4.0, 5.0, 6.0);
+
+        assertEquals(0.974632, JamVector.cosine(x, y), 1.0E-06);
+    }
+
     @Test public void testCross() {
 	VectorView ex = JamVector.UNIT_X;
 	VectorView ey = JamVector.UNIT_Y;
