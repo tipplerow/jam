@@ -1,6 +1,8 @@
 
 package jam.report;
 
+import java.text.DecimalFormat;
+
 /**
  * Builds delimited report lines field by field.
  */
@@ -62,6 +64,19 @@ public final class LineBuilder {
     public void append(double d, String fmt) {
         newField();
         builder.append(String.format(fmt, d));
+    }
+
+    /**
+     * Appends a {@code double} value to the line with specific
+     * formatting.
+     *
+     * @param d the {@code double} value to append.
+     *
+     * @param fmt the format string.
+     */
+    public void append(double d, DecimalFormat fmt) {
+        newField();
+        builder.append(fmt.format(d));
     }
 
     /**
