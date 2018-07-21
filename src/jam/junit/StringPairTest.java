@@ -54,11 +54,11 @@ public class StringPairTest {
     }
 
     @Test public void testFirst() {
-        assertEquals("abc", StringPair.valueOf("abc", "def").first());
+        assertEquals("abc", StringPair.valueOf("abc", "def").first);
     }
 
     @Test public void testSecond() {
-        assertEquals("def", StringPair.valueOf("abc", "def").second());
+        assertEquals("def", StringPair.valueOf("abc", "def").second);
     }
 
     @Test public void testParse() {

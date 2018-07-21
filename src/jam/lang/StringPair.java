@@ -8,10 +8,7 @@ import jam.util.RegexUtil;
  * two-dimensional key.  The order of the strings is material
  * for equality tests and for ordering comparisons.
  */
-public final class StringPair implements Comparable<StringPair>, Formatted {
-    private final String first;
-    private final String second;
-
+public final class StringPair extends ObjectPair<String, String> implements Comparable<StringPair>, Formatted {
     /**
      * Creates a new string pair.
      *
@@ -20,8 +17,7 @@ public final class StringPair implements Comparable<StringPair>, Formatted {
      * @param second the second string of the pair.
      */
     public StringPair(String first, String second) {
-        this.first = first;
-        this.second = second;
+        super(first, second);
     }
 
     /**
@@ -61,24 +57,6 @@ public final class StringPair implements Comparable<StringPair>, Formatted {
         return new StringPair(first, second);
     }
 
-    /**
-     * Returns the first string of this pair.
-     *
-     * @return the first string of this pair.
-     */
-    public String first() {
-        return first;
-    }
-
-    /**
-     * Returns the second string of this pair.
-     *
-     * @return the second string of this pair.
-     */
-    public String second() {
-        return second;
-    }
-
     @Override public int compareTo(StringPair that) {
         int firstComp = this.first.compareTo(that.first);
 
@@ -90,18 +68,6 @@ public final class StringPair implements Comparable<StringPair>, Formatted {
 
     @Override public String format() {
         return first + ", " + second;
-    }
-
-    @Override public boolean equals(Object that) {
-        return (that instanceof StringPair) && equalsStringPair((StringPair) that);
-    }
-
-    private boolean equalsStringPair(StringPair that) {
-        return this.first.equals(that.first) && this.second.equals(that.second);
-    }
-
-    @Override public int hashCode() {
-        return first.hashCode() + 37 * second.hashCode();
     }
 
     @Override public String toString() {
