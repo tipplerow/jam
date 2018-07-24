@@ -31,4 +31,55 @@ public abstract class StepRecord extends TrialRecord {
     public final int getTimeStep() {
         return timeStep;
     }
+
+    /**
+     * Keys this record by trial index and time step.
+     *
+     * @return a new key for this record.
+     */
+    public final Key key() {
+        return new Key(this);
+    }
+
+    /**
+     * Creates a step record key.
+     *
+     * @param trialIndex the index of the simulation trial.
+     *
+     * @param timeStep the time step in the simulation trial.
+     *
+     * @return a new key for the trial index and time step.
+     */
+    public static Key key(int trialIndex, int timeStep) {
+        return new Key(trialIndex, timeStep);
+    }
+
+    /**
+     * Keys simulation records by trial index and time step.
+     */
+    public static final class Key {
+        private final int trialIndex;
+        private final int timeStep;
+
+        private Key(StepRecord parent) {
+            this(parent.getTrialIndex(), parent.getTimeStep());
+        }
+
+        private Key(int trialIndex, int timeStep) {
+            this.trialIndex = trialIndex;
+            this.timeStep   = timeStep;
+        }
+
+        @Override public boolean equals(Object obj) {
+            return (obj instanceof Key) && equalsKey((Key) obj);
+        }
+
+        private boolean equalsKey(Key that) {
+            return this.timeStep == that.timeStep && this.trialIndex == that.trialIndex;
+        }
+
+        @Override public int hashCode() {
+            return timeStep + (trialIndex << 16);
+        }
+    }
 }
