@@ -238,7 +238,7 @@ public final class Coord implements Comparable<Coord> {
      *
      * @return the normalized radial distance for this coordinate.
      */
-    public double normR(VectorMoment moment) {
+    public double normRadialDist(VectorMoment moment) {
         return distance(moment.getCM()) / moment.scalar();
     }
     
