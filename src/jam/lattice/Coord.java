@@ -1,6 +1,7 @@
 
 package jam.lattice;
 
+import jam.math.VectorMoment;
 import jam.util.RegexUtil;
 import jam.vector.JamVector;
 import jam.vector.VectorView;
@@ -191,6 +192,19 @@ public final class Coord implements Comparable<Coord> {
     }
 
     /**
+     * Computes the dot product of this (vector) coordinate with
+     * another.
+     *
+     * @param that another coordinate.
+     *
+     * @return the dot product between this coordinate vector and the
+     * input coordinate.
+     */
+    public int dot(Coord that) {
+	return (this.x * that.x) + (this.y * that.y) + (this.z * that.z);
+    }
+
+    /**
      * Returns the squared distance of this coordinate from the
      * origin.
      *
@@ -212,6 +226,20 @@ public final class Coord implements Comparable<Coord> {
      */
     public int getSquaredDistance(Coord that) {
 	return computeSquaredDistance(this, that);
+    }
+
+    /**
+     * Computes a <em>normalized radial distance</em>:  the distance from
+     * this coordinate to the center of mass divided by the scalar radius 
+     * of gyration.
+     *
+     * @param moment a vector moment describing the spatial distribution
+     * of objects on a lattice.
+     *
+     * @return the normalized radial distance for this coordinate.
+     */
+    public double normR(VectorMoment moment) {
+        return distance(moment.getCM()) / moment.scalar();
     }
     
     /**
@@ -268,19 +296,6 @@ public final class Coord implements Comparable<Coord> {
      */
     public Coord minus(int x, int y, int z) {
         return plus(-x, -y, -z);
-    }
-
-    /**
-     * Computes the dot product of this (vector) coordinate with
-     * another.
-     *
-     * @param that another coordinate.
-     *
-     * @return the dot product between this coordinate vector and the
-     * input coordinate.
-     */
-    public int dot(Coord that) {
-	return (this.x * that.x) + (this.y * that.y) + (this.z * that.z);
     }
 
     /**
