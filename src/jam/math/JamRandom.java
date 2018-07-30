@@ -84,7 +84,15 @@ public abstract class JamRandom {
     }
 
     private static long globalSeed() {
-        return JamProperties.getOptionalLong(SEED_PROPERTY, randomSeed());
+        if (JamProperties.isSet(SEED_PROPERTY))
+            return JamProperties.getRequiredLong(SEED_PROPERTY);
+
+        // Record the randomly generated seed in the system properties
+        // so that the random sequence run may be reproduced...
+        long seed = randomSeed();
+        JamProperties.setProperty(SEED_PROPERTY, Long.toString(seed));
+
+        return seed;
     }
 
     /**
