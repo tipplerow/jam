@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well44497b;
 
 import jam.app.JamLogger;
@@ -23,7 +24,7 @@ import jam.io.IOUtil;
  * on Mathematical Software (TOMS), Volume 32 Issue 1, March 2006,
  * Pages 1-16.
  */
-public abstract class JamRandom {
+public abstract class JamRandom implements RandomGenerator {
     private static JamRandom global = null;
     
     // Source for nearly unique seeds...
@@ -183,22 +184,6 @@ public abstract class JamRandom {
     }
 
     /**
-     * Returns the next uniformly distributed {@code boolean} value.
-     *
-     * @return the next uniformly distributed {@code boolean} value.
-     */
-    public abstract boolean nextBoolean();
-
-    /**
-     * Returns the next uniformly distributed {@code double} value
-     * between {@code 0.0} and {@code 1.0}.
-     *
-     * @return the next uniformly distributed {@code double} value
-     * between {@code 0.0} and {@code 1.0}.
-     */
-    public abstract double nextDouble();
-
-    /**
      * Returns the next uniformly distributed {@code double} value
      * between specified bounds.
      *
@@ -216,26 +201,6 @@ public abstract class JamRandom {
 
         return lower + (upper - lower) * nextDouble();
     }
-
-    /**
-     * Returns the next uniformly distributed {@code int} value
-     * between {@code Integer.MIN_VALUE} and {@code Integer.MAX_VALUE}.
-     *
-     * @return the next uniformly distributed {@code int} value
-     * between {@code Integer.MIN_VALUE} and {@code Integer.MAX_VALUE}.
-     */
-    public abstract int nextInt();
-
-    /**
-     * Returns the next uniformly distributed {@code int} value in the
-     * half-open interval {@code [0, upper)}.
-     *
-     * @param upper upper bound (exclusive) on the value returned.
-     *
-     * @return the next uniformly distributed {@code int} value in the
-     * half-open interval {@code [0, upper)}.
-     */
-    public abstract int nextInt(int upper);
 
     /**
      * Returns the next uniformly distributed {@code int} value in the
@@ -257,15 +222,6 @@ public abstract class JamRandom {
 
         return lower + nextInt(upper - lower);
     }
-
-    /**
-     * Returns the next value from a normal distribution with zero
-     * mean and unit variance.
-     *
-     * @return the next value from a normal distribution with zero
-     * mean and unit variance.
-     */
-    public abstract double nextGaussian();
 
     /**
      * Returns the next value from a normal distribution with
@@ -325,18 +281,4 @@ public abstract class JamRandom {
 
         return eventIndex;
     }
-
-    /**
-     * Returns the value used to seed the generator.
-     *
-     * @return the value used to seed the generator.
-     */
-    public abstract long getSeed();
-
-    /**
-     * Resets the seed of the generator.
-     *
-     * @param seed the new seed to set.
-     */
-    public abstract void setSeed(long seed);
 }

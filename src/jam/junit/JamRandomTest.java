@@ -61,14 +61,6 @@ public class JamRandomTest {
         return EmpiricalDiscreteDistribution.compute(observations);
     }
 
-    @Test public void testGlobal() {
-        assertNull(System.getProperty(JamRandom.SEED_PROPERTY));
-
-        JamRandom global = JamRandom.global();
-
-        assertEquals(global.getSeed(), JamProperties.getRequiredLong(JamRandom.SEED_PROPERTY));
-    }
-
     @Test public void testNextDouble() {
         int count = 1000000;
         JamVector values = new JamVector(count);
