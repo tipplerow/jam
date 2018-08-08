@@ -156,6 +156,19 @@ public final class Coord implements Comparable<Coord> {
     }
 
     /**
+     * Computes the vector from the center of mass to this coordinate.
+     *
+     * @param CM the center of mass.
+     *
+     * @return the vector from the center of mass to this coordinate.
+     */
+    public JamVector cmVector(VectorView CM) {
+        return JamVector.valueOf(x - CM.getDouble(0),
+                                 y - CM.getDouble(1),
+                                 z - CM.getDouble(2));
+    }
+
+    /**
      * Returns the distance between this coordinate and a point in
      * continuous space.
      *
