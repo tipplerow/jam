@@ -1,7 +1,11 @@
 
 package jam.junit;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+
 import jam.dist.HypersphericalDistribution;
+import jam.lattice.Coord;
 import jam.math.StatUtil;
 import jam.vector.JamVector;
 
@@ -33,6 +37,27 @@ public class HypersphericalDistributionTest extends MultivariateDistributionTest
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidRadius() {
         new HypersphericalDistribution(3, 0.0);
+    }
+
+    @Test public void testExpansionDistribution() {
+        double    radius = 0.5 * Math.sqrt(3.0);
+        JamVector center = JamVector.valueOf(0.0, 0.0, 0.0);
+        
+        HypersphericalDistribution dist =
+            new HypersphericalDistribution(radius, center);
+
+        Multiset<Coord> coords = HashMultiset.create();
+
+        for (int k = 0; k < 1000000; ++k)
+            coords.add(Coord.nearest(dist.sample()));
+
+        int[] counts = new int[4];
+
+        for (Coord coord : coords.elementSet())
+            counts[coord.getSquaredLength()] += coords.count(coord);
+
+        assertEquals(731089, counts[1]);
+        assertEquals(268911, counts[2]);
     }
 
     public static void main(String[] args) {
