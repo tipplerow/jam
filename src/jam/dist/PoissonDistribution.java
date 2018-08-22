@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.special.Gamma;
 
-import jam.math.DoubleComparator;
 import jam.math.DoubleRange;
 import jam.math.IntRange;
 import jam.math.JamRandom;
@@ -217,8 +216,10 @@ final class PoissonDistributionExact extends PoissonDistribution {
         for (int k = 1; k < CDF.length; ++k) {
             CDF[k] = CDF[k - 1] + pdf(k, mean);
 
-            if (DoubleComparator.DEFAULT.isUnity(CDF[k]))
-                return Arrays.copyOf(CDF, k + 1);
+            if (1.0 - CDF[k] < 1.0E-15) {
+                CDF[k + 1] = 1.0;
+                return Arrays.copyOf(CDF, k + 2);
+            }
         }
 
         throw new IllegalStateException("The mean value is too large for explicit CDF sampling.");
