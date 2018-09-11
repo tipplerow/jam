@@ -3,6 +3,9 @@ package jam.report;
 
 import java.text.DecimalFormat;
 
+import jam.lattice.Coord;
+import jam.vector.VectorView;
+
 /**
  * Builds delimited report lines field by field.
  */
@@ -40,6 +43,17 @@ public final class LineBuilder {
             builder.append(delim);
 
         ++fieldCount;
+    }
+
+    /**
+     * Appends a lattice coordinate to the line.
+     *
+     * @param coord the coordinate to append.
+     */
+    public void append(Coord coord) {
+        append(coord.x);
+        append(coord.y);
+        append(coord.z);
     }
 
     /**
@@ -117,6 +131,43 @@ public final class LineBuilder {
     public void append(String s) {
         newField();
         builder.append(s);
+    }
+
+    /**
+     * Appends a floating-point vector to the line with default
+     * formatting.
+     *
+     * @param vector the floating-point vector to append.
+     */
+    public void append(VectorView vector) {
+        for (double d : vector.elements())
+            append(d);
+    }
+
+    /**
+     * Appends a floating-point vector to the line with specific
+     * formatting.
+     *
+     * @param vector the floating-point vector to append.
+     *
+     * @param fmt the format string.
+     */
+    public void append(VectorView vector, String fmt) {
+        for (double d : vector.elements())
+            append(d, fmt);
+    }
+
+    /**
+     * Appends a floating-point vector to the line with specific
+     * formatting.
+     *
+     * @param vector the floating-point vector to append.
+     *
+     * @param fmt the format string.
+     */
+    public void append(VectorView vector, DecimalFormat fmt) {
+        for (double d : vector.elements())
+            append(d, fmt);
     }
 
     @Override public String toString() {
