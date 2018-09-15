@@ -6,6 +6,7 @@
       <include name="commons-io/commons-io-2.4.jar"/>
       <include name="commons-lang3/commons-lang3-3.3.2.jar"/>
       <include name="commons-math3/commons-math3-3.3.jar"/>
+      <include name="commons-net/commons-net-3.6.jar"/>
       <include name="commons-primitives/commons-primitives-1.0.jar"/>
       <include name="fastutil/fastutil-8.1.1.jar"/>
       <include name="guava/guava-20.0.jar"/>
