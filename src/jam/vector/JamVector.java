@@ -1,3 +1,4 @@
+
 package jam.vector;
 
 import java.util.Collection;
@@ -6,6 +7,7 @@ import org.apache.commons.collections.primitives.ArrayDoubleList;
 
 import jam.math.DoubleUtil;
 import jam.math.IntSequence;
+import jam.math.JamRandom;
 import jam.math.StatUtil;
 import jam.matrix.MatrixView;
 
@@ -145,6 +147,30 @@ public final class JamVector extends AbstractVector {
      */
     public static JamVector ones(int length) {
         return new JamVector(length, 1.0);
+    }
+
+    /**
+     * Creates a vector with elements drawn from a Gaussian
+     * distribution with a specified mean and standard deviation.
+     *
+     * @param length the dimensionality of the structure.
+     *
+     * @param mean the mean of the Gaussian distribution from which
+     * the elements are drawn.
+     *
+     * @param stdev the standard deviation of the Gaussian
+     * distribution from which the elements are drawn.
+     *
+     * @return a new vector with elements drawn from a Gaussian
+     * distribution (using the global random number generator).
+     */
+    public static JamVector gaussian(int length, double mean, double stdev) {
+        JamVector vector = new JamVector(length);
+
+        for (int k = 0; k < length; ++k)
+            vector.set(k, JamRandom.global().nextGaussian(mean, stdev));
+
+        return vector;
     }
 
     /**

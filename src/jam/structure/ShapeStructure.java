@@ -4,7 +4,6 @@ package jam.structure;
 import java.util.Arrays;
 
 import jam.math.Discretization;
-import jam.math.JamRandom;
 import jam.vector.JamVector;
 import jam.vector.VectorView;
 
@@ -75,12 +74,7 @@ public final class ShapeStructure extends NumericStructure {
      * normal distribution (using the global generator).
      */
     public static ShapeStructure gaussian(int length, double stdev) {
-        JamVector vector = new JamVector(length);
-
-        for (int k = 0; k < length; ++k)
-            vector.set(k, JamRandom.global().nextGaussian(0.0, stdev));
-
-        return new ShapeStructure(vector);
+        return new ShapeStructure(JamVector.gaussian(length, 0.0, stdev));
     }
 
     /**
