@@ -4,6 +4,7 @@ package jam.structure;
 import java.util.Arrays;
 
 import jam.math.Discretization;
+import jam.math.JamRandom;
 import jam.vector.JamVector;
 import jam.vector.VectorView;
 
@@ -59,6 +60,27 @@ public final class ShapeStructure extends NumericStructure {
      */
     public static ShapeStructure conserved(int length) {
         return new ShapeStructure(new JamVector(length, CONSERVED));
+    }
+
+    /**
+     * Creates a shape structure with coordinates drawn from a normal
+     * distribution with zero mean and specified standard deviation.
+     *
+     * @param length the dimensionality of the structure.
+     *
+     * @param stdev the standard deviation of the normal distribution
+     * from which the coordinates are drawn.
+     *
+     * @return a new shape structure with coordinates drawn from a
+     * normal distribution (using the global generator).
+     */
+    public static ShapeStructure gaussian(int length, double stdev) {
+        JamVector vector = new JamVector(length);
+
+        for (int k = 0; k < length; ++k)
+            vector.set(k, JamRandom.global().nextGaussian(0.0, stdev));
+
+        return new ShapeStructure(vector);
     }
 
     /**
