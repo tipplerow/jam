@@ -32,6 +32,22 @@ public class IntUtilTest {
         assertEquals(3, counts.count(3));
     }
 
+    @Test public void testIsDivisible() {
+        assertTrue(IntUtil.isDivisible(10,  1));
+        assertTrue(IntUtil.isDivisible(10,  2));
+        assertTrue(IntUtil.isDivisible(10,  5));
+        assertTrue(IntUtil.isDivisible(10, 10));
+
+        assertFalse(IntUtil.isDivisible(10,  3));
+        assertFalse(IntUtil.isDivisible(10,  4));
+        assertFalse(IntUtil.isDivisible(10,  6));
+        assertFalse(IntUtil.isDivisible(10,  7));
+        assertFalse(IntUtil.isDivisible(10,  8));
+        assertFalse(IntUtil.isDivisible(10,  9));
+        assertFalse(IntUtil.isDivisible(10, 11));
+        assertFalse(IntUtil.isDivisible(10, 99));
+    }
+
     @Test public void testParseIntArray() {
         int[] actual   = IntUtil.parseIntArray("1, 2, 3", RegexUtil.COMMA);
         int[] expected = new int[] { 1, 2, 3 };

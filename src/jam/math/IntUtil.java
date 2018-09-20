@@ -43,6 +43,20 @@ public final class IntUtil {
     }
 
     /**
+     * Determines whether one integer is evenly divisible by another.
+     *
+     * @param numer the numerator to examine.
+     *
+     * @param denom the denominator to examine.
+     *
+     * @return {@code true} iff the numerator is evenly divisible by
+     * the denominator (has no remainder).
+     */
+    public static boolean isDivisible(int numer, int denom) {
+        return numer % denom == 0;
+    }
+
+    /**
      * Parses a string representation of an integer value.
      *
      * <p>In addition to all formats accepted by the built-in 
