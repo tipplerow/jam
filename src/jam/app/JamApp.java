@@ -1,9 +1,9 @@
 
 package jam.app;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +21,7 @@ import jam.lang.JamException;
 public abstract class JamApp {
     private final String[] propertyFiles;
     private final File reportDir;
-    private final Collection<Closeable> autoClose = new ArrayList<Closeable>();
+    private final Collection<Writer> autoClose = new ArrayList<Writer>();
     private final Map<String, PrintWriter> writerMap = new TreeMap<String, PrintWriter>();
 
     /**
@@ -74,20 +74,22 @@ public abstract class JamApp {
      * {@code autoClose(Closeable)}.
      */
     public void autoClose() {
-        for (Closeable closeable : autoClose)
-            IOUtil.close(closeable);
+        for (Writer writer : autoClose) {
+            IOUtil.flush(writer);
+            IOUtil.close(writer);
+        }
     }
 
     /**
-     * Registers an object to be closed by the {@code close()} method.
+     * Registers a writer to be closed by the {@code close()} method.
      *
      * <p>Report writers opened by the {@code openWriter()} method are
      * automatically registered.
      *
-     * @param closeable the object to the closed.
+     * @param writer the report writer to the closed.
      */
-    public void autoClose(Closeable closeable) {
-        autoClose.add(closeable);
+    public void autoClose(Writer writer) {
+        autoClose.add(writer);
     }
 
     /**

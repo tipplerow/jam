@@ -7,6 +7,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -36,6 +37,21 @@ public final class IOUtil {
         try {
             if (closeable != null)
                 closeable.close();
+        }
+        catch (Exception ex) {
+            JamLogger.warn(ex.getMessage());
+        }
+    }
+
+    /**
+     * Flushes a flushable object and ignores all exceptions.
+     *
+     * @param flushable the object to flush.
+     */
+    public static void flush(Flushable flushable) {
+        try {
+            if (flushable != null)
+                flushable.flush();
         }
         catch (Exception ex) {
             JamLogger.warn(ex.getMessage());
