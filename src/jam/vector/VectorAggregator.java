@@ -50,6 +50,16 @@ public abstract class VectorAggregator {
         };
 
     /**
+     * The median-absolute aggregator.
+     */
+    public static final VectorAggregator MEDABS =
+        new VectorAggregator() {
+            @Override public double compute(VectorView values) {
+                return StatUtil.medabs(values);
+            }
+        };
+
+    /**
      * The minimum-value aggregator.
      */
     public static final VectorAggregator MIN =
@@ -163,6 +173,18 @@ public abstract class VectorAggregator {
      */
     public static double meansqr(VectorView values) {
         return MEANSQR.compute(values);
+    }
+
+    /**
+     * Computes the median of the absolute values in a vector; missing
+     * values are excluded.
+     *
+     * @param values the values to aggregate.
+     *
+     * @return the median absolute value.
+     */
+    public static double medabs(VectorView values) {
+        return MEDABS.compute(values);
     }
 
     /**

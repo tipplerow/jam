@@ -101,6 +101,19 @@ public class StatUtilTest extends NumericTestBase {
         assertDouble(StatUtil.mean(val1), StatUtil.mean(val2, wt2));
     }
 
+    @Test public void testMedAbs() {
+        assertTrue(Double.isNaN(StatUtil.medabs(VectorView.EMPTY)));
+        assertTrue(Double.isNaN(StatUtil.medabs(VectorView.wrap(Double.NaN))));
+
+        assertDouble(2.0, StatUtil.medabs(VectorView.wrap(-2.0, 1.0, 3.0)));
+        assertDouble(2.5, StatUtil.medabs(VectorView.wrap(2.0, -3.0, -4.0, 1.0)));
+
+        assertDouble(1.1, StatUtil.medabs(VectorView.wrap(-1.1, Double.NaN, 3.0, -0.5)));
+        assertDouble(1.1, StatUtil.medabs(VectorView.wrap(-1.1, Double.NaN, 3.0, Double.NaN, -0.5)));
+
+        assertDouble(2.0, StatUtil.medabs(VectorView.wrap(1.0, -2.0, 1.5, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY)));
+    }
+
     @Test public void testMedian() {
         assertTrue(Double.isNaN(StatUtil.median(VectorView.EMPTY)));
         assertTrue(Double.isNaN(StatUtil.median(VectorView.wrap(Double.NaN))));

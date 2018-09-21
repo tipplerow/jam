@@ -259,6 +259,25 @@ public final class StatUtil {
     }
 
     /**
+     * Computes the median of the absolute values of a numerical
+     * sequence, ignoring missing values.
+     *
+     * @param values the values to examine.
+     *
+     * @return the median of the non-missing absolute values, or
+     * {@code Double.NaN} if the sequence contains no non-missing
+     * values.
+     */
+    public static double medabs(VectorView values) {
+        JamVector absval = new JamVector(values.length());
+
+        for (int k : IntSequence.along(values))
+            absval.set(k, Math.abs(values.getDouble(k)));
+
+        return median(absval);
+    }
+
+    /**
      * Computes the median absolute deviation (MAD) of a numerical
      * sequence, ignoring missing values.
      *
