@@ -542,6 +542,17 @@ public final class JamVector extends AbstractVector {
     }
 
     /**
+     * Returns the {@code p}-norm of this vector.
+     *
+     * @param p the index of the vector norm to compute.
+     *
+     * @return the {@code p}-norm of this vector.
+     */
+    public double norm(int p) {
+        return StatUtil.normp(this, p);
+    }
+
+    /**
      * Normalizes this vector: after applying this operation, the
      * elements of this vector will sum to one.
      *

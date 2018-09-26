@@ -320,8 +320,17 @@ public class JamVectorTest extends NumericTestBase {
     }
 
     @Test public void testNorm() {
-        assertDouble(Math.sqrt(14.0), DENSE3.norm());
-        assertDouble(Math.sqrt(30.0), DENSE4.norm());
+        JamVector v3 = JamVector.valueOf(-1.0,  2.0, -3.0);
+        JamVector v4 = JamVector.valueOf( 1.0, -2.0,  3.0, -4.0);
+
+        assertDouble(Math.sqrt(14.0), v3.norm());
+        assertDouble(Math.sqrt(30.0), v4.norm());
+
+        assertDouble( 6.0, v3.norm(1));
+        assertDouble(10.0, v4.norm(1));
+
+        assertDouble(Math.sqrt(14.0), v3.norm(2));
+        assertDouble(Math.sqrt(30.0), v4.norm(2));
     }
 
     @Test public void testNormalize() {
