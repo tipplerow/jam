@@ -634,6 +634,40 @@ public final class JamVector extends AbstractVector {
     }
 
     /**
+     * Returns a subvector of this vector.
+     *
+     * <p>Similarly to {@code String.substring}, the subvector begins
+     * at the specified index and extends to the end of this vector.
+     *
+     * @param beginIndex the beginning index, inclusive.
+     *
+     * @return the specified subvector (in a new object).
+     *
+     * @throws RuntimeException unless the specifed index is valid.
+     */
+    public JamVector subvector(int beginIndex) {
+        return subvector(beginIndex, length());
+    }
+
+    /**
+     * Returns a subvector of this vector.
+     *
+     * <p>Similarly to {@code String.substring}, the subvector
+     * contains elements {@code (beginIndex, endIndex]}.
+     *
+     * @param beginIndex the beginning index, inclusive.
+     *
+     * @param endIndex the ending index, exclusive.
+     *
+     * @return the specified subvector (in a new object).
+     *
+     * @throws RuntimeException unless the specifed indexes are valid.
+     */
+    public JamVector subvector(int beginIndex, int endIndex) {
+        return new JamVector(impl.subvector(beginIndex, endIndex));
+    }
+
+    /**
      * Subtracts another vector from this vector <em>in place</em>.
      *
      * @param that the vector to subtract.

@@ -438,6 +438,30 @@ public class JamVectorTest extends NumericTestBase {
         assertDenseUnchanged();
     }
 
+    @Test public void testSubVector1() {
+        JamVector v1 = JamVector.valueOf(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+        JamVector v2 = v1.subvector(0);
+        JamVector v3 = v1.subvector(4);
+        JamVector v4 = v1.subvector(2, 2);
+        JamVector v5 = v1.subvector(2, 4);
+
+        assertEquals(v1, JamVector.valueOf(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0));
+        assertEquals(v2, JamVector.valueOf(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0));
+        assertEquals(v3, JamVector.valueOf(4.0, 5.0, 6.0));
+        assertEquals(v4, JamVector.valueOf());
+        assertEquals(v5, JamVector.valueOf(2.0, 3.0));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSubvectorInvalid1() {
+        DENSE4.subvector(8);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSubvectorInvalid2() {
+        DENSE4.subvector(2, 1);
+    }
+
     @Test public void testSum() {
         assertDouble( 6.0, DENSE3.sum());
         assertDouble(10.0, DENSE4.sum());

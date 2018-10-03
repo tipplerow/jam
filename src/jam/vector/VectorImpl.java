@@ -65,6 +65,18 @@ abstract class VectorImpl extends AbstractVector {
         return result;
     }
 
+    VectorImpl subvector(int begin, int end) {
+        if (end < begin)
+            throw new IndexOutOfBoundsException("Ending index is less than the beginning index.");
+
+        VectorImpl result = like(end - begin);
+
+        for (int index : IntSequence.along(result))
+            result = result.set(index, this.getDouble(index + begin));
+
+        return result;
+    }
+
     VectorImpl times(double scalar) {
         VectorImpl result = like();
 
