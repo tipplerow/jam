@@ -22,6 +22,16 @@ public abstract class Ordinal implements Comparable<Ordinal> {
     }
 
     /**
+     * Creates a new ordinal object with the next index produced by
+     * the automatic ordinal index counter.
+     *
+     * @param index the automatic ordinal index counter.
+     */
+    protected Ordinal(OrdinalIndex index) {
+        this(index.next());
+    }
+
+    /**
      * Returns the index for this object.
      *
      * @return the index for this object.
