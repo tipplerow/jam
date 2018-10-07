@@ -438,7 +438,7 @@ public class JamVectorTest extends NumericTestBase {
         assertDenseUnchanged();
     }
 
-    @Test public void testSubVector1() {
+    @Test public void testSubVector() {
         JamVector v1 = JamVector.valueOf(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
         JamVector v2 = v1.subvector(0);
         JamVector v3 = v1.subvector(4);

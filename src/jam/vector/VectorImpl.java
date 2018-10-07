@@ -65,7 +65,7 @@ abstract class VectorImpl extends AbstractVector {
         return result;
     }
 
-    VectorImpl subvector(int begin, int end) {
+    public VectorImpl subvector(int begin, int end) {
         if (end < begin)
             throw new IndexOutOfBoundsException("Ending index is less than the beginning index.");
 

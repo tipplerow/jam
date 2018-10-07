@@ -102,6 +102,34 @@ public class VectorViewTest extends NumericTestBase {
         assertDouble(5.0, view.getDouble(3));
     }
 
+    @Test public void testSubVector() {
+        VectorView v1 = VectorView.wrap(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+        VectorView v2 = v1.subvector(0);
+        VectorView v3 = v1.subvector(4);
+        VectorView v4 = v1.subvector(2, 2);
+        VectorView v5 = v1.subvector(2, 4);
+
+        assertTrue(v2.equalsVector(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0));
+        assertTrue(v3.equalsVector(4.0, 5.0, 6.0));
+        assertTrue(v4.equalsVector());
+        assertTrue(v5.equalsVector(2.0, 3.0));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSubvectorInvalid1() {
+        VectorView.wrap(1.0, 2.0, 3.0, 4.0).subvector(-2);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSubvectorInvalid2() {
+        VectorView.wrap(1.0, 2.0, 3.0, 4.0).subvector(8);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSubvectorInvalid3() {
+        VectorView.wrap(1.0, 2.0, 3.0, 4.0).subvector(2, 1);
+    }
+
     @Test public void testWrapArrayList() {
         List<Double> list = new ArrayList<Double>();
         VectorView   view = VectorView.wrap(list);

@@ -76,7 +76,7 @@ public interface VectorView extends Traversable {
      * @return {@code true} iff this vector and the input array have
      * the same length and are equal when compared element-by-element.
      */
-    public default boolean equalsVector(double[] elements) {
+    public default boolean equalsVector(double... elements) {
         return equalsVector(wrap(elements));
     }
 
@@ -201,6 +201,40 @@ public interface VectorView extends Traversable {
      */
     public default boolean isValidOperand(VectorView operand) {
         return this.length() == operand.length();
+    }
+
+    /**
+     * Returns a subvector of this vector.
+     *
+     * <p>Similarly to {@code String.substring}, the subvector begins
+     * at the specified index and extends to the end of this vector.
+     *
+     * @param beginIndex the beginning index, inclusive.
+     *
+     * @return the specified subvector (in a new object).
+     *
+     * @throws RuntimeException unless the specifed index is valid.
+     */
+    public default VectorView subvector(int beginIndex) {
+        return subvector(beginIndex, length());
+    }
+
+    /**
+     * Returns a subvector of this vector.
+     *
+     * <p>Similarly to {@code String.substring}, the subvector
+     * contains elements {@code (beginIndex, endIndex]}.
+     *
+     * @param beginIndex the beginning index, inclusive.
+     *
+     * @param endIndex the ending index, exclusive.
+     *
+     * @return the specified subvector (in a new object).
+     *
+     * @throws RuntimeException unless the specifed indexes are valid.
+     */
+    public default VectorView subvector(int beginIndex, int endIndex) {
+        return new SubVectorView(this, beginIndex, endIndex);
     }
 
     /**
