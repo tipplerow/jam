@@ -148,6 +148,18 @@ public class JamRandomTest {
 	assertTrue(seed1 != seed2);
     }
 
+    @Test public void testSelect() {
+        int trialCount = 1000000;
+        String[] strings = new String[] { "A", "B", "C", "D" };
+        HashMultiset<String> selected = HashMultiset.create();
+
+        for (int k = 0; k < trialCount; ++k)
+            selected.add(SOURCE.select(strings));
+
+        for (String s : strings)
+            assertEquals(0.25, DoubleUtil.ratio(selected.count(s), trialCount), 1E-3);
+    }
+
     @Test public void testSelectCDF() {
         double[] targetPDF = new double[] { 0.1, 0.2, 0.3, 0.4 };
         double[] targetCDF = new double[] { 0.1, 0.3, 0.6, 1.0 };

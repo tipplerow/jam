@@ -238,6 +238,20 @@ public abstract class JamRandom implements RandomGenerator {
     }
 
     /**
+     * Selects an object at random from an array, with each object
+     * selected with equal likelihood.
+     *
+     * @param <V> the runtime object type.
+     *
+     * @param objects the objects to choose from.
+     *
+     * @return one of the objects in the array, selected randomly.
+     */
+    public <V> V select(V[] objects) {
+        return objects[nextInt(0, objects.length)];
+    }
+
+    /**
      * Selects one event from a set of mutually exclusive events.
      *
      * <p>In the interest of efficiency, the distribution function is
