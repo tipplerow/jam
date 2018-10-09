@@ -1,6 +1,7 @@
 
 package jam.math;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Function;
 
@@ -113,6 +114,31 @@ public final class StatSummary {
      */
     public static StatSummary compute(Multiset<Integer> values) {
         return compute(values, k -> Double.valueOf(k));
+    }
+
+    /**
+     * Creates univariate summary statistics for a data set describing
+     * the number of times an object was counted (or event occurred).
+     *
+     * @param <V> the runtime type for the counted objects or events.
+     *
+     * @param counts the number of times each object was observed (or
+     * event occurred).
+     *
+     * @param universe the entire object or event universe (some of
+     * which may not have been counted or occurred).
+     *
+     * @return the new summary object.
+     *
+     * @throws IllegalArgumentException if the universe is empty.
+     */
+    public static <V> StatSummary compute(Multiset<V> counts, Collection<V> universe) {
+        Collection<Double> values = new ArrayList<Double>(universe.size());
+
+        for (V object : universe)
+            values.add(Double.valueOf(counts.count(object)));
+
+        return compute(values);
     }
 
     /**

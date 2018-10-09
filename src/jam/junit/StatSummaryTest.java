@@ -69,7 +69,7 @@ public class StatSummaryTest extends NumericTestBase {
         assertEquals(median, summary.getMedian(), 0.002);
     }
 
-    @Test public void testMultiset() {
+    @Test public void testMultiset1() {
         Multiset<Integer> values = HashMultiset.create();
 
         values.add(1);
@@ -88,6 +88,22 @@ public class StatSummaryTest extends NumericTestBase {
         assertEquals(0.755929, summary.getSD(), 1.0E-06);
     }
 
+    @Test public void testMultiset2() {
+        List<String> universe = List.of("A", "B", "C", "D", "E");
+        Multiset<String> counts = HashMultiset.create();
+
+        counts.add("B", 1);
+        counts.add("C", 2);
+        counts.add("D", 4);
+        counts.add("E", 8);
+
+        StatSummary summary = StatSummary.compute(counts, universe);
+
+        assertDouble(2.0, summary.getMedian());
+        assertDouble(3.0, summary.getMean());
+        assertEquals(3.162278, summary.getSD(), 1.0E-06);
+    }
+        
     @Test public void testUniform() {
         double[] values = new double[1000000];
 
