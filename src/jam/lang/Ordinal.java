@@ -1,6 +1,9 @@
 
 package jam.lang;
 
+import java.util.Collection;
+import java.util.TreeSet;
+
 /**
  * Provides a skeletal implementation for classes that are indexed
  * by a long integer.
@@ -29,6 +32,23 @@ public abstract class Ordinal implements Comparable<Ordinal> {
      */
     protected Ordinal(OrdinalIndex index) {
         this(index.next());
+    }
+
+    /**
+     * Sorts a collection of {@code Ordinal} objects by their index.
+     *
+     * @param <E> the runtime ordinal type.
+     *
+     * @param ordinals the {@code Ordinal} objects to sort.
+     *
+     * @return a new {@code TreeSet} containing the (unique) ordinal
+     * objects ordered by their index.
+     */
+    public static <E extends Ordinal> TreeSet<E> sort(Collection<E> ordinals) {
+        //
+        // Dump into a tree set to order by index...
+        //
+        return new TreeSet<E>(ordinals);
     }
 
     /**
