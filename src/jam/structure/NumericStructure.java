@@ -55,7 +55,7 @@ public abstract class NumericStructure extends Structure {
      * the reference structure.
      */
     public double euclideanDistance(NumericStructure that) {
-        return Distance.euclidean(this.asNumeric(), that.asNumeric());
+        return Distance.EUCLIDEAN.compute(this.asNumeric(), that.asNumeric());
     }
 
     /**

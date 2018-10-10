@@ -12,19 +12,19 @@ public class DistanceTest extends NumericTestBase {
     private final VectorView v2 = VectorView.wrap(0.0, 4.0, 7.0);
 
     @Test public void testEuclidean() {
-        assertDouble(0.0, Distance.euclidean(v1, v1));
-        assertDouble(0.0, Distance.euclidean(v2, v2));
+        assertDouble(0.0, Distance.EUCLIDEAN.compute(v1, v1));
+        assertDouble(0.0, Distance.EUCLIDEAN.compute(v2, v2));
 
-        assertDouble(Math.sqrt(21.0), Distance.euclidean(v1, v2));
-        assertDouble(Math.sqrt(21.0), Distance.euclidean(v2, v1));
+        assertDouble(Math.sqrt(21.0), Distance.EUCLIDEAN.compute(v1, v2));
+        assertDouble(Math.sqrt(21.0), Distance.EUCLIDEAN.compute(v2, v1));
     }
 
     @Test public void testManhattan() {
-        assertDouble(0.0, Distance.manhattan(v1, v1));
-        assertDouble(0.0, Distance.manhattan(v2, v2));
+        assertDouble(0.0, Distance.MANHATTAN.compute(v1, v1));
+        assertDouble(0.0, Distance.MANHATTAN.compute(v2, v2));
 
-        assertDouble(7.0, Distance.manhattan(v1, v2));
-        assertDouble(7.0, Distance.manhattan(v2, v1));
+        assertDouble(7.0, Distance.MANHATTAN.compute(v1, v2));
+        assertDouble(7.0, Distance.MANHATTAN.compute(v2, v1));
     }
 
     public static void main(String[] args) {

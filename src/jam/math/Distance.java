@@ -5,10 +5,38 @@ import jam.vector.JamVector;
 import jam.vector.VectorView;
 
 /**
- * Represents and computes generalized distances.
+ * Implements standard distance metrics.
  */
-public final class Distance {
-    private Distance() {}
+public enum Distance {
+    /**
+     * The Euclidean (L2-norm) distance.
+     */
+    EUCLIDEAN {
+        @Override protected double computeChecked(VectorView v1, VectorView v2) {
+            double sumsqr = 0.0;
+
+            for (int k = 0; k < v1.length(); ++k) {
+                double dxk = v1.getDouble(k) - v2.getDouble(k);
+                sumsqr += dxk * dxk;
+            }
+
+            return Math.sqrt(sumsqr);
+        }
+    },
+
+    /**
+     * The Manhattan (L1-norm) distance.
+     */
+    MANHATTAN {
+        @Override protected double computeChecked(VectorView v1, VectorView v2) {
+            double sumabs = 0.0;
+
+            for (int k = 0; k < v1.length(); ++k)
+                sumabs += Math.abs(v1.getDouble(k) - v2.getDouble(k));
+
+            return sumabs;
+        }
+    };
 
     /**
      * Computes a generalized distance between two points: the p-norm
@@ -31,34 +59,33 @@ public final class Distance {
     }
 
     /**
-     * Computes the Euclidean distance between two points.
+     * Computes the metric distance between two points.
      *
      * @param v1 the coordinates of the first point.
      *
      * @param v2 the coordinates of the second point.
      *
-     * @return the Euclidean distance between the points.
+     * @return the distance between the points.
      *
      * @throws IllegalArgumentException unless the points have the
      * same dimensionality.
      */
-    public static double euclidean(VectorView v1, VectorView v2) {
-        return compute(v1, v2, 2);
+    public double compute(VectorView v1, VectorView v2) {
+        if (v1.length() != v2.length())
+            throw new IllegalArgumentException("Incongruent vectors.");
+
+        return computeChecked(v1, v2);
     }
 
     /**
-     * Computes the Manhattan distance between two points.
+     * Computes the metric distance between two points (with assured
+     * congruent dimensionality).
      *
      * @param v1 the coordinates of the first point.
      *
      * @param v2 the coordinates of the second point.
      *
-     * @return the Manhattan distance between the points.
-     *
-     * @throws IllegalArgumentException unless the points have the
-     * same dimensionality.
+     * @return the distance between the points.
      */
-    public static double manhattan(VectorView v1, VectorView v2) {
-        return compute(v1, v2, 1);
-    }
+    protected abstract double computeChecked(VectorView v1, VectorView v2);
 }

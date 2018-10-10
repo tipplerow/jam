@@ -290,7 +290,7 @@ public final class VectorMoment {
      * point match those of this vector moment.
      */
     public double normR(VectorView point) {
-        return Distance.euclidean(point, CM) / scalar();
+        return Distance.EUCLIDEAN.compute(point, CM) / scalar();
     }
 
     /**
