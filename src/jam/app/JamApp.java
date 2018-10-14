@@ -34,6 +34,12 @@ public abstract class JamApp {
     public static final String REPORT_DIR_PROPERTY = "jam.app.reportDir";
 
     /**
+     * Name of the output file containing all relevant system
+     * properties that were defined at the time of execution.
+     */
+    public static final String RUNTIME_PROPERTY_FILE_NAME = "runtime.prop";
+
+    /**
      * Creates a new application instance and reads system properties
      * from a set of property files.
      *
@@ -136,5 +142,23 @@ public abstract class JamApp {
 
         autoClose(writer);
         return writer;
+    }
+
+    /**
+     * Writes the relevant runtime properties to the file name
+     * specified by {@code RUNTIME_PROPERTY_FILE_NAME}.
+     *
+     * @param prefixes properties will be omitted unless their name
+     * begins with one of the prefixes.
+     */
+    public void writeRuntimeProperties(String... prefixes) {
+        PrintWriter writer = openWriter(RUNTIME_PROPERTY_FILE_NAME);
+        Map<String, String> properties = JamProperties.filter(prefixes);
+
+        for (Map.Entry<String, String> entry : properties.entrySet())
+            writer.println(entry.getKey() + " = " + entry.getValue());
+
+        writer.flush();
+        writer.close();
     }
 }
