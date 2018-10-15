@@ -131,6 +131,30 @@ public class MultisetUtilTest extends NumericTestBase {
         assertEquals(6, set.size());
     }
 
+    @Test public void testTally() {
+        Multiset<String> set = HashMultiset.create();
+
+        set.add("A");
+        set.add("B");
+        set.add("C");
+        set.add("D");
+        set.add("E");
+        set.add("E");
+        set.add("F");
+        set.add("F");
+        set.add("G");
+        set.add("G");
+        set.add("G");
+
+        assertEquals(0, MultisetUtil.tallyCount(set, -1));
+        assertEquals(0, MultisetUtil.tallyCount(set,  0));
+        assertEquals(4, MultisetUtil.tallyCount(set,  1));
+        assertEquals(2, MultisetUtil.tallyCount(set,  2));
+        assertEquals(1, MultisetUtil.tallyCount(set,  3));
+        assertEquals(0, MultisetUtil.tallyCount(set,  4));
+        assertEquals(0, MultisetUtil.tallyCount(set,  5));
+    }
+
     @SuppressWarnings("unchecked")
     @Test public void testTree() {
         TreeMultiset<String> set1 = MultisetUtil.tree(lists);

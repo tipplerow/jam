@@ -110,6 +110,27 @@ public final class MultisetUtil {
     }
 
     /**
+     * Counts the number of objects in a multiset with a fixed number
+     * of occurrences (the target tally).
+     *
+     * @param set the set to tally.
+     *
+     * @param target the number of occurrences to count.
+     *
+     * @return the number of objects in the input set containing
+     * exactly {@code target} occurrences.
+     */
+    public static int tallyCount(Multiset<?> set, int target) {
+        int tally = 0;
+
+        for (Object key : set.elementSet())
+            if (set.count(key) == target)
+                ++tally;
+
+        return tally;
+    }
+
+    /**
      * Creates a new {@code TreeMultiset} populated by a sequence of
      * integers.
      *
