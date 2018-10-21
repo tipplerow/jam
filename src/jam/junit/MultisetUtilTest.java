@@ -4,6 +4,7 @@ package jam.junit;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -80,6 +81,15 @@ public class MultisetUtilTest extends NumericTestBase {
         assertDouble(1.0 / 6.0, MultisetUtil.frequency(set, "abc"));
         assertDouble(2.0 / 6.0, MultisetUtil.frequency(set, "def"));
         assertDouble(3.0 / 6.0, MultisetUtil.frequency(set, "ghi"));
+    }
+
+    @Test public void testFrequencyMap() {
+        Map<String, Double> map = MultisetUtil.frequencyMap(set);
+
+        assertEquals(3, map.size());
+        assertDouble(1.0 / 6.0, map.get("abc"));
+        assertDouble(2.0 / 6.0, map.get("def"));
+        assertDouble(3.0 / 6.0, map.get("ghi"));
     }
 
     @SuppressWarnings("unchecked")

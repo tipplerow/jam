@@ -3,6 +3,10 @@ package jam.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -39,6 +43,27 @@ public final class MultisetUtil {
      */
     public static double frequency(Multiset set, Object key) {
         return set.count(key) / ((double) set.size());
+    }
+
+    /**
+     * Computes the frequency of occurrence for each item in a
+     * multiset.
+     *
+     * @param <E> the type of element stored in the multiset.
+     *
+     * @param set the multiset to examine.
+     *
+     * @return a map containing the frequency of occurrence for each
+     * item in the multiset.
+     */
+    public static <E> Map<E, Double> frequencyMap(Multiset<E> set) {
+        Set<E> keys = set.elementSet();
+        Map<E, Double> map = new HashMap<E, Double>(keys.size());
+
+        for (E key : keys)
+            map.put(key, frequency(set, key));
+
+        return map;
     }
 
     /**
