@@ -3,6 +3,8 @@ package jam.math;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -51,6 +53,27 @@ public final class VectorMoment {
         return compute(vectors.toArray(new VectorView[vectors.size()]));
     }
     
+    /**
+     * Computes the generalized center of mass and gyration tensor for
+     * a collection of objects that can be mapped to vector coordinates.
+     *
+     * @param <T> the runtime object type.
+     *
+     * @param collection the collection of objects on which to operate.
+     *
+     * @param mapper the function that extracts a vector from each
+     * object in the collection.
+     *
+     * @return a {@code VectorMoment} instance containing the computed
+     * center of mass and gyration tensor.
+     *
+     * @throws IllegalArgumentException unless there is at least one
+     * object and all vectors have the same dimensionality.
+     */
+    public static <T> VectorMoment compute(Collection<T> collection, Function<? super T, ? extends VectorView> mapper) {
+        return compute(collection.stream().map(mapper).collect(Collectors.toList()));
+    }
+
     /**
      * Computes the generalized center of mass and gyration tensor for
      * a collection of vector coordinates.
