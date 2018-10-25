@@ -390,6 +390,21 @@ public final class Probability extends DomainDouble implements Comparable<Probab
     }
 
     /**
+     * Parses the string representation of a probability.
+     *
+     * @param s the string representation of a probability. 
+     *
+     * @return a new probability with the value specfied by the input
+     * string.
+     *
+     * @throws IllegalArgumentException unless the string is a valid
+     * probability.
+     */
+    public static Probability parse(String s) {
+        return valueOf(Double.parseDouble(s));
+    }
+
+    /**
      * Multiplies this probability by a scalar factor.
      *
      * @param scalar the scalar multiplier.

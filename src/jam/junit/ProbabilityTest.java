@@ -25,7 +25,7 @@ public class ProbabilityTest extends NumericTestBase {
     @Test public void testAccept() {
         int accepted = 0;
         int numTrial = 100000;
-        Probability prob = Probability.valueOf(0.3);
+        Probability prob = Probability.parse("0.3");
 
         for (int index = 0; index < numTrial; index++)
             if (prob.accept())
