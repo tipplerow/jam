@@ -1,6 +1,7 @@
 
 package jam.dist;
 
+import jam.app.JamProperties;
 import jam.math.DoubleRange;
 import jam.math.JamRandom;
 
@@ -131,6 +132,23 @@ public interface RealDistribution {
      * @return the range of non-zero probability density.
      */
     public abstract DoubleRange support();
+
+    /**
+     * Creates a {@code RealDistribution} that has been specified by a
+     * properly-encoded system property.
+     *
+     * @param propertyName the name of the system property containing
+     * the string that defines the distribution.
+     *
+     * @return the {@code RealDistribution} defined by the system
+     * property with the given name.
+     *
+     * @throws IllegalArgumentException unless the system property
+     * with the given name defines a valid probability distribution.
+     */
+    public static RealDistribution resolve(String propertyName) {
+        return RealDistributionType.parse(JamProperties.getRequired(propertyName));
+    }
 
     /**
      * Sample a series of random deviates and write them to standard
