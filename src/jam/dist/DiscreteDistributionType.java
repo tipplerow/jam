@@ -2,6 +2,7 @@
 package jam.dist;
 
 import jam.math.Probability;
+import jam.util.RegexUtil;
 import jam.vector.JamVector;
 
 /**
@@ -13,20 +14,19 @@ public enum DiscreteDistributionType {
         /**
          * Creates a new binomial distribution.
          *
-         * @param param (1) the number of trials and (2) the
+         * @param params (1) the number of trials and (2) the
          * probability that a single trial succeeds.
          *
          * @return the new binomial distribution.
          *
-         * @throws IllegalArgumentException unless the parameter
-         * vector has length two and contains a valid number of trials
-         * and success probability.
+         * @throws IllegalArgumentException unless the parameter array
+         * contains a valid number of trials and success probability.
          */
-        @Override public DiscreteDistribution create(double... param) {
-            if (param.length != 2)
+        @Override public DiscreteDistribution create(String... params) {
+            if (params.length != 2)
                 throw new IllegalArgumentException("Invalid parameter set.");
 
-            return BinomialDistribution.create((int) Math.round(param[0]), Probability.valueOf(param[1]));
+            return BinomialDistribution.create(Integer.parseInt(params[0]), Probability.parse(params[1]));
         }
     },
 
@@ -34,20 +34,20 @@ public enum DiscreteDistributionType {
         /**
          * Creates a new occurrence distribution.
          *
-         * @param param (1) the probability that an event occurs on a
+         * @param params (1) the probability that an event occurs on a
          * single trial, and (2) the number of trials.
          *
          * @return the new occurrence distribution.
          *
-         * @throws IllegalArgumentException unless the parameter
-         * vector has length two and contains a valid event
-         * probability and non-negative number of trials.
+         * @throws IllegalArgumentException unless the parameter array
+         * contains a valid event probability and non-negative number
+         * of trials.
          */
-        @Override public DiscreteDistribution create(double... param) {
-            if (param.length != 2)
+        @Override public DiscreteDistribution create(String... params) {
+            if (params.length != 2)
                 throw new IllegalArgumentException("Invalid parameter set.");
 
-            return new OccurrenceDistribution(Probability.valueOf(param[0]), (int) Math.round(param[1]));
+            return new OccurrenceDistribution(Probability.parse(params[0]), Integer.parseInt(params[1]));
         }
     },
 
@@ -55,48 +55,54 @@ public enum DiscreteDistributionType {
         /**
          * Creates a new Poisson distribution.
          *
-         * @param param the mean value.
+         * @param params the mean value.
          *
          * @return the new Poisson distribution.
          *
          * @throws IllegalArgumentException unless the parameter
-         * vector has length one and contains a positive mean value.
+         * array has length one and contains a positive mean value.
          */
-        @Override public DiscreteDistribution create(double... param) {
-            if (param.length != 1)
+        @Override public DiscreteDistribution create(String... params) {
+            if (params.length != 1)
                 throw new IllegalArgumentException("Invalid parameter set.");
 
-            return PoissonDistribution.create(param[0]);
+            return PoissonDistribution.create(Double.parseDouble(params[0]));
+        }
+    },
+
+    UNIFORM {
+        /**
+         * Creates a new uniform discrete distribution.
+         *
+         * @param param (1) the lower bound (inclusive) of the support
+         * range, and (2) the upper bound (exclusive) of the support
+         * range.
+         *
+         * @return the new uniform discrete distribution.
+         *
+         * @throws IllegalArgumentException unless the parameter array
+         * contains a valid range.
+         */
+        @Override public DiscreteDistribution create(String... params) {
+            if (params.length != 2)
+                throw new IllegalArgumentException("Invalid parameter set.");
+
+            return new UniformDiscreteDistribution(Integer.parseInt(params[0]), Integer.parseInt(params[1]));
         }
     };
 
     /**
      * Creates a probability distribution of this type.
      *
-     * @param param the parameters required by the constructor for
-     * this type of distribution.
+     * @param params the string representations of the parameters
+     * required by the constructor for this type of distribution.
      *
      * @return the new distribution instance.
      *
      * @throws IllegalArgumentException unless the parameters are
      * valid for this distribution type.
      */
-    public abstract DiscreteDistribution create(double... param);
-
-    /**
-     * Creates a probability distribution of this type.
-     *
-     * @param param parameters required by the constructor for this
-     * type of distribution, formatted as a comma-delimited string.
-     *
-     * @return the new distribution instance.
-     *
-     * @throws IllegalArgumentException unless the parameters are
-     * valid for this distribution type.
-     */
-    public DiscreteDistribution create(String param) {
-        return create(JamVector.parseCSV(param).toNumeric());
-    }
+    public abstract DiscreteDistribution create(String... params);
 
     /**
      * Parses a single string that defines a unique probability
@@ -115,7 +121,7 @@ public enum DiscreteDistributionType {
      * defines a valid probability distribution.
      */
     public static DiscreteDistribution parse(String def) {
-        String[] fields = def.split(";");
+        String[] fields = RegexUtil.SEMICOLON.split(def);
 
         if (fields.length != 2)
             throw new IllegalArgumentException(String.format("Invalid format: [%s].", def));
@@ -123,6 +129,6 @@ public enum DiscreteDistributionType {
         String typeField  = fields[0].trim();
         String paramField = fields[1].trim();
 
-        return valueOf(typeField).create(paramField);
+        return valueOf(typeField).create(RegexUtil.split(RegexUtil.COMMA, paramField));
     }
 }

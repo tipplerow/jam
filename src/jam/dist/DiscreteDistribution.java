@@ -3,6 +3,7 @@ package jam.dist;
 
 import com.google.common.collect.Multiset;
 
+import jam.app.JamProperties;
 import jam.math.IntRange;
 import jam.math.JamRandom;
 
@@ -209,6 +210,23 @@ public interface DiscreteDistribution {
             builder.append(String.format("%3d   %8.6f   %8.6f\n", k, pdf(k), cdf(k)));
 
         return builder.toString();
+    }
+
+    /**
+     * Creates a {@code DiscreteDistribution} that has been specified by a
+     * properly-encoded system property.
+     *
+     * @param propertyName the name of the system property containing
+     * the string that defines the distribution.
+     *
+     * @return the {@code DiscreteDistribution} defined by the system
+     * property with the given name.
+     *
+     * @throws IllegalArgumentException unless the system property
+     * with the given name defines a valid probability distribution.
+     */
+    public static DiscreteDistribution resolve(String propertyName) {
+        return DiscreteDistributionType.parse(JamProperties.getRequired(propertyName));
     }
 
     /**
