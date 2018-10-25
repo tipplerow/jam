@@ -74,7 +74,7 @@ public final class RegexUtil {
      * formatted floating-point values.
      */
     public static double[] parseDouble(Pattern pattern, String string) {
-        return parseDouble(pattern.split(string));
+        return parseDouble(split(pattern, string));
     }
 
     /**
@@ -99,20 +99,11 @@ public final class RegexUtil {
         return parseDouble(split(pattern, string, count));
     }
 
-    private static String[] split(Pattern pattern, String string, int count) {
-        String[] fields = pattern.split(string);
-
-        if (fields.length != count)
-            throw new IllegalArgumentException(String.format("Expected [%d] fields but found [%d].", count, fields.length));
-
-        return fields;
-    }
-
     private static double[] parseDouble(String[] fields) {
         double[] result = new double[fields.length];
 
         for (int index = 0; index < fields.length; index++)
-            result[index] = Double.parseDouble(fields[index].trim());
+            result[index] = Double.parseDouble(fields[index]);
 
         return result;
     }
@@ -131,7 +122,7 @@ public final class RegexUtil {
      * formatted integer values.
      */
     public static int[] parseInt(Pattern pattern, String string) {
-        return parseInt(pattern.split(string));
+        return parseInt(split(pattern, string));
     }
 
     /**
@@ -160,8 +151,56 @@ public final class RegexUtil {
         int[] result = new int[fields.length];
 
         for (int index = 0; index < fields.length; index++)
-            result[index] = Integer.parseInt(fields[index].trim());
+            result[index] = Integer.parseInt(fields[index]);
 
         return result;
+    }
+
+    /**
+     * Splits a string into fields defined by a given pattern and
+     * trims leading and trailing white space from each field.
+     *
+     * @param pattern the delimiting pattern.
+     *
+     * @param string the delimited string.
+     *
+     * @return an array containing all delimted fields, stripped of
+     * leading and trailing white space.
+     */
+    public static String[] split(Pattern pattern, String string) {
+        return trim(pattern.split(string));
+    }
+
+    private static String[] trim(String[] fields) {
+        for (int k = 0; k < fields.length; ++k)
+            fields[k] = fields[k].trim();
+
+        return fields;
+    }
+
+    /**
+     * Splits a string into a pre-defined number of fields defined by
+     * a given pattern and trims leading and trailing white space from
+     * each field.
+     *
+     * @param pattern the delimiting pattern.
+     *
+     * @param string the delimited string.
+     *
+     * @param count the expected number of fields.
+     *
+     * @return an array containing all delimted fields, stripped of
+     * leading and trailing white space.
+     *
+     * @throws IllegalArgumentException unless the number of fields
+     * matches the expected value.
+     */
+    public static String[] split(Pattern pattern, String string, int count) {
+        String[] fields = pattern.split(string);
+
+        if (fields.length != count)
+            throw new IllegalArgumentException(String.format("Expected [%d] fields but found [%d].", count, fields.length));
+
+        return trim(fields);
     }
 }
