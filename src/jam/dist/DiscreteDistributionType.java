@@ -1,6 +1,7 @@
 
 package jam.dist;
 
+import jam.math.IntUtil;
 import jam.math.Probability;
 import jam.util.RegexUtil;
 import jam.vector.JamVector;
@@ -26,7 +27,7 @@ public enum DiscreteDistributionType {
             if (params.length != 2)
                 throw new IllegalArgumentException("Invalid parameter set.");
 
-            return BinomialDistribution.create(Integer.parseInt(params[0]), Probability.parse(params[1]));
+            return BinomialDistribution.create(IntUtil.parseInt(params[0]), Probability.parse(params[1]));
         }
     },
 
@@ -47,7 +48,7 @@ public enum DiscreteDistributionType {
             if (params.length != 2)
                 throw new IllegalArgumentException("Invalid parameter set.");
 
-            return new OccurrenceDistribution(Probability.parse(params[0]), Integer.parseInt(params[1]));
+            return new OccurrenceDistribution(Probability.parse(params[0]), IntUtil.parseInt(params[1]));
         }
     },
 
@@ -87,7 +88,7 @@ public enum DiscreteDistributionType {
             if (params.length != 2)
                 throw new IllegalArgumentException("Invalid parameter set.");
 
-            return new UniformDiscreteDistribution(Integer.parseInt(params[0]), Integer.parseInt(params[1]));
+            return new UniformDiscreteDistribution(IntUtil.parseInt(params[0]), IntUtil.parseInt(params[1]));
         }
     };
 
