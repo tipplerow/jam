@@ -1,6 +1,8 @@
 
 package jam.math;
 
+import jam.util.RegexUtil;
+
 /**
  * Represents an interval on the real number line with some finite
  * tolerance for imprecision in floating-point comparisons.
@@ -118,6 +120,39 @@ public final class DoubleRange {
      */
     public static DoubleRange closed(double lowerBound, double upperBound) {
         return new DoubleRange(lowerBound, upperBound, RangeType.CLOSED);
+    }
+
+    /**
+     * Parses a string representation of a range.
+     *
+     * <p>The first character of the string must be either {@code [}
+     * (closed) or {@code (} (open); the last character must be either
+     * {@code ]} (closed) or {@code )} (open); the bounds must be
+     * separated by a comma.
+     *
+     * @param s the string to parse.
+     *
+     * @return the range specified by the given string.
+     *
+     * @throws IllegalArgumentException unless the input string
+     * contains a valid range.
+     */
+    public static DoubleRange parse(String s) {
+        //
+        // Strip leading and trailing white space...
+        //
+        s = s.trim();
+
+        // Extract the type from the first and last characters...
+        RangeType rangeType = RangeType.parse(s);
+
+        // Remove those characters...
+        s = s.substring(1, s.length() - 1);
+
+        // And parse the bounds...
+        double[] bounds = RegexUtil.parseDouble(RegexUtil.COMMA, s, 2);
+
+        return new DoubleRange(bounds[0], bounds[1], rangeType);
     }
 
     /**

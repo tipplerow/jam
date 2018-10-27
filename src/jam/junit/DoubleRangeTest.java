@@ -246,6 +246,28 @@ public class DoubleRangeTest extends NumericTestBase {
         DoubleRange.NEGATIVE.validate(1.0);
     }
 
+    @Test public void testParse() {
+        assertEquals(DoubleRange.open(-1.0, 2.0),       DoubleRange.parse("(-1.0, 2.0)"));
+        assertEquals(DoubleRange.leftOpen(-1.0, 2.0),   DoubleRange.parse("(-1.0, 2.0]"));
+        assertEquals(DoubleRange.leftClosed(-1.0, 2.0), DoubleRange.parse("[-1.0, 2.0)"));
+        assertEquals(DoubleRange.closed(-1.0, 2.0),     DoubleRange.parse(" [ -1.0,2.0 ] "));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseBad1() {
+        DoubleRange.parse("-1.0, 2.0");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseBad2() {
+        DoubleRange.parse("[-1.0 2.0]");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseBad3() {
+        DoubleRange.parse("[-1.0; 2.0]");
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.DoubleRangeTest");
     }
