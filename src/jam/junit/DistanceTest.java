@@ -11,6 +11,14 @@ public class DistanceTest extends NumericTestBase {
     private final VectorView v1 = VectorView.wrap(1.0, 2.0, 3.0);
     private final VectorView v2 = VectorView.wrap(0.0, 4.0, 7.0);
 
+    @Test public void testChebyshev() {
+        assertDouble(0.0, Distance.CHEBYSHEV.compute(v1, v1));
+        assertDouble(0.0, Distance.CHEBYSHEV.compute(v2, v2));
+
+        assertDouble(4.0, Distance.CHEBYSHEV.compute(v1, v2));
+        assertDouble(4.0, Distance.CHEBYSHEV.compute(v2, v1));
+    }
+
     @Test public void testEuclidean() {
         assertDouble(0.0, Distance.EUCLIDEAN.compute(v1, v1));
         assertDouble(0.0, Distance.EUCLIDEAN.compute(v2, v2));

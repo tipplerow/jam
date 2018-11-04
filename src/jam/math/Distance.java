@@ -9,6 +9,20 @@ import jam.vector.VectorView;
  */
 public enum Distance {
     /**
+     * The Chebyshev (infinity-norm) distance.
+     */
+    CHEBYSHEV {
+        @Override protected double computeChecked(VectorView v1, VectorView v2) {
+            double maxabs = 0.0;
+
+            for (int k = 0; k < v1.length(); ++k)
+                maxabs = Math.max(maxabs, Math.abs(v1.getDouble(k) - v2.getDouble(k)));
+
+            return maxabs;
+        }
+    },
+
+    /**
      * The Euclidean (L2-norm) distance.
      */
     EUCLIDEAN {
