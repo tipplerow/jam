@@ -229,6 +229,24 @@ public enum Residue {
     }
 
     /**
+     * Returns a different native residue selected at random, with all
+     * other native residues chosen with equal probability.
+     *
+     * @param random the random number source.
+     *
+     * @return a different native residue selected at random.
+     */
+    public Residue mutate(JamRandom random) {
+        Residue result;
+
+        do {
+            result = selectNative(random);
+        } while (result.equals(this));
+
+        return result;
+    }
+
+    /**
      * Selects a native residue at random, with all native residues
      * equally likely.
      *

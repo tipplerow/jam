@@ -16,6 +16,9 @@ import com.google.common.collect.Multiset;
 import jam.math.JamRandom;
 import jam.util.MultisetUtil;
 
+/**
+ * Nucleic acid triplets encoding amino acids.
+ */
 public enum Codon {
     GCA(Residue.Ala),
     GCC(Residue.Ala),
