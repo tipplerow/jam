@@ -97,7 +97,7 @@ public final class Peptide {
         LineBuilder builder = LineBuilder.csv();
 
         for (Residue residue : residues)
-            builder.append(residue);
+            builder.append(residue.code1());
 
         return builder.toString();
     }
