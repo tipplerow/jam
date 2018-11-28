@@ -103,6 +103,17 @@ public final class Peptide {
     }
 
     /**
+     * Returns the header line for CSV files containing peptides with
+     * the same length as this peptide.
+     *
+     * @return the header line for CSV files containing peptides with
+     * the same length as this peptide.
+     */
+    public String header() {
+        return header(length());
+    }
+
+    /**
      * Returns the header line for CSV files containing peptides of a
      * given length.
      *
