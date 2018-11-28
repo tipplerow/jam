@@ -1,6 +1,9 @@
 
 package jam.lang;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * Provides an abstraction for object creation.
  */
@@ -11,6 +14,22 @@ public interface ObjectFactory<T> {
      * @return the new object.
      */
     public abstract T newInstance();
+
+    /**
+     * Creates new objects.
+     *
+     * @param count the number of new objects to create.
+     *
+     * @return the new objects.
+     */
+    public default Collection<T> newInstances(int count) {
+        Collection<T> instances = new ArrayList<T>(count);
+
+        while (instances.size() < count)
+            instances.add(newInstance());
+
+        return instances;
+    }
 
     /**
      * Returns an object factory that will create new instances of a

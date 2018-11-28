@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 import jam.lang.ObjectFactory;
@@ -15,6 +16,16 @@ final class IntegerFactory implements ObjectFactory<Integer> {
 }
 
 public class ObjectFactoryTest {
+    @Test public void testCollection() {
+        ObjectFactory<Integer> integerFactory = new IntegerFactory();
+        Collection<Integer> integers = integerFactory.newInstances(5);
+
+        assertEquals(5, integers.size());
+
+        for (Integer integer : integers)
+            assertEquals(0, integer.intValue());
+    }
+
     @Test public void testForString() {
         ObjectFactory<String> stringFactory = ObjectFactory.forClass(String.class);
         assertEquals("", stringFactory.newInstance());
