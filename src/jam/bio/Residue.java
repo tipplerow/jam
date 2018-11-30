@@ -220,6 +220,15 @@ public enum Residue {
     }
 
     /**
+     * Returns the number of native residues.
+     *
+     * @return the number of native residues.
+     */
+    public static int countNative() {
+        return nativeList.size();
+    }
+
+    /**
      * Lists the native residues.
      *
      * @return an unmodifiable list containing the native residues.

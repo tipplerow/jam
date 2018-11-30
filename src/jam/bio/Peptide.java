@@ -57,6 +57,52 @@ public final class Peptide {
     }
 
     /**
+     * Enumerates every native peptide of a given length.
+     *
+     * @param length the desired peptide length.
+     *
+     * @return a list containing all possible native peptides
+     * (composed of native residues) with the specified length.
+     *
+     * @throws IllegalArgumentException if the length exceeds seven
+     * (because the number of unique peptides exceeds the capacity of
+     * a list) or is not positive.
+     */
+    public static List<Peptide> enumerate(int length) {
+        if (length < 1)
+            throw new IllegalArgumentException("Length must be positive.");
+
+        if (length == 1)
+            return enumerate1();
+
+        if (length <= 7)
+            return addGeneration(enumerate(length - 1));
+
+        throw new IllegalArgumentException("Length must not exceed seven.");
+    }
+
+    private static List<Peptide> enumerate1() {
+        List<Peptide> resultList =
+            new ArrayList<Peptide>(Residue.countNative());
+
+        for (Residue residue : Residue.listNative())
+            resultList.add(Peptide.of(residue));
+
+        return resultList;
+    }
+
+    private static List<Peptide> addGeneration(List<Peptide> parentList) {
+        List<Peptide> resultList =
+            new ArrayList<Peptide>(Residue.countNative() * parentList.size());
+
+        for (Peptide parent : parentList)
+            for (Residue residue : Residue.listNative())
+                resultList.add(parent.append(residue));
+
+        return resultList;
+    }
+
+    /**
      * Creates a new peptide with native residues chosen randomly with
      * equal probability.
      *
@@ -72,6 +118,61 @@ public final class Peptide {
             residues.add(Residue.selectNative(JamRandom.global()));
 
         return new Peptide(residues, false);
+    }
+
+    /**
+     * Returns a peptide with a fixed sequence of residues.
+     *
+     * @param residues the sequence of residues to compose the peptide.
+     *
+     * @return the peptide with the specified residues.
+     *
+     * @throws IllegalArgumentException if the residue sequence is empty.
+     */
+    public static Peptide of(Residue... residues) {
+        return new Peptide(residues);
+    }
+
+    /**
+     * Returns a peptide with a fixed sequence of residues.
+     *
+     * @param residues the list of residues to compose the peptide.
+     *
+     * @return the peptide with the specified residues.
+     *
+     * @throws IllegalArgumentException if the residue list is empty.
+     */
+    public static Peptide of(List<Residue> residues) {
+        return new Peptide(residues);
+    }
+
+    /**
+     * Appends a sequence of residues to this peptide and returns a
+     * new peptide with the full sequence; this peptide is unchanged.
+     *
+     * @param addlResidues the residues to append.
+     *
+     * @return the new peptide with the additional residues.
+     */
+    public Peptide append(Residue... addlResidues) {
+        return append(List.of(addlResidues));
+    }
+
+    /**
+     * Appends a list of residues to this peptide and returns a new
+     * peptide with the full sequence; this peptide is unchanged.
+     *
+     * @param addlResidues the residues to append.
+     *
+     * @return the new peptide with the additional residues.
+     */
+    public Peptide append(List<Residue> addlResidues) {
+        List<Residue> newResidues =
+            new ArrayList<Residue>(this.residues);
+
+        newResidues.addAll(addlResidues);
+
+        return new Peptide(newResidues, false);
     }
 
     /**
@@ -177,5 +278,16 @@ public final class Peptide {
             hashCode = residues.hashCode();
 
         return hashCode;
+    }
+
+    @Override public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Peptide(");
+
+        for (Residue residue : residues)
+            builder.append(residue.code1());
+
+        builder.append(")");
+        return builder.toString();
     }
 }
