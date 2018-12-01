@@ -22,6 +22,15 @@ abstract class MatrixImpl extends MatrixView {
     // type as this, with all elements initialized to zero.
     abstract MatrixImpl like(int nrow, int ncol);
 
+    // Adds a value to an element.
+    //
+    // Returns the implementation, usually this same matrix, but
+    // potentially a different implementation if the underlying
+    // storage scheme must change, e.g., when adding a non-zero
+    // value to an off-diagonal element in a diagonal matrix.
+    //
+    abstract MatrixImpl add(int row, int col, double value);
+
     // Assigns a value to the element at location [row, col].
     //
     // Returns the implementation, usually this same matrix, but
@@ -79,6 +88,10 @@ abstract class MatrixImpl extends MatrixView {
     //
     double dot(int row, int col, MatrixView factor) {
         return dot(row, factor.viewColumn(col));
+    }
+
+    MatrixImpl multiply(int row, int col, double value) {
+        return set(row, col, get(row, col) * value);
     }
 
     MatrixImpl plus(double scalar) {

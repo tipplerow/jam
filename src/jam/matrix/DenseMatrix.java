@@ -20,12 +20,26 @@ final class DenseMatrix extends MatrixImpl {
         this.elements = elements;
     }
 
+    @Override public MatrixImpl add(int row, int col, double value) {
+        elements.addToEntry(row, col, value);
+        return this;
+    }
+
     @Override public MatrixImpl copy() {
         return new DenseMatrix(elements.copy());
     }
 
+    @Override public double get(int row, int col) {
+        return elements.getEntry(row, col);
+    }
+
     @Override public MatrixImpl like(int nrow, int ncol) {
         return new DenseMatrix(nrow, ncol);
+    }
+
+    @Override MatrixImpl multiply(int row, int col, double value) {
+        elements.multiplyEntry(row, col, value);
+        return this;
     }
 
     @Override public int nrow() {
@@ -36,10 +50,6 @@ final class DenseMatrix extends MatrixImpl {
         return elements.getColumnDimension();
     }
 
-    @Override public double get(int row, int col) {
-        return elements.getEntry(row, col);
-    }
-    
     @Override public MatrixImpl set(int row, int col, double value) {
         elements.setEntry(row, col, value);
         return this;

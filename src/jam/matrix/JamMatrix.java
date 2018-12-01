@@ -318,6 +318,32 @@ public final class JamMatrix extends MatrixView {
     }
 
     /**
+     * Creates a new square matrix initialized with zeros.
+     *
+     * @param N the number of rows and columns.
+     *
+     * @return a new square matrix with {@code N} rows and columns
+     * initialized with zeros.
+     */
+    public static JamMatrix square(int N) {
+        return square(N, 0.0);
+    }
+
+    /**
+     * Creates a new square matrix.
+     *
+     * @param N the number of rows and columns.
+     *
+     * @param value the value to assign to each element.
+     *
+     * @return a new square matrix with {@code N} rows and columns
+     * initialized with {@code value}.
+     */
+    public static JamMatrix square(int N, double value) {
+        return new JamMatrix(N, N, value);
+    }
+
+    /**
      * Creates a copy of this matrix.
      *
      * @return a new matrix with the same elements as this matrix.
@@ -454,6 +480,19 @@ public final class JamMatrix extends MatrixView {
     }
 
     /**
+     * Increments the value of a specified element.
+     *
+     * @param row the row index of the element to increment.
+     *
+     * @param col the column index of the element to increment.
+     *
+     * @param value the value to add to the specified element.
+     */
+    public void add(int row, int col, double value) {
+        impl = impl.add(row, col, value);
+    }
+
+    /**
      * Applies an aggregator to each row in this matrix.
      *
      * @param aggregator the aggregator to apply.
@@ -525,6 +564,19 @@ public final class JamMatrix extends MatrixView {
      */
     public void divide(double scalar) {
         multiply(1.0 / scalar);
+    }
+
+    /**
+     * Divides a specified element by a scalar value.
+     *
+     * @param row the row index of the element to divide.
+     *
+     * @param col the column index of the element to divide.
+     *
+     * @param scalar the scalar divisor.
+     */
+    public void divide(int row, int col, double scalar) {
+        divide(row, col, 1.0 / scalar);
     }
 
     /**
@@ -610,6 +662,19 @@ public final class JamMatrix extends MatrixView {
     }
 
     /**
+     * Multiplies a specified element by a scalar value.
+     *
+     * @param row the row index of the element to multiply.
+     *
+     * @param col the column index of the element to multiply.
+     *
+     * @param scalar the scalar multiplier.
+     */
+    public void multiply(int row, int col, double scalar) {
+        impl = impl.multiply(row, col, scalar);
+    }
+
+    /**
      * Computes the sum of this matrix and a scalar value and returns
      * the result in a new {@code JamMatrix}; this matrix is unchanged.
      *
@@ -635,6 +700,19 @@ public final class JamMatrix extends MatrixView {
      */
     public JamMatrix plus(MatrixView that) {
         return daxpy(1.0, that);
+    }
+
+    /**
+     * Decrements the value of a specified element.
+     *
+     * @param row the row index of the element to decrement.
+     *
+     * @param col the column index of the element to decrement.
+     *
+     * @param value the value to subtract from the specified element.
+     */
+    public void subtract(int row, int col, double value) {
+        add(row, col, -value);
     }
 
     /**

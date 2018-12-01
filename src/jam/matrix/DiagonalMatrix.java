@@ -23,6 +23,20 @@ final class DiagonalMatrix extends MatrixImpl {
         return new DiagonalMatrix(diagonal);
     }
 
+    @Override public MatrixImpl add(int row, int col, double value) {
+        return set(row, col, get(row, col) + value);
+    }
+
+    @Override public double get(int row, int col) {
+        //
+        // onDiagonal also validates the indexes...
+        //
+        if (onDiagonal(row, col))
+            return diagonal[row];
+        else
+            return 0.0;
+    }
+
     @Override public MatrixImpl like(int nrow, int ncol) {
         validateSquare(nrow, ncol);
         return new DiagonalMatrix(nrow);
@@ -36,16 +50,6 @@ final class DiagonalMatrix extends MatrixImpl {
         return diagonal.length;
     }
 
-    @Override public double get(int row, int col) {
-        //
-        // onDiagonal also validates the indexes...
-        //
-        if (onDiagonal(row, col))
-            return diagonal[row];
-        else
-            return 0.0;
-    }
-    
     @Override public MatrixImpl set(int row, int col, double value) {
         //
         // onDiagonal also validates the indexes...
