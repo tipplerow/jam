@@ -8,13 +8,18 @@ import jam.io.FileUtil;
 import jam.io.LineReader;
 import jam.matrix.JamMatrix;
 import jam.matrix.MatrixView;
+import jam.vector.JamVector;
+import jam.vector.VectorView;
 
 /**
- * Represents pairwise interactions between residues (a
+ * Represents pairwise interactions between native residues (a
  * <em>R</em>esidue <em>I</em>nteraction <em>M</em>atrix).
  */
 public final class RIM {
     private final MatrixView matrix;
+
+    // Mean values computed on demand...
+    private VectorView means = null;
 
     private RIM(MatrixView matrix) {
         this.matrix = matrix;
@@ -88,6 +93,44 @@ public final class RIM {
      * @return the interaction strength between the specific residues.
      */
     public double get(Residue res1, Residue res2) {
-	return matrix.get(res1.ordinal(), res2.ordinal());
+	return matrix.get(indexOf(res1), indexOf(res2));
+    }
+
+    private static int indexOf(Residue res) {
+        return res.ordinal();
+    }
+
+    /**
+     * Returns the mean interaction for one residue taken over all
+     * native residues.
+     *
+     * @param res the residue of interest.
+     *
+     * @return the mean interaction of the specified residue taken
+     * over all native residues.
+     */
+    public double mean(Residue res) {
+        if (means == null)
+            means = computeMeans();
+
+        return means.getDouble(indexOf(res));
+    }
+
+    private JamVector computeMeans() {
+        JamVector meanVec = new JamVector(matrix.ncol());
+
+        for (Residue res1 : Residue.listNative())
+            meanVec.set(indexOf(res1), computeMean(res1));
+
+        return meanVec;
+    }
+
+    private double computeMean(Residue res1) {
+        double total = 0.0;
+
+        for (Residue res2 : Residue.listNative())
+            total += get(res1, res2);
+
+        return total / Residue.countNative();
     }
 }

@@ -20,6 +20,10 @@ public class RIMTest extends NumericTestBase {
         assertDouble(-1.53, MJ.get(Residue.Asn, Residue.Pro));
     }
 
+    @Test public void testMeans() {
+        assertDouble(-2.443, RIM.MiyazawaJernigan.mean(Residue.Pro));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.RIMTest");
     }
