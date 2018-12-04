@@ -42,6 +42,12 @@ public class PeptideTest {
     }
 
     @Test public void testEnumerate() {
+        assertEquals(     20, Peptide.enumerationSize(1));
+        assertEquals(    400, Peptide.enumerationSize(2));
+        assertEquals(   8000, Peptide.enumerationSize(3));
+        assertEquals( 160000, Peptide.enumerationSize(4));
+        assertEquals(3200000, Peptide.enumerationSize(5));
+
         for (int length = 1; length <= 4; ++length) {
             List<Peptide> peptides = Peptide.enumerate(length);
             assertEquals((int) Math.pow(20, length), peptides.size());

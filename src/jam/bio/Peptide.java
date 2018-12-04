@@ -35,6 +35,12 @@ public final class Peptide {
     }
 
     /**
+     * The maximum peptide length that can be explicitly enumerated
+     * without exceeding the maximum size of a {@code Collection}.
+     */
+    public static final int ENUMERATION_LIMIT = 7;
+
+    /**
      * Creates a new peptide from a sequence of residues.
      *
      * @param residues the sequence of residues to compose the peptide.
@@ -64,9 +70,8 @@ public final class Peptide {
      * @return a list containing all possible native peptides
      * (composed of native residues) with the specified length.
      *
-     * @throws IllegalArgumentException if the length exceeds seven
-     * (because the number of unique peptides exceeds the capacity of
-     * a list) or is not positive.
+     * @throws IllegalArgumentException unless the length is positive
+     * but not greater than the enumeration limit.
      */
     public static List<Peptide> enumerate(int length) {
         if (length < 1)
@@ -75,10 +80,10 @@ public final class Peptide {
         if (length == 1)
             return enumerate1();
 
-        if (length <= 7)
+        if (length <= ENUMERATION_LIMIT)
             return addGeneration(enumerate(length - 1));
 
-        throw new IllegalArgumentException("Length must not exceed seven.");
+        throw new IllegalArgumentException("Length must not exceed the enumeration limit.");
     }
 
     private static List<Peptide> enumerate1() {
@@ -100,6 +105,27 @@ public final class Peptide {
                 resultList.add(parent.append(residue));
 
         return resultList;
+    }
+
+    /**
+     * Returns the number of unique native peptides with a fixed
+     * length.
+     *
+     * @param length the desired peptide length.
+     *
+     * @return the number of unique native peptides with the specified
+     * length.
+     *
+     * @throws IllegalArgumentException unless the length is positive
+     * but not greater than the enumeration limit.
+     */
+    public static int enumerationSize(int length) {
+        if (length < 1)
+            throw new IllegalArgumentException("Length must be positive.");
+        else if (length > ENUMERATION_LIMIT)
+            throw new IllegalArgumentException("Length must not exceed the enumeration limit.");
+
+        return (int) Math.pow(Residue.countNative(), length);
     }
 
     /**
