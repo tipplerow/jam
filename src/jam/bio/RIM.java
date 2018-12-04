@@ -5,37 +5,33 @@ import java.io.File;
 
 import jam.app.JamHome;
 import jam.io.FileUtil;
-import jam.io.LineReader;
-import jam.matrix.JamMatrix;
-import jam.matrix.MatrixView;
-import jam.vector.JamVector;
-import jam.vector.VectorView;
+import jam.matrix.MatrixUtil;
 
 /**
  * Represents pairwise interactions between native residues (a
  * <em>R</em>esidue <em>I</em>nteraction <em>M</em>atrix).
  */
 public final class RIM {
-    private final MatrixView matrix;
+    private final double[][] matrix;
+    private final double[]   means;
 
-    // Mean values computed on demand...
-    private VectorView means = null;
-
-    private RIM(MatrixView matrix) {
-        this.matrix = matrix;
+    private RIM(double[][] matrix) {
         validateMatrix(matrix);
+
+        this.matrix = matrix;
+        this.means  = MatrixUtil.rowMeans(matrix);
     }
 
-    private static void validateMatrix(MatrixView matrix) {
+    private static void validateMatrix(double[][] matrix) {
         int N = Residue.countNative();
 
-        if (matrix.nrow() != N)
+        if (MatrixUtil.nrow(matrix) != N)
             throw new IllegalArgumentException("Invalid matrix row dimension.");
 
-        if (matrix.ncol() != N)
+        if (MatrixUtil.ncol(matrix) != N)
             throw new IllegalArgumentException("Invalid matrix column dimension.");
 
-        if (!matrix.isSymmetric())
+        if (!MatrixUtil.isSymmetric(matrix))
             throw new IllegalArgumentException("Non-symmetric matrix.");
     }
 
@@ -93,7 +89,7 @@ public final class RIM {
      * @return the interaction strength between the specific residues.
      */
     public double get(Residue res1, Residue res2) {
-	return matrix.get(indexOf(res1), indexOf(res2));
+	return matrix[indexOf(res1)][indexOf(res2)];
     }
 
     private static int indexOf(Residue res) {
@@ -110,27 +106,6 @@ public final class RIM {
      * over all native residues.
      */
     public double mean(Residue res) {
-        if (means == null)
-            means = computeMeans();
-
-        return means.getDouble(indexOf(res));
-    }
-
-    private JamVector computeMeans() {
-        JamVector meanVec = new JamVector(matrix.ncol());
-
-        for (Residue res1 : Residue.listNative())
-            meanVec.set(indexOf(res1), computeMean(res1));
-
-        return meanVec;
-    }
-
-    private double computeMean(Residue res1) {
-        double total = 0.0;
-
-        for (Residue res2 : Residue.listNative())
-            total += get(res1, res2);
-
-        return total / Residue.countNative();
+        return means[indexOf(res)];
     }
 }

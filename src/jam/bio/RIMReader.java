@@ -5,25 +5,24 @@ import java.io.File;
 
 import jam.app.JamHome;
 import jam.io.LineReader;
-import jam.lang.JamException;
-import jam.matrix.JamMatrix;
+import jam.matrix.MatrixUtil;
 import jam.util.RegexUtil;
 
 final class RIMReader {
     private final File file;
-    private final JamMatrix matrix;
+    private final double[][] matrix;
 
     private RIMReader(File file) {
         this.file = file;
-        this.matrix = JamMatrix.square(Residue.countNative());
+        this.matrix = MatrixUtil.square(Residue.countNative(), Double.NaN);
     }
 
-    static JamMatrix readSparse(File file) {
+    static double[][] readSparse(File file) {
         RIMReader reader = new RIMReader(file);
         return reader.readSparse();
     }
 
-    private JamMatrix readSparse() {
+    private double[][] readSparse() {
         LineReader reader = LineReader.open(file);
 
         try {
@@ -52,7 +51,7 @@ final class RIMReader {
         int index1 = res1.ordinal();
         int index2 = res2.ordinal();
 
-        matrix.set(index1, index2, bind);
-        matrix.set(index2, index1, bind);
+        matrix[index1][index2] = bind;
+        matrix[index2][index1] = bind;
     }        
 }
