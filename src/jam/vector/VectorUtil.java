@@ -4,6 +4,7 @@ package jam.vector;
 import java.util.Arrays;
 import java.util.Collection;
 
+import jam.dist.RealDistribution;
 import jam.math.DoubleComparator;
 
 /**
@@ -104,6 +105,25 @@ public final class VectorUtil {
                 return false;
 
         return true;
+    }
+
+    /**
+     * Creates new vector with randomly sampled elements.
+     *
+     * @param N the length of the vector to create.
+     *
+     * @param distrib the probability distribution from which to
+     * sample the elements.
+     *
+     * @return the new random vector.
+     */
+    public static double[] random(int N, RealDistribution distrib) {
+        double[] result = new double[N];
+
+        for (int k = 0; k < N; ++k)
+            result[k] = distrib.sample();
+
+        return result;
     }
 
     /**
