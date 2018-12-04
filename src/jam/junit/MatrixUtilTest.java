@@ -75,6 +75,18 @@ public class MatrixUtilTest {
 	MatrixUtil.create(5, -1, -1.1);
     }
 
+    @Test public void testIsSymmetric() {
+        double[][] x1 = new double[][] {{ 1.0, 2.0, 3.0 },
+                                        { 2.0, 4.0, 6.0 },
+                                        { 3.0, 6.0, 9.0 }};
+
+        assertTrue(MatrixUtil.isSymmetric(x1));
+
+        x1[0][1] = 1.1;
+
+        assertFalse(MatrixUtil.isSymmetric(x1));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.MatrixUtilTest");
     }
