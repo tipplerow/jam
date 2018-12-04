@@ -1,7 +1,11 @@
 
 package jam.matrix;
 
+import jam.dist.RealDistribution;
+import jam.math.DoubleComparator;
+import jam.math.StatUtil;
 import jam.vector.VectorUtil;
+import jam.vector.VectorView;
 
 /**
  * Provides utility methods operating on bare floating-point matrices
@@ -23,10 +27,45 @@ public final class MatrixUtil {
     public static double[][] create(int nrow, int ncol, double fill) {
         double[][] result = new double[nrow][];
 
-        for (int row = 0; row < nrow; row++)
-            result[row] = VectorUtil.create(ncol, fill);
+        for (int k = 0; k < nrow; ++k)
+            result[k] = VectorUtil.create(ncol, fill);
 
         return result;
+    }
+
+    /**
+     * Creates a new matrix with randomly sampled elements.
+     *
+     * @param nrow the number of rows in the new matrix.
+     *
+     * @param ncol the number of colums in the new matrix.
+     *
+     * @param distrib the probability distribution from which to
+     * sample the elements.
+     *
+     * @return the new random matrix.
+     */
+    public static double[][] random(int nrow, int ncol, RealDistribution distrib) {
+        double[][] result = new double[nrow][];
+
+        for (int k = 0; k < nrow; ++k)
+            result[k] = VectorUtil.random(ncol, distrib);
+
+        return result;
+    }
+
+    /**
+     * Creates a new square matrix and assigns all elements to a
+     * single value.
+     *
+     * @param N the number of rows and columns in the new matrix.
+     *
+     * @param fill the value to assign to each element.
+     *
+     * @return the new matrix.
+     */
+    public static double[][] square(int N, double fill) {
+        return create(N, N, fill);
     }
 
     /**
@@ -39,8 +78,8 @@ public final class MatrixUtil {
     public static double[][] copy(double[][] matrix) {
         double[][] result = new double[nrow(matrix)][];
 
-        for (int row = 0; row < nrow(matrix); row++)
-            result[row] = VectorUtil.copy(matrix[row]);
+        for (int k = 0; k < nrow(matrix); ++k)
+            result[k] = VectorUtil.copy(row(matrix, k));
 
         return result;
     }
@@ -79,9 +118,74 @@ public final class MatrixUtil {
      * @return {@code true} iff all rows have the same length.
      */
     public static boolean isRectangular(double[][] matrix) {
-        for (int row = 1; row < nrow(matrix); row++)
-            if (matrix[row].length != matrix[0].length)
+        int N = ncol(matrix, 0);
+
+        for (int k = 1; k < nrow(matrix); ++k)
+            if (ncol(matrix, k) != N)
                 return false;
+
+        return true;
+    }
+
+    private static int ncol(double[][] matrix, int k) {
+        return row(matrix, k).length;
+    }
+
+    /**
+     * Identifies square matrices.
+     *
+     * @param matrix the matrix to examine.
+     *
+     * @return {@code true} iff the matrix is square.
+     */
+    public static boolean isSquare(double[][] matrix) {
+        return (nrow(matrix) == ncol(matrix)) && isRectangular(matrix);
+    }
+
+    /**
+     * Identifies symmetric matrices.
+     *
+     * @param matrix the matrix to examine.
+     *
+     * @return {@code true} iff the matrix is symmetric within the
+     * default floating-point tolerance.
+     */
+    public static boolean isSymmetric(double[][] matrix) {
+        return isSymmetric(matrix, DoubleComparator.DEFAULT);
+    }
+
+    /**
+     * Identifies symmetric matrices.
+     *
+     * @param matrix the matrix to examine.
+     *
+     * @param tolerance the floating-point comparison tolerance.
+     *
+     * @return {@code true} iff the matrix is symmetric within the
+     * specified tolerance.
+     */
+    public static boolean isSymmetric(double[][] matrix, double tolerance) {
+        return isSymmetric(matrix, new DoubleComparator(tolerance));
+    }
+
+    /**
+     * Identifies symmetric matrices.
+     *
+     * @param matrix the matrix to examine.
+     *
+     * @param comparator the floating-point comparator.
+     *
+     * @return {@code true} iff the matrix is symmetric within the
+     * specified tolerance.
+     */
+    public static boolean isSymmetric(double[][] matrix, DoubleComparator comparator) {
+        if (!isSquare(matrix))
+            return false;
+
+        for (int i = 0; i < nrow(matrix); ++i)
+            for (int j = i + 1; j < ncol(matrix); ++j)
+                if (comparator.NE(matrix[i][j], matrix[j][i]))
+                    return false;
 
         return true;
     }
@@ -111,7 +215,37 @@ public final class MatrixUtil {
      * @throws RuntimeException if the matrix is empty.
      */
     public static int ncol(double[][] matrix) {
-        return matrix[0].length;
+        return row(matrix, 0).length;
+    }
+
+    /**
+     * Extracts a single row from a bare matrix.
+     *
+     * @param matrix the matrix of interest.
+     *
+     * @param k the index of the row to extract.
+     *
+     * @return the {@code k}th row of the matrix.
+     */
+    public static double[] row(double[][] matrix, int k) {
+        return matrix[k];
+    }
+
+    /**
+     * Computes the mean of each row in a matrix.
+     *
+     * @param matrix the matrix of interest.
+     *
+     * @return a vector {@code v} with {@code v[k]} containing the
+     * mean value in row {@code k}.
+     */
+    public static double[] rowMeans(double[][] matrix) {
+        double[] means = new double[nrow(matrix)];
+
+        for (int k = 0; k < nrow(matrix); ++k)
+            means[k] = StatUtil.mean(VectorView.wrap(row(matrix, k)));
+
+        return means;
     }
 
     /**

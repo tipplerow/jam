@@ -402,10 +402,11 @@ public abstract class MatrixView implements NumericMatrix, Iterable<MatrixCursor
         double[][] result = new double[nrow()][];
 
         for (int irow = 0; irow < nrow(); irow++) {
-            result[irow] = new double[ncol()];
+            double[] rowi = new double[ncol()];
+            result[irow]  = rowi;
 
             for (int jcol = 0; jcol < ncol(); jcol++)
-                result[irow][jcol] = get(irow, jcol);
+                rowi[jcol] = get(irow, jcol);
         }
 
         return result;
