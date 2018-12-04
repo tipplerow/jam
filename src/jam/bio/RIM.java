@@ -4,6 +4,7 @@ package jam.bio;
 import java.io.File;
 
 import jam.app.JamHome;
+import jam.dist.RealDistribution;
 import jam.io.FileUtil;
 import jam.matrix.MatrixUtil;
 
@@ -51,6 +52,32 @@ public final class RIM {
 
     private static File findMJData() {
         return new File(FileUtil.join(JamHome.NAME, "data", "MJ_upper.csv"));
+    }
+
+    /**
+     * Creates a residue-interaction matrix with elements sampled from
+     * a probability distribution.
+     *
+     * @param distrib the distribution from which to sample interactions.
+     *
+     * @return the new random interaction matrix.
+     */
+    public static RIM random(RealDistribution distrib) {
+        int N = Residue.countNative();
+        double[][] elements = MatrixUtil.square(N, Double.NaN);
+
+        for (int i = 0; i < N; ++i) {
+            elements[i][i] = distrib.sample();
+
+            for (int j = i + 1; j < N; ++j) {
+                double xij = distrib.sample();
+
+                elements[i][j] = xij;
+                elements[j][i] = xij;
+            }
+        }
+
+        return new RIM(elements);
     }
 
     /**
