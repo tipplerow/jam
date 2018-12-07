@@ -1,8 +1,8 @@
 
 package jam.junit;
 
+import jam.bio.PIPairwiseBinder;
 import jam.bio.Peptide;
-import jam.bio.PeptideBinder;
 import jam.bio.Residue;
 import jam.bio.RIM;
 import jam.math.IntRange;
@@ -10,13 +10,29 @@ import jam.math.IntRange;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-final class MiyaMHC extends PeptideBinder {
-    public MiyaMHC(Residue... residues) {
-        super(new Peptide(residues));
+abstract class LocalBinder implements PIPairwiseBinder {
+    private final Peptide binder;
+
+    public LocalBinder(Residue... residues) {
+        this.binder = Peptide.of(residues);
     }
 
-    @Override public RIM getRIM() {
-        return RIM.MiyazawaJernigan;
+    @Override public double getActivationEnergy() {
+        return 0.0;
+    }
+
+    @Override public Peptide getBinderPeptide() {
+        return binder;
+    }
+
+    @Override public double getFreeEnergy(Residue r1, Residue r2) {
+        return RIM.MiyazawaJernigan.get(r1, r2);
+    }
+}
+
+final class LocalMHC extends LocalBinder {
+    public LocalMHC(Residue... residues) {
+        super(residues);
     }
 
     @Override public IntRange getTargetRange() {
@@ -24,13 +40,9 @@ final class MiyaMHC extends PeptideBinder {
     }
 }
 
-final class MiyaTCR extends PeptideBinder {
-    public MiyaTCR(Residue... residues) {
-        super(new Peptide(residues));
-    }
-
-    @Override public RIM getRIM() {
-        return RIM.MiyazawaJernigan;
+final class LocalTCR extends LocalBinder {
+    public LocalTCR(Residue... residues) {
+        super(residues);
     }
 
     @Override public IntRange getTargetRange() {
@@ -38,7 +50,7 @@ final class MiyaTCR extends PeptideBinder {
     }
 }
 
-public class PeptideBinderTest extends NumericTestBase {
+public class PIPairwiseBinderTest extends NumericTestBase {
     private static final Residue A = Residue.Ala;
     private static final Residue C = Residue.Cys;
     private static final Residue D = Residue.Asp;
@@ -52,10 +64,10 @@ public class PeptideBinderTest extends NumericTestBase {
     private static final RIM MJ = RIM.MiyazawaJernigan;
 
     @Test public void testCompute() {
-        MiyaMHC mhc  = new MiyaMHC(A, C);
-        MiyaTCR tcr  = new MiyaTCR(E, F, G);
-        Peptide pep1 = new Peptide(K, I, H, G, E);
-        Peptide pep2 = new Peptide(G, F, K, I, H);
+        LocalMHC mhc = new LocalMHC(A, C);
+        LocalTCR tcr = new LocalTCR(E, F, G);
+        Peptide pep1 = Peptide.of(K, I, H, G, E);
+        Peptide pep2 = Peptide.of(G, F, K, I, H);
 
         assertDouble(MJ.get(A, K) + MJ.get(C, I), mhc.computeFreeEnergy(pep1));
         assertDouble(MJ.get(A, G) + MJ.get(C, F), mhc.computeFreeEnergy(pep2));
@@ -64,15 +76,7 @@ public class PeptideBinderTest extends NumericTestBase {
         assertDouble(MJ.get(E, K) + MJ.get(F, I) + MJ.get(G, H), tcr.computeFreeEnergy(pep2));
     }
 
-    @Test public void testMean() {
-        MiyaMHC mhc = new MiyaMHC(A, C);
-        MiyaTCR tcr = new MiyaTCR(E, F, G);
-
-        assertDouble(MJ.mean(A) + MJ.mean(C), mhc.meanFreeEnergy());
-        assertDouble(MJ.mean(E) + MJ.mean(F) + MJ.mean(G), tcr.meanFreeEnergy());
-    }
-
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.junit.PeptideBinderTest");
+        org.junit.runner.JUnitCore.main("jam.junit.PIPairwiseBinderTest");
     }
 }

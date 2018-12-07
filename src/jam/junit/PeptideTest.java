@@ -55,10 +55,10 @@ public class PeptideTest {
     }
 
     @Test public void testEquals() {
-        Peptide p1 = new Peptide(Residue.His, Residue.Gln);
-        Peptide p2 = new Peptide(Residue.His, Residue.Gln);
-        Peptide p3 = new Peptide(Residue.Gln, Residue.His);
-        Peptide p4 = new Peptide(Residue.His, Residue.Gln, Residue.Gln);
+        Peptide p1 = Peptide.of(Residue.His, Residue.Gln);
+        Peptide p2 = Peptide.of(Residue.His, Residue.Gln);
+        Peptide p3 = Peptide.of(Residue.Gln, Residue.His);
+        Peptide p4 = Peptide.of(Residue.His, Residue.Gln, Residue.Gln);
 
         assertTrue(p1.equals(p1));
         assertTrue(p1.equals(p2));
@@ -67,10 +67,10 @@ public class PeptideTest {
     }
 
     @Test public void testHashCode() {
-        Peptide p1 = new Peptide(Residue.His, Residue.Gln);
-        Peptide p2 = new Peptide(Residue.His, Residue.Gln);
-        Peptide p3 = new Peptide(Residue.Gln, Residue.His);
-        Peptide p4 = new Peptide(Residue.His, Residue.Gln, Residue.Gln);
+        Peptide p1 = Peptide.of(Residue.His, Residue.Gln);
+        Peptide p2 = Peptide.of(Residue.His, Residue.Gln);
+        Peptide p3 = Peptide.of(Residue.Gln, Residue.His);
+        Peptide p4 = Peptide.of(Residue.His, Residue.Gln, Residue.Gln);
 
         assertTrue(p1.hashCode() == p1.hashCode());
         assertTrue(p1.hashCode() == p2.hashCode());
@@ -80,12 +80,12 @@ public class PeptideTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidConstructor1() {
-        new Peptide();
+        Peptide.of();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidConstructor2() {
-        new Peptide(List.of());
+        Peptide.of(List.of());
     }
 
     public static void main(String[] args) {

@@ -1,146 +1,49 @@
 
 package jam.bio;
 
-import java.util.List;
-
-import jam.math.IntRange;
-import jam.math.StatSummary;
-import jam.util.ListUtil;
-
 /**
- * Base class for biological structures that bind peptides and are
- * themselves contructed of peptides (MHC molecules and lymphocyte
- * receptors).
+ * Represents biological entities (MHC molecules and lymphocyte
+ * receptors) that may bind peptides.
  */
-public abstract class PeptideBinder {
-    private final Peptide structure;
-
-    // Summary of binding free energies over all possible peptides,
-    // computed on demand...
-    private StatSummary summary = null;
+public interface PeptideBinder {
+    /**
+     * Computes the free energy of binding to a target peptide.
+     *
+     * @param target the target peptide for binding.
+     *
+     * @return the free energy of binding to the specified peptide.
+     */
+    public abstract double computeFreeEnergy(Peptide target);
 
     /**
-     * Creates a new peptide binder with a fixed structure.
+     * Returns the activation energy used to convert free energy into
+     * affinity.
      *
-     * @param structure the fixed structure of the binder.
+     * @return the activation energy for this binder.
      */
-    protected PeptideBinder(Peptide structure) {
-        this.structure = structure;
+    public abstract double getActivationEnergy();
+
+    /**
+     * Computes the affinity of this binder for a target peptide.
+     *
+     * @param target the target peptide for binding.
+     *
+     * @return the affinity of this binder for the specified peptide.
+     */
+    public default double computeAffinity(Peptide target) {
+        return computeAffinity(computeFreeEnergy(target));
     }
 
     /**
-     * Defines the pairwise residue interactions for this binder.
+     * Translates a free energy of binding into a binding affinity:
+     * {@code Affinity = ActivationEnergy - FreeEnergy}.
      *
-     * @return the pairwise residue interaction matrix for this
-     * binder.
+     * @param freeEnergy the free energy of binding.
+     *
+     * @return the binding affinity corresponding to the specified
+     * free energy.
      */
-    public abstract RIM getRIM();
-
-    /**
-     * Identifies the region of a target peptide bound by this
-     * binder.
-     *
-     * @return the region of a target peptide bound by this binder.
-     */
-    public abstract IntRange getTargetRange();
-
-    /**
-     * Returns the fixed peptide structure of this binder.
-     *
-     * @return the fixed peptide structure of this binder.
-     */
-    public Peptide getStructure() {
-        return structure;
-    }
-
-    /**
-     * Computes the free energy of binding for a given target peptide.
-     *
-     * @param target the target peptide to bind.
-     *
-     * @return the free energy of binding for the specified target
-     * peptide.
-     *
-     * @throws IllegalArgumentException unless the target peptide
-     * contains the range specified by {@code getTargetRange()}.
-     *
-     * @throws IllegalStateException unless the size of the range
-     * specified by {@code getTargetRange()} matches the length of
-     * the underlying peptide structure of this binder.
-     */
-    public double computeFreeEnergy(Peptide target) {
-        RIM rim = getRIM();
-        IntRange targetRange = getTargetRange();
-
-        if (targetRange.size() != structure.length())
-            throw new IllegalStateException("Target range does not match the structure length.");
-
-        // Iterate over the entire range of the underlying structure,
-        // but only the specified subregion of the target peptide...
-        int structIndex = 0;
-        int targetIndex = targetRange.lower();
-        double freeEnergy = 0.0;
-
-        while (structIndex < structure.length()) {
-            Residue structResidue = structure.at(structIndex);
-            Residue targetResidue = target.at(targetIndex);
-
-            freeEnergy += rim.get(structResidue, targetResidue);
-
-            ++structIndex;
-            ++targetIndex;
-        }
-
-        return freeEnergy;
-    }
-
-    /**
-     * Computes the free energy of binding for this structure over all
-     * possible target peptides.
-     *
-     * @return the free energy of binding for this structure over all
-     * possible target peptides.
-     *
-     * @throws IllegalStateException if the length of this structure
-     * exceeds the native peptide enumeration limit.
-     */
-    public List<Double> enumerateFreeEnergy() {
-        return ListUtil.apply(Peptide.enumerate(structure.length()), x -> computeFreeEnergy(x));
-    }
-
-    /**
-     * Computes the mean free energy of binding for this structure
-     * over all possible target peptides (assuming that all native
-     * amino acids occur with equal probability).
-     *
-     * @return the mean free energy of binding for this structure
-     * over all possible target peptides.
-     */
-    public double meanFreeEnergy() {
-        //
-        // No need to enumerate if only the mean is requested...
-        //
-        RIM rim = getRIM();
-        double mean = 0.0;
-
-        for (Residue residue : structure.viewResidues())
-            mean += rim.mean(residue);
-
-        return mean;
-    }
-
-    /**
-     * Returns a statistical summary of the free energy of binding for
-     * this structure over all possible target peptides (assuming that
-     * all native amino acids occur with equal probability).
-     *
-     * @return a statistical summary of the free energy of binding for
-     * this structure over all possible target peptides.
-     */
-    public StatSummary summarize() {
-        if (summary == null)
-            summary = StatSummary.compute(enumerateFreeEnergy());
-
-        return summary;
+    public default double computeAffinity(double freeEnergy) {
+        return getActivationEnergy() - freeEnergy;
     }
 }
