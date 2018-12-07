@@ -1,5 +1,5 @@
 
-package jam.bio;
+package jam.tcell;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -9,6 +9,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 
 import jam.app.JamLogger;
+import jam.bio.Peptide;
 import jam.math.DoubleUtil;
 import jam.math.StatSummary;
 import jam.util.MultisetUtil;
@@ -84,7 +85,7 @@ public final class TCRAssay {
     }
 
     private void assayPair(TCR receptor, Peptide peptide) {
-        if (receptor.isRecognized(peptide)) {
+        if (receptor.isCognate(peptide)) {
             immunogenicity.add(peptide);
             crossReactivity.add(receptor);
         }

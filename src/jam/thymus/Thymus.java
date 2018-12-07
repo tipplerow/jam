@@ -10,18 +10,27 @@ import java.util.Set;
 
 import jam.app.JamLogger;
 import jam.bio.Peptide;
-import jam.bio.TCR;
 import jam.lang.ObjectFactory;
 import jam.math.DoubleRange;
 import jam.math.DoubleUtil;
+import jam.tcell.TCR;
+import jam.tcell.TCellProperties;
 
 /**
  * Executes the positive and negative selection of T cell receptors
  * and maintains statistics necessary to compute selection rates.
  */
-public abstract class Thymus<V extends TCR> {
+public class Thymus {
+    private final int repertoireSize;
+    private final DoubleRange positivePassRange;
+    private final DoubleRange negativePassRange;
+    private final DoubleRange netSelectionRange;
+    private final ObjectFactory<TCR> receptorFactory;
+    private final Collection<Peptide> cortexPeptides;
+    private final Collection<Peptide> medullaPeptides;
+
     // Processed receptors and their fates...
-    private Map<ThymicOutcome, Set<V>> receptors;
+    private Map<ThymicOutcome, Set<TCR>> receptors;
 
     // Realized TCR selection rates...
     private double positivePassRate;
@@ -31,58 +40,109 @@ public abstract class Thymus<V extends TCR> {
     private static final int LOG_INTERVAL = 1000;
     private static final int VALIDATION_INTERVAL = 10000;
 
-    /**
-     * Returns the creator of pre-selection ("double negative") T cells.
-     *
-     * @return the creator of pre-selection ("double negative") T cells.
-     */
-    public abstract ObjectFactory<V> getReceptorFactory();
+    private Thymus(int repertoireSize,
+                   DoubleRange positivePassRange,
+                   DoubleRange negativePassRange,
+                   DoubleRange netSelectionRange,
+                   ObjectFactory<TCR> receptorFactory,
+                   Collection<Peptide> cortexPeptides,
+                   Collection<Peptide> medullaPeptides) {
+        this.repertoireSize    = repertoireSize;
+        this.positivePassRange = positivePassRange;
+        this.negativePassRange = negativePassRange;
+        this.netSelectionRange = netSelectionRange;
+        this.receptorFactory   = receptorFactory;
+        this.cortexPeptides    = cortexPeptides;
+        this.medullaPeptides   = medullaPeptides;
+    }
 
     /**
-     * Returns the MHC-restricted collection of self-peptides present
-     * in the thymic cortex.
+     * Simulates thymic selection using parameters specified by the
+     * global system properties.
      *
-     * @return the MHC-restricted collection of self-peptides present
-     * in the thymic cortex.
+     * @param peptideFactory the creator of self-peptides.
+     *
+     * @param receptorFactory the creator of pre-selection ("double
+     * negative") T cells.
+     *
+     * @return the thymus containing all receptors grouped by their
+     * thymic outcome.
+     *
+     * @throws IllegalStateException unless the selection rates are
+     * within the allowed ranges.
      */
-    public abstract Collection<Peptide> getCortexPeptides();
+    public static Thymus select(ObjectFactory<Peptide> peptideFactory,
+                                ObjectFactory<TCR>     receptorFactory) {
+        int repertoireSize = TCellProperties.getRepertoireSize();
+
+        DoubleRange positivePassRange = ThymusProperties.getPositivePassRange();
+        DoubleRange negativePassRange = ThymusProperties.getNegativePassRange();
+        DoubleRange netSelectionRange = ThymusProperties.getNetSelectionRange();
+
+        int cortexPeptideCount = ThymusProperties.getCortexPeptideCount();
+        int medullaPeptideCount = ThymusProperties.getMedullaPeptideCount();
+
+        Collection<Peptide> cortexPeptides = peptideFactory.newInstances(cortexPeptideCount);
+        Collection<Peptide> medullaPeptides = peptideFactory.newInstances(medullaPeptideCount);
+        
+        return select(repertoireSize,
+                      positivePassRange,
+                      negativePassRange,
+                      netSelectionRange,
+                      receptorFactory,
+                      cortexPeptides,
+                      medullaPeptides);
+    }
 
     /**
-     * Returns the MHC-restricted collection of self-peptides present
-     * in the thymic medulla.
+     * Simulates thymic selection.
      *
-     * @return the MHC-restricted collection of self-peptides present
-     * in the thymic medulla.
+     * @param repertoireSize the number of T cells to export from the
+     * thymus.
+     *
+     * @param positivePassRange the acceptable range of positive
+     * selection rates.
+     *
+     * @param negativePassRange the acceptable range of negative
+     * selection rates.
+     *
+     * @param netSelectionRange the acceptable range of net selection
+     * rates.
+     *
+     * @param receptorFactory the creator of pre-selection ("double
+     * negative") T cells.
+     *
+     * @param cortexPeptides the MHC-restricted collection of
+     * self-peptides present in the thymic cortex.
+     *
+     * @param medullaPeptides the MHC-restricted collection of
+     * self-peptides present in the thymic medulla.
+     *
+     * @return the thymus containing all receptors grouped by their
+     * thymic outcome.
+     *
+     * @throws IllegalStateException unless the selection rates are
+     * within the allowed ranges.
      */
-    public abstract Collection<Peptide> getMedullaPeptides();
+    public static Thymus select(int repertoireSize,
+                                DoubleRange positivePassRange,
+                                DoubleRange negativePassRange,
+                                DoubleRange netSelectionRange,
+                                ObjectFactory<TCR> receptorFactory,
+                                Collection<Peptide> cortexPeptides,
+                                Collection<Peptide> medullaPeptides) {
+        Thymus thymus =
+            new Thymus(repertoireSize,
+                       positivePassRange,
+                       negativePassRange,
+                       netSelectionRange,
+                       receptorFactory,
+                       cortexPeptides,
+                       medullaPeptides);
 
-    /**
-     * Returns the acceptable range of positive selection rates.
-     *
-     * @return the acceptable range of positive selection rates.
-     */
-    public abstract DoubleRange getPositivePassRange();
-
-    /**
-     * Returns the acceptable range of negative selection rates.
-     *
-     * @return the acceptable range of negative selection rates.
-     */
-    public abstract DoubleRange getNegativePassRange();
-                          
-    /**
-     * Returns the acceptable range of net selection rates.
-     *
-     * @return the acceptable range of net selection rates.
-     */
-    public abstract DoubleRange getNetSelectionRange();
-
-    /**
-     * Returns the number of naive T cells to export from the thymus.
-     *
-     * @return the number of naive T cells to export from the thymus.
-     */
-    public abstract int getRepertoireSize();
+        thymus.select();
+        return thymus;
+    }
 
     /**
      * Returns the total number of receptors processed.
@@ -107,6 +167,74 @@ public abstract class Thymus<V extends TCR> {
      */
     public int countReceptors(ThymicOutcome outcome) {
         return receptors.get(outcome).size();
+    }
+
+    /**
+     * Returns the creator of pre-selection ("double negative") T cells.
+     *
+     * @return the creator of pre-selection ("double negative") T cells.
+     */
+    public ObjectFactory<TCR> getReceptorFactory() {
+        return receptorFactory;
+    }
+
+    /**
+     * Returns the MHC-restricted collection of self-peptides present
+     * in the thymic cortex.
+     *
+     * @return the MHC-restricted collection of self-peptides present
+     * in the thymic cortex.
+     */
+    public Collection<Peptide> viewCortexPeptides() {
+        return cortexPeptides;
+    }
+
+    /**
+     * Returns the MHC-restricted collection of self-peptides present
+     * in the thymic medulla.
+     *
+     * @return the MHC-restricted collection of self-peptides present
+     * in the thymic medulla.
+     */
+    public Collection<Peptide> viewMedullaPeptides() {
+        return medullaPeptides;
+    }
+
+    /**
+     * Returns the acceptable range of positive selection rates.
+     *
+     * @return the acceptable range of positive selection rates.
+     */
+    public DoubleRange getPositivePassRange() {
+        return positivePassRange;
+    }
+
+    /**
+     * Returns the acceptable range of negative selection rates.
+     *
+     * @return the acceptable range of negative selection rates.
+     */
+    public DoubleRange getNegativePassRange() {
+        return negativePassRange;
+    }
+                          
+    /**
+     * Returns the acceptable range of net selection rates.
+     *
+     * @return the acceptable range of net selection rates.
+     */
+    public DoubleRange getNetSelectionRange() {
+        return netSelectionRange;
+    }
+
+
+    /**
+     * Returns the number of naive T cells to export from the thymus.
+     *
+     * @return the number of naive T cells to export from the thymus.
+     */
+    public int getRepertoireSize() {
+        return repertoireSize;
     }
 
     /**
@@ -150,17 +278,11 @@ public abstract class Thymus<V extends TCR> {
      * @return a read-only view of the receptors with the specified
      * outcome.
      */
-    public Set<V> viewReceptors(ThymicOutcome outcome) {
+    public Set<TCR> viewReceptors(ThymicOutcome outcome) {
         return Collections.unmodifiableSet(receptors.get(outcome));
     }
 
-    /**
-     * Simulates the thymic selection.
-     *
-     * @throws IllegalStateException unless the selection rates are
-     * within the allowed ranges.
-     */
-    public void select() {
+    private void select() {
         initialize();
 
         while (continueSelection())
@@ -171,10 +293,10 @@ public abstract class Thymus<V extends TCR> {
     }
 
     private void initialize() {
-        receptors = new EnumMap<ThymicOutcome, Set<V>>(ThymicOutcome.class);
+        receptors = new EnumMap<ThymicOutcome, Set<TCR>>(ThymicOutcome.class);
 
         for (ThymicOutcome outcome : ThymicOutcome.values())
-            receptors.put(outcome, new LinkedHashSet<V>());
+            receptors.put(outcome, new LinkedHashSet<TCR>());
 
         positivePassRate = Double.NaN;
         negativePassRate = Double.NaN;
@@ -182,11 +304,11 @@ public abstract class Thymus<V extends TCR> {
     }
 
     private boolean continueSelection() {
-        return countReceptors(ThymicOutcome.EXPORTED) < getRepertoireSize();
+        return countReceptors(ThymicOutcome.EXPORTED) < repertoireSize;
     }
 
     private void processOne() {
-        V receptor = getReceptorFactory().newInstance();
+        TCR receptor = receptorFactory.newInstance();
         ThymicOutcome outcome = classify(receptor);
 
         receptors.get(outcome).add(receptor);
@@ -217,27 +339,19 @@ public abstract class Thymus<V extends TCR> {
     }
     
     private boolean failPositive(TCR receptor) {
-        for (Peptide peptide : getCortexPeptides())
-            if (passPositive(receptor, peptide))
+        for (Peptide peptide : cortexPeptides)
+            if (receptor.isSelector(peptide))
                 return false;
 
         return true;
     }
 
-    private boolean passPositive(TCR receptor, Peptide peptide) {
-        return receptor.bindsWeakly(peptide);
-    }
-
     private boolean failNegative(TCR receptor) {
-        for (Peptide peptide : getMedullaPeptides())
-            if (failNegative(receptor, peptide))
+        for (Peptide peptide : medullaPeptides)
+            if (receptor.isDeletor(peptide))
                 return true;
 
         return false;
-    }
-
-    private boolean failNegative(TCR receptor, Peptide peptide) {
-        return receptor.bindsStrongly(peptide);
     }
 
     private void logStatus() {
@@ -251,13 +365,13 @@ public abstract class Thymus<V extends TCR> {
     }
 
     private void validateRates() {
-        if (!getPositivePassRange().contains(positivePassRate))
+        if (!positivePassRange.contains(positivePassRate))
 	    throw new IllegalStateException("Positive pass rate is outside the valid range.");
 
-	if (!getNegativePassRange().contains(negativePassRate))
+	if (!negativePassRange.contains(negativePassRate))
             throw new IllegalStateException("Negative pass rate is outside the valid range.");
 
-        if (!getNetSelectionRange().contains(netSelectionRate))
+        if (!netSelectionRange.contains(netSelectionRate))
             throw new IllegalStateException("Net selection rate is outside the valid range.");
     }
 }

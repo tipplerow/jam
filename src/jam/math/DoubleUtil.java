@@ -99,6 +99,29 @@ public final class DoubleUtil {
     }
 
     /**
+     * Identifies floating-point values that have been assigned
+     * non-missing values.
+     *
+     * @param x the value to examine.
+     *
+     * @return {@code true} iff the input value is set.
+     */
+    public static boolean isSet(double x) {
+        return !Double.isNaN(x);
+    }
+
+    /**
+     * Identifies unset or missing floating-point values.
+     *
+     * @param x the value to examine.
+     *
+     * @return {@code true} iff the input value is unset.
+     */
+    public static boolean isUnset(double x) {
+        return Double.isNaN(x);
+    }
+
+    /**
      * Computes the logarithm with an arbitrary base.
      *
      * @param x the value to take the logarithm of.
@@ -252,5 +275,16 @@ public final class DoubleUtil {
             result[index++] = value;
 
         return result;
+    }
+
+    /**
+     * Returns {@code Double.NaN} as a universal indicator of an unset
+     * floating-point value.
+     *
+     * @return {@code Double.NaN} as a universal indicator of an unset
+     * floating-point value.
+     */
+    public static double unset() {
+        return Double.NaN;
     }
 }
