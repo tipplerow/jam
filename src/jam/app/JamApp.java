@@ -20,6 +20,7 @@ import jam.lang.JamException;
  */
 public abstract class JamApp {
     private final String[] propertyFiles;
+    private final int trialIndex;
     private final File reportDir;
     private final Collection<Writer> autoClose = new ArrayList<Writer>();
     private final Map<String, PrintWriter> writerMap = new TreeMap<String, PrintWriter>();
@@ -32,6 +33,12 @@ public abstract class JamApp {
      * were no property files specified).
      */
     public static final String REPORT_DIR_PROPERTY = "jam.app.reportDir";
+
+    /**
+     * Name of the system property that specifies the index of the
+     * simulation trial (only used by iterative applications).
+     */
+    public static final String TRIAL_INDEX_PROPERTY = "jam.app.trialIndex";
 
     /**
      * Name of the output file containing all relevant system
@@ -54,6 +61,7 @@ public abstract class JamApp {
             JamProperties.loadFiles(propertyFiles, false);
 
         this.reportDir = resolveReportDir();
+        this.trialIndex = resolveTrialIndex();
     }
 
     private File resolveReportDir() {
@@ -72,6 +80,10 @@ public abstract class JamApp {
             return FileUtil.getParentName(new File(propertyFiles[0]));
         else
             return ".";
+    }
+
+    private static int resolveTrialIndex() {
+        return JamProperties.getOptionalInt(TRIAL_INDEX_PROPERTY, 0);
     }
 
     /**
@@ -117,6 +129,17 @@ public abstract class JamApp {
      */
     public File getReportFile(String baseName) {
         return new File(reportDir, baseName);
+    }
+
+    /**
+     * Returns the index of the simulation trial (as assigned via
+     * system properties), or zero if the trial index is not set.
+     *
+     * @return the index of the simulation trial (as assigned via
+     * system properties), or zero if the trial index is not set.
+     */
+    public int getTrialIndex() {
+        return trialIndex;
     }
 
     /**
