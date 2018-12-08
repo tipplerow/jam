@@ -35,7 +35,7 @@ final class LocalMHC extends LocalBinder {
         super(residues);
     }
 
-    @Override public IntRange getTargetRange() {
+    @Override public IntRange getTargetRegion() {
         return new IntRange(0, 1);
     }
 }
@@ -45,7 +45,7 @@ final class LocalTCR extends LocalBinder {
         super(residues);
     }
 
-    @Override public IntRange getTargetRange() {
+    @Override public IntRange getTargetRegion() {
         return new IntRange(2, 4);
     }
 }

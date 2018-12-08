@@ -31,7 +31,7 @@ public interface PairwiseBinder extends PeptideBinder {
      * @return the region of a target peptide that overlaps with this
      * binder.
      */
-    public abstract IntRange getTargetRange();
+    public abstract IntRange getTargetRegion();
 
     /**
      * Returns the location on a target peptide (the index of the
@@ -48,7 +48,7 @@ public interface PairwiseBinder extends PeptideBinder {
         // so the target index is offset by the lower bound of
         // the target range...
         //
-        return binderIndex + getTargetRange().lower();
+        return binderIndex + getTargetRegion().lower();
     }
 
     /**
@@ -86,7 +86,7 @@ public interface PairwiseBinder extends PeptideBinder {
      * @return the number of residues in this binder.
      */
     public default int length() {
-        return getTargetRange().size();
+        return getTargetRegion().size();
     }
 
     @Override public default double computeFreeEnergy(Peptide target) {
