@@ -4,6 +4,7 @@ package jam.bio;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.lang.ObjectFactory;
 import jam.math.JamRandom;
 import jam.report.LineBuilder;
 
@@ -110,6 +111,21 @@ public interface Peptide {
     }
 
     /**
+     * Returns an object factory that creates new peptides of
+     * fixed length with native residues chosen randomly with 
+     * equal probability.
+     *
+     * @param length the desired number of residues.
+     *
+     * @return an object factory that creates new peptides of
+     * fixed length with native residues chosen randomly with 
+     * equal probability.
+     */
+    public static ObjectFactory<Peptide> nativeFactory(int length) {
+        return ArrayPeptide.nativeFactory(length);
+    }
+
+    /**
      * Creates a new peptide with native residues chosen randomly with
      * equal probability.
      *
@@ -119,12 +135,7 @@ public interface Peptide {
      * residues chosen at random with equal probability.
      */
     public static Peptide newNative(int length) {
-        List<Residue> residues = new ArrayList<Residue>(length);
-
-        while (residues.size() < length)
-            residues.add(Residue.selectNative(JamRandom.global()));
-
-        return new ArrayPeptide(residues, false);
+        return ArrayPeptide.newNative(length);
     }
 
     /**

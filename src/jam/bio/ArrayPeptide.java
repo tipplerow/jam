@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jam.lang.ObjectFactory;
 import jam.math.JamRandom;
 
 final class ArrayPeptide extends AbstractPeptide {
@@ -27,6 +28,31 @@ final class ArrayPeptide extends AbstractPeptide {
 
     ArrayPeptide(Residue... residues) {
         this(Arrays.asList(residues), true);
+    }
+
+    static ObjectFactory<Peptide> nativeFactory(int length) {
+        return new NativeFactory(length);
+    }
+
+    private static final class NativeFactory implements ObjectFactory<Peptide> {
+        private final int length;
+
+        private NativeFactory(int length) {
+            this.length = length;
+        }
+
+        @Override public Peptide newInstance() {
+            return newNative(length);
+        }
+    }
+
+    static Peptide newNative(int length) {
+        List<Residue> residues = new ArrayList<Residue>(length);
+
+        while (residues.size() < length)
+            residues.add(Residue.selectNative(JamRandom.global()));
+
+        return new ArrayPeptide(residues, false);
     }
 
     @Override public Peptide append(List<Residue> addlResidues) {
