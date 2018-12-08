@@ -11,8 +11,9 @@ import jam.math.IntRange;
  * thymus.
  */
 public final class ThymusProperties {
-    private static int cortexPeptideCount = 0;
-    private static int medullaPeptideCount = 0;
+    private static Integer sharedPeptideCount = null;
+    private static Integer cortexPrivateCount = null;
+    private static Integer medullaPrivateCount = null;
 
     private static DoubleRange positivePassRange = null;
     private static DoubleRange negativePassRange = null;
@@ -20,29 +21,42 @@ public final class ThymusProperties {
 
     /**
      * Name of the system property that specifies the number of
-     * self-peptides in the thymic cortex.
+     * self-peptides present in both cortex and medulla.
      */
-    public static final String CORTEX_PEPTIDE_COUNT_PROPERTY = "jam.thymus.cortexPeptideCount";
+    public static final String SHARED_PEPTIDE_COUNT_PROPERTY = "jam.thymus.sharedPeptideCount";
 
     /**
      * Name of the system property that specifies the probability
-     * distribution for the number of self-peptides in the thymic
-     * cortex.
+     * distribution for the number of self-peptides presented in 
+     * both the cortex and medulla.
      */
-    public static final String CORTEX_PEPTIDE_DISTRIB_PROPERTY = "jam.thymus.cortexPeptideDistrib";
+    public static final String SHARED_PEPTIDE_DISTRIB_PROPERTY = "jam.thymus.sharedPeptideDistrib";
 
     /**
      * Name of the system property that specifies the number of
-     * self-peptides in the thymic medulla.
+     * self-peptides presented only in the thymic cortex.
      */
-    public static final String MEDULLA_PEPTIDE_COUNT_PROPERTY = "jam.thymus.medullaPeptideCount";
+    public static final String CORTEX_PRIVATE_COUNT_PROPERTY = "jam.thymus.cortexPrivateCount";
 
     /**
      * Name of the system property that specifies the probability
-     * distribution for the ratio of the number of self-peptides in
-     * the thymic medulla to the number in the cortex.
+     * distribution for the number of self-peptides presented only
+     * in the thymic cortex.
      */
-    public static final String MEDULLA_RATIO_DISTRIB_PROPERTY = "jam.thymus.medullaRatioDistrib";
+    public static final String CORTEX_PRIVATE_DISTRIB_PROPERTY = "jam.thymus.cortexPrivateDistrib";
+
+    /**
+     * Name of the system property that specifies the number of
+     * self-peptides presented only in the thymic medulla.
+     */
+    public static final String MEDULLA_PRIVATE_COUNT_PROPERTY = "jam.thymus.medullaPrivateCount";
+
+    /**
+     * Name of the system property that specifies the probability
+     * distribution for the number of self-peptides presented only
+     * in the thymic medulla.
+     */
+    public static final String MEDULLA_PRIVATE_DISTRIB_PROPERTY = "jam.thymus.medullaPrivateDistrib";
 
     /**
      * Name of the system property that specifies the acceptable range
@@ -63,54 +77,85 @@ public final class ThymusProperties {
     public static final String NET_SELECTION_RANGE_PROPERTY = "jam.thymus.netSelectionRange";
 
     /**
-     * Returns the number of peptides in the thymic cortex.
+     * Returns the number of self-peptides presented in both cortex
+     * and medulla.
      *
-     * @return the number of peptides in the thymic cortex.
+     * @return the number of self-peptides presented in both cortex
+     * and medulla.
      */
-    public static int getCortexPeptideCount() {
-        if (cortexPeptideCount < 1)
-            cortexPeptideCount = resolveCortexPeptideCount();
+    public static int getSharedPeptideCount() {
+        if (sharedPeptideCount == null)
+            sharedPeptideCount = resolveSharedPeptideCount();
 
-        return cortexPeptideCount;
+        return sharedPeptideCount;
     }
 
-    private static int resolveCortexPeptideCount() {
+    private static int resolveSharedPeptideCount() {
         int peptideCount;
 
-        if (JamProperties.isSet(CORTEX_PEPTIDE_DISTRIB_PROPERTY))
-            peptideCount = (int) RealDistribution.resolve(CORTEX_PEPTIDE_DISTRIB_PROPERTY).sample();
+        if (JamProperties.isSet(SHARED_PEPTIDE_DISTRIB_PROPERTY))
+            peptideCount = (int) RealDistribution.resolve(SHARED_PEPTIDE_DISTRIB_PROPERTY).sample();
         else
-            peptideCount = JamProperties.getRequiredInt(CORTEX_PEPTIDE_COUNT_PROPERTY);
+            peptideCount = JamProperties.getRequiredInt(SHARED_PEPTIDE_COUNT_PROPERTY);
 
         if (peptideCount < 1)
-            throw new IllegalStateException("Cortex peptide count must be positive.");
+            throw new IllegalStateException("Shared peptide count must be positive.");
 
         return peptideCount;
     }
 
     /**
-     * Returns the number of peptides in the thymic medulla.
+     * Returns the number of self-peptides presented only in the
+     * thymic cortex.
      *
-     * @return the number of peptides in the thymic medulla.
+     * @return the number of self-peptides presented only in the
+     * thymic cortex.
      */
-    public static int getMedullaPeptideCount() {
-        if (medullaPeptideCount < 1)
-            medullaPeptideCount = resolveMedullaPeptideCount();
+    public static int getCortexPrivateCount() {
+        if (cortexPrivateCount == null)
+            cortexPrivateCount = resolveCortexPrivateCount();
 
-        return medullaPeptideCount;
+        return cortexPrivateCount;
     }
 
-    private static int resolveMedullaPeptideCount() {
+    private static int resolveCortexPrivateCount() {
         int peptideCount;
 
-        if (JamProperties.isSet(MEDULLA_RATIO_DISTRIB_PROPERTY))
-            peptideCount = (int) (getCortexPeptideCount() * 
-                                  RealDistribution.resolve(MEDULLA_RATIO_DISTRIB_PROPERTY).sample());
+        if (JamProperties.isSet(CORTEX_PRIVATE_DISTRIB_PROPERTY))
+            peptideCount = (int) RealDistribution.resolve(CORTEX_PRIVATE_DISTRIB_PROPERTY).sample();
         else
-            peptideCount = JamProperties.getRequiredInt(MEDULLA_PEPTIDE_COUNT_PROPERTY);
+            peptideCount = JamProperties.getRequiredInt(CORTEX_PRIVATE_COUNT_PROPERTY);
 
-        if (peptideCount < getCortexPeptideCount())
-            throw new IllegalStateException("Medulla peptide count must exceed the cortex peptide count.");
+        if (peptideCount < 0)
+            throw new IllegalStateException("Cortex private peptide count must be non-negative.");
+
+        return peptideCount;
+    }
+
+    /**
+     * Returns the number of self-peptides presented only in the
+     * thymic medulla.
+     *
+     * @return the number of self-peptides presented only in the
+     * thymic medulla.
+     */
+    public static int getMedullaPrivateCount() {
+        if (medullaPrivateCount == null)
+            medullaPrivateCount = resolveMedullaPrivateCount();
+
+        return medullaPrivateCount;
+    }
+
+    private static int resolveMedullaPrivateCount() {
+        int peptideCount;
+
+        if (JamProperties.isSet(MEDULLA_PRIVATE_DISTRIB_PROPERTY))
+            peptideCount = (int) RealDistribution.resolve(MEDULLA_PRIVATE_DISTRIB_PROPERTY).sample();
+        else
+            peptideCount = JamProperties.getRequiredInt(MEDULLA_PRIVATE_COUNT_PROPERTY);
+
+        if (peptideCount < 0)
+            throw new IllegalStateException("Medulla private peptide count must be non-negative.");
 
         return peptideCount;
     }

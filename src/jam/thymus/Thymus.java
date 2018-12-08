@@ -1,6 +1,7 @@
 
 package jam.thymus;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -25,9 +26,10 @@ public class Thymus {
     private final DoubleRange positivePassRange;
     private final DoubleRange negativePassRange;
     private final DoubleRange netSelectionRange;
-    private final ObjectFactory<TCR> receptorFactory;
-    private final Collection<Peptide> cortexPeptides;
-    private final Collection<Peptide> medullaPeptides;
+    private final ObjectFactory<? extends TCR> receptorFactory;
+    private final Collection<? extends Peptide> sharedPeptides;
+    private final Collection<? extends Peptide> cortexPeptides;  // Private to the cortex
+    private final Collection<? extends Peptide> medullaPeptides; // Private to the medulla
 
     // Processed receptors and their fates...
     private Map<ThymicOutcome, Set<TCR>> receptors;
@@ -44,14 +46,16 @@ public class Thymus {
                    DoubleRange positivePassRange,
                    DoubleRange negativePassRange,
                    DoubleRange netSelectionRange,
-                   ObjectFactory<TCR> receptorFactory,
-                   Collection<Peptide> cortexPeptides,
-                   Collection<Peptide> medullaPeptides) {
+                   ObjectFactory<? extends TCR> receptorFactory,
+                   Collection<? extends Peptide> sharedPeptides,
+                   Collection<? extends Peptide> cortexPeptides,
+                   Collection<? extends Peptide> medullaPeptides) {
         this.repertoireSize    = repertoireSize;
         this.positivePassRange = positivePassRange;
         this.negativePassRange = negativePassRange;
         this.netSelectionRange = netSelectionRange;
         this.receptorFactory   = receptorFactory;
+        this.sharedPeptides    = sharedPeptides;
         this.cortexPeptides    = cortexPeptides;
         this.medullaPeptides   = medullaPeptides;
     }
@@ -71,25 +75,28 @@ public class Thymus {
      * @throws IllegalStateException unless the selection rates are
      * within the allowed ranges.
      */
-    public static Thymus select(ObjectFactory<Peptide> peptideFactory,
-                                ObjectFactory<TCR>     receptorFactory) {
+    public static Thymus select(ObjectFactory<? extends Peptide> peptideFactory,
+                                ObjectFactory<? extends TCR>     receptorFactory) {
         int repertoireSize = TCellProperties.getRepertoireSize();
 
         DoubleRange positivePassRange = ThymusProperties.getPositivePassRange();
         DoubleRange negativePassRange = ThymusProperties.getNegativePassRange();
         DoubleRange netSelectionRange = ThymusProperties.getNetSelectionRange();
 
-        int cortexPeptideCount = ThymusProperties.getCortexPeptideCount();
-        int medullaPeptideCount = ThymusProperties.getMedullaPeptideCount();
+        int sharedPeptideCount = ThymusProperties.getSharedPeptideCount();
+        int cortexPrivateCount = ThymusProperties.getCortexPrivateCount();
+        int medullaPrivateCount = ThymusProperties.getMedullaPrivateCount();
 
-        Collection<Peptide> cortexPeptides = peptideFactory.newInstances(cortexPeptideCount);
-        Collection<Peptide> medullaPeptides = peptideFactory.newInstances(medullaPeptideCount);
-        
+        Collection<? extends Peptide> sharedPeptides = peptideFactory.newInstances(sharedPeptideCount);
+        Collection<? extends Peptide> cortexPeptides = peptideFactory.newInstances(cortexPrivateCount);
+        Collection<? extends Peptide> medullaPeptides = peptideFactory.newInstances(medullaPrivateCount);
+
         return select(repertoireSize,
                       positivePassRange,
                       negativePassRange,
                       netSelectionRange,
                       receptorFactory,
+                      sharedPeptides,
                       cortexPeptides,
                       medullaPeptides);
     }
@@ -112,11 +119,14 @@ public class Thymus {
      * @param receptorFactory the creator of pre-selection ("double
      * negative") T cells.
      *
-     * @param cortexPeptides the MHC-restricted collection of
-     * self-peptides present in the thymic cortex.
+     * @param sharedPeptides the MHC-restricted self-peptides present
+     * in both the thymic cortex and medulla.
      *
-     * @param medullaPeptides the MHC-restricted collection of
-     * self-peptides present in the thymic medulla.
+     * @param cortexPeptides the MHC-restricted self-peptides present
+     * only in the thymic cortex.
+     *
+     * @param medullaPeptides the MHC-restricted self-peptides present
+     * only in the thymic medulla.
      *
      * @return the thymus containing all receptors grouped by their
      * thymic outcome.
@@ -128,15 +138,17 @@ public class Thymus {
                                 DoubleRange positivePassRange,
                                 DoubleRange negativePassRange,
                                 DoubleRange netSelectionRange,
-                                ObjectFactory<TCR> receptorFactory,
-                                Collection<Peptide> cortexPeptides,
-                                Collection<Peptide> medullaPeptides) {
+                                ObjectFactory<? extends TCR> receptorFactory,
+                                Collection<? extends Peptide> sharedPeptides,
+                                Collection<? extends Peptide> cortexPeptides,
+                                Collection<? extends Peptide> medullaPeptides) {
         Thymus thymus =
             new Thymus(repertoireSize,
                        positivePassRange,
                        negativePassRange,
                        netSelectionRange,
                        receptorFactory,
+                       sharedPeptides,
                        cortexPeptides,
                        medullaPeptides);
 
@@ -170,34 +182,45 @@ public class Thymus {
     }
 
     /**
+     * Returns the number of MHC-restricted self-peptides present in
+     * both the thymic cortex and medulla.
+     *
+     * @return the number of MHC-restricted self-peptides present in
+     * both the thymic cortex and medulla.
+     */
+    public int countSharedPeptides() {
+        return sharedPeptides.size();
+    }
+
+    /**
+     * Returns the number of MHC-restricted self-peptides present only
+     * in the thymic cortex.
+     *
+     * @return the number of MHC-restricted self-peptides present only
+     * in the thymic cortex.
+     */
+    public int countCortexPeptides() {
+        return cortexPeptides.size();
+    }
+
+    /**
+     * Returns the number of MHC-restricted self-peptides present only
+     * in the thymic medulla.
+     *
+     * @return the number of MHC-restricted self-peptides present only
+     * in the thymic medulla.
+     */
+    public int countMedullaPeptides() {
+        return medullaPeptides.size();
+    }
+
+    /**
      * Returns the creator of pre-selection ("double negative") T cells.
      *
      * @return the creator of pre-selection ("double negative") T cells.
      */
-    public ObjectFactory<TCR> getReceptorFactory() {
+    public ObjectFactory<? extends TCR> getReceptorFactory() {
         return receptorFactory;
-    }
-
-    /**
-     * Returns the MHC-restricted collection of self-peptides present
-     * in the thymic cortex.
-     *
-     * @return the MHC-restricted collection of self-peptides present
-     * in the thymic cortex.
-     */
-    public Collection<Peptide> viewCortexPeptides() {
-        return cortexPeptides;
-    }
-
-    /**
-     * Returns the MHC-restricted collection of self-peptides present
-     * in the thymic medulla.
-     *
-     * @return the MHC-restricted collection of self-peptides present
-     * in the thymic medulla.
-     */
-    public Collection<Peptide> viewMedullaPeptides() {
-        return medullaPeptides;
     }
 
     /**
@@ -271,6 +294,39 @@ public class Thymus {
     }
 
     /**
+     * Returns the MHC-restricted self-peptides present in both the
+     * thymic cortex and medulla.
+     *
+     * @return the MHC-restricted self-peptides present in both the
+     * thymic cortex and medulla.
+     */
+    public Collection<? extends Peptide> viewSharedPeptides() {
+        return Collections.unmodifiableCollection(sharedPeptides);
+    }
+
+    /**
+     * Returns the MHC-restricted self-peptides present only in the
+     * thymic cortex.
+     *
+     * @return the MHC-restricted self-peptides present only in the
+     * thymic cortex.
+     */
+    public Collection<? extends Peptide> viewCortexPeptides() {
+        return Collections.unmodifiableCollection(cortexPeptides);
+    }
+
+    /**
+     * Returns the MHC-restricted self-peptides present only in the
+     * thymic medulla.
+     *
+     * @return the MHC-restricted self-peptides present only in the
+     * thymic medulla.
+     */
+    public Collection<? extends Peptide> viewMedullaPeptides() {
+        return Collections.unmodifiableCollection(medullaPeptides);
+    }
+
+    /**
      * Returns a read-only view of the receptors with a given outcome.
      *
      * @param outcome the outcome of interest.
@@ -339,6 +395,10 @@ public class Thymus {
     }
     
     private boolean failPositive(TCR receptor) {
+        for (Peptide peptide : sharedPeptides)
+            if (receptor.isSelector(peptide))
+                return false;
+
         for (Peptide peptide : cortexPeptides)
             if (receptor.isSelector(peptide))
                 return false;
@@ -347,6 +407,10 @@ public class Thymus {
     }
 
     private boolean failNegative(TCR receptor) {
+        for (Peptide peptide : sharedPeptides)
+            if (receptor.isDeletor(peptide))
+                return true;
+
         for (Peptide peptide : medullaPeptides)
             if (receptor.isDeletor(peptide))
                 return true;
