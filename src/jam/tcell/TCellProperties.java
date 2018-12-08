@@ -10,10 +10,26 @@ import jam.math.IntRange;
  * receptors.
  */
 public final class TCellProperties {
-    private static int repertoireSize = 0;
+    private static Integer receptorLength = null;
+    private static Integer repertoireSize = null;
+
+    private static IntRange targetRegion = null;
+
     private static double activationEnergy = DoubleUtil.unset();
     private static double positiveThreshold = DoubleUtil.unset();
     private static double negativeThreshold = DoubleUtil.unset();
+
+    /**
+     * Name of the system property that defines a common length for
+     * all T cell receptors.
+     */
+    public static final String RECEPTOR_LENGTH_PROPERTY = "jam.tcell.receptorLength";
+
+    /**
+     * Name of the system property that defines the indexes of the
+     * target residues that overlap with the receptor peptide.
+     */
+    public static final String TARGET_REGION_PROPERTY = "jam.tcell.targetRegion";
 
     /**
      * Name of the system property that defines the activation energy
@@ -38,6 +54,32 @@ public final class TCellProperties {
      * circulating in the periphery.
      */
     public static final String REPERTOIRE_SIZE_PROPERTY = "jam.tcell.repertoireSize";
+
+    /**
+     * Returns the common length for all T cell receptors.
+     *
+     * @return the common length for all T cell receptors.
+     */
+    public static int getReceptorLength() {
+        if (receptorLength == null)
+            receptorLength = JamProperties.getRequiredInt(RECEPTOR_LENGTH_PROPERTY, IntRange.POSITIVE);
+
+        return receptorLength;
+    }
+
+    /**
+     * Returns the indexes of the target residues that overlap with
+     * the receptor peptide.
+     *
+     * @return the indexes of the target residues that overlap with
+     * the receptor peptide.
+     */
+    public static IntRange getTargetRegion() {
+        if (targetRegion == null)
+            targetRegion = IntRange.parse(JamProperties.getRequired(TARGET_REGION_PROPERTY));
+
+        return targetRegion;
+    }
 
     /**
      * Returns the activation energy for TCR-epitope binding.
@@ -88,7 +130,7 @@ public final class TCellProperties {
      * @return the number of T cells circulating in the periphery.
      */
     public static int getRepertoireSize() {
-        if (repertoireSize < 1)
+        if (repertoireSize == null)
             repertoireSize = JamProperties.getRequiredInt(REPERTOIRE_SIZE_PROPERTY, IntRange.POSITIVE);
 
         return repertoireSize;
