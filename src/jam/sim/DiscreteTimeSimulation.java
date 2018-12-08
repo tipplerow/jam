@@ -5,7 +5,8 @@ import jam.app.JamApp;
 import jam.app.JamProperties;
 
 /**
- * Provides a base class for discrete-time simulation applications.
+ * Provides a base class for multi-trial discrete-time simulation
+ * applications.
  */
 public abstract class DiscreteTimeSimulation extends JamApp {
     // The number of trials already executed in the current
