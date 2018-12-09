@@ -43,7 +43,6 @@ public abstract class ThresholdTuner extends JamApp {
 
     /**
      * Returns the factory that creates immature T cell receptors.
-     * simulation.
      *
      * @return the factory that creates immature T cell receptors.
      */
