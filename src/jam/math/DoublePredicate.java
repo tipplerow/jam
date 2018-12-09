@@ -24,7 +24,7 @@ public interface DoublePredicate extends Predicate<Double> {
      *
      * @return the logical value at the specified value.
      */
-     @Override default public boolean test(Double value) {
+     @Override public boolean test(Double value) {
 	 return test(value.doubleValue());
      }
 

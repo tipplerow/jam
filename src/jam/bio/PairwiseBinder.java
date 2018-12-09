@@ -89,7 +89,7 @@ public interface PairwiseBinder extends PeptideBinder {
         return getTargetRegion().size();
     }
 
-    @Override public default double computeFreeEnergy(Peptide target) {
+    @Override public double computeFreeEnergy(Peptide target) {
         double freeEnergy = 0.0;
 
         for (int binderIndex = 0; binderIndex < length(); ++binderIndex)

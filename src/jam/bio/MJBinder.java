@@ -12,7 +12,7 @@ public interface MJBinder extends RIMBinder {
      *
      * @return the pairwise free energy.
      */
-    @Override public default RIM getRIM() {
+    @Override public RIM getRIM() {
         return RIM.MiyazawaJernigan;
     }
 }
