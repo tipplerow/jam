@@ -24,11 +24,26 @@ public interface ObjectFactory<T> {
      */
     public default Collection<T> newInstances(int count) {
         Collection<T> instances = new ArrayList<T>(count);
-
-        while (instances.size() < count)
-            instances.add(newInstance());
-
+        addInstances(instances, count);
         return instances;
+    }
+
+    /**
+     * Adds new objects to a collection until reaching a desired size.
+     *
+     * @param instances the collection to hold the new objects.
+     *
+     * @param finalSize the final size of the collection.
+     *
+     * @throws IllegalArgumentException if the final size exceeds the
+     * initial size of the collection.
+     */
+    public default void addInstances(Collection<T> instances, int finalSize) {
+        if (finalSize < instances.size())
+            throw new IllegalArgumentException("Collection size exceeds the final size.");
+
+        while (instances.size() < finalSize)
+            instances.add(newInstance());
     }
 
     /**
