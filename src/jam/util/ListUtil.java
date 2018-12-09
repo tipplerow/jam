@@ -170,6 +170,22 @@ public final class ListUtil {
     }
 
     /**
+     * Selects one list element at random using the global random
+     * number generator.
+     *
+     * @param <V> the element type.
+     *
+     * @param list the list to select from.
+     *
+     * @return an element selected at random.
+     *
+     * @throws IllegalArgumentException if the list is empty.
+     */
+    public static <V> V select(List<V> list) {
+        return select(list, JamRandom.global());
+    }
+
+    /**
      * Selects one list element at random.
      *
      * @param <V> the element type.
@@ -192,6 +208,16 @@ public final class ListUtil {
         return list.get(random.nextInt(list.size()));
     }
     
+    /**
+     * Randomly reorders elements in a list (in place) using the
+     * global random number generator.
+     *
+     * @param list the list to shuffle.
+     */
+    public static void shuffle(List<?> list) {
+        shuffle(list, JamRandom.global());
+    }
+
     /**
      * Randomly reorders elements in a list (in place).
      *
