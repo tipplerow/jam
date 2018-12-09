@@ -2,11 +2,13 @@
 package jam.bio;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import jam.lang.ObjectFactory;
 import jam.math.JamRandom;
 import jam.report.LineBuilder;
+import jam.util.ListUtil;
 
 /**
  * Defines a fixed linear sequence of amino acids.
@@ -213,6 +215,34 @@ public interface Peptide {
             builder.append(String.format("R%d", k));
 
         return builder.toString();
+    }
+
+    /**
+     * Generates randomly mutations in a collection of peptides.
+     *
+     * <p>In one iteration, a parent peptide is selected at random and
+     * then mutated; the process repeats {@code mutationCount} times.
+     * Some parents may be selected more than once, some not at all.
+     *
+     * @param parents the parent peptides to choose from.
+     *
+     * @param mutationCount the desired number of mutated peptides to
+     * generate.
+     *
+     * @return a list of mutated peptides.
+     */
+    public static List<Peptide> mutate(Collection<? extends Peptide> parents, int mutationCount) {
+        //
+        // Dump the parents into an ArrayList for efficient random
+        // selection...
+        //
+        List<Peptide> parentList = new ArrayList<Peptide>(parents);
+        List<Peptide> mutantList = new ArrayList<Peptide>(mutationCount);
+
+        while (mutantList.size() < mutationCount)
+            mutantList.add(ListUtil.select(parentList).mutate());
+
+        return mutantList;
     }
 
     /**
