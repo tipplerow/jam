@@ -3,6 +3,8 @@ package jam.tcell.miya;
 
 import jam.bio.MJBinder;
 import jam.bio.Peptide;
+import jam.bio.RIM;
+import jam.bio.Residue;
 import jam.lang.ObjectFactory;
 import jam.math.IntRange;
 import jam.tcell.GlobalTCR;
@@ -68,5 +70,14 @@ public final class MiyaTCR extends GlobalTCR implements MJBinder {
 
     @Override public IntRange getTargetRegion() {
         return TCellProperties.getTargetRegion();
+    }
+
+    @Override public double meanFreeEnergy() {
+        double mean = 0.0;
+
+        for (Residue residue : binder)
+            mean += RIM.MiyazawaJernigan.mean(residue);
+
+        return mean;
     }
 }

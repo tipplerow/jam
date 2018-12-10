@@ -27,6 +27,27 @@ public interface TCR extends PeptideBinder {
     public abstract double getNegativeThreshold();
 
     /**
+     * Returns the mean free energy of binding taken over all target
+     * peptides (assuming amino acids are distributed indpendently
+     * with equal probability).
+     *
+     * @return the mean free energy of binding taken over all target
+     * peptides.
+     */
+    public abstract double meanFreeEnergy();
+
+    /**
+     * Returns the mean affinity taken over all target peptides
+     * (assuming amino acids are distributed indpendently with
+     * equal probability).
+     *
+     * @return the mean affinity taken over all target peptides.
+     */
+    public default double meanAffinity() {
+        return computeAffinity(meanFreeEnergy());
+    }
+
+    /**
      * Determines whether a target peptide binds with this receptor
      * strongly enough to induce clonal deletion (to fail negative
      * selection).
