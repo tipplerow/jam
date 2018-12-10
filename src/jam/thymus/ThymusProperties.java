@@ -135,7 +135,7 @@ public final class ThymusProperties {
     }
 
     private static int resolvePrivateRatio(String propertyName) {
-        return (int) RealDistribution.resolve(propertyName).sample() * getSharedPeptideCount();
+        return (int) (RealDistribution.resolve(propertyName).sample() * getSharedPeptideCount());
     }
 
     /**

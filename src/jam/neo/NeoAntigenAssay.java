@@ -176,17 +176,17 @@ public abstract class NeoAntigenAssay extends JamApp {
         builder.append(TCellProperties.getRepertoireSize());
         builder.append(TCellProperties.getPositiveThreshold());
         builder.append(TCellProperties.getNegativeThreshold());
-        builder.append(thymus.getPositivePassRate());
-        builder.append(thymus.getNegativePassRate());
-        builder.append(thymus.getNetSelectionRate());
+        builder.append(thymus.getPositivePassRate(), "%.4g");
+        builder.append(thymus.getNegativePassRate(), "%.4g");
+        builder.append(thymus.getNetSelectionRate(), "%.4g");
 
         double meanAffFP = CollectionUtil.average(thymus.viewReceptors(ThymicOutcome.FAILED_POSITIVE), x -> x.meanAffinity());
         double meanAffFN = CollectionUtil.average(thymus.viewReceptors(ThymicOutcome.FAILED_NEGATIVE), x -> x.meanAffinity());
         double meanAffEX = CollectionUtil.average(thymus.viewReceptors(ThymicOutcome.EXPORTED),        x -> x.meanAffinity());
 
-        builder.append(meanAffFP);
-        builder.append(meanAffFN);
-        builder.append(meanAffEX);
+        builder.append(meanAffFP, "%.4g");
+        builder.append(meanAffFN, "%.4g");
+        builder.append(meanAffEX, "%.4g");
 
         appendAssayData(builder, pathogenAssay);
         appendAssayData(builder, sharedNeoAssay);
