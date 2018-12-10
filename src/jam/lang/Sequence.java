@@ -146,7 +146,7 @@ public interface Sequence<E> extends Traversable, Iterable<E> {
         return result;
     }
 
-    @Override public Iterator<E> iterator() {
+    @Override public default Iterator<E> iterator() {
         return new SequenceIterator<E>(this);
     }
 }

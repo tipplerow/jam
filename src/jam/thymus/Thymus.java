@@ -338,6 +338,15 @@ public class Thymus {
         return Collections.unmodifiableSet(receptors.get(outcome));
     }
 
+    /**
+     * Returns a read-only view of the exported receptors.
+     *
+     * @return a read-only view of the exported receptors.
+     */
+    public Collection<? extends TCR> viewRepertoire() {
+        return Collections.unmodifiableCollection(receptors.get(ThymicOutcome.EXPORTED));
+    }
+
     private void select() {
         initialize();
 

@@ -3,6 +3,7 @@ package jam.bio;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import jam.lang.ObjectFactory;
@@ -13,7 +14,7 @@ import jam.util.ListUtil;
 /**
  * Defines a fixed linear sequence of amino acids.
  */
-public interface Peptide {
+public interface Peptide extends Iterable<Residue> {
     /**
      * The maximum peptide length that can be explicitly enumerated
      * without exceeding the maximum size of a {@code Collection}.
@@ -141,65 +142,6 @@ public interface Peptide {
     }
 
     /**
-     * Appends a sequence of residues to this peptide and returns a
-     * new peptide with the full sequence; this peptide is unchanged.
-     *
-     * @param addlResidues the residues to append.
-     *
-     * @return the new peptide with the additional residues.
-     */
-    public default Peptide append(Residue... addlResidues) {
-        return append(List.of(addlResidues));
-    }
-
-    /**
-     * Appends a list of residues to this peptide and returns a new
-     * peptide with the full sequence; this peptide is unchanged.
-     *
-     * @param addlResidues the residues to append.
-     *
-     * @return the new peptide with the additional residues.
-     */
-    public abstract Peptide append(List<Residue> addlResidues);
-
-    /**
-     * Returns the residue at a specified location.
-     *
-     * @param index the index of the desired location.
-     *
-     * @return the residue at the specified location.
-     *
-     * @throws IndexOutOfBoundsException unless the index is valid.
-     */
-    public abstract Residue at(int index);
-
-    /**
-     * Formats the residues in this peptide for output to a CSV file.
-     *
-     * @return the residues in this peptide formatted for output to a
-     * CSV file.
-     */
-    public default String format() {
-        LineBuilder builder = LineBuilder.csv();
-
-        for (Residue residue : viewResidues())
-            builder.append(residue.code1());
-
-        return builder.toString();
-    }
-
-    /**
-     * Returns the header line for CSV files containing peptides with
-     * the same length as this peptide.
-     *
-     * @return the header line for CSV files containing peptides with
-     * the same length as this peptide.
-     */
-    public default String header() {
-        return header(length());
-    }
-
-    /**
      * Returns the header line for CSV files containing peptides of a
      * given length.
      *
@@ -246,6 +188,39 @@ public interface Peptide {
     }
 
     /**
+     * Appends a sequence of residues to this peptide and returns a
+     * new peptide with the full sequence; this peptide is unchanged.
+     *
+     * @param addlResidues the residues to append.
+     *
+     * @return the new peptide with the additional residues.
+     */
+    public default Peptide append(Residue... addlResidues) {
+        return append(List.of(addlResidues));
+    }
+
+    /**
+     * Appends a list of residues to this peptide and returns a new
+     * peptide with the full sequence; this peptide is unchanged.
+     *
+     * @param addlResidues the residues to append.
+     *
+     * @return the new peptide with the additional residues.
+     */
+    public abstract Peptide append(List<Residue> addlResidues);
+
+    /**
+     * Returns the residue at a specified location.
+     *
+     * @param index the index of the desired location.
+     *
+     * @return the residue at the specified location.
+     *
+     * @throws IndexOutOfBoundsException unless the index is valid.
+     */
+    public abstract Residue at(int index);
+
+    /**
      * Returns the number of residues in this peptide.
      *
      * @return the number of residues in this peptide.
@@ -266,4 +241,34 @@ public interface Peptide {
      * @return a read-only view of the residues in this peptide.
      */
     public abstract List<Residue> viewResidues();
+
+    /**
+     * Formats the residues in this peptide for output to a CSV file.
+     *
+     * @return the residues in this peptide formatted for output to a
+     * CSV file.
+     */
+    public default String format() {
+        LineBuilder builder = LineBuilder.csv();
+
+        for (Residue residue : viewResidues())
+            builder.append(residue.code1());
+
+        return builder.toString();
+    }
+
+    /**
+     * Returns the header line for CSV files containing peptides with
+     * the same length as this peptide.
+     *
+     * @return the header line for CSV files containing peptides with
+     * the same length as this peptide.
+     */
+    public default String header() {
+        return header(length());
+    }
+
+    @Override public default Iterator<Residue> iterator() {
+        return viewResidues().iterator();
+    }
 }

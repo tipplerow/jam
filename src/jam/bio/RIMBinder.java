@@ -14,7 +14,7 @@ public interface RIMBinder extends PIPairwiseBinder {
      */
     public abstract RIM getRIM();
 
-    @Override public double getFreeEnergy(Residue targetResidue, Residue binderResidue) {
+    @Override public default double getFreeEnergy(Residue targetResidue, Residue binderResidue) {
         return getRIM().get(targetResidue, binderResidue);
     }
 }

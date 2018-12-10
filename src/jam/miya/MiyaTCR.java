@@ -1,5 +1,5 @@
 
-package jam.tcell.miya;
+package jam.miya;
 
 import jam.bio.MJBinder;
 import jam.bio.Peptide;

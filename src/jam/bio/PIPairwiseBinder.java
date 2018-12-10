@@ -25,11 +25,11 @@ public interface PIPairwiseBinder extends PairwiseBinder {
      */
     public abstract Peptide getBinderPeptide();
 
-    @Override public double getFreeEnergy(Residue targetResidue, int binderIndex) {
+    @Override public default double getFreeEnergy(Residue targetResidue, int binderIndex) {
         return getFreeEnergy(targetResidue, getBinderPeptide().at(binderIndex));
     }
 
-    @Override public int length() {
+    @Override public default int length() {
         return getBinderPeptide().length();
     }
 }

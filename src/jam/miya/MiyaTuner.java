@@ -1,5 +1,5 @@
 
-package jam.tcell.miya;
+package jam.miya;
 
 import jam.bio.Peptide;
 import jam.lang.ObjectFactory;
