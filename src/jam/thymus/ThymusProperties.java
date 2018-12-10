@@ -40,10 +40,11 @@ public final class ThymusProperties {
 
     /**
      * Name of the system property that specifies the probability
-     * distribution for the number of self-peptides presented only
-     * in the thymic cortex.
+     * distribution for the ratio of the number of self-peptides
+     * presented only in the thymic cortex to the number of shared
+     * self-peptides.
      */
-    public static final String CORTEX_PRIVATE_DISTRIB_PROPERTY = "jam.thymus.cortexPrivateDistrib";
+    public static final String CORTEX_RATIO_DISTRIB_PROPERTY = "jam.thymus.cortexRatioDistrib";
 
     /**
      * Name of the system property that specifies the number of
@@ -53,10 +54,11 @@ public final class ThymusProperties {
 
     /**
      * Name of the system property that specifies the probability
-     * distribution for the number of self-peptides presented only
-     * in the thymic medulla.
+     * distribution for the ratio of the number of self-peptides
+     * presented only in the thymic medulla to the number of shared
+     * self-peptides.
      */
-    public static final String MEDULLA_PRIVATE_DISTRIB_PROPERTY = "jam.thymus.medullaPrivateDistrib";
+    public static final String MEDULLA_RATIO_DISTRIB_PROPERTY = "jam.thymus.medullaRatioDistrib";
 
     /**
      * Name of the system property that specifies the acceptable range
@@ -121,8 +123,8 @@ public final class ThymusProperties {
     private static int resolveCortexPrivateCount() {
         int peptideCount;
 
-        if (JamProperties.isSet(CORTEX_PRIVATE_DISTRIB_PROPERTY))
-            peptideCount = (int) RealDistribution.resolve(CORTEX_PRIVATE_DISTRIB_PROPERTY).sample();
+        if (JamProperties.isSet(CORTEX_RATIO_DISTRIB_PROPERTY))
+            peptideCount = resolvePrivateRatio(CORTEX_RATIO_DISTRIB_PROPERTY);
         else
             peptideCount = JamProperties.getRequiredInt(CORTEX_PRIVATE_COUNT_PROPERTY);
 
@@ -130,6 +132,10 @@ public final class ThymusProperties {
             throw new IllegalStateException("Cortex private peptide count must be non-negative.");
 
         return peptideCount;
+    }
+
+    private static int resolvePrivateRatio(String propertyName) {
+        return (int) RealDistribution.resolve(propertyName).sample() * getSharedPeptideCount();
     }
 
     /**
@@ -149,8 +155,8 @@ public final class ThymusProperties {
     private static int resolveMedullaPrivateCount() {
         int peptideCount;
 
-        if (JamProperties.isSet(MEDULLA_PRIVATE_DISTRIB_PROPERTY))
-            peptideCount = (int) RealDistribution.resolve(MEDULLA_PRIVATE_DISTRIB_PROPERTY).sample();
+        if (JamProperties.isSet(MEDULLA_RATIO_DISTRIB_PROPERTY))
+            peptideCount = resolvePrivateRatio(MEDULLA_RATIO_DISTRIB_PROPERTY);
         else
             peptideCount = JamProperties.getRequiredInt(MEDULLA_PRIVATE_COUNT_PROPERTY);
 
