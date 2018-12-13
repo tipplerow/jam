@@ -1,9 +1,9 @@
 
 package jam.miya;
 
-import jam.bio.Peptide;
 import jam.lang.ObjectFactory;
 import jam.neo.NeoAntigenAssay;
+import jam.peptide.Peptide;
 import jam.tcell.TCR;
 import jam.tcell.TCellProperties;
 

@@ -1,5 +1,5 @@
 
-package jam.bio;
+package jam.peptide;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jam.lang.ObjectFactory;
+import jam.math.IntRange;
 import jam.math.JamRandom;
 
 final class ArrayPeptide extends AbstractPeptide {
@@ -16,9 +17,9 @@ final class ArrayPeptide extends AbstractPeptide {
         validateResidues(residues);
 
         if (copy)
-            this.residues = Collections.unmodifiableList(new ArrayList<Residue>(residues));
+            this.residues = new ArrayList<Residue>(residues);
         else
-            this.residues = Collections.unmodifiableList(residues);
+            this.residues = residues;
     }
 
     private static void validateResidues(List<Residue> residues) {
@@ -68,6 +69,10 @@ final class ArrayPeptide extends AbstractPeptide {
         return residues.get(index);
     }
 
+    @Override public Peptide fragment(IntRange range) {
+        return new ArrayPeptide(residues.subList(range.lower(), range.upper() + 1), false);
+    }
+
     @Override public int length() {
         return residues.size();
     }
@@ -82,6 +87,6 @@ final class ArrayPeptide extends AbstractPeptide {
     }
 
     @Override public List<Residue> viewResidues() {
-        return residues;
+        return Collections.unmodifiableList(residues);
     }
 }

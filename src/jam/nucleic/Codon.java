@@ -1,5 +1,5 @@
 
-package jam.bio;
+package jam.nucleic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +14,7 @@ import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Multiset;
 
 import jam.math.JamRandom;
+import jam.peptide.Residue;
 import jam.util.MultisetUtil;
 
 /**

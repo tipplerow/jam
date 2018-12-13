@@ -1,5 +1,5 @@
 
-package jam.bio;
+package jam.peptide;
 
 import java.util.ArrayList;
 import java.util.Collections;

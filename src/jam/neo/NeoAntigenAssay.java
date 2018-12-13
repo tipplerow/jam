@@ -9,10 +9,10 @@ import org.apache.commons.lang3.time.StopWatch;
 import jam.app.JamApp;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
-import jam.bio.Peptide;
 import jam.lang.ObjectFactory;
 import jam.math.DoubleUtil;
 import jam.math.IntRange;
+import jam.peptide.Peptide;
 import jam.report.LineBuilder;
 import jam.tcell.TCR;
 import jam.tcell.TCRAssay;
@@ -180,9 +180,9 @@ public abstract class NeoAntigenAssay extends JamApp {
         builder.append(thymus.getNegativePassRate(), "%.4g");
         builder.append(thymus.getNetSelectionRate(), "%.4g");
 
-        double meanAffFP = CollectionUtil.average(thymus.viewReceptors(ThymicOutcome.FAILED_POSITIVE), x -> x.meanAffinity());
-        double meanAffFN = CollectionUtil.average(thymus.viewReceptors(ThymicOutcome.FAILED_NEGATIVE), x -> x.meanAffinity());
-        double meanAffEX = CollectionUtil.average(thymus.viewReceptors(ThymicOutcome.EXPORTED),        x -> x.meanAffinity());
+        double meanAffFP = meanAffinity(ThymicOutcome.FAILED_POSITIVE);
+        double meanAffFN = meanAffinity(ThymicOutcome.FAILED_NEGATIVE);
+        double meanAffEX = meanAffinity(ThymicOutcome.EXPORTED);
 
         builder.append(meanAffFP, "%.4g");
         builder.append(meanAffFN, "%.4g");
@@ -194,6 +194,10 @@ public abstract class NeoAntigenAssay extends JamApp {
 
         builder.append((int) stopWatch.getTime() / 1000);
         return builder.toString();
+    }
+
+    private double meanAffinity(ThymicOutcome outcome) {
+        return CollectionUtil.average(thymus.viewReceptors(outcome), x -> x.computeMeanAffinity());
     }
 
     private void appendAssayData(LineBuilder builder, TCRAssay assay) {

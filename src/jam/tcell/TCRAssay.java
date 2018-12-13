@@ -9,9 +9,9 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 
 import jam.app.JamLogger;
-import jam.bio.Peptide;
 import jam.math.DoubleUtil;
 import jam.math.StatSummary;
+import jam.peptide.Peptide;
 import jam.util.MultisetUtil;
 
 /**

@@ -1,17 +1,7 @@
 
-package jam.bio;
+package jam.peptide;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import jam.math.JamRandom;
-
-/**
- * Provides a skeletal implementation of the {@code Peptide} interface.
- */
-public abstract class AbstractPeptide implements Peptide {
+abstract class AbstractPeptide implements Peptide {
     private int hashCode;
 
     private static final int UNSET_HASH_CODE = 0;

@@ -1,5 +1,5 @@
 
-package jam.bio;
+package jam.nucleic;
 
 /**
  * Enumerates the nucleotides contained in DNA and RNA.

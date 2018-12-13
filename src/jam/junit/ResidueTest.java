@@ -3,7 +3,7 @@ package jam.junit;
 
 import java.util.List;
 
-import jam.bio.Residue;
+import jam.peptide.Residue;
 
 import org.junit.*;
 import static org.junit.Assert.*;

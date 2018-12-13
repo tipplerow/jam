@@ -1,8 +1,8 @@
 
 package jam.junit;
 
-import jam.bio.Residue;
-import jam.bio.RIM;
+import jam.peptide.Residue;
+import jam.peptide.RIM;
 
 import org.junit.*;
 import static org.junit.Assert.*;

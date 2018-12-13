@@ -5,8 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jam.bio.Peptide;
-import jam.bio.Residue;
+import jam.math.IntRange;
+import jam.peptide.Peptide;
+import jam.peptide.Residue;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -64,6 +65,21 @@ public class PeptideTest {
         assertTrue(p1.equals(p2));
         assertFalse(p1.equals(p3));
         assertFalse(p1.equals(p4));
+    }
+
+    @Test public void testFragment() {
+        Peptide full = Peptide.of(Residue.Ala, Residue.Cys, Residue.Leu, Residue.Phe, Residue.Arg);
+        Peptide frag = full.fragment(new IntRange(2, 3));
+
+        assertEquals(2, frag.length());
+        assertEquals(Residue.Leu, frag.at(0));
+        assertEquals(Residue.Phe, frag.at(1));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testFragmentInvalid() {
+        Peptide full = Peptide.of(Residue.Ala, Residue.Cys, Residue.Leu, Residue.Phe, Residue.Arg);
+        Peptide frag = full.fragment(new IntRange(2, 8));
     }
 
     @Test public void testHashCode() {

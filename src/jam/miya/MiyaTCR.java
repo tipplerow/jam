@@ -1,22 +1,20 @@
 
 package jam.miya;
 
-import jam.bio.MJBinder;
-import jam.bio.Peptide;
-import jam.bio.RIM;
-import jam.bio.Residue;
 import jam.lang.ObjectFactory;
 import jam.math.IntRange;
-import jam.tcell.GlobalTCR;
+import jam.peptide.MJAffinityModel;
+import jam.peptide.Peptide;
+import jam.peptide.RIM;
+import jam.peptide.Residue;
+import jam.tcell.AbstractTCR;
 import jam.tcell.TCellProperties;
 
 /**
  * Represents a T cell receptor that binds peptides with a free energy
  * defined by the Miyazawa-Jernigan pairwise potential.
  */
-public final class MiyaTCR extends GlobalTCR implements MJBinder {
-    private final Peptide binder;
-
+public final class MiyaTCR extends AbstractTCR {
     /**
      * Creates a new Miyazawa-Jernigan T cell receptor with a fixed
      * binding structure.
@@ -24,7 +22,7 @@ public final class MiyaTCR extends GlobalTCR implements MJBinder {
      * @param binder the peptide binding structure.
      */
     public MiyaTCR(Peptide binder) {
-        this.binder = binder;
+        super(binder);
     }
 
     /**
@@ -64,15 +62,11 @@ public final class MiyaTCR extends GlobalTCR implements MJBinder {
         return new MiyaTCR(Peptide.newNative(length));
     }
 
-    @Override public Peptide getBinderPeptide() {
-        return binder;
+    @Override public MJAffinityModel getAffinityModel() {
+        return MJAffinityModel.INSTANCE;
     }
 
-    @Override public IntRange getTargetRegion() {
-        return TCellProperties.getTargetRegion();
-    }
-
-    @Override public double meanFreeEnergy() {
+    @Override public double computeMeanAffinity() {
         double mean = 0.0;
 
         for (Residue residue : binder)

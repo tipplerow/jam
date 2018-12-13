@@ -1,5 +1,5 @@
 
-package jam.bio;
+package jam.peptide;
 
 import java.io.File;
 

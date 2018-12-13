@@ -1,5 +1,5 @@
 
-package jam.bio;
+package jam.peptide;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jam.lang.ObjectFactory;
+import jam.math.IntRange;
 import jam.math.JamRandom;
 import jam.report.LineBuilder;
 import jam.util.ListUtil;
@@ -219,6 +220,22 @@ public interface Peptide extends Iterable<Residue> {
      * @throws IndexOutOfBoundsException unless the index is valid.
      */
     public abstract Residue at(int index);
+
+    /**
+     * Returns a read-only view of a subsegment of this peptide.
+     *
+     * <p>The residue indexes in the fragment are {@code 0, ..., range.size() - 1}
+     * and correspond to indexes {@code range.lower(), ..., range.upper()} on this
+     * peptide.
+     *
+     * @param range the index range of residues in the fragment.
+     *
+     * @return a read-only view of a subsegment of this peptide.
+     *
+     * @throws RuntimeException unless the specified falls entirely
+     * within this peptide.
+     */
+    public abstract Peptide fragment(IntRange range);
 
     /**
      * Returns the number of residues in this peptide.

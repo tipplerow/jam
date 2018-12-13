@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 import jam.app.JamLogger;
-import jam.bio.Peptide;
 import jam.lang.ObjectFactory;
 import jam.math.DoubleRange;
 import jam.math.DoubleUtil;
+import jam.peptide.Peptide;
 import jam.tcell.TCR;
 import jam.tcell.TCellProperties;
 

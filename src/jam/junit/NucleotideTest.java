@@ -1,7 +1,7 @@
 
 package jam.junit;
 
-import jam.bio.Nucleotide;
+import jam.nucleic.Nucleotide;
 
 import org.junit.*;
 import static org.junit.Assert.*;
