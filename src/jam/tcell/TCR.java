@@ -2,23 +2,12 @@
 package jam.tcell;
 
 import jam.peptide.Peptide;
+import jam.peptide.PeptideBinder;
 
 /**
  * Represents a T cell receptor.
  */
-public interface TCR {
-    /**
-     * Computes the affinity of this receptor for a target peptide.
-     *
-     * @param target the target peptide.
-     *
-     * @return the affinity of this receptor for the given peptide.
-     *
-     * @throws RuntimeException unless the target peptide is congruent
-     * with this receptor.
-     */
-    public abstract double computeAffinity(Peptide target);
-
+public interface TCR extends PeptideBinder {
     /**
      * Computes the average affinity of this receptor over all
      * congruent target peptides (assuming that amino acids are

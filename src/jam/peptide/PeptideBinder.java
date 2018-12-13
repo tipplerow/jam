@@ -1,27 +1,29 @@
 
 package jam.peptide;
 
-import jam.math.IntRange;
+import java.util.Collection;
 
 public interface PeptideBinder {
-    
-    public abstract AffinityModel getAffinityModel();
+    public abstract double computeFreeEnergy(Peptide target);
 
-    public abstract Peptide getBinderPeptide();
-
-    public abstract IntRange getBinderRegion();
-
-    public abstract IntRange getTargetRegion();
-
-    public default double computeAffinity(Peptide targetPeptide) {
-        return getAffinityModel().computeAffinity(getBinderFragment(), getTargetFragment(targetPeptide));
+    public default double computeAffinity(double freeEnergy) {
+        return getActivationEnergy() - freeEnergy;
     }
 
-    public default Peptide getBinderFragment() {
-        return getBinderPeptide().fragment(getBinderRegion());
+    public default double computeAffinity(Peptide target) {
+        return computeAffinity(computeFreeEnergy(target));
+    }
+
+    public default double computeMeanAffinity(Collection<Peptide> targets) {
+        double total = 0.0;
+
+        for (Peptide target : targets)
+            total += computeAffinity(target);
+
+        return total / targets.size();
     }        
 
-    public default Peptide getTargetFragment(Peptide targetPeptide) {
-        return targetPeptide.fragment(getTargetRegion());
-    }        
+    public default double getActivationEnergy() {
+        return 0.0;
+    }
 }

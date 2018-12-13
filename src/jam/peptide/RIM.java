@@ -2,6 +2,7 @@
 package jam.peptide;
 
 import java.io.File;
+import java.util.List;
 
 import jam.app.JamHome;
 import jam.dist.RealDistribution;
@@ -104,6 +105,29 @@ public final class RIM {
             result += get(pep1.at(k), pep2.at(k));
 
         return result;
+    }
+
+    /**
+     * Computes the average nearest-neighbor interaction energy for a
+     * given binder peptide averaged over all possible target peptides
+     * of the same length, assuming that amino acids are distributed
+     * independently with equal probability.
+     *
+     * @param binder the binder peptide.
+     *
+     * @return the average nearest-neighbor interaction energy.
+     *
+     * @throws IllegalArgumentException if the binder peptide exceeds
+     * the enumeration length.
+     */
+    public double computeMeanNearest(Peptide binder) {
+        double total = 0.0;
+        List<Peptide> targets = Peptide.enumerate(binder.length());
+
+        for (Peptide target : targets)
+            total += computeNearest(binder, target);
+
+        return total / targets.size();
     }
 
     /**

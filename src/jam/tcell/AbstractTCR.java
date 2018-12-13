@@ -1,8 +1,6 @@
 
 package jam.tcell;
 
-import jam.math.IntRange;
-import jam.peptide.AffinityModel;
 import jam.peptide.Peptide;
 
 public abstract class AbstractTCR implements TCR {
@@ -12,10 +10,8 @@ public abstract class AbstractTCR implements TCR {
         this.binder = binder;
     }
 
-    public abstract AffinityModel getAffinityModel();
-
-    @Override public double computeAffinity(Peptide target) {
-        return getAffinityModel().computeAffinity(binder, target.fragment(TCellProperties.getTargetRegion()));
+    @Override public double getActivationEnergy() {
+        return TCellProperties.getActivationEnergy();
     }
 
     @Override public double getPositiveThreshold() {

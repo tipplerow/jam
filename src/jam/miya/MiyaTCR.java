@@ -2,8 +2,6 @@
 package jam.miya;
 
 import jam.lang.ObjectFactory;
-import jam.math.IntRange;
-import jam.peptide.MJAffinityModel;
 import jam.peptide.Peptide;
 import jam.peptide.RIM;
 import jam.peptide.Residue;
@@ -62,8 +60,8 @@ public final class MiyaTCR extends AbstractTCR {
         return new MiyaTCR(Peptide.newNative(length));
     }
 
-    @Override public MJAffinityModel getAffinityModel() {
-        return MJAffinityModel.INSTANCE;
+    @Override public double computeFreeEnergy(Peptide target) {
+        return RIM.MiyazawaJernigan.computeNearest(binder, target.fragment(TCellProperties.getTargetRegion()));
     }
 
     @Override public double computeMeanAffinity() {
