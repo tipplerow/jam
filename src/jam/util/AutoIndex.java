@@ -26,6 +26,8 @@ public final class AutoIndex<V> {
     /**
      * Creates a new auto-index and fills it with a series of objects.
      *
+     * @param <V> the runtime object type.
+     *
      * @param objects the objects to index.
      *
      * @return the new auto-index.
@@ -38,6 +40,8 @@ public final class AutoIndex<V> {
     /**
      * Creates a new auto-index and fills it with a collection of
      * objects.
+     *
+     * @param <V> the runtime object type.
      *
      * @param objects the objects to index.
      *
