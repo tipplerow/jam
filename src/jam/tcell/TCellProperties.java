@@ -13,6 +13,7 @@ public final class TCellProperties {
     private static Integer receptorLength = null;
     private static Integer repertoireSize = null;
 
+    private static IntRange binderRegion = null;
     private static IntRange targetRegion = null;
 
     private static double activationEnergy = DoubleUtil.unset();
@@ -24,6 +25,12 @@ public final class TCellProperties {
      * all T cell receptors.
      */
     public static final String RECEPTOR_LENGTH_PROPERTY = "jam.tcell.receptorLength";
+
+    /**
+     * Name of the system property that defines the indexes of the
+     * receptor residues that overlap with the target peptide.
+     */
+    public static final String BINDER_REGION_PROPERTY = "jam.tcell.binderRegion";
 
     /**
      * Name of the system property that defines the indexes of the
@@ -65,6 +72,20 @@ public final class TCellProperties {
             receptorLength = JamProperties.getRequiredInt(RECEPTOR_LENGTH_PROPERTY, IntRange.POSITIVE);
 
         return receptorLength;
+    }
+
+    /**
+     * Returns the indexes of the binder residues that overlap with
+     * the target peptide.
+     *
+     * @return the indexes of the binder residues that overlap with
+     * the target peptide.
+     */
+    public static IntRange getBinderRegion() {
+        if (binderRegion == null)
+            binderRegion = IntRange.parse(JamProperties.getRequired(BINDER_REGION_PROPERTY));
+
+        return binderRegion;
     }
 
     /**

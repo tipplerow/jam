@@ -121,13 +121,12 @@ public final class RIM {
      * the enumeration length.
      */
     public double computeMeanNearest(Peptide binder) {
-        double total = 0.0;
-        List<Peptide> targets = Peptide.enumerate(binder.length());
+        double result = 0.0;
 
-        for (Peptide target : targets)
-            total += computeNearest(binder, target);
+        for (Residue residue : binder)
+            result += mean(residue);
 
-        return total / targets.size();
+        return result;
     }
 
     /**

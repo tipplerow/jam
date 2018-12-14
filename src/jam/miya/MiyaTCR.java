@@ -4,15 +4,14 @@ package jam.miya;
 import jam.lang.ObjectFactory;
 import jam.peptide.Peptide;
 import jam.peptide.RIM;
-import jam.peptide.Residue;
-import jam.tcell.AbstractTCR;
+import jam.tcell.PairwiseTCR;
 import jam.tcell.TCellProperties;
 
 /**
  * Represents a T cell receptor that binds peptides with a free energy
  * defined by the Miyazawa-Jernigan pairwise potential.
  */
-public final class MiyaTCR extends AbstractTCR {
+public final class MiyaTCR extends PairwiseTCR {
     /**
      * Creates a new Miyazawa-Jernigan T cell receptor with a fixed
      * binding structure.
@@ -60,16 +59,7 @@ public final class MiyaTCR extends AbstractTCR {
         return new MiyaTCR(Peptide.newNative(length));
     }
 
-    @Override public double computeFreeEnergy(Peptide target) {
-        return RIM.MiyazawaJernigan.computeNearest(binder, target.fragment(TCellProperties.getTargetRegion()));
-    }
-
-    @Override public double computeMeanAffinity() {
-        double mean = 0.0;
-
-        for (Residue residue : binder)
-            mean += RIM.MiyazawaJernigan.mean(residue);
-
-        return mean;
+    @Override public RIM getRIM() {
+        return RIM.MiyazawaJernigan;
     }
 }
