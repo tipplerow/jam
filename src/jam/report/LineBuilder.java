@@ -57,6 +57,17 @@ public final class LineBuilder {
     }
 
     /**
+     * Appends a {@code char} value to the line with default
+     * formatting.
+     *
+     * @param c the {@code char} value to append.
+     */
+    public void append(char c) {
+        newField();
+        builder.append(c);
+    }
+
+    /**
      * Appends a {@code double} value to the line with default
      * formatting.
      *
