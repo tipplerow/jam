@@ -66,5 +66,6 @@ public abstract class GenotypeScanner extends JamApp {
         double rate = genotype.computePresentationRate(MHCProperties.enumerateCanonicalTargets());
 
         writer.println(String.format("%d,%.6f", trialIndex, rate));
+        writer.flush();
     }
 }
