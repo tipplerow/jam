@@ -32,6 +32,15 @@ public abstract class AbstractMHC implements MHC {
             throw new IllegalArgumentException("Anchor structure does not match the anchor length.");
     }
 
+    /**
+     * Returns the anchor structure.
+     *
+     * @return the anchor structure.
+     */
+    public final Peptide getAnchor() {
+        return anchor;
+    }
+
     @Override public double getActivationEnergy() {
         return MHCProperties.getActivationEnergy();
     }

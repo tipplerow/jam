@@ -13,22 +13,26 @@ import jam.report.LineBuilder;
 import jam.thymus.Thymus;
 import jam.thymus.ThymusProperties;
 
-public abstract class ThresholdTuner extends JamApp {
+/**
+ * Provides a command-line application to assist with tuning the
+ * positive and negative selection thresholds.
+ */
+public abstract class SelectionTuner extends JamApp {
     private Thymus thymus;
     private PrintWriter writer;
 
     /**
      * Name of the summary file.
      */
-    public static final String SUMMARY_NAME = "threshold-tuner-summary.csv";
+    public static final String SUMMARY_NAME = "selection-tuner-summary.csv";
 
     /**
-     * Creates a new threshold tuner.
+     * Creates a new selection tuner.
      *
      * @param propertyFiles files containing the system properties
      * that define the simulation parameters.
      */
-    protected ThresholdTuner(String[] propertyFiles) {
+    protected SelectionTuner(String[] propertyFiles) {
         super(propertyFiles);
     }
 

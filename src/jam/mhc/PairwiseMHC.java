@@ -4,7 +4,6 @@ package jam.mhc;
 import jam.math.IntRange;
 import jam.peptide.PairwiseBinder;
 import jam.peptide.Peptide;
-import jam.peptide.RIM;
 
 /**
  * Represents MHC alleles with anchor peptides having purely local

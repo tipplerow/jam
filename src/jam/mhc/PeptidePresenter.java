@@ -23,22 +23,22 @@ public interface PeptidePresenter {
     public abstract boolean isPresented(Peptide target);
 
     /**
-     * Computes the fraction of peptides that are presented by this
-     * allele or genotype.
+     * Computes the fraction of target peptides that are presented by
+     * this allele or genotype
      *
-     * @param peptides the peptides to test.
+     * @param targets the target peptides to test.
      *
-     * @return the fraction of peptides that are presented by this
-     * allele.
+     * @return the fraction of target peptides in the given collection
+     * that are presented by this allele.
      */
-    public default double computePresentationRate(Collection<Peptide> peptides) {
+    public default double computePresentationRate(Collection<Peptide> targets) {
         int presented = 0;
 
-        for (Peptide peptide : peptides)
-            if (isPresented(peptide))
+        for (Peptide target : targets)
+            if (isPresented(target))
                 ++presented;
 
-        return DoubleUtil.ratio(presented, peptides.size());
+        return DoubleUtil.ratio(presented, targets.size());
     }
 
     /**

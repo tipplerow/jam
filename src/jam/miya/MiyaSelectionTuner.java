@@ -5,10 +5,10 @@ import jam.lang.ObjectFactory;
 import jam.peptide.Peptide;
 import jam.tcell.TCR;
 import jam.tcell.TCellProperties;
-import jam.tcell.ThresholdTuner;
+import jam.tcell.SelectionTuner;
 
-public final class MiyaTuner extends ThresholdTuner {
-    private MiyaTuner(String[] propertyFiles) {
+public final class MiyaSelectionTuner extends SelectionTuner {
+    private MiyaSelectionTuner(String[] propertyFiles) {
         super(propertyFiles);
     }
 
@@ -21,7 +21,7 @@ public final class MiyaTuner extends ThresholdTuner {
     }
 
     public static void main(String[] args) {
-        MiyaTuner tuner = new MiyaTuner(args);
+        MiyaSelectionTuner tuner = new MiyaSelectionTuner(args);
         tuner.run();
     }
 }

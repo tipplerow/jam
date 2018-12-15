@@ -211,6 +211,18 @@ public interface Peptide extends Iterable<Residue> {
     public abstract Peptide append(List<Residue> addlResidues);
 
     /**
+     * Appends another peptide to this peptide and returns a new
+     * peptide with the full sequence; this peptide is unchanged.
+     *
+     * @param peptide the peptide to append.
+     *
+     * @return the new peptide with the additional residues.
+     */
+    public default Peptide append(Peptide peptide) {
+        return append(peptide.viewResidues());
+    }
+
+    /**
      * Returns the residue at a specified location.
      *
      * @param index the index of the desired location.
