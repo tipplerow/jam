@@ -5,9 +5,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import jam.app.JamApp;
-import jam.app.JamLogger;
-import jam.app.JamProperties;
-import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
 import jam.report.LineBuilder;
 
@@ -48,7 +45,7 @@ public abstract class PresentationTuner extends JamApp {
     protected void run() {
         writer = openWriter(DETAIL_REPORT_NAME);
         alleles = enumerateAlleles();
-        targets = MHC.enumerateCanonicalTargets();
+        targets = MHCProperties.enumerateCanonicalTargets();
 
         writeHeader();
         writeData();

@@ -1,9 +1,14 @@
 
 package jam.mhc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jam.app.JamProperties;
+import jam.math.DoubleRange;
 import jam.math.DoubleUtil;
 import jam.math.IntRange;
+import jam.peptide.Peptide;
 
 /**
  * Manages global system properties related to MHC alleles and
@@ -16,8 +21,13 @@ public final class MHCProperties {
     private static IntRange anchorRegion = null;
     private static IntRange targetRegion = null;
 
+    private static DoubleRange presentationRange = null;
+
     private static double activationEnergy = DoubleUtil.unset();
     private static double affinityThreshold = DoubleUtil.unset();
+
+    private static List<Peptide> anchorPeptides = null;
+    private static List<Peptide> canonicalTargets = null;
 
     /**
      * Name of the system property that defines the number of MHC
@@ -54,6 +64,65 @@ public final class MHCProperties {
      * for peptide presentation.
      */
     public static final String AFFINITY_THRESHOLD_PROPERTY = "jam.mhc.affinityThreshold";
+
+    /**
+     * Name of the system property that defines the valid range of MHC
+     * allele presentation rates (alleles presenting a total fraction
+     * of peptides outside of this range are not used in genotypes).
+     */
+    public static final String PRESENTATION_RANGE_PROPERTY = "jam.mhc.presentationRange";
+
+    /**
+     * Generates a list of all unique anchor peptides for alleles with
+     * the global anchor length.
+     *
+     * @return a list of all unique anchor peptides for alleles with
+     * the global anchor length.
+     *
+     * @throws IllegalStateException unless the anchor region begins
+     * with the first (index zero) anchor residue.
+     */
+    public static List<Peptide> enumerateAnchorPeptides() {
+        if (anchorPeptides == null)
+            generateAnchorPeptides();
+
+        return anchorPeptides;
+    }
+
+    private static void generateAnchorPeptides() {
+        IntRange anchorRegion = getAnchorRegion();
+
+        if (anchorRegion.lower() != 0)
+            throw new IllegalStateException("MHC anchor region must begin at index zero.");
+
+        anchorPeptides = Peptide.enumerate(anchorRegion.size());
+    }
+
+    /**
+     * Generates a list of all unique target peptides for alleles
+     * whose anchors bind the global target region.
+     *
+     * @return a list of all unique target peptides for alleles whose
+     * anchors bind the global target region.
+     *
+     * @throws IllegalStateException unless the target region begins
+     * with the first (index zero) target residue.
+     */
+    public static List<Peptide> enumerateCanonicalTargets() {
+        if (canonicalTargets == null)
+            generateCanonicalTargets();
+
+        return canonicalTargets;
+    }
+
+    private static void generateCanonicalTargets() {
+        IntRange targetRegion = MHCProperties.getTargetRegion();
+
+        if (targetRegion.lower() != 0)
+            throw new IllegalStateException("MHC target region must begin at index zero.");
+
+        canonicalTargets = Peptide.enumerate(targetRegion.size());
+    }
 
     /**
      * Returns the number of MHC alleles in the genotype.
@@ -129,5 +198,19 @@ public final class MHCProperties {
             affinityThreshold = JamProperties.getRequiredDouble(AFFINITY_THRESHOLD_PROPERTY);
 
         return affinityThreshold;
+    }
+
+    /**
+     * Returns the valid range of MHC allele presentation rates
+     * (alleles presenting a total fraction of peptides outside
+     * of this range are not used in genotypes).
+     *
+     * @return the valid range of MHC allele presentation rates.
+     */
+    public static DoubleRange getPresentationRange() {
+        if (presentationRange == null)
+            presentationRange = DoubleRange.parse(JamProperties.getRequired(PRESENTATION_RANGE_PROPERTY));
+
+        return presentationRange;
     }
 }

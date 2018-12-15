@@ -4,7 +4,6 @@ package jam.miya;
 import java.util.ArrayList;
 import java.util.List;
 
-import jam.mhc.MHC;
 import jam.mhc.MHCProperties;
 import jam.mhc.PresentationTuner;
 import jam.peptide.Peptide;
@@ -15,7 +14,7 @@ public final class MiyaPresentationTuner extends PresentationTuner {
     }
 
     @Override protected List<MiyaMHC> enumerateAlleles() {
-        List<Peptide> anchors = MHC.enumerateAnchorPeptides();
+        List<Peptide> anchors = MHCProperties.enumerateAnchorPeptides();
         List<MiyaMHC> alleles = new ArrayList<MiyaMHC>(anchors.size());
 
         for (Peptide anchor : anchors)
