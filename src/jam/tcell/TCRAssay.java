@@ -19,7 +19,7 @@ import jam.util.MultisetUtil;
  * repertoire with respect to a collection of peptides.
  */
 public final class TCRAssay {
-    private Collection<? extends TCR> receptors;
+    private Repertoire repertoire;
     private Collection<? extends Peptide> peptides;
 
     // Number of TCRs recognizing each peptide...
@@ -44,29 +44,29 @@ public final class TCRAssay {
     private StatSummary immunogenicitySummary;
     private StatSummary crossReactivitySummary;
 
-    private TCRAssay(Collection<? extends TCR> receptors, Collection<? extends Peptide> peptides) {
-        this.receptors = receptors;
-        this.peptides  = peptides;
+    private TCRAssay(Repertoire repertoire, Collection<? extends Peptide> peptides) {
+        this.peptides = peptides;
+        this.repertoire = repertoire;
     }
 
     /**
      * Assays the immunogenicity and cross-reactivity of a T cell
      * repertoire with respect to a collection of peptides.
      *
-     * @param receptors the T cell repertoire.
+     * @param repertoire the T cell repertoire.
      *
      * @param peptides the challenging peptides.
      *
      * @return the resulting assay.
      */
-    public static TCRAssay run(Collection<? extends TCR> receptors, Collection<? extends Peptide> peptides) {
-        TCRAssay assay = new TCRAssay(receptors, peptides);
+    public static TCRAssay run(Repertoire repertoire, Collection<? extends Peptide> peptides) {
+        TCRAssay assay = new TCRAssay(repertoire, peptides);
         assay.run();
         return assay;
     }
 
     private void run() {
-        JamLogger.info("Running assay on [%d] TCRs and [%d] peptides...", receptors.size(), peptides.size());
+        JamLogger.info("Running assay on [%d] TCRs and [%d] peptides...", repertoire.size(), peptides.size());
 
         scanPairs();
         computeCoverage();
@@ -76,16 +76,16 @@ public final class TCRAssay {
 
     private void scanPairs() {
         pairsProcessed = 0;
-        totalPairCount = receptors.size() * peptides.size();
+        totalPairCount = repertoire.size() * peptides.size();
         nextProgressReport = progressReportInterval;
 
-        for (TCR receptor : receptors)
+        for (TCR receptor : repertoire)
             for (Peptide peptide : peptides)
                 assayPair(receptor, peptide);
     }
 
     private void assayPair(TCR receptor, Peptide peptide) {
-        if (receptor.isCognate(peptide)) {
+        if (receptor.isRecognized(peptide)) {
             immunogenicity.add(peptide);
             crossReactivity.add(receptor);
         }
@@ -115,7 +115,7 @@ public final class TCRAssay {
         // The "crossReactivity" set contains only TCRs that recognize
         // by one or more peptides...
         //
-        int totalCount = receptors.size();
+        int totalCount = repertoire.size();
         int reactiveCount = MultisetUtil.countUnique(crossReactivity);
 
         reactiveFrac = DoubleUtil.ratio(reactiveCount, totalCount);
@@ -124,7 +124,7 @@ public final class TCRAssay {
     @SuppressWarnings("unchecked")
     private void computeSummaries() {
         immunogenicitySummary = StatSummary.compute(immunogenicity, (Collection<Peptide>) peptides);
-        crossReactivitySummary = StatSummary.compute(crossReactivity, (Collection<TCR>) receptors);
+        crossReactivitySummary = StatSummary.compute(crossReactivity, (Collection<TCR>) repertoire);
     }
 
     public int countCognatePeptides(TCR receptor) {
@@ -140,7 +140,7 @@ public final class TCRAssay {
     }
 
     public int countReceptors() {
-        return receptors.size();
+        return repertoire.size();
     }
 
     public double getCognatePeptideFraction(TCR receptor) {
@@ -179,7 +179,7 @@ public final class TCRAssay {
         return Collections.unmodifiableCollection(peptides);
     }
 
-    public Collection<TCR> viewReceptors() {
-        return Collections.unmodifiableCollection(receptors);
+    public Collection<TCR> viewRepertoire() {
+        return repertoire;
     }
 }

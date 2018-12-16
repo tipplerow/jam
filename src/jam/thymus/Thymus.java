@@ -14,6 +14,7 @@ import jam.lang.ObjectFactory;
 import jam.math.DoubleRange;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
+import jam.tcell.Repertoire;
 import jam.tcell.TCR;
 import jam.tcell.TCellProperties;
 
@@ -343,8 +344,8 @@ public class Thymus {
      *
      * @return a read-only view of the exported receptors.
      */
-    public Collection<? extends TCR> viewRepertoire() {
-        return Collections.unmodifiableCollection(receptors.get(ThymicOutcome.EXPORTED));
+    public Repertoire viewRepertoire() {
+        return Repertoire.wrap(receptors.get(ThymicOutcome.EXPORTED));
     }
 
     private void select() {

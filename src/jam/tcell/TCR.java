@@ -72,7 +72,7 @@ public interface TCR extends PeptideBinder {
      * @return {@code true} iff this receptor recognizes the given
      * peptide.
      */
-    public default boolean isCognate(Peptide target) {
+    public default boolean isRecognized(Peptide target) {
         return computeAffinity(target) >= getNegativeThreshold();
     }
 }

@@ -14,6 +14,7 @@ import jam.math.DoubleUtil;
 import jam.math.IntRange;
 import jam.peptide.Peptide;
 import jam.report.LineBuilder;
+import jam.tcell.Repertoire;
 import jam.tcell.TCR;
 import jam.tcell.TCRAssay;
 import jam.tcell.TCellProperties;
@@ -30,7 +31,7 @@ public abstract class NeoAntigenAssay extends JamApp {
     private final int medullaNeoPeptideCount;
 
     private Thymus thymus;
-    private Collection<? extends TCR> repertoire;
+    private Repertoire repertoire;
 
     private Collection<? extends Peptide> pathogenPeptides;
     private Collection<? extends Peptide> sharedNeoPeptides;

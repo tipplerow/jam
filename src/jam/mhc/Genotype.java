@@ -1,9 +1,11 @@
 
 package jam.mhc;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import jam.lang.ObjectFactory;
@@ -13,7 +15,7 @@ import jam.peptide.Peptide;
 /**
  * Represents a complete set of MHC alleles.
  */
-public final class Genotype implements PeptidePresenter {
+public final class Genotype extends AbstractCollection implements PeptidePresenter {
     private final Collection<MHC> alleles;
 
     /**
@@ -69,20 +71,19 @@ public final class Genotype implements PeptidePresenter {
         throw new IllegalStateException("Failed to generate an allele with a valid presentation rate.");
     }
 
-    /**
-     * Returns a read-only view of the alleles in this genotype.
-     *
-     * @return a read-only view of the alleles in this genotype.
-     */
-    public Collection<MHC> viewAlleles() {
-        return alleles;
-    }
-
     @Override public boolean isPresented(Peptide target) {
         for (MHC allele : alleles)
             if (allele.isPresented(target))
                 return true;
 
         return false;
+    }
+
+    @Override public Iterator<MHC> iterator() {
+        return alleles.iterator();
+    }
+
+    @Override public int size() {
+        return alleles.size();
     }
 }
