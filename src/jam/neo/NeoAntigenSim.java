@@ -76,6 +76,10 @@ public abstract class NeoAntigenSim extends JamApp {
     private Thymus thymus;
     private Repertoire repertoire;
 
+    private ImmuneStateReport pathogenISR;
+    private ImmuneStateReport sharedNeoISR;
+    private ImmuneStateReport medullaNeoISR;
+
     private TCRAssay pathogenAssay;
     private TCRAssay sharedNeoAssay;
     private TCRAssay cortexNeoAssay;
@@ -174,12 +178,10 @@ public abstract class NeoAntigenSim extends JamApp {
         restrictPeptidome();
 
         selectRepertoire();
-        /*
-        JamLogger.info("Creating the peptide challengers...");
-        pathogenPeptides = getPeptideFactory().newInstances(pathogenPeptideCount);
-        sharedNeoPeptides = Peptide.mutate(thymus.viewSharedPeptides(), sharedNeoPeptideCount);
-        medullaNeoPeptides = Peptide.mutate(thymus.viewMedullaPeptides(), medullaNeoPeptideCount);
 
+        //runAssays();
+        runImmuneStateReports();
+        /*
         JamLogger.info("Running assays...");
         pathogenAssay = TCRAssay.run(repertoire, pathogenPeptides);
         sharedNeoAssay = TCRAssay.run(repertoire, sharedNeoPeptides);
@@ -263,6 +265,12 @@ public abstract class NeoAntigenSim extends JamApp {
         repertoire = thymus.viewRepertoire();
     }
 
+    private void runImmuneStateReports() {
+        pathogenISR    = ImmuneStateReport.run(genotype, repertoire, allPathogenPeptides);
+        sharedNeoISR   = ImmuneStateReport.run(genotype, repertoire, allSharedNeoPeptides);
+        medullaNeoISR  = ImmuneStateReport.run(genotype, repertoire, allMedullaNeoPeptides);
+    }
+
     private void writeSummary() {
         PrintWriter writer = openWriter(SUMMARY_NAME);
 
@@ -304,6 +312,10 @@ public abstract class NeoAntigenSim extends JamApp {
         builder.append("meanAffinity.FP");
         builder.append("meanAffinity.FN");
         builder.append("meanAffinity.EX");
+
+        appendImmuneStateReportHeader(builder, "pathogen");
+        appendImmuneStateReportHeader(builder, "sharedNeo");
+        appendImmuneStateReportHeader(builder, "medullaNeo");
         /*
         appendAssayHeader(builder, "pathogen");
         appendAssayHeader(builder, "sharedNeo");
@@ -315,8 +327,13 @@ public abstract class NeoAntigenSim extends JamApp {
     }
 
     private void appendAssayHeader(LineBuilder builder, String prefix) {
-        builder.append(prefix + "." + "coveredFrac");
-        builder.append(prefix + "." + "reactiveFrac");
+        builder.append(prefix + ".coveredFrac");
+        builder.append(prefix + ".reactiveFrac");
+    }
+
+    private void appendImmuneStateReportHeader(LineBuilder builder, String prefix) {
+        for (ImmuneState state : ImmuneState.values())
+            builder.append(prefix + "." + state.getCode());
     }
 
     private String summaryDataLine() {
@@ -357,6 +374,11 @@ public abstract class NeoAntigenSim extends JamApp {
         builder.append(meanAffFP, "%.4g");
         builder.append(meanAffFN, "%.4g");
         builder.append(meanAffEX, "%.4g");
+
+        appendImmuneStateReportData(builder, pathogenISR);
+        appendImmuneStateReportData(builder, sharedNeoISR);
+        appendImmuneStateReportData(builder, medullaNeoISR);
+
         /*
         appendAssayData(builder, pathogenAssay);
         appendAssayData(builder, sharedNeoAssay);
@@ -373,5 +395,10 @@ public abstract class NeoAntigenSim extends JamApp {
     private void appendAssayData(LineBuilder builder, TCRAssay assay) {
         builder.append(assay.getCoveredFrac(), "%.4g");
         builder.append(assay.getReactiveFrac(), "%.4g");
+    }
+
+    private void appendImmuneStateReportData(LineBuilder builder, ImmuneStateReport report) {
+        for (ImmuneState state : ImmuneState.values())
+            builder.append(report.getFraction(state), "%.6f");
     }
 }

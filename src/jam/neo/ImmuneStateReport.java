@@ -13,6 +13,7 @@ import com.google.common.collect.Multiset;
 import jam.app.JamLogger;
 import jam.mhc.Genotype;
 import jam.peptide.Peptide;
+import jam.peptide.Peptidome;
 import jam.tcell.Repertoire;
 import jam.util.MultisetUtil;
 
@@ -20,19 +21,19 @@ import jam.util.MultisetUtil;
  * Classifies the immune state of a collection of target peptides.
  */
 public final class ImmuneStateReport {
-    private final Genotype genotype;
+    private final Genotype   genotype;
     private final Repertoire repertoire;
-    private final Collection<? extends Peptide> targets;
+    private final Peptidome  peptidome;
 
     private final Map<Peptide, ImmuneState> peptideState  = new HashMap<Peptide, ImmuneState>();
     private final Map<ImmuneState, Double>  stateFraction = new EnumMap<ImmuneState, Double>(ImmuneState.class);
 
     private static final int LOG_INTERVAL = 1000;
 
-    private ImmuneStateReport(Genotype genotype, Repertoire repertoire, Collection<? extends Peptide> targets) {
-        this.genotype = genotype;
+    private ImmuneStateReport(Genotype genotype, Repertoire repertoire, Peptidome peptidome) {
+        this.genotype   = genotype;
         this.repertoire = repertoire;
-        this.targets = targets;
+        this.peptidome  = peptidome;
     }
 
     /**
@@ -42,14 +43,12 @@ public final class ImmuneStateReport {
      *
      * @param repertoire the T cells available for immune surveillance.
      *
-     * @param targets the target peptides to classify.
+     * @param peptidome the target peptidome to classify.
      *
      * @return the immune state report.
      */
-    public static ImmuneStateReport run(Genotype genotype,
-                                        Repertoire repertoire,
-                                        Collection<? extends Peptide> targets) {
-        ImmuneStateReport report = new ImmuneStateReport(genotype, repertoire, targets);
+    public static ImmuneStateReport run(Genotype genotype, Repertoire repertoire, Peptidome peptidome) {
+        ImmuneStateReport report = new ImmuneStateReport(genotype, repertoire, peptidome);
         report.run();
         return report;
     }
@@ -57,7 +56,7 @@ public final class ImmuneStateReport {
     private void run() {
         Multiset<ImmuneState> counter = EnumMultiset.create(ImmuneState.class);
 
-        for (Peptide peptide : targets) {
+        for (Peptide peptide : peptidome) {
             ImmuneState state = classify(peptide);
 
             counter.add(state);
@@ -87,9 +86,5 @@ public final class ImmuneStateReport {
 
     public ImmuneState getState(Peptide peptide) {
         return peptideState.get(peptide);
-    }
-
-    public Collection<? extends Peptide> viewTargets() {
-        return Collections.unmodifiableCollection(targets);
     }
 }
