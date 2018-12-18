@@ -1,0 +1,24 @@
+code3,code1,name,isNative,family
+Asp, D, Aspartic acid, TRUE, ACIDIC
+Glu, E, Glutamic acid, TRUE, ACIDIC
+Arg, R, Arginine,      TRUE, BASIC
+Lys, K, Lysine,        TRUE, BASIC
+His, H, Histidine,     TRUE, BASIC
+Asn, N, Asparagine,    TRUE, UNCHARGED_POLAR
+Gln, Q, Glutamine,     TRUE, UNCHARGED_POLAR
+Ser, S, Serine,        TRUE, UNCHARGED_POLAR
+Thr, T, Threonine,     TRUE, UNCHARGED_POLAR
+Tyr, Y, Tyrosine,      TRUE, UNCHARGED_POLAR
+Ala, A, Alanine,       TRUE, NONPOLAR
+Gly, G, Glycine,       TRUE, NONPOLAR
+Val, V, Valine,        TRUE, NONPOLAR
+Leu, L, Leucine,       TRUE, NONPOLAR
+Ile, I, Isoleucine,    TRUE, NONPOLAR
+Pro, P, Proline,       TRUE, NONPOLAR
+Phe, F, Phenylalanine, TRUE, NONPOLAR
+Met, M, Methionine,    TRUE, NONPOLAR
+Trp, W, Tryptophan,    TRUE, NONPOLAR
+Cys, C, Cysteine,      TRUE, NONPOLAR
+UNK, X, UNKNOWN,       FALSE,
+DEL, -, DELETION,      FALSE,
+STOP, ., STOP,         FALSE,
