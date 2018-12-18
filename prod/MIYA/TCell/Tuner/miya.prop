@@ -1,0 +1,17 @@
+
+jam.tcell.receptorLength = 6
+jam.tcell.targetRegion   = [0, 5]
+
+jam.tcell.repertoireSize   = 2000
+jam.tcell.activationEnergy = 0.0
+
+jam.tcell.positiveThreshold = 31.6
+jam.tcell.negativeThreshold = 33.2
+
+jam.thymus.sharedPeptideCount  = 5000
+jam.thymus.cortexPrivateCount  = 0
+jam.thymus.medullaPrivateCount = 5000
+
+jam.thymus.positivePassRange = [0.04, 1.0]
+jam.thymus.negativePassRange = [0.10, 1.0]
+jam.thymus.netSelectionRange = [0.02, 1.0]

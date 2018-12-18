@@ -1,0 +1,11 @@
+
+jam.mhc.anchorLength = 3
+jam.mhc.anchorRegion = [0, 2]
+jam.mhc.targetRegion = [0, 2]
+
+jam.mhc.alleleCount = 6
+jam.mhc.presentationRange = [0.001, 0.5]
+
+jam.mhc.activationEnergy  =  0.0
+jam.mhc.affinityThreshold = 15.0
+
