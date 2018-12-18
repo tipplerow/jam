@@ -1,0 +1,21 @@
+
+jam.neo.pathogenPeptideCount   = 1E5
+jam.neo.sharedNeoPeptideCount  = 1E5
+jam.neo.medullaNeoPeptideCount = 1E5
+
+jam.tcell.receptorLength = 6
+jam.tcell.targetRegion   = [0, 5]
+
+jam.tcell.repertoireSize   = 1E5
+jam.tcell.activationEnergy = 0.0
+
+jam.tcell.positiveThreshold = 31.6
+jam.tcell.negativeThreshold = 33.2
+
+jam.thymus.sharedPeptideDistrib = LOG_UNIFORM; 6.9, 11.5
+jam.thymus.medullaRatioDistrib  = UNIFORM; 0.0, 1.0
+jam.thymus.cortexPrivateCount   = 0
+
+jam.thymus.positivePassRange = [0.04, 1.0]
+jam.thymus.negativePassRange = [0.10, 1.0]
+jam.thymus.netSelectionRange = [0.02, 1.0]
