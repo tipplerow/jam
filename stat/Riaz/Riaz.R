@@ -72,3 +72,21 @@ Riaz.correlation <- function(riaz) {
     cormat
 }
 
+Riaz.vioplot <- function() {
+    riaz <- Riaz.load()
+
+    par(las = 1)
+    par(fig = c(0, 1, 0.1, 0.9))
+
+    xR  <- riaz$NeoPepRatio[which(riaz$Response %in% c("CR", "PR", "SD"))]
+    xNR <- riaz$NeoPepRatio[which(riaz$Response == "PD")]
+
+    vioplot(xR, xNR, names = c("R", "NR"), col = "cadetblue3", ylim = c(0, 4))
+    print(wilcox.test(xR, xNR))
+}
+
+
+
+
+
+
