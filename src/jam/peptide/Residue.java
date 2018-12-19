@@ -351,6 +351,10 @@ public enum Residue {
      * Returns the frequency with which this residue occurs in the
      * human proteome.
      *
+     * <p>The frequencies were downloaded from
+     * <pre>https://web.expasy.org/protscale/pscale/A.A.Swiss-Prot.html</pre>
+     * on 19 December 2018.
+     *
      * @return the frequency with which this residue occurs in the
      * human proteome.
      */
