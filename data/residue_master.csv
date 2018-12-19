@@ -1,24 +1,24 @@
-code3,code1,name,isNative,family
-Asp, D, Aspartic acid, TRUE, ACIDIC
-Glu, E, Glutamic acid, TRUE, ACIDIC
-Arg, R, Arginine,      TRUE, BASIC
-Lys, K, Lysine,        TRUE, BASIC
-His, H, Histidine,     TRUE, BASIC
-Asn, N, Asparagine,    TRUE, UNCHARGED_POLAR
-Gln, Q, Glutamine,     TRUE, UNCHARGED_POLAR
-Ser, S, Serine,        TRUE, UNCHARGED_POLAR
-Thr, T, Threonine,     TRUE, UNCHARGED_POLAR
-Tyr, Y, Tyrosine,      TRUE, UNCHARGED_POLAR
-Ala, A, Alanine,       TRUE, NONPOLAR
-Gly, G, Glycine,       TRUE, NONPOLAR
-Val, V, Valine,        TRUE, NONPOLAR
-Leu, L, Leucine,       TRUE, NONPOLAR
-Ile, I, Isoleucine,    TRUE, NONPOLAR
-Pro, P, Proline,       TRUE, NONPOLAR
-Phe, F, Phenylalanine, TRUE, NONPOLAR
-Met, M, Methionine,    TRUE, NONPOLAR
-Trp, W, Tryptophan,    TRUE, NONPOLAR
-Cys, C, Cysteine,      TRUE, NONPOLAR
-UNK, X, UNKNOWN,       FALSE,
-DEL, -, DELETION,      FALSE,
-STOP, ., STOP,         FALSE,
+code3,code1,name,protFreq,isNative,family
+Asp, D, Aspartic acid, 5.45, TRUE, ACIDIC
+Glu, E, Glutamic acid, 6.75, TRUE, ACIDIC
+Arg, R, Arginine,      5.53, TRUE, BASIC
+Lys, K, Lysine,        5.84, TRUE, BASIC
+His, H, Histidine,     2.27, TRUE, BASIC
+Asn, N, Asparagine,    4.06, TRUE, UNCHARGED_POLAR
+Gln, Q, Glutamine,     3.93, TRUE, UNCHARGED_POLAR
+Ser, S, Serine,        6.56, TRUE, UNCHARGED_POLAR
+Thr, T, Threonine,     5.34, TRUE, UNCHARGED_POLAR
+Tyr, Y, Tyrosine,      2.92, TRUE, UNCHARGED_POLAR
+Ala, A, Alanine,       8.25, TRUE, NONPOLAR
+Gly, G, Glycine,       7.07, TRUE, NONPOLAR
+Val, V, Valine,        6.87, TRUE, NONPOLAR
+Leu, L, Leucine,       9.66, TRUE, NONPOLAR
+Ile, I, Isoleucine,    5.96, TRUE, NONPOLAR
+Pro, P, Proline,       4.70, TRUE, NONPOLAR
+Phe, F, Phenylalanine, 3.86, TRUE, NONPOLAR
+Met, M, Methionine,    2.42, TRUE, NONPOLAR
+Trp, W, Tryptophan,    1.08, TRUE, NONPOLAR
+Cys, C, Cysteine,      1.37, TRUE, NONPOLAR
+UNK, X, UNKNOWN,       0.0,  FALSE,
+DEL, -, DELETION,      0.0,  FALSE,
+STOP, ., STOP,         0.0,  FALSE,
