@@ -16,29 +16,29 @@ import jam.math.JamRandom;
  * for deletions in mutated sequences and unknown or missing residues.
  */
 public enum Residue {
-    Asp('D', "Aspartic acid", true, Family.ACIDIC),
-    Glu('E', "Glutamic acid", true, Family.ACIDIC),
-    Arg('R', "Arginine",      true, Family.BASIC),
-    Lys('K', "Lysine",        true, Family.BASIC),
-    His('H', "Histidine",     true, Family.BASIC),
-    Asn('N', "Asparagine",    true, Family.UNCHARGED_POLAR),
-    Gln('Q', "Glutamine",     true, Family.UNCHARGED_POLAR),
-    Ser('S', "Serine",        true, Family.UNCHARGED_POLAR),
-    Thr('T', "Threonine",     true, Family.UNCHARGED_POLAR),
-    Tyr('Y', "Tyrosine",      true, Family.UNCHARGED_POLAR),
-    Ala('A', "Alanine",       true, Family.NONPOLAR),
-    Gly('G', "Glycine",       true, Family.NONPOLAR),
-    Val('V', "Valine",        true, Family.NONPOLAR),
-    Leu('L', "Leucine",       true, Family.NONPOLAR),
-    Ile('I', "Isoleucine",    true, Family.NONPOLAR),
-    Pro('P', "Proline",       true, Family.NONPOLAR),
-    Phe('F', "Phenylalanine", true, Family.NONPOLAR),
-    Met('M', "Methionine",    true, Family.NONPOLAR),
-    Trp('W', "Tryptophan",    true, Family.NONPOLAR),
-    Cys('C', "Cysteine",      true, Family.NONPOLAR),
-    UNK('X', "UNKNOWN",       false, null),
-    DEL('-', "DELETION",      false, null),
-    STOP('.', "STOP",         false, null);
+    Asp('D', "Aspartic acid", 5.45, true, Family.ACIDIC),
+    Glu('E', "Glutamic acid", 6.75, true, Family.ACIDIC),
+    Arg('R', "Arginine",      5.53, true, Family.BASIC),
+    Lys('K', "Lysine",        5.84, true, Family.BASIC),
+    His('H', "Histidine",     2.27, true, Family.BASIC),
+    Asn('N', "Asparagine",    4.06, true, Family.UNCHARGED_POLAR),
+    Gln('Q', "Glutamine",     3.93, true, Family.UNCHARGED_POLAR),
+    Ser('S', "Serine",        6.56, true, Family.UNCHARGED_POLAR),
+    Thr('T', "Threonine",     5.34, true, Family.UNCHARGED_POLAR),
+    Tyr('Y', "Tyrosine",      2.92, true, Family.UNCHARGED_POLAR),
+    Ala('A', "Alanine",       8.25, true, Family.NONPOLAR),
+    Gly('G', "Glycine",       7.07, true, Family.NONPOLAR),
+    Val('V', "Valine",        6.87, true, Family.NONPOLAR),
+    Leu('L', "Leucine",       9.66, true, Family.NONPOLAR),
+    Ile('I', "Isoleucine",    5.96, true, Family.NONPOLAR),
+    Pro('P', "Proline",       4.70, true, Family.NONPOLAR),
+    Phe('F', "Phenylalanine", 3.86, true, Family.NONPOLAR),
+    Met('M', "Methionine",    2.42, true, Family.NONPOLAR),
+    Trp('W', "Tryptophan",    1.08, true, Family.NONPOLAR),
+    Cys('C', "Cysteine",      1.37, true, Family.NONPOLAR),
+    UNK('X', "UNKNOWN",       0.0,  false, null),
+    DEL('-', "DELETION",      0.0,  false, null),
+    STOP('.', "STOP",         0.0,  false, null);
 
     /**
      * Side-chain polarity flag.
@@ -140,6 +140,7 @@ public enum Residue {
     private final char    code1;
     private final Family  family;
     private final String  fullName;
+    private final double  protFreq;
     private final boolean isNative;
 
     private static final Map<Character, Residue> map1 = new HashMap<Character, Residue>();
@@ -150,10 +151,11 @@ public enum Residue {
         populateNative();
     }
 
-    private Residue(char code1, String fullName, boolean isNative, Family family) {
+    private Residue(char code1, String fullName, double protFreq, boolean isNative, Family family) {
         this.code1    = code1;
         this.family   = family;
         this.fullName = fullName;
+        this.protFreq = protFreq;
         this.isNative = isNative;
     }
 
@@ -343,5 +345,16 @@ public enum Residue {
      */
     public boolean isNonPolar() {
         return family != null && family.isNonPolar();
+    }
+
+    /**
+     * Returns the frequency with which this residue occurs in the
+     * human proteome.
+     *
+     * @return the frequency with which this residue occurs in the
+     * human proteome.
+     */
+    public double proteomeFrequency() {
+        return protFreq;
     }
 }
