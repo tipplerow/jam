@@ -1,10 +1,18 @@
 
 package jam.peptide;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.EnumMultiset;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultiset;
 
 import jam.lang.ObjectFactory;
 import jam.math.IntRange;
@@ -94,6 +102,37 @@ public interface Peptide extends Iterable<Residue> {
     }
 
     /**
+     * Enumerates all native peptides of a given length having a
+     * distinct unordered representation (residue count).
+     *
+     * @param length the desired peptide length.
+     *
+     * @return a list containing all native peptides (composed of
+     * native residues) with the specified length having a distinct
+     * unordered representation (residue count).
+     *
+     * @throws IllegalArgumentException unless the length is positive
+     * but not greater than the enumeration limit.
+     */
+    public static List<Peptide> enumerateUnordered(int length) {
+        List<Peptide> allPeptides = enumerate(length);
+        ArrayList<Peptide> unorderedPeptides = new ArrayList<Peptide>();
+        Set<Multiset<Residue>> unorderedKeys = new HashSet<Multiset<Residue>>();
+
+        for (Peptide peptide : allPeptides) {
+            Multiset<Residue> unorderedKey = peptide.unordered();
+
+            if (!unorderedKeys.contains(unorderedKey)) {
+                unorderedKeys.add(unorderedKey);
+                unorderedPeptides.add(peptide);
+            }
+        }
+
+        unorderedPeptides.trimToSize();
+        return unorderedPeptides;
+    }
+
+    /**
      * Returns the number of unique native peptides with a fixed
      * length.
      *
@@ -112,6 +151,43 @@ public interface Peptide extends Iterable<Residue> {
             throw new IllegalArgumentException("Length must not exceed the enumeration limit.");
 
         return (int) Math.pow(Residue.countNative(), length);
+    }
+
+    /**
+     * Generates a unique key to identify peptide isomers.
+     *
+     * @return the isomer key for this peptide.
+     */
+    public default String isomerKey() {
+        char[] codes = new char[length()];
+
+        for (int k = 0; k < length(); ++k)
+            codes[k] = at(k).code1();
+
+        Arrays.sort(codes);
+        return String.valueOf(codes);
+    }
+
+    /**
+     * Enumerates all distinct isomers for peptides with a fixed
+     * length and counts the number of occurrences of each isomer.
+     *
+     * @param length the desired peptide length.
+     *
+     * @return a multiset counting the number of occurrences of each
+     * distinct isomer for peptides with the specified length.
+     *
+     * @throws IllegalArgumentException unless the length is positive
+     * but not greater than the enumeration limit.
+     */
+    public static Multiset<String> mapIsomers(int length) {
+        List<Peptide> peptides = enumerate(length);
+        Multiset<String> counts = TreeMultiset.create();
+
+        for (Peptide peptide : peptides)
+            counts.add(peptide.isomerKey());
+
+        return counts;
     }
 
     /**
@@ -263,6 +339,21 @@ public interface Peptide extends Iterable<Residue> {
      * to another residue chosen at random with equal probability.
      */
     public abstract Peptide mutate();
+
+    /**
+     * Returns an unordered view of this peptide: a multiset counting
+     * the number of times each residue occurs in this peptide.
+     *
+     * @return an unordered view of this peptide.
+     */
+    public default Multiset<Residue> unordered() {
+        Multiset<Residue> counts = EnumMultiset.create(Residue.class);
+
+        for (Residue residue : viewResidues())
+            counts.add(residue);
+
+        return counts;
+    }
 
     /**
      * Returns a read-only view of the residues in this peptide.

@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Multiset;
+
 import jam.math.IntRange;
 import jam.peptide.Peptide;
 import jam.peptide.Residue;
@@ -55,6 +57,12 @@ public class PeptideTest {
         }
     }
 
+    @Test public void testEnumerateUnordered() {
+        assertEquals( 210, Peptide.enumerateUnordered(2).size());
+        assertEquals(1540, Peptide.enumerateUnordered(3).size());
+        assertEquals(8855, Peptide.enumerateUnordered(4).size());
+    }
+
     @Test public void testEquals() {
         Peptide p1 = Peptide.of(Residue.His, Residue.Gln);
         Peptide p2 = Peptide.of(Residue.His, Residue.Gln);
@@ -102,6 +110,45 @@ public class PeptideTest {
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidConstructor2() {
         Peptide.of(List.of());
+    }
+
+    @Test public void testIsomerKey() {
+        Peptide pep = Peptide.of(Residue.His,
+                                 Residue.Cys,
+                                 Residue.Gln,
+                                 Residue.Gln,
+                                 Residue.Cys,
+                                 Residue.Gln,
+                                 Residue.Ala,
+                                 Residue.Lys);
+
+        assertEquals("ACCHKQQQ", pep.isomerKey());
+    }
+
+    @Test public void testMapIsomers() {
+        assertEquals( 210, Peptide.mapIsomers(2).elementSet().size());
+        assertEquals(1540, Peptide.mapIsomers(3).elementSet().size());
+        assertEquals(8855, Peptide.mapIsomers(4).elementSet().size());
+    }
+
+    @Test public void testUnordered() {
+        Peptide pep = Peptide.of(Residue.His,
+                                 Residue.Cys,
+                                 Residue.Gln,
+                                 Residue.Gln,
+                                 Residue.Cys,
+                                 Residue.Gln,
+                                 Residue.Ala,
+                                 Residue.Lys);
+
+        Multiset<Residue> counts = pep.unordered();
+
+        assertEquals(counts.size(), pep.length());
+        assertEquals(1, counts.count(Residue.Ala));
+        assertEquals(1, counts.count(Residue.His));
+        assertEquals(1, counts.count(Residue.Lys));
+        assertEquals(2, counts.count(Residue.Cys));
+        assertEquals(3, counts.count(Residue.Gln));
     }
 
     public static void main(String[] args) {
