@@ -265,6 +265,27 @@ public interface Peptide extends Iterable<Residue> {
     }
 
     /**
+     * Creates a peptide from a string representation containing a
+     * sequence of single-character residue codes.
+     *
+     * @param s a sequence of single-character residue codes.
+     *
+     * @return a peptide containing the residues specified in the
+     * input string.
+     *
+     * @throws IllegalArgumentException unless the input string is a
+     * valid peptide representation.
+     */
+    public static Peptide parse(String s) {
+        List<Residue> residues = new ArrayList<Residue>(s.length());
+
+        for (int k = 0; k < s.length(); ++k)
+            residues.add(Residue.valueOfCode1(s.charAt(k)));
+
+        return new ArrayPeptide(residues, false);
+    }
+
+    /**
      * Appends a sequence of residues to this peptide and returns a
      * new peptide with the full sequence; this peptide is unchanged.
      *

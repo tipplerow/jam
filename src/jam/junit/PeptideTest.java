@@ -131,6 +131,16 @@ public class PeptideTest {
         assertEquals(8855, Peptide.mapIsomers(4).elementSet().size());
     }
 
+    @Test public void testParse() {
+        Peptide pep = Peptide.parse("ACHK");
+
+        assertEquals(4, pep.length());
+        assertEquals(Residue.Ala, pep.at(0));
+        assertEquals(Residue.Cys, pep.at(1));
+        assertEquals(Residue.His, pep.at(2));
+        assertEquals(Residue.Lys, pep.at(3));
+    }
+
     @Test public void testUnordered() {
         Peptide pep = Peptide.of(Residue.His,
                                  Residue.Cys,
