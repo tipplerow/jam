@@ -11,7 +11,7 @@ import com.google.common.collect.Multiset;
 import jam.app.JamApp;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
-import jam.math.DoubleUtil;
+import jam.math.StatSummary;
 import jam.peptide.Peptide;
 import jam.peptide.RIM;
 import jam.report.LineBuilder;
@@ -87,7 +87,7 @@ public class IsomerScanner extends JamApp {
 
         builder.append("isomerString");
         builder.append("instanceCount");
-        builder.append("meanAffinity");
+        builder.append(StatSummary.header("affinity"));
         builder.append("selectorCount");
         builder.append("deletorCount");
 
@@ -116,10 +116,10 @@ public class IsomerScanner extends JamApp {
         int deletorCount = 0;
         int selectorCount = 0;
 
-        for (Peptide target : targets) {
-            double affinity =
-                activationEnergy - getRIM().computeNearest(receptor, target);
+        List<Double> affinities = computeAffinities(receptor);
+        StatSummary  summary    = StatSummary.compute(affinities);
 
+        for (Double affinity : affinities) {
             if (affinity >= negativeThreshold)
                 ++deletorCount;
             else if (affinity >= positiveThreshold)
@@ -130,12 +130,21 @@ public class IsomerScanner extends JamApp {
 
         builder.append(isomer);
         builder.append(isomers.count(isomer));
-        builder.append(meanAffinity, "%.4f");
+        builder.append(summary.format("%.4f"));
         builder.append(selectorCount);
         builder.append(deletorCount);
 
         writer.println(builder.toString());
         writer.flush();
+    }
+
+    private List<Double> computeAffinities(Peptide receptor) {
+        List<Double> affinities = new ArrayList<Double>(targets.size());
+
+        for (Peptide target : targets)
+            affinities.add(activationEnergy - getRIM().computeNearest(receptor, target));
+
+        return affinities;
     }
 
     public static void main(String[] args) {
