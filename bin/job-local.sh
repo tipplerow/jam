@@ -41,7 +41,7 @@ fi
 
 cd $WorkDir
 
-${JAM_HOME}/bin/jam-run.sh ${NEO_HOME} \
+${JAM_HOME}/bin/jam-run.sh ${JAM_HOME} \
     -Djam.app.reportDir=$ReportDir \
     -Djam.app.trialIndex=$TrialIndex \
     "$@"
