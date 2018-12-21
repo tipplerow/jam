@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import com.google.common.collect.Multiset;
 
+import jam.report.LineBuilder;
 import jam.util.ListUtil;
 import jam.util.RegexUtil;
 import jam.vector.VectorUtil;
@@ -177,25 +178,41 @@ public final class StatSummary {
      * summary.
      */
     public String format() {
-        StringBuilder builder = new StringBuilder();
+        LineBuilder builder = LineBuilder.csv();
 
         builder.append(size);
-        builder.append(",");
         builder.append(min);
-        builder.append(",");
         builder.append(max);
-        builder.append(",");
         builder.append(mean);
-        builder.append(",");
         builder.append(SD);
-        builder.append(",");
         builder.append(median);
-        builder.append(",");
         builder.append(MAD);
-        builder.append(",");
         builder.append(quartile1);
-        builder.append(",");
         builder.append(quartile3);
+
+        return builder.toString();
+    }
+
+    /**
+     * Formats this summary into a comma-delimited string.
+     *
+     * @param fmt floating-point format string.
+     *
+     * @return a comma-delimited string containing the items in this
+     * summary.
+     */
+    public String format(String fmt) {
+        LineBuilder builder = LineBuilder.csv();
+
+        builder.append(size, fmt);
+        builder.append(min, fmt);
+        builder.append(max, fmt);
+        builder.append(mean, fmt);
+        builder.append(SD, fmt);
+        builder.append(median, fmt);
+        builder.append(MAD, fmt);
+        builder.append(quartile1, fmt);
+        builder.append(quartile3, fmt);
 
         return builder.toString();
     }
@@ -208,25 +225,42 @@ public final class StatSummary {
      * comma-delimited files.
      */
     public static String header() {
-        StringBuilder builder = new StringBuilder();
+        LineBuilder builder = LineBuilder.csv();
 
         builder.append("size");
-        builder.append(",");
         builder.append("min");
-        builder.append(",");
         builder.append("max");
-        builder.append(",");
         builder.append("mean");
-        builder.append(",");
         builder.append("SD");
-        builder.append(",");
         builder.append("median");
-        builder.append(",");
         builder.append("MAD");
-        builder.append(",");
         builder.append("quartile1");
-        builder.append(",");
         builder.append("quartile3");
+
+        return builder.toString();
+    }
+
+    /**
+     * Returns a string to be used as the header line in
+     * comma-delimited files.
+     *
+     * @param prefix a prefix for the column names.
+     *
+     * @return a string to be used as the header line in
+     * comma-delimited files.
+     */
+    public static String header(String prefix) {
+        LineBuilder builder = LineBuilder.csv();
+
+        builder.append(prefix + "Size");
+        builder.append(prefix + "Min");
+        builder.append(prefix + "Max");
+        builder.append(prefix + "Mean");
+        builder.append(prefix + "SD");
+        builder.append(prefix + "Median");
+        builder.append(prefix + "MAD");
+        builder.append(prefix + "Q1");
+        builder.append(prefix + "Q3");
 
         return builder.toString();
     }
