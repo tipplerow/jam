@@ -87,6 +87,7 @@ public class IsomerScanner extends JamApp {
 
         builder.append("isomerString");
         builder.append("instanceCount");
+        builder.append("meanAffinity");
         builder.append("selectorCount");
         builder.append("deletorCount");
 
@@ -107,26 +108,29 @@ public class IsomerScanner extends JamApp {
     }
 
     private void writeLine(String isomer) {
-        LineBuilder builder = LineBuilder.csv();
+        Peptide receptor = Peptide.parse(isomer);
 
-        builder.append(isomer);
-        builder.append(isomers.count(isomer));
+        double meanAffinity =
+            activationEnergy - getRIM().computeMeanNearest(receptor);
 
         int deletorCount = 0;
         int selectorCount = 0;
-        Peptide receptor = Peptide.parse(isomer);
 
         for (Peptide target : targets) {
             double affinity =
                 activationEnergy - getRIM().computeNearest(receptor, target);
 
-            if (affinity >= positiveThreshold)
-                ++selectorCount;
-
             if (affinity >= negativeThreshold)
                 ++deletorCount;
+            else if (affinity >= positiveThreshold)
+                ++selectorCount;
         }
 
+        LineBuilder builder = LineBuilder.csv();
+
+        builder.append(isomer);
+        builder.append(isomers.count(isomer));
+        builder.append(meanAffinity, "%.4f");
         builder.append(selectorCount);
         builder.append(deletorCount);
 
