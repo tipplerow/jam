@@ -181,7 +181,18 @@ public interface Peptide extends Iterable<Residue> {
      * but not greater than the enumeration limit.
      */
     public static Multiset<String> mapIsomers(int length) {
-        List<Peptide> peptides = enumerate(length);
+        return mapIsomers(enumerate(length));
+    }
+
+    /**
+     * Enumerates all distinct isomers for a collection of peptides.
+     *
+     * @param peptides a collection of peptides to examine.
+     *
+     * @return a multiset counting the number of occurrences of each
+     * distinct isomer in the peptide collection.
+     */
+    public static Multiset<String> mapIsomers(Collection<Peptide> peptides) {
         Multiset<String> counts = TreeMultiset.create();
 
         for (Peptide peptide : peptides)
