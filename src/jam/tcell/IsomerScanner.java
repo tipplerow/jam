@@ -11,10 +11,11 @@ import com.google.common.collect.Multiset;
 import jam.app.JamApp;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
-import jam.math.StatSummary;
+import jam.math.StatUtil;
 import jam.peptide.Peptide;
 import jam.peptide.RIM;
 import jam.report.LineBuilder;
+import jam.vector.VectorView;
 
 /**
  * Provides a command-line application to compute the number of
@@ -87,7 +88,8 @@ public class IsomerScanner extends JamApp {
 
         builder.append("isomerString");
         builder.append("instanceCount");
-        builder.append(StatSummary.header("affinity"));
+        builder.append("affinityMean");
+        builder.append("affinitySD");
         builder.append("selectorCount");
         builder.append("deletorCount");
 
@@ -116,10 +118,12 @@ public class IsomerScanner extends JamApp {
         int deletorCount = 0;
         int selectorCount = 0;
 
-        List<Double> affinities = computeAffinities(receptor);
-        StatSummary  summary    = StatSummary.compute(affinities);
+        double[] affinities = computeAffinities(receptor);
 
-        for (Double affinity : affinities) {
+        double affinityMean = StatUtil.mean(VectorView.wrap(affinities));
+        double affinitySD   = StatUtil.stdev(VectorView.wrap(affinities));
+
+        for (double affinity : affinities) {
             if (affinity >= negativeThreshold)
                 ++deletorCount;
             else if (affinity >= positiveThreshold)
@@ -130,7 +134,8 @@ public class IsomerScanner extends JamApp {
 
         builder.append(isomer);
         builder.append(isomers.count(isomer));
-        builder.append(summary.format("%.4f"));
+        builder.append(affinityMean, "%.4f");
+        builder.append(affinitySD, "%.4f");
         builder.append(selectorCount);
         builder.append(deletorCount);
 
@@ -138,11 +143,11 @@ public class IsomerScanner extends JamApp {
         writer.flush();
     }
 
-    private List<Double> computeAffinities(Peptide receptor) {
-        List<Double> affinities = new ArrayList<Double>(targets.size());
+    private double[] computeAffinities(Peptide receptor) {
+        double[] affinities = new double[targets.size()];
 
-        for (Peptide target : targets)
-            affinities.add(activationEnergy - getRIM().computeNearest(receptor, target));
+        for (int k = 0; k < targets.size(); ++k)
+            affinities[k] = activationEnergy - getRIM().computeNearest(receptor, targets.get(k));
 
         return affinities;
     }
