@@ -38,6 +38,10 @@ public class RIMTest extends NumericTestBase {
         assertDouble(-2.443, MJ.mean(P));
     }
 
+    @Test public void testStDev() {
+        assertEquals(1.057624, MJ.stdev(P), 1.0E-6);
+    }
+
     @Test public void testNearest() {
         Peptide p1 = Peptide.of(A, C);
         Peptide p2 = Peptide.of(K, I);

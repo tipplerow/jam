@@ -7,7 +7,9 @@ import java.util.List;
 import jam.app.JamHome;
 import jam.dist.RealDistribution;
 import jam.io.FileUtil;
+import jam.math.StatUtil;
 import jam.matrix.MatrixUtil;
+import jam.vector.VectorView;
 
 /**
  * Represents pairwise interactions between native residues (a
@@ -16,12 +18,14 @@ import jam.matrix.MatrixUtil;
 public final class RIM {
     private final double[][] matrix;
     private final double[]   means;
+    private final double[]   stdev;
 
     private RIM(double[][] matrix) {
         validateMatrix(matrix);
 
         this.matrix = matrix;
         this.means  = MatrixUtil.rowMeans(matrix);
+        this.stdev = computeStDev(matrix);
     }
 
     private static void validateMatrix(double[][] matrix) {
@@ -35,6 +39,16 @@ public final class RIM {
 
         if (!MatrixUtil.isSymmetric(matrix))
             throw new IllegalArgumentException("Non-symmetric matrix.");
+    }
+
+    private static double[] computeStDev(double[][] matrix) {
+        int nrow = MatrixUtil.nrow(matrix);
+        double[] stdev = new double[nrow];
+
+        for (int row = 0; row < nrow; ++row)
+            stdev[row] = StatUtil.stdev(VectorView.wrap(matrix[row]));
+
+        return stdev;
     }
 
     /**
@@ -157,5 +171,18 @@ public final class RIM {
      */
     public double mean(Residue res) {
         return means[indexOf(res)];
+    }
+
+    /**
+     * Returns the standard deviation of the interactions of one
+     * residue with all native residues.
+     *
+     * @param res the residue of interest.
+     *
+     * @return the standard deviation of the interactions of the
+     * specified residue with all native residues.
+     */
+    public double stdev(Residue res) {
+        return stdev[indexOf(res)];
     }
 }
