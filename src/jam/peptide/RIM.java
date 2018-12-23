@@ -18,14 +18,14 @@ import jam.vector.VectorView;
 public final class RIM {
     private final double[][] matrix;
     private final double[]   means;
-    private final double[]   stdev;
+    private final double[]   variances;;
 
     private RIM(double[][] matrix) {
         validateMatrix(matrix);
 
-        this.matrix = matrix;
-        this.means  = MatrixUtil.rowMeans(matrix);
-        this.stdev = computeStDev(matrix);
+        this.matrix    = matrix;
+        this.means     = MatrixUtil.rowMeans(matrix);
+        this.variances = computeVariances(matrix);
     }
 
     private static void validateMatrix(double[][] matrix) {
@@ -41,14 +41,14 @@ public final class RIM {
             throw new IllegalArgumentException("Non-symmetric matrix.");
     }
 
-    private static double[] computeStDev(double[][] matrix) {
+    private static double[] computeVariances(double[][] matrix) {
         int nrow = MatrixUtil.nrow(matrix);
-        double[] stdev = new double[nrow];
+        double[] result = new double[nrow];
 
         for (int row = 0; row < nrow; ++row)
-            stdev[row] = StatUtil.stdev(VectorView.wrap(matrix[row]));
+            result[row] = StatUtil.variance(VectorView.wrap(matrix[row]));
 
-        return stdev;
+        return result;
     }
 
     /**
@@ -130,15 +130,45 @@ public final class RIM {
      * @param binder the binder peptide.
      *
      * @return the average nearest-neighbor interaction energy.
-     *
-     * @throws IllegalArgumentException if the binder peptide exceeds
-     * the enumeration length.
      */
     public double computeMeanNearest(Peptide binder) {
         double result = 0.0;
 
         for (Residue residue : binder)
             result += mean(residue);
+
+        return result;
+    }
+
+    /**
+     * Computes the ideal standard deviation in the nearest-neighbor
+     * interaction energy for a given binder peptide when averaged
+     * over all possible target peptides of the same length.
+     *
+     * @param binder the binder peptide.
+     *
+     * @return the ideal standard deviation in the nearest-neighbor
+     * interaction energy.
+     */
+    public double computeStDevNearest(Peptide binder) {
+        return Math.sqrt(computeVarianceNearest(binder));
+    }
+
+    /**
+     * Computes the ideal variance in the nearest-neighbor interaction
+     * energy for a given binder peptide when averaged over all target
+     * peptides of the same length.
+     *
+     * @param binder the binder peptide.
+     *
+     * @return the ideal variance in the nearest-neighbor interaction
+     * energy.
+     */
+    public double computeVarianceNearest(Peptide binder) {
+        double result = 0.0;
+
+        for (Residue residue : binder)
+            result += variance(residue);
 
         return result;
     }
@@ -183,6 +213,19 @@ public final class RIM {
      * specified residue with all native residues.
      */
     public double stdev(Residue res) {
-        return stdev[indexOf(res)];
+        return Math.sqrt(variance(res));
+    }
+
+    /**
+     * Returns the variance of the interactions of one residue with
+     * all native residues.
+     *
+     * @param res the residue of interest.
+     *
+     * @return the variance of the interactions of the specified
+     * residue with all native residues.
+     */
+    public double variance(Residue res) {
+        return variances[indexOf(res)];
     }
 }
