@@ -88,8 +88,10 @@ public class IsomerScanner extends JamApp {
 
         builder.append("isomerString");
         builder.append("instanceCount");
-        builder.append("affinityMean");
-        builder.append("affinitySD");
+        builder.append("affinityMeanIdeal");
+        builder.append("affinitySDIdeal");
+        builder.append("affinityMeanActual");
+        builder.append("affinitySDActual");
         builder.append("selectorCount");
         builder.append("deletorCount");
 
@@ -120,8 +122,11 @@ public class IsomerScanner extends JamApp {
 
         double[] affinities = computeAffinities(receptor);
 
-        double affinityMean = StatUtil.mean(VectorView.wrap(affinities));
-        double affinitySD   = StatUtil.stdev(VectorView.wrap(affinities));
+        double affinityMeanIdeal = activationEnergy - getRIM().computeMeanNearest(receptor);
+        double affinitySDIdeal   = getRIM().computeStDevNearest(receptor);
+
+        double affinityMeanActual = StatUtil.mean(VectorView.wrap(affinities));
+        double affinitySDActual   = StatUtil.stdev(VectorView.wrap(affinities));
 
         for (double affinity : affinities) {
             if (affinity >= negativeThreshold)
@@ -134,8 +139,10 @@ public class IsomerScanner extends JamApp {
 
         builder.append(isomer);
         builder.append(isomers.count(isomer));
-        builder.append(affinityMean, "%.4f");
-        builder.append(affinitySD, "%.4f");
+        builder.append(affinityMeanIdeal, "%.4f");
+        builder.append(affinitySDIdeal, "%.4f");
+        builder.append(affinityMeanActual, "%.4f");
+        builder.append(affinitySDActual, "%.4f");
         builder.append(selectorCount);
         builder.append(deletorCount);
 
