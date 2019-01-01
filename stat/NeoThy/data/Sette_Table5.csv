@@ -1,0 +1,40 @@
+########################################################################
+#
+# Table 5 from Sinu Paul, Daniela Weiskopf, Michael A. Angelo, John
+# Sidney, Bjoern Peters, and Alessandro Sette, "HLA Class I Alleles
+# Are Associated with Peptide-Binding Repertoires of Different Size,
+# Affinity, and Immunogenicity" (2013) J. Immunol. 191:5831-5839.
+#
+#
+# Size of the dengue virus-derived peptide-binding repertoire for
+# various HLA alleles.
+#
+########################################################################
+allele,repertoireSizePct
+HLA-A01:01, 0.29
+HLA-A26:01, 0.60
+HLA-A30:02, 1.31
+HLA-A32:01, 7.46
+HLA-A02:01, 4.96
+HLA-A02:03, 8.77
+HLA-A02:06,10.40
+HLA-A68:02, 4.90
+HLA-A03:01, 1.74
+HLA-A11:01, 3.44
+HLA-A30:01, 8.13
+HLA-A31:01, 4.00
+HLA-A33:01, 1.71
+HLA-A68:01, 5.92
+HLA-A23:01, 0.96
+HLA-A24:02, 0.45
+HLA-B07:02, 1.24
+HLA-B35:01, 3.79
+HLA-B51:01, 0.07
+HLA-B53:01, 2.16
+HLA-B08:01, 1.37
+HLA-B40:01, 1.51
+HLA-B44:02, 0.21
+HLA-B44:03, 0.76
+HLA-B57:01, 1.08
+HLA-B58:01, 2.86
+HLA-B15:01, 2.22
