@@ -1,28 +1,33 @@
 
-Miao.loadGlobal <- function() {
-    master   <- read.csv("Miao_SupTable2.csv")
+Miao.createMaster <- function(dirName = "../data") {
+    master   <- read.csv(file.path(dirName, "Miao_SupTable2.csv"))
     keyFrame <- master[,c("pair_id", "Tumor_Sample_Barcode")]
 
-    mutDetail  <- read.table("Miao_SupTable5.tsv", header = TRUE, sep = "\t")
+    mutDetail  <- read.table(file.path(dirName, "Miao_SupTable5.tsv"), header = TRUE, sep = "\t")
     mutDetail  <- subset(mutDetail, nchar(Variant_Classification) < 20)
     mutByTumor <- Miao.aggregateMutByTumor(mutDetail)
     mutByTumor <- merge(keyFrame, mutByTumor)
     
-    neoDetail  <- read.table("Miao_SupTable10.tsv", header = TRUE, sep = "\t")
+    neoDetail  <- read.table(file.path(dirName, "Miao_SupTable10.tsv"), header = TRUE, sep = "\t")
     neoDetail  <- neoDetail[!duplicated(neoDetail[,c("Tumor_Sample_Barcode", "HLA", "pep_mut")]),]
     neoByTumor <- Miao.aggregateNeoByTumor(neoDetail)
     neoByTumor <- merge(keyFrame, neoByTumor)
 
     master <- merge(master, mutByTumor, all = TRUE)
     master <- merge(master, neoByTumor, all = TRUE)
-    master <- subset(master, is.finite(nonSilentCount) & is.finite(count500))
 
-    master$zOS  <- Miao.zscore(log(master$os_days))
-    master$zPFS <- Miao.zscore(log(master$pfs_days))
+    master$os_event  <- 1 - master$os_censor
+    master$pfs_event <- 1 - master$pfs_censor
+    master
+}
+
+Miao.load <- function(dirName = "../data") {
+    master <- read.csv(file.path(dirName, "Miao_Master.csv"))
+    master <- subset(master, is.finite(nonSilentCount) & is.finite(neoCount500))
 
     master$zTMB <- Miao.zscore(log(master$nonSilentCount))
-    master$zNAB <- Miao.zscore(log(master$count500))
-    master$zHLA <- Miao.zscore(log(master$count500 / master$nonSilentCount))
+    master$zNAB <- Miao.zscore(log(master$neoCount500))
+    master$zHLA <- Miao.zscore(log(master$neoCount500 / master$nonSilentCount))
 
     master$lowTMB <- as.numeric(master$zTMB < median(master$zTMB, na.rm = TRUE))
     master$lowNAB <- as.numeric(master$zNAB < median(master$zNAB, na.rm = TRUE))
@@ -40,7 +45,7 @@ Miao.plotKR <- function(master) {
 
     par(las = 1)
     par(fig = c(0, xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht))
-    plot(survfit(Surv(os_days, os_censor) ~ lowTMB, data = master),
+    plot(survfit(Surv(os_days, os_event) ~ lowTMB, data = master),
          col = 3:4,
          lwd = 2,
          xlim = c(-50, 2050),
@@ -49,10 +54,10 @@ Miao.plotKR <- function(master) {
          cex.axis = 0.7)
     legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
            legend = c("High TMB", "Low TMB"))
-    legend(-200, 0.2, bty = "n", legend = "p = 0.00013", cex = cex)
+    legend(-200, 0.2, bty = "n", legend = "p = 0.12", cex = cex)
     
     par(fig = c(0.5 - 0.5 * xwd, 0.5 + 0.5 * xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
-    plot(survfit(Surv(os_days, os_censor) ~ lowNAB, data = master),
+    plot(survfit(Surv(os_days, os_event) ~ lowNAB, data = master),
          col = 3:4,
          lwd = 2,
          xlim = c(-50, 2050),
@@ -64,11 +69,11 @@ Miao.plotKR <- function(master) {
     box()
     legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
            legend = c("High NAL", "Low NAL"))
-    legend(-200, 0.2, bty = "n", legend = "p = 0.011", cex = cex)
+    legend(-200, 0.2, bty = "n", legend = "p = 0.67", cex = cex)
     
-    
+    ##par(fig = c(0.5 - 0.5 * xwd, 0.5 + 0.5 * xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
     par(fig = c(1.0 - xwd, 1.0, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
-    plot(survfit(Surv(os_days, os_censor) ~ lowHLA, data = master),
+    plot(survfit(Surv(os_days, os_event) ~ lowHLA, data = master),
          col = 3:4,
          lwd = 2,
          xlim = c(-50, 2050),
@@ -80,7 +85,7 @@ Miao.plotKR <- function(master) {
     box()
     legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
            legend = c("High HLA", "Low HLA"))
-    legend(-200, 0.2, bty = "n", legend = "p = 0.19", cex = cex)
+    legend(-200, 0.2, bty = "n", legend = "p = 0.60", cex = cex)
 }
 
 Miao.plotQQ <- function(master) {
@@ -126,6 +131,51 @@ Miao.plotQQ <- function(master) {
 
     par(fig = c(1 - xwd, 1, 0, yht), new = TRUE)
     zQQ(master$zHLA, "HLA Presentation Rate (HLA)", "Theoretical Quantiles", "")
+}
+
+
+Miao.plotQQ3 <- function(master) {
+    zQQ <- function(x, desc, xlab, ylab, pch = 1, cex = 0.75) {
+        xy <- qqnorm(x, plot.it = FALSE)
+        plot(xy$x,
+             xy$y,
+             cex  = cex,
+             type = "p",
+             xlab = "",
+             ylab = "",
+             xlim = c(-4, 4),
+             ylim = c(-4, 4),
+             axes = FALSE,
+             cex.axis = cex)
+        box()
+        axis(1, labels = nchar(xlab) > 0, cex.axis = cex)
+        axis(2, labels = nchar(ylab) > 0, cex.axis = cex)
+        lines(c(-5, 5), c(-5, 5))
+        ##legend(-4.9, 4.3, bty = "n", legend = desc, cex = 0.6)
+
+        if (nchar(xlab) > 0)
+            mtext(xlab, 1, line = 2.25, cex = cex)
+
+        if (nchar(ylab) > 0)
+            mtext(ylab, 2, line = 2, cex = cex, las = 0)
+    }
+    
+    xwd <- 0.435
+    yht <- 0.45
+    cex <- 0.7
+
+    par(las = 1)
+    par(fig = c(0, xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht))
+    zQQ(master$zTMB, "Tumor Mutational Burden (TMB)", "Theoretical Quantiles", "Sample Quantiles")
+    mtext("Tumor Mutational Burden (TMB)", 3, line = 0.5, cex = 0.7)
+
+    par(fig = c(0.5 - 0.5 * xwd, 0.5 + 0.5 * xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
+    zQQ(master$zNAB, "Neoantigen Load (NAL)", "Theoretical Quantiles", "")
+    mtext("Neoantigen Load (NAL)", 3, line = 0.5, cex = 0.7)
+
+    par(fig = c(1.0 - xwd, 1.0, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
+    zQQ(master$zHLA, "HLA Presentation Rate (HLA)", "Theoretical Quantiles", "")
+    mtext("HLA Presentation Rate (HLA)", 3, line = 0.5, cex = 0.7)
 }
 
 
@@ -221,8 +271,8 @@ Miao.aggregateByCancerType <- function(master) {
                    zOS  = Miao.zscore(log(slice$os_days)),
                    zPFS = Miao.zscore(log(slice$pfs_days)),
                    zTMB = Miao.zscore(log(slice$nonSilentCount)),
-                   zNAB = Miao.zscore(log(slice$count500)),
-                   zHLA = Miao.zscore(log(slice$count500 / slice$nonSilentCount)))
+                   zNAB = Miao.zscore(log(slice$neoCount500)),
+                   zHLA = Miao.zscore(log(slice$neoCount500 / slice$nonSilentCount)))
     }
 
     result <- do.call(rbind, by(master, list(master$cancer_type, master$os_censor), aggFunc))
@@ -261,11 +311,11 @@ Miao.aggregateNeoByTumor <- function(neoAg) {
         slice <- slice[!duplicated(slice$pep_mut),]
 
         data.frame(Tumor_Sample_Barcode = slice$Tumor_Sample_Barcode[1],
-                   totalNeo = nrow(slice),
-                   count50  = sum(slice$affinity_mut <  50),
-                   count100 = sum(slice$affinity_mut < 100),
-                   count250 = sum(slice$affinity_mut < 250),
-                   count500 = sum(slice$affinity_mut < 500))
+                   totalNeo    = nrow(slice),
+                   neoCount50  = sum(slice$affinity_mut <  50),
+                   neoCount100 = sum(slice$affinity_mut < 100),
+                   neoCount250 = sum(slice$affinity_mut < 250),
+                   neoCount500 = sum(slice$affinity_mut < 500))
     }
     
     result <- do.call(rbind, by(neoAg, neoAg$Tumor_Sample_Barcode, aggFunc))

@@ -3,61 +3,127 @@ Chowell.zscore <- function(x) {
     (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 }
 
-Chowell.mergePresentRate <- function(master) {
-}
-
-Chowell.load1 <- function() {
-    cohort1 <- read.table("Chowell_Cohort1.txt", sep = "\t", header = TRUE)
+Chowell.load1 <- function(dirName = "../data") {
+    cohort1 <- read.table(file.path(dirName, "Chowell_Cohort1.txt"), sep = "\t", header = TRUE)
     cohort1 <- subset(cohort1, is.finite(OS_Months) & is.finite(Homozygous))
 
     cohort1$zOS  <- Chowell.zscore(log(cohort1$OS_Months))
     cohort1$zTMB <- Chowell.zscore(log(cohort1$MutCnt))
 
-    cohort1$TMB_High <- as.numeric(cohort1$MutCnt > median(cohort1$MutCnt, na.rm = TRUE))
+    cohort1$LowTMB <- as.numeric(cohort1$MutCnt < median(cohort1$MutCnt, na.rm = TRUE))
     cohort1
 }
 
-Chowell.load2 <- function() {
-    cohort2 <- read.table("Chowell_Cohort2.txt", sep = "\t", header = TRUE)
+Chowell.load2 <- function(dirName = "../data") {
+    cohort2 <- read.table(file.path(dirName, "Chowell_Cohort2.txt"), sep = "\t", header = TRUE)
     cohort2 <- subset(cohort2, is.finite(OS_Months) & is.finite(IMPACT_MutCnt) & is.finite(Homozygous))
 
     cohort2$zOS  <- Chowell.zscore(log(1 + cohort2$OS_Months))
     cohort2$zTMB <- Chowell.zscore(log(1 + cohort2$IMPACT_MutCnt))
 
-    cohort2$HighLoad <- as.numeric(cohort2$IMPACT_MutCnt > 16.72)
+    cohort2$LowTMB <- as.numeric(cohort2$IMPACT_MutCnt < median(cohort2$IMPACT_MutCnt, na.rm = TRUE))
     cohort2
 }
 
-Chowell.plotKR <- function() {
+Chowell.expandHLA <- function(master) {
+    master$hla.list <- strsplit(master$HLA_Class_I_Alleles, ",")
+
+    master$hla.a1 <- lapply(master$hla.list, function(x) x[[1]])
+    master$hla.a2 <- lapply(master$hla.list, function(x) x[[2]])
+    master$hla.b1 <- lapply(master$hla.list, function(x) x[[3]])
+    master$hla.b2 <- lapply(master$hla.list, function(x) x[[4]])
+    master$hla.c1 <- lapply(master$hla.list, function(x) x[[5]])
+    master$hla.c2 <- lapply(master$hla.list, function(x) x[[6]])
+
+    hlaNames <- sprintf("hla.%s", c("a1", "a2", "b1", "b2", "c1", "c2"))
+
+    for (hlaName in hlaNames)
+        master[,hlaName] <-
+            sprintf("HLA-%s:%s",
+                    substr(master[,hlaName], 1, 3),
+                    substr(master[,hlaName], 4, 5))
+
+    master
+}
+
+Chowell.plotKR1 <- function() {
     require(survival)
-    require(survminer)
 
-    cohort1 <- read.table("Chowell_Cohort1.txt", sep = "\t", header = TRUE)
-    cohort1 <- subset(cohort1, is.finite(OS_Months) & is.finite(Homozygous))
+    cohort1 <- Chowell.load1()
 
-    cohort1$MutZyg <-
-        ifelse(cohort1$MutCnt > 113 & cohort1$Homozygous > 0.5, "High_Homo",
-        ifelse(cohort1$MutCnt < 113 & cohort1$Homozygous < 0.5, "Low_Hetero", NA))
-    cohort1 <- subset(cohort1, !is.na(MutZyg))
+    xwd <- 0.57
+    yht <- 0.55
+    cex <- 0.7
 
     par(las = 1)
-    par(fig = c(0, 1, 0.1, 0.9))
-    fit <- survfit(Surv(OS_Months, OS_Event) ~ MutZyg, data = cohort1)
-    ggsurvplot(fit, data = cohort1, risk.table = TRUE, pval = TRUE)
-    print(coxph(Surv(OS_Months, OS_Event) ~ MutZyg, data = cohort1))
-
-    plot(fit,
-         col  = c(3, 4),
-         lwd  = 3,
-         xlim = c(-2, 82),
+    par(fig = c(0, xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht))
+    plot(survfit(Surv(OS_Months, OS_Event) ~ Homozygous, data = cohort1),
+         col = 3:4,
+         lwd = 2,
+         xlim = c(-3, 83),
          xlab = "Months",
-         ylab = "Survival probability")
+         ylab = "Survival probability",
+         cex.lab  = cex,
+         cex.axis = cex)
+    legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
+           legend = c("Homozygous", "Heterozygous"))
+    legend(-2, 0.2, bty = "n", legend = "p = 0.036", cex = cex)
 
-    legend("topright", bty = "n",
-           legend = c("High TMB, Homozygous", "Low TMB, Heterozygous"),
-           col = c(3, 4),
-           lty = c(1, 1),
-           lwd = c(3, 3))
+    par(fig = c(1 - xwd, 1, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
+    plot(survfit(Surv(OS_Months, OS_Event) ~ LowTMB, data = cohort1),
+         col = 3:4,
+         lwd = 2,
+         xlab = "Months",
+         xlim = c(-3, 83),
+         axes = FALSE,
+         cex.lab  = cex,
+         cex.axis = cex)
+    axis(1, cex.axis = cex)
+    axis(2, labels = FALSE)
+    box()
+    legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
+           legend = c("High TMB", "Low TMB"))
+    legend(-2, 0.2, bty = "n", legend = "p = 0.0013", cex = cex)
+}
+
+Chowell.plotKR2 <- function() {
+    require(survival)
+
+    cohort2 <- Chowell.load2()
+
+    xwd <- 0.57
+    yht <- 0.55
+    cex <- 0.7
+
+    par(las = 1)
+    par(fig = c(0, xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht))
+    plot(survfit(Surv(OS_Months, OS_Event) ~ Homozygous, data = cohort2),
+         col = 3:4,
+         lwd = 2,
+         xlim = c(-3, 83),
+         xlab = "Months",
+         ylab = "Survival probability",
+         cex.lab  = cex,
+         cex.axis = cex)
+    legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
+           legend = c("Homozygous", "Heterozygous"))
+    legend(-2, 0.2, bty = "n", legend = "p = 0.036", cex = cex)
+
+    par(fig = c(1 - xwd, 1, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
+    plot(survfit(Surv(OS_Months, OS_Event) ~ LowTMB, data = cohort2),
+         col = 3:4,
+         lwd = 2,
+         xlab = "Months",
+         xlim = c(-3, 83),
+         axes = FALSE,
+         cex.lab  = cex,
+         cex.axis = cex)
+    axis(1, cex.axis = cex)
+    axis(2, labels = FALSE)
+    box()
+    legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
+           legend = c("High TMB", "Low TMB"))
+    legend(-2, 0.2, bty = "n", legend = "p = 0.0013", cex = cex)
 }
 
 Chowell.plotQQ <- function() {
