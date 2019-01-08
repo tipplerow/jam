@@ -2,12 +2,12 @@
 ########################################################################
 # Run one job in a production sesquence on the local machine.
 #
-# Usage: job-local.sh WorkDir BlockIndex TrialIndex [JVM_FLAGS] ClassName ...
+# Usage: job-local.sh ProjectHome WorkDir BlockIndex TrialIndex [JVM_FLAGS] ClassName ...
 ########################################################################
 
-if [ $# -lt 4 ]
+if [ $# -lt 5 ]
 then
-    echo "Usage:" `basename $0` "WorkDir BlockIndex TrialIndex [JVM_FLAGS] ClassName ..."
+    echo "Usage:" `basename $0` "ProjectHome WorkDir BlockIndex TrialIndex [JVM_FLAGS] ClassName ..."
     exit 1
 fi
 
@@ -16,6 +16,9 @@ then
     echo "Environment variable JAM_HOME is not set; exiting."
     exit 1
 fi
+
+ProjectHome=$1
+shift
 
 WorkDir=$1
 shift
@@ -41,7 +44,7 @@ fi
 
 cd $WorkDir
 
-${JAM_HOME}/bin/jam-run.sh ${JAM_HOME} \
+${JAM_HOME}/bin/jam-run.sh $ProjectHome \
     -Djam.app.reportDir=$ReportDir \
     -Djam.app.trialIndex=$TrialIndex \
     "$@"
