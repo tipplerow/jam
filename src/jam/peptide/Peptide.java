@@ -238,7 +238,7 @@ public interface Peptide extends Iterable<Residue> {
      * @return the header line for CSV files containing peptides with
      * the specified length.
      */
-    public static String header(int length) {
+    public static String headerCSV(int length) {
         LineBuilder builder = LineBuilder.csv();
 
         for (int k = 0; k < length; ++k)
@@ -400,8 +400,24 @@ public interface Peptide extends Iterable<Residue> {
      * @return the residues in this peptide formatted for output to a
      * CSV file.
      */
-    public default String format() {
+    public default String formatCSV() {
         LineBuilder builder = LineBuilder.csv();
+
+        for (Residue residue : viewResidues())
+            builder.append(residue.code1());
+
+        return builder.toString();
+    }
+
+    /**
+     * Formats the residues in this peptide into a string of
+     * single-character codes.
+     *
+     * @return the residues in this peptide as string of
+     * single-character codes.
+     */
+    public default String formatString() {
+        StringBuilder builder = new StringBuilder();
 
         for (Residue residue : viewResidues())
             builder.append(residue.code1());
@@ -416,8 +432,8 @@ public interface Peptide extends Iterable<Residue> {
      * @return the header line for CSV files containing peptides with
      * the same length as this peptide.
      */
-    public default String header() {
-        return header(length());
+    public default String headerCSV() {
+        return headerCSV(length());
     }
 
     @Override public default Iterator<Residue> iterator() {

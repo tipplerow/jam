@@ -32,13 +32,6 @@ abstract class AbstractPeptide implements Peptide {
     }
 
     @Override public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Peptide(");
-
-        for (Residue residue : viewResidues())
-            builder.append(residue.code1());
-
-        builder.append(")");
-        return builder.toString();
+        return "Peptide(" + formatString() + ")";
     }
 }

@@ -56,7 +56,7 @@ public abstract class PresentationTuner extends JamApp {
         LineBuilder builder = LineBuilder.csv();
 
         builder.append("alleleIndex");
-        builder.append(alleles.get(0).getAnchor().header());
+        builder.append(alleles.get(0).getAnchor().headerCSV());
         builder.append("presentationRate");
 
         writer.println(builder.toString());
@@ -72,7 +72,7 @@ public abstract class PresentationTuner extends JamApp {
         LineBuilder builder = LineBuilder.csv();
         
         builder.append(getTrialIndex());
-        builder.append(mhc.getAnchor().format());
+        builder.append(mhc.getAnchor().formatCSV());
         builder.append(computePresentationRate(mhc));
 
         writer.println(builder.toString());
