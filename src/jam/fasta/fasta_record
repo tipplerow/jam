@@ -1,0 +1,275 @@
+
+package jam.fasta;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.LinkedList;
+
+import tip.app.TipLog;
+import tip.util.RegexUtil;
+import tip.util.StringUtil;
+
+/**
+ * Encapsulates a single record from a FASTA file.
+ */
+public final class FastaRecord {
+    private final String  key;
+    private final String  comment;
+    private final Peptide peptide;
+
+    /**
+     * Special character identifying header lines in FASTA files.
+     */
+    public static final String HEADER_MARKER = ">";
+
+    /**
+     * Maximum line length for FASTA files.
+     */
+    public static final int LINE_LENGTH = 70;
+
+    /**
+     * Creates a new FASTA record.
+     *
+     * @param key     the record key.
+     * @param comment thd record comment.
+     * @param peptide the peptide sequence.
+     */
+    public FastaRecord(String key, String comment, Peptide peptide) {
+        this.key = key;
+	this.comment = comment;
+        this.peptide = peptide;
+    }
+
+    /**
+     * Identifies header lines in FASTA files.
+     *
+     * @param line a line to examine.
+     *
+     * @return {@code true} iff the input line starts with the header
+     * marker.
+     */
+    public static boolean isHeaderLine(String line) {
+        return line.startsWith(HEADER_MARKER);
+    } 
+
+    /**
+     * Removes the header marker from a header line (if it is
+     * present).
+     *
+     * @param line a line to modify.
+     *
+     * @return the header line with the marker removed.
+     */
+    public static String removeHeaderMarker(String line) {
+	if (isHeaderLine(line))
+	    line = line.substring(HEADER_MARKER.length());
+
+	return line;
+    }
+
+    /**
+     * Extracts the key from a record header.
+     *
+     * <p>The header need not begin with the special marker character;
+     * if it does, the marker will be ignored.
+     *
+     * @param header a record header.
+     *
+     * @return the record key (the first word in the header).
+     */
+    public static String extractKey(String header) {
+	String[] fields = RegexUtil.MULTI_WHITE_SPACE.split(removeHeaderMarker(header), 2);
+	return fields[0];
+    }
+
+    /**
+     * Extracts the comment from a record header.
+     *
+     * <p>The header need not begin with the special marker character;
+     * if it does, the marker will be ignored.
+     *
+     * @param header a record header.
+     *
+     * @return the record comment (everything following the first word
+     * in the header).
+     */
+    public static String extractComment(String header) {
+	String[] fields = RegexUtil.MULTI_WHITE_SPACE.split(removeHeaderMarker(header), 2);
+
+	if (fields.length > 1)
+	    return fields[1];
+	else
+	    return "";
+    }
+
+    /**
+     * Formats this record for output to a FASTA file.
+     *
+     * @return this record formatted as a single string.
+     */
+    public String format() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(HEADER_MARKER);
+        builder.append(key);
+        builder.append(" ");
+        builder.append(comment);
+        builder.append(SystemUtils.LINE_SEPARATOR);
+        builder.append(StringUtil.multiLine(peptide.format(), LINE_LENGTH));
+
+        return builder.toString();
+    }
+
+    /**
+     * Parses a complete FASTA record from an input string.
+     *
+     * <p>The input string must contain a header line and amino acid
+     * lines separated by the system-dependent line separator.
+     *
+     * @param s the input string.
+     *
+     * @return a new FASTA record with the specified sequence.
+     *
+     * @throws IllegalArgumentException if the input string is not
+     * properly formatted.
+     */
+    public static FastaRecord parse(String s) {
+        String[] lineArray = s.split(SystemUtils.LINE_SEPARATOR);
+        List<String> lineList = new LinkedList<String>(Arrays.asList(lineArray));
+
+        return parse(lineList);
+    }
+
+    /**
+     * Parses a complete FASTA record from an input string.
+     *
+     * <p>Rather than throw an exception, this method returns {@code
+     * null} if the string is not properly formatted, e.g., if it
+     * contains ambiguous amino acid codes ("B", "J", "Z").
+     *
+     * <p>The input string must contain a header line and amino acid
+     * lines separated by the system-dependent line separator.
+     *
+     * @param s the input string.
+     *
+     * @param level the level for logging improperly formatted records.
+     *
+     * @return a new FASTA record with the specified sequence, or
+     * {@code null} if the input is invalid.
+     */
+    public static FastaRecord parseLenient(String s, TipLog.Level level) {
+        FastaRecord record = null;
+
+        try {
+            record = parse(s);
+        }
+        catch (IllegalArgumentException ex) {
+            TipLog.log(level, "Invalid FASTA record [%s]", s);
+        }
+
+        return record;
+    }
+
+    /**
+     * Parses a complete FASTA record from a list of input strings.
+     *
+     * <p>The first line must be the header line; subsequent lines
+     * must contain amino acids.
+     *
+     * @param lines a list of input lines from a FASTA file.
+     *
+     * @return a new FASTA record with the specified sequence.
+     *
+     * @throws IllegalArgumentException unless the input lines form a
+     * valid record.
+     */
+    public static FastaRecord parse(List<String> lines) {
+	if (!isHeaderLine(lines.get(0)))
+	    throw new IllegalArgumentException("Missing header line.");
+	    
+	String header = removeHeaderMarker(lines.get(0));
+	lines.remove(0);
+
+	if (lines.isEmpty())
+	    throw new IllegalArgumentException("Missing amino acid lines.");
+
+	String  key     = extractKey(header);
+	String  comment = extractComment(header);
+        Peptide peptide = Peptide.parse(StringUtil.concat(lines));
+
+        return new FastaRecord(key, comment, peptide);
+    }
+
+    /**
+     * Parses a complete FASTA record from a list of input strings.
+     *
+     * <p>The first line must be the header line; subsequent lines
+     * must contain amino acids.
+     *
+     * @param lines a list of input lines from a FASTA file.
+     *
+     * @param level the level for logging improperly formatted records.
+     *
+     * @return a new FASTA record with the specified sequence, or
+     * {@code null} if the input is invalid.
+     */
+    public static FastaRecord parseLenient(List<String> lines, TipLog.Level level) {
+        FastaRecord record = null;
+
+        try {
+            record = parse(lines);
+        }
+        catch (IllegalArgumentException ex) {
+            TipLog.log(level, "Invalid FASTA record [%s]", StringUtil.concat(lines));
+        }
+
+        return record;
+    }
+
+    /**
+     * Removes records from a collection unless they contain native
+     * peptides.
+     *
+     * @param records the collection on which to operate.
+     */
+    public static void keepNative(Collection<FastaRecord> records) {
+        Iterator<FastaRecord> iter = records.iterator();
+
+        while (iter.hasNext())
+            if (!iter.next().getPeptide().isNative())
+                iter.remove();
+    }
+
+    /**
+     * Returns the key for this record.
+     *
+     * @return the key for this record.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the comment for this record.
+     *
+     * @return the comment for this record.
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Returns the peptide sequence in this record.
+     *
+     * @return the peptide sequence in this record.
+     */
+    public Peptide getPeptide() {
+        return peptide;
+    }
+
+    @Override public String toString() {
+	return format();
+    }
+}

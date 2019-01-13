@@ -1,6 +1,8 @@
 
 package jam.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -42,6 +44,28 @@ public final class StringUtil {
      */
     public static boolean isDoubleQuoted(String s) {
         return s.startsWith(StringUtil.DOUBLE_QUOTE) && s.endsWith(StringUtil.DOUBLE_QUOTE);
+    }
+
+    /**
+     * Splits a single string across multiple lines.
+     *
+     * @param string the string to split.
+     *
+     * @param lineLength the maximum length of each line.
+     *
+     * @return the lines composing the original string, each limited
+     * to {@code lineLength} characters.
+     */
+    public static List<String> multiLine(String string, int lineLength) {
+        List<String> lines = new ArrayList<String>();
+
+        while (string.length() > lineLength) {
+            lines.add(string.substring(0, lineLength));
+            string = string.substring(lineLength);
+        }
+
+        lines.add(string);
+        return lines;
     }
 
     /**

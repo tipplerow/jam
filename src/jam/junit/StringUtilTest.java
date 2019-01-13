@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import jam.util.RegexUtil;
@@ -19,6 +20,14 @@ public class StringUtilTest {
     @Test(expected = RuntimeException.class)
     public void testChopEmpty() {
         StringUtil.chop("");
+    }
+
+    @Test public void testMultiLine() {
+        assertEquals(List.of(""), StringUtil.multiLine("", 5));
+        assertEquals(List.of("abc"), StringUtil.multiLine("abc", 5));
+        assertEquals(List.of("abcde"), StringUtil.multiLine("abcde", 5));
+        assertEquals(List.of("abcde", "f"), StringUtil.multiLine("abcdef", 5));
+        assertEquals(List.of("abcde", "fghij", "klm"), StringUtil.multiLine("abcdefghijklm", 5));
     }
 
     @Test public void testRemoveCommentText() {

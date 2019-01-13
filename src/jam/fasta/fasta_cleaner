@@ -1,0 +1,62 @@
+
+package tip.bio;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.util.List;
+
+import tip.app.TipLog;
+
+/**
+ * Removes invalid records from FASTA files.
+ */
+public final class FastaCleaner {
+    private final File inFile;
+    private final File outFile;
+
+    private FastaCleaner(File inFile, File outFile) {
+        this.inFile  = inFile;
+        this.outFile = outFile;
+    }
+
+    /**
+     * Cleans a FASTA file.
+     *
+     * @param inFile the unclean file to read.
+     *
+     * @param outFile the clean file to write.
+     *
+     * @throws IOException if any I/O errors occur.
+     */
+    public static void clean(File inFile, File outFile) throws IOException {
+        FastaCleaner cleaner = new FastaCleaner(inFile, outFile);
+        cleaner.clean();
+    }
+
+    private void clean() throws IOException {
+        TipLog.info("Reading [%s]...", inFile);
+        List<FastaRecord> records = FastaFile.read(inFile, TipLog.Level.WARN);
+
+        TipLog.info("Removing non-native records...");
+        FastaRecord.keepNative(records);
+
+        TipLog.info("Writing [%s]...", outFile);
+        FastaFile.write(outFile, records);
+    }
+
+    private static void usage() {
+        System.err.println("Usage: tip.bio.FastaCleaner <input_file> <output_file>");
+        System.exit(1);
+    }
+
+    public static void main(String[] args) throws IOException {
+        if (args.length != 2)
+            usage();
+
+        File inFile  = new File(args[0]);
+        File outFile = new File(args[1]);
+
+        clean(inFile, outFile);
+    }
+}

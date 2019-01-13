@@ -1,0 +1,88 @@
+
+package tip.bio;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Presents an immutable map of FASTA records indexed by record key.
+ */
+public final class FastaMap {
+    private final Map<String, FastaRecord> records;
+
+    /**
+     * Creates a new FASTA map.
+     *
+     * @param records the records to place in the map.
+     *
+     * @throws IllegalArgumentException unless the record keys are
+     * unique.
+     */
+    public FastaMap(Collection<FastaRecord> records) {
+        this.records = mapRecords(records);
+    }
+
+    private static Map<String, FastaRecord> mapRecords(Collection<FastaRecord> collection) {
+        Map<String, FastaRecord> map = new LinkedHashMap<String, FastaRecord>(collection.size());
+
+        for (FastaRecord record : collection) {
+            String key = record.getKey();
+
+            if (map.containsKey(key))
+                throw new IllegalArgumentException(String.format("Duplicate key: [%s]", key));
+
+            map.put(key, record);
+        }
+
+        return map;
+    }
+
+    /**
+     * Identifies keys in this map.
+     *
+     * @param key the key of interest.
+     *
+     * @return {@code true} iff this map contains a record with the
+     * specified key.
+     */
+    public boolean containsKey(String key) {
+        return records.containsKey(key);
+    }
+
+    /**
+     * Returns all keys in this map.
+     *
+     * @return a new set containing all keys in this map; modifying
+     * the set will not change the contents of this map.
+     */
+    public Set<String> getKeys() {
+        return new LinkedHashSet<String>(records.keySet());
+    }
+
+    /**
+     * Retrieves a record by its key.
+     *
+     * @param key the key of interest.
+     *
+     * @return the record with the specfied key, or {@code null} if
+     * there is no matching record.
+     */
+    public FastaRecord getRecord(String key) {
+        return records.get(key);
+    }
+
+    /**
+     * Returns all records in this map.
+     *
+     * @return a new list containing all records in this map;
+     * modifying the list will not change the contents of this map.
+     */
+    public List<FastaRecord> getRecords() {
+        return new ArrayList<FastaRecord>(records.values());
+    }
+}
