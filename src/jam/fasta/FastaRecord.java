@@ -1,7 +1,11 @@
 
 package jam.fasta;
 
+import java.util.regex.Pattern;
+
 import jam.peptide.Peptide;
+import jam.util.RegexUtil;
+import jam.util.StringUtil;
 
 /**
  * Encapsulates a single record from a FASTA file.
@@ -15,6 +19,11 @@ public final class FastaRecord {
      * Special character identifying header lines in FASTA files.
      */
     public static final String HEADER_MARKER = ">";
+
+    /**
+     * Delimiter separating the header key from header comment text.
+     */
+    public static final Pattern KEY_COMMENT_DELIM = RegexUtil.MULTI_WHITE_SPACE;
 
     /**
      * Maximum line length for FASTA files.
@@ -46,8 +55,13 @@ public final class FastaRecord {
         builder.append(key);
         builder.append(" ");
         builder.append(comment);
-        builder.append(System.lineSeparator());
-        //builder.append(StringUtil.multiLine(peptide.format(), LINE_LENGTH));
+
+        for (int index = 0; index < peptide.length(); ++index) {
+            if (index % LINE_LENGTH == 0)
+                builder.append(System.lineSeparator());
+
+            builder.append(peptide.at(index).code1());
+        }
 
         return builder.toString();
     }
