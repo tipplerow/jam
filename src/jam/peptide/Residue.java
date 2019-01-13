@@ -41,6 +41,12 @@ public enum Residue {
     STOP('.', "STOP",         0.0,  false, null);
 
     /**
+     * Additional character symbols that may be used (e.g., in FASTA
+     * files) to represent unknown amino acids.
+     */
+    public static char[] UNKNOWN_ALIAS = new char[] { '*' };
+
+    /**
      * Side-chain polarity flag.
      */
     public enum Polarity { POLAR, NONPOLAR };
@@ -162,6 +168,9 @@ public enum Residue {
     private static void populateMap1() {
         for (Residue residue : values())
             map1.put(residue.code1(), residue);
+
+        for (char code : UNKNOWN_ALIAS)
+            map1.put(code, Residue.UNK);
     }
 
     private static void populateNative() {
