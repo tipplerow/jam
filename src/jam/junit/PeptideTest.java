@@ -131,6 +131,22 @@ public class PeptideTest {
         assertEquals(8855, Peptide.mapIsomers(4).elementSet().size());
     }
 
+    @Test public void testNativeNMers() {
+        Peptide parent = Peptide.parse("MPKLNSTFVTEFLFEG");
+
+        assertEquals(List.of(), parent.nativeNMers(100));
+        assertEquals(List.of(parent), parent.nativeNMers(parent.length()));
+        assertEquals(List.of(Peptide.parse("MPKLNSTFV"),
+                             Peptide.parse("PKLNSTFVT"),
+                             Peptide.parse("KLNSTFVTE"),
+                             Peptide.parse("LNSTFVTEF"),
+                             Peptide.parse("NSTFVTEFL"),
+                             Peptide.parse("STFVTEFLF"),
+                             Peptide.parse("TFVTEFLFE"),
+                             Peptide.parse("FVTEFLFEG")),
+                     parent.nativeNMers(9));
+    }
+
     @Test public void testParse() {
         Peptide pep = Peptide.parse("ACHK");
 

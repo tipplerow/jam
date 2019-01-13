@@ -4,6 +4,7 @@ package jam.peptide;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -154,6 +155,20 @@ public interface Peptide extends Iterable<Residue> {
     }
 
     /**
+     * Identifies native peptides.
+     *
+     * @return {@code true} iff every residue in this peptide is a
+     * native residue.
+     */
+    public default boolean isNative() {
+        for (Residue residue : this)
+            if (!residue.isNative())
+                return false;
+
+        return true;
+    }
+
+    /**
      * Generates a unique key to identify peptide isomers.
      *
      * @return the isomer key for this peptide.
@@ -214,6 +229,29 @@ public interface Peptide extends Iterable<Residue> {
      */
     public static ObjectFactory<Peptide> nativeFactory(int length) {
         return ArrayPeptide.nativeFactory(length);
+    }
+
+    /**
+     * Extract all native N-mers from this peptide.
+     *
+     * @param N the length of peptide fragments to extract.
+     *
+     * @return a list containing all native N-mers from this peptide.
+     */
+    public default List<Peptide> nativeNMers(int N) {
+        if (length() < N)
+            return Collections.emptyList();
+
+        List<Peptide> nmers = new ArrayList<Peptide>(length() - N + 1);
+
+        for (int start = 0; start <= length() - N; ++start) {
+            Peptide nmer = fragment(new IntRange(start, start + N - 1));
+
+            if (nmer.isNative())
+                nmers.add(nmer);
+        }
+
+        return nmers;
     }
 
     /**
