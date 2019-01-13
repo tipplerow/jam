@@ -1,4 +1,3 @@
-
 package jam.junit;
 
 import java.util.Arrays;
@@ -79,6 +78,13 @@ public class RegexUtilTest extends NumericTestBase {
     @Test public void testSemiolon() {
         testSplit(RegexUtil.SEMICOLON, "abc:def", 1, "abc:def");
         testSplit(RegexUtil.SEMICOLON, "abc;def", 2, "abc", "def");
+    }
+
+    @Test public void testStripComment() {
+        assertEquals("abc def", RegexUtil.stripComment(RegexUtil.PYTHON_COMMENT, " abc def "));
+        assertEquals("abc", RegexUtil.stripComment(RegexUtil.PYTHON_COMMENT, " abc # def "));
+        assertEquals("", RegexUtil.stripComment(RegexUtil.PYTHON_COMMENT, " # abc def "));
+        assertEquals("", RegexUtil.stripComment(RegexUtil.PYTHON_COMMENT, "# abc def "));
     }
 
     public static void main(String[] args) {

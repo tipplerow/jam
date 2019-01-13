@@ -203,4 +203,8 @@ public final class RegexUtil {
 
         return trim(fields);
     }
+
+    public static String stripComment(Pattern pattern, String string) {
+        return split(pattern, string)[0];
+    }
 }
