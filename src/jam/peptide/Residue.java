@@ -44,7 +44,7 @@ public enum Residue {
      * Additional character symbols that may be used (e.g., in FASTA
      * files) to represent unknown amino acids.
      */
-    public static char[] UNKNOWN_ALIAS = new char[] { '*' };
+    public static char[] UNKNOWN_ALIAS = new char[] { '*', 'U' };
 
     /**
      * Side-chain polarity flag.
