@@ -29,7 +29,7 @@ public final class FastaFile {
     /**
      * Reads FASTA records from a file.
      *
-     * @param file the file to read.
+     * @param fileName the name of the file to read.
      *
      * @return a list of records read from the file.
      *
