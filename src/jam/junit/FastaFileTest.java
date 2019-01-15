@@ -3,7 +3,7 @@ package jam.junit;
 
 import java.util.List;
 
-import jam.fasta.FastaReader;
+import jam.fasta.FastaFile;
 import jam.fasta.FastaRecord;
 import jam.peptide.Peptide;
 import jam.peptide.Residue;
@@ -11,11 +11,11 @@ import jam.peptide.Residue;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class FastaReaderTest {
+public class FastaFileTest {
     private static final String ENSEMBL_FILE = "data/ensembl_test.fa";
 
     @Test public void testEnsembl() {
-        List<FastaRecord> records = FastaReader.read(ENSEMBL_FILE);
+        List<FastaRecord> records = FastaFile.read(ENSEMBL_FILE);
         assertEquals(4, records.size());
 
         assertEquals("ENSP00000487941.1", records.get(0).getKey());
@@ -37,6 +37,6 @@ public class FastaReaderTest {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.junit.FastaReaderTest");
+        org.junit.runner.JUnitCore.main("jam.junit.FastaFileTest");
     }
 }

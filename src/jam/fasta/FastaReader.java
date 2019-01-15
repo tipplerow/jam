@@ -11,10 +11,7 @@ import jam.lang.JamException;
 import jam.peptide.Peptide;
 import jam.util.RegexUtil;
 
-/**
- * Reads FASTA records from an input file.
- */
-public final class FastaReader {
+final class FastaReader {
     private final File file;
     private final LineReader reader;
     private final List<FastaRecord> records;
@@ -29,38 +26,11 @@ public final class FastaReader {
         this.records = new ArrayList<FastaRecord>();
     }
 
-    /**
-     * The comment marker.
-     */
-    public static final Pattern COMMENT_PATTERN = RegexUtil.PYTHON_COMMENT;
+    static final Pattern COMMENT_PATTERN = RegexUtil.SEMICOLON;
 
-    /**
-     * Reads FASTA records from an input file.
-     *
-     * @param file the file to read.
-     *
-     * @return the FASTA records contained in the file.
-     *
-     * @throws RuntimeException if the file cannot be opened for
-     * reading or if it contains improperly formatted peptides.
-     */
-    public static List<FastaRecord> read(File file) {
+    static List<FastaRecord> read(File file) {
         FastaReader reader = new FastaReader(file);
         return reader.read();
-    }
-
-    /**
-     * Reads FASTA records from an input file.
-     *
-     * @param fileName the name of the file to read.
-     *
-     * @return the FASTA records contained in the file.
-     *
-     * @throws RuntimeException if the file cannot be opened for
-     * reading or if it contains improperly formatted peptides.
-     */
-    public static List<FastaRecord> read(String fileName) {
-        return read(new File(fileName));
     }
 
     private List<FastaRecord> read() {
