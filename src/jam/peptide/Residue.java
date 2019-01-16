@@ -182,7 +182,7 @@ public enum Residue {
     /**
      * Identifies valid single-character amino acid codes.
      *
-     * @param code1 a single-digit code.
+     * @param code1 a single-character code.
      *
      * @return {@code true} iff the specified code identifies an amino
      * acid.
@@ -192,9 +192,21 @@ public enum Residue {
     }
 
     /**
+     * Identifies valid single-character amino acid codes.
+     *
+     * @param code1 a single-character code.
+     *
+     * @return {@code true} iff the specified code identifies an amino
+     * acid.
+     */
+    public static boolean isValidCode1(String code1) {
+        return code1.length() == 1 && map1.containsKey(code1.charAt(0));
+    }
+
+    /**
      * Retrieves an amino acid by its single-character code.
      *
-     * @param code1 a single-digit code.
+     * @param code1 a single-character code.
      *
      * @return the amino acid with the specified single-character
      * code, or {@code null} if the code is invalid.
@@ -206,9 +218,9 @@ public enum Residue {
     /**
      * Validates single-character amino acid codes.
      *
-     * @param code1 a single-digit code.
+     * @param code1 a single-character code.
      *
-     * @throws IllegalArgumentException if the code is invalid.
+     * @throws IllegalArgumentException unless the code is valid.
      */
     public static void validateCode1(char code1) {
         if (!isValidCode1(code1))
@@ -216,18 +228,48 @@ public enum Residue {
     }
 
     /**
+     * Validates single-character amino acid codes.
+     *
+     * @param code1 a single-character code.
+     *
+     * @throws IllegalArgumentException unless the string is a valid
+     * single-character code.
+     */
+    public static void validateCode1(String code1) {
+        if (!isValidCode1(code1))
+            throw new IllegalArgumentException(String.format("Invalid amino acid code [%s].", code1));
+    }
+
+    /**
      * Retrieves an amino acid by its single-character code.
      *
-     * @param code1 a single-digit code.
+     * @param code1 a single-character code.
      *
      * @return the amino acid with the specified single-character
      * code.
      *
-     * @throws IllegalArgumentException if the code is invalid.
+     * @throws IllegalArgumentException unless the character code is
+     * valid.
      */
     public static Residue valueOfCode1(char code1) {
         validateCode1(code1);
         return lookupCode1(code1);
+    }
+
+    /**
+     * Retrieves an amino acid by its single-character code.
+     *
+     * @param code1 a single-character code.
+     *
+     * @return the amino acid with the specified single-character
+     * code.
+     *
+     * @throws IllegalArgumentException unless the string is a valid
+     * single-character code.
+     */
+    public static Residue valueOfCode1(String code1) {
+        validateCode1(code1);
+        return lookupCode1(code1.charAt(0));
     }
 
     /**

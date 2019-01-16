@@ -12,9 +12,13 @@ public class ResidueTest {
     @Test public void testCode1() {
         assertEquals(Residue.Val, Residue.valueOf("Val"));
         assertEquals(Residue.Val, Residue.valueOfCode1('V'));
+        assertEquals(Residue.Val, Residue.valueOfCode1("V"));
 
         assertTrue(Residue.isValidCode1('A'));
+        assertTrue(Residue.isValidCode1("A"));
         assertFalse(Residue.isValidCode1('?'));
+        assertFalse(Residue.isValidCode1(""));
+        assertFalse(Residue.isValidCode1("AV"));
     }
 
     @Test(expected = IllegalArgumentException.class)
