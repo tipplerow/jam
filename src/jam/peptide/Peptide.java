@@ -238,20 +238,20 @@ public interface Peptide extends Iterable<Residue> {
      *
      * @return a list containing all native N-mers from this peptide.
      */
-    public default List<Peptide> nativeNMers(int N) {
+    public default List<Peptide> nativeFragments(int N) {
         if (length() < N)
             return Collections.emptyList();
 
-        List<Peptide> nmers = new ArrayList<Peptide>(length() - N + 1);
+        List<Peptide> fragments = new ArrayList<Peptide>(length() - N + 1);
 
         for (int start = 0; start <= length() - N; ++start) {
-            Peptide nmer = fragment(new IntRange(start, start + N - 1));
+            Peptide fragment = fragment(new IntRange(start, start + N - 1));
 
-            if (nmer.isNative())
-                nmers.add(nmer);
+            if (fragment.isNative())
+                fragments.add(fragment);
         }
 
-        return nmers;
+        return fragments;
     }
 
     /**

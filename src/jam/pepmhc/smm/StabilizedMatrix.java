@@ -26,8 +26,7 @@ public final class StabilizedMatrix {
     }
 
     /**
-     * Returns the stabilized matrix for a given allele code and
-     * peptide length.
+     * Returns the stabilized matrix for a given predictor key.
      *
      * @param key the key of the desired predictor.
      *
