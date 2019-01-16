@@ -6,7 +6,6 @@ import java.util.List;
 import jam.fasta.FastaFile;
 import jam.fasta.FastaRecord;
 import jam.peptide.Peptide;
-import jam.peptide.Residue;
 
 import org.junit.*;
 import static org.junit.Assert.*;

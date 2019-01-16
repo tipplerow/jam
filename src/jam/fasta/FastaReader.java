@@ -1,121 +1,190 @@
 
 package jam.fasta;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
-import jam.io.LineReader;
+import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
 import jam.util.RegexUtil;
 
-final class FastaReader {
+/**
+ * Reads FASTA records sequentially from a FASTA-formatted file.
+ */
+public final class FastaReader implements Iterable<FastaRecord>, Iterator<FastaRecord> {
     private final File file;
-    private final LineReader reader;
-    private final List<FastaRecord> records;
+    private final BufferedReader reader;
 
-    private String headerKey;
-    private String headerComment;
-    private List<String> peptideLines;
+    // The next header line to be processed (null when there are no
+    // records remaining)...
+    private String nextHeaderLine;
 
     private FastaReader(File file) {
         this.file = file;
-        this.reader = LineReader.open(file);
-        this.records = new ArrayList<FastaRecord>();
+        this.reader = IOUtil.openReader(file);
+
+        // Advance the next header pointer to the first non-comment
+        // line in the file...
+        this.nextHeaderLine = nextDataLine();
     }
 
-    static final Pattern COMMENT_PATTERN = RegexUtil.SEMICOLON;
-
-    static List<FastaRecord> read(File file) {
-        FastaReader reader = new FastaReader(file);
-        return reader.read();
+    private String nextDataLine() {
+        return IOUtil.nextDataLine(reader, COMMENT_PATTERN);
     }
 
-    private List<FastaRecord> read() {
-        reset();
+    /**
+     * The comment character for FASTA files.
+     */
+    public static final Pattern COMMENT_PATTERN = RegexUtil.SEMICOLON;
 
-        try {
-            for (String line : reader)
-                processLine(line);
-        }
-        finally {
-            reader.close();
-        }
-
-        addRecord();
-        return records;
+    /**
+     * Opens a FASTA file for reading.
+     *
+     * @param file the path to the FASTA file.
+     *
+     * @return the opened reader.
+     *
+     * @throws RuntimeException if the file cannot be opened for
+     * reading.
+     */
+    public static FastaReader open(File file) {
+        return new FastaReader(file);
     }
 
-    private void reset() {
-        headerKey = null;
-        headerComment = null;
-        peptideLines = null;
+    /**
+     * Opens a FASTA file for reading.
+     *
+     * @param fileName the name of the FASTA file.
+     *
+     * @return the opened reader.
+     *
+     * @throws RuntimeException if the file cannot be opened for
+     * reading.
+     */
+    public static FastaReader open(String fileName) {
+        return open(new File(fileName));
     }
 
-    private void addRecord() {
-        if (headerKey == null)
-            throw JamException.runtime("Missing header key.");
+    /**
+     * Reads all FASTA records from a given file.
+     *
+     * @param file the path to the FASTA file.
+     *
+     * @return all FASTA records contained in the given file.
+     *
+     * @throws RuntimeException if the file cannot be opened for
+     * reading or if the file contains 
+     */
+    public static List<FastaRecord> read(File file) {
+        FastaReader myReader = open(file);
+        List<FastaRecord> myRecords = new ArrayList<FastaRecord>();
 
-        if (headerComment == null)
-            throw JamException.runtime("Missing header comment.");
+        for (FastaRecord myRecord : myReader)
+            myRecords.add(myRecord);
 
-        if (peptideLines == null || peptideLines.isEmpty())
-            throw JamException.runtime("Missing peptide data.");
-
-        records.add(new FastaRecord(headerKey, headerComment, Peptide.parse(String.join("", peptideLines))));
-        reset();
+        return myRecords;
     }
 
-    private void processLine(String line) {
-        line = RegexUtil.stripComment(COMMENT_PATTERN, line);
+    /**
+     * Reads all FASTA records from a given file.
+     *
+     * @param fileName the name of the FASTA file.
+     *
+     * @return all FASTA records contained in the given file.
+     *
+     * @throws RuntimeException if the file cannot be opened for
+     * reading or if the file contains 
+     */
+    public static List<FastaRecord> read(String fileName) {
+        return read(new File(fileName));
+    }
 
-        if (line.isEmpty())
-            return;
-        else if (isHeaderLine(line))
-            processHeader(line);
+    /**
+     * Closes this reader.
+     */
+    public void close() {
+        IOUtil.close(reader);
+    }
+
+    /**
+     * Identifies the end of the FASTA file.
+     *
+     * @return {@code true} iff the FASTA file contains another FASTA
+     * record.
+     */
+    @Override public boolean hasNext() {
+        return nextHeaderLine != null;
+    }
+
+    /**
+     * Reads the next complete FASTA record from the file.
+     *
+     * @return the next complete FASTA record from the file.
+     *
+     * @throws RuntimeException unless the file contains at least one
+     * more properly formatted FASTA record.
+     */
+    @Override public FastaRecord next() {
+        if (nextHeaderLine != null)
+            return createRecord(nextHeaderLine, readPeptideLines());
         else
-            processPeptide(line);
+            throw new NoSuchElementException();
+    }
+
+    private List<String> readPeptideLines() {
+        List<String> peptideLines = new ArrayList<String>();
+
+        while (true) {
+            String line = nextDataLine();
+
+            if (line == null) {
+                nextHeaderLine = null;
+                break;
+            }
+            else if (isHeaderLine(line)) {
+                nextHeaderLine = line;
+                break;
+            }
+            else {
+                peptideLines.add(line);
+            }
+        }
+
+        return peptideLines;
     }
 
     private static boolean isHeaderLine(String line) {
         return line.startsWith(FastaRecord.HEADER_MARKER);
     }
 
-    private void processHeader(String line) {
-        //
-        // If a previous header is already in place, we have reached a
-        // record boundary and the previous record should be added to
-        // the output list...
-        //
-        if (headerKey != null)
-            addRecord();
+    private static FastaRecord createRecord(String headerLine, List<String> peptideLines) {
+        if (!isHeaderLine(headerLine))
+            throw JamException.runtime("Expected a record header line but found [%s].", headerLine);
+
+        if (peptideLines.isEmpty())
+            throw JamException.runtime("No peptides for record [%s].", headerLine);
 
         // Remove the header marker...
-        line = line.substring(FastaRecord.HEADER_MARKER.length());
+        headerLine = headerLine.substring(FastaRecord.HEADER_MARKER.length());
 
         // Split into key and comment, delimited by white space...
-        String[] fields = FastaRecord.KEY_COMMENT_DELIM.split(line, 2);
+        String[] fields = FastaRecord.KEY_COMMENT_DELIM.split(headerLine, 2);
 
-        headerKey = fields[0];
+        String  key     = fields[0];
+        String  descrip = (fields.length == 2) ? fields[1] : "";
+        Peptide peptide = Peptide.parse(String.join("", peptideLines));
 
-        if (fields.length == 2)
-            headerComment = fields[1];
-        else
-            headerComment = "";
+        return new FastaRecord(key, descrip, peptide);
     }
 
-    private void processPeptide(String line) {
-        //
-        // The header must be populated or the file is not properly formatted...
-        //
-        if (headerKey == null)
-            throw JamException.runtime("New peptide data with no header line.");
-
-        if (peptideLines == null)
-            peptideLines = new ArrayList<String>();
-
-        peptideLines.add(line);
+    @Override public Iterator<FastaRecord> iterator() {
+        return this;
     }
 }
