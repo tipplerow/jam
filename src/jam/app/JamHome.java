@@ -7,6 +7,8 @@ import java.io.File;
  * Locates the top-level directory of the {@code JAM} library.
  */
 public final class JamHome {
+    private JamHome() {}
+
     /**
      * The name of the top-level directory of the {@code JAM} library.
      */
