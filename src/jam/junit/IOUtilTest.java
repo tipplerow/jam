@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import jam.io.IOUtil;
+import jam.util.RegexUtil;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -35,6 +36,15 @@ public class IOUtilTest {
         assertNull(reader.readLine());
 
         reader.close();
+    }
+
+    @Test public void testNextDataLine() {
+        BufferedReader reader = IOUtil.openReader("data/test/comments123.txt");
+
+        assertEquals("line 1", IOUtil.nextDataLine(reader, RegexUtil.PYTHON_COMMENT));
+        assertEquals("line 2", IOUtil.nextDataLine(reader, RegexUtil.PYTHON_COMMENT));
+        assertEquals("line 3", IOUtil.nextDataLine(reader, RegexUtil.PYTHON_COMMENT));
+        assertNull(IOUtil.nextDataLine(reader, RegexUtil.PYTHON_COMMENT));
     }
 
     @Test public void testOpenReader() throws IOException {

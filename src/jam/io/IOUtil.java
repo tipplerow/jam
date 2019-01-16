@@ -16,8 +16,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import java.util.regex.Pattern;
+
 import jam.app.JamLogger;
 import jam.lang.JamException;
+import jam.util.RegexUtil;
 
 /**
  * Provides utility methods for file I/O operations.
@@ -56,6 +59,42 @@ public final class IOUtil {
         catch (Exception ex) {
             JamLogger.warn(ex.getMessage());
         }
+    }
+
+    /**
+     * Reads the next data line (not empty after comment text and
+     * leading and trailing white space has been removed) from a file.
+     *
+     * @param reader an open file reader.
+     *
+     * @param comment the delimeter marking the beginning of comment
+     * text: all text from the delimiter to the end of the line is
+     * considered as comment text and removed.
+     *
+     * @return the next data line from the input file; {@code null} if
+     * the reader reaches the end of the file.
+     */
+    public static String nextDataLine(BufferedReader reader, Pattern comment) {
+        String line = null;
+
+        try {
+            while (true) {
+                line = reader.readLine();
+
+                if (line == null)
+                    break;
+
+                line = RegexUtil.stripComment(comment, line);
+
+                if (!line.isEmpty())
+                    break;
+            }
+        }
+        catch (IOException ioex) {
+            throw JamException.runtime(ioex);
+        }
+
+        return line;
     }
 
     /**
