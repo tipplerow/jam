@@ -15,11 +15,11 @@ public class DataReaderTest {
     private static final Pattern comment = Pattern.compile("#");
 
     @Test public void testContinuation() {
-        assertLines("data/continuation.txt", Arrays.asList("line 1", "line 2", "line 3", "abc def ghi"));
+        assertLines("data/test/continuation.txt", Arrays.asList("line 1", "line 2", "line 3", "abc def ghi"));
     }
 
     @Test public void testIterator() {
-        assertLines("data/comments123.txt", Arrays.asList("line 1", "line 2", "line 3"));
+        assertLines("data/test/comments123.txt", Arrays.asList("line 1", "line 2", "line 3"));
     }
 
     private void assertLines(String fileName, List<String> expected) {
@@ -34,7 +34,7 @@ public class DataReaderTest {
     }
 
     @Test public void testNext() {
-        DataReader reader = DataReader.open("data/comments123.txt", comment);
+        DataReader reader = DataReader.open("data/test/comments123.txt", comment);
 
         assertEquals("line 1", reader.next());
         assertEquals("line 2", reader.next());

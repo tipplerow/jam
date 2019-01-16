@@ -13,7 +13,7 @@ public class LineReaderTest {
 
     @Test public void testIterator() {
         ArrayList<String> lines = new ArrayList<String>();
-        LineReader reader = LineReader.open("data/lines123.txt");
+        LineReader reader = LineReader.open("data/test/lines123.txt");
 
         for (String line : reader)
             lines.add(line);
@@ -23,7 +23,7 @@ public class LineReaderTest {
     }
 
     @Test public void testNext() {
-        LineReader reader = LineReader.open("data/lines123.txt");
+        LineReader reader = LineReader.open("data/test/lines123.txt");
 
         assertEquals("line 1", reader.next());
         assertEquals("line 2", reader.next());

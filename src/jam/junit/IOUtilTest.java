@@ -38,7 +38,7 @@ public class IOUtilTest {
     }
 
     @Test public void testOpenReader() throws IOException {
-        BufferedReader reader = IOUtil.openReader("data/lines123.txt");
+        BufferedReader reader = IOUtil.openReader("data/test/lines123.txt");
 
         assertEquals("line 1", reader.readLine());
         assertEquals("line 2", reader.readLine());
@@ -73,7 +73,7 @@ public class IOUtilTest {
     }
 
     @Test public void testReadLines() {
-        assertEquals(Arrays.asList("line 1", "line 2", "line 3"), IOUtil.readLines("data/lines123.txt"));
+        assertEquals(Arrays.asList("line 1", "line 2", "line 3"), IOUtil.readLines("data/test/lines123.txt"));
     }
 
     @Test public void testWriteFile() {

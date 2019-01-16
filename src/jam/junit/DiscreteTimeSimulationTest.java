@@ -15,7 +15,7 @@ public class DiscreteTimeSimulationTest {
         private int stepCounter;
 
         private Simulator() {
-            super(new String[] { "data/app.prop" });
+            super(new String[] { "data/test/app.prop" });
         }
 
         @Override protected int getTrialIndexOffset() {

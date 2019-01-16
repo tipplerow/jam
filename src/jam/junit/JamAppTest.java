@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class JamAppTest {
     private static final class TestApp extends JamApp {
         private TestApp() {
-            super(new String[] { "data/app.prop" });
+            super(new String[] { "data/test/app.prop" });
         }
     }
 

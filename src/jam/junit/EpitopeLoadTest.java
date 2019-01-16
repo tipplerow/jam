@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 
 public class EpitopeLoadTest {
     static {
-        System.setProperty(Epitope.CONFIG_FILE_PROPERTY, "data/epitope_sample.conf");
+        System.setProperty(Epitope.CONFIG_FILE_PROPERTY, "data/test/epitope_sample.conf");
         Epitope.load();
     }
 
@@ -25,7 +25,7 @@ public class EpitopeLoadTest {
 
     @Test(expected = RuntimeException.class)
     public void testBadLoad() {
-        Epitope.load("data/bad_epitope.conf");
+        Epitope.load("data/test/bad_epitope.conf");
     }
 
     @Test public void testConserved() {

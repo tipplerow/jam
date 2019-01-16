@@ -12,7 +12,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class FastaFileTest {
-    private static final String ENSEMBL_FILE = "data/ensembl_test.fa";
+    private static final String ENSEMBL_FILE = "data/test/ensembl_test.fa";
 
     @Test public void testEnsembl() {
         List<FastaRecord> records = FastaFile.read(ENSEMBL_FILE);

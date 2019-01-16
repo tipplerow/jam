@@ -27,7 +27,7 @@ public class FileParserTest {
     }
 
     @Test public void testProcessFile() {
-        FileParser parser = new ParserImpl("data/comments123.txt");
+        FileParser parser = new ParserImpl("data/test/comments123.txt");
 
         parser.processFile();
         assertEquals(Arrays.asList("line 1", "line 2", "line 3"), lines);
@@ -35,7 +35,7 @@ public class FileParserTest {
 
     @Test(expected = IllegalStateException.class)
     public void testProcessFileTwice() {
-        FileParser parser = new ParserImpl("data/comments123.txt");
+        FileParser parser = new ParserImpl("data/test/comments123.txt");
 
         parser.processFile();
         assertEquals(Arrays.asList("line 1", "line 2", "line 3"), lines);
