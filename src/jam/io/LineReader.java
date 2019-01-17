@@ -2,6 +2,7 @@
 package jam.io;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,7 +18,7 @@ import jam.lang.JamException;
 /**
  * Provides for {@code Iterable} file reading, line by line.
  */
-public final class LineReader implements Iterable<String> {
+public final class LineReader implements Closeable, Iterable<String> {
     private final LineIterator iterator;
 
     private LineReader(LineIterator iterator) {
@@ -68,7 +69,7 @@ public final class LineReader implements Iterable<String> {
     /**
      * Closes the underlying reader.
      */
-    public void close() {
+    @Override public void close() {
         iterator.close();
     }
 

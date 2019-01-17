@@ -12,7 +12,7 @@ import jam.fasta.FastaRecord;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
 
-public final class PresentationRateCalculator {
+public final class AllelePresentCalc {
     private final int peptideLength;
     private final String inputFile;
     private final String alleleCode;
@@ -24,7 +24,7 @@ public final class PresentationRateCalculator {
     private Set<Peptide> pepFragments;
     private int binderCount;
 
-    private PresentationRateCalculator(String inputFile, PredictionMethod predMethod, String alleleCode, int peptideLength) {
+    private AllelePresentCalc(String inputFile, PredictionMethod predMethod, String alleleCode, int peptideLength) {
         this.inputFile     = inputFile;
         this.predMethod    = predMethod;
         this.alleleCode    = alleleCode;
@@ -105,7 +105,7 @@ public final class PresentationRateCalculator {
     }
 
     private static void usage() {
-        System.err.println("Usage: java jam.pepmhc.PresentationRateCalculator "
+        System.err.println("Usage: java jam.pepmhc.AllelePresentCalc "
                            + "FASTA_FILE PREDICTION_METHOD ALLELE_CODE PEPTIDE_LENGTH");
         System.exit(1);
     }
@@ -123,8 +123,8 @@ public final class PresentationRateCalculator {
         alleleCode    = args[2];
         peptideLength = Integer.parseInt(args[3]);
 
-        PresentationRateCalculator calculator =
-            new PresentationRateCalculator(inputFile, predMethod, alleleCode, peptideLength);
+        AllelePresentCalc calculator =
+            new AllelePresentCalc(inputFile, predMethod, alleleCode, peptideLength);
 
         calculator.run();
     }

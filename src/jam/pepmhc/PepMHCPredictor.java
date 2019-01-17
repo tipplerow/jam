@@ -1,6 +1,10 @@
 
 package jam.pepmhc;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jam.peptide.Peptide;
 
 public interface PepMHCPredictor {
@@ -79,5 +83,55 @@ public interface PepMHCPredictor {
         int              length = Integer.parseInt(args[2]);
 
         return instance(method, allele, length);
+    }
+
+    /**
+     * Returns a list of predictors for a given method, peptide
+     * length, and collection of alleles.
+     *
+     * @param predictionMethod the underlying prediction method.
+     *
+     * @param alleleCodes the keys of the MHC alleles for the
+     * predictors.
+     *
+     * @param peptideLength the peptide length for the predictor.
+     *
+     * @return the predictor for the specified method, allele, and
+     * peptide length.
+     *
+     * @throws RuntimeException unless the specified arguments define
+     * valid predictors.
+     */
+    public static List<PepMHCPredictor> instances(PredictionMethod   predictionMethod,
+                                                  Collection<String> alleleCodes,
+                                                  int                peptideLength) {
+        List<PepMHCPredictor> predictors =
+            new ArrayList<PepMHCPredictor>(alleleCodes.size());
+
+        for (String alleleCode : alleleCodes)
+            predictors.add(instance(predictionMethod, alleleCode, peptideLength));
+
+        return predictors;
+    }
+
+    /**
+     * Computes the maximum binding affinity (the minimum nanomolar
+     * IC50 concentration) of a given peptide over a collection of
+     * predictors.
+     *
+     * @param predictors the affinity predictors.
+     *
+     * @param peptide the peptide to predict.
+     *
+     * @return the minimum IC50 of the specified peptide over the
+     * given predictors.
+     */
+    public static double minimumIC50(Collection<PepMHCPredictor> predictors, Peptide peptide) {
+        double result = Double.POSITIVE_INFINITY;
+
+        for (PepMHCPredictor predictor : predictors)
+            result = Math.min(result, predictor.predictIC50(peptide));
+
+        return result;
     }
 }
