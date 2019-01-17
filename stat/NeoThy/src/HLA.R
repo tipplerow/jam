@@ -102,8 +102,8 @@ HLA.histGenotype <- function(genoPct) {
              ylab = "Density")
 }
 
-HLA.sampleGenotype <- function(N = 100, homozygous = FALSE) {
-    master <- HLA.merge()
+HLA.sampleGenotype <- function(N = 100, homozygous = FALSE, dirName = "../data") {
+    master <- HLA.master(dirName)
 
     masterA <- master[grep("HLA-A", master$allele),]
     masterB <- master[grep("HLA-B", master$allele),]

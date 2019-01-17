@@ -25,6 +25,43 @@ Chowell.load2 <- function(dirName = "../data") {
     cohort2
 }
 
+Chowell.loadJoin <- function(dirName = "../data") {
+    chow1 <- Chowell.load1(dirName)
+    chow2 <- Chowell.load2(dirName)
+
+    chow1 <- Chowell.expandHLA(chow1)
+    chow2 <- Chowell.expandHLA(chow2)
+
+    chow1 <- HLA.mergeRepertoire(chow1, HLA.master())
+    chow2 <- HLA.mergeRepertoire(chow2, HLA.master())
+
+    chow1 <- subset(chow1, hla.a1.repertoire > 0 &
+                           hla.a2.repertoire > 0 &
+                           hla.b1.repertoire > 0 &
+                           hla.b2.repertoire > 0)
+
+    chow2 <- subset(chow2, hla.a1.repertoire > 0 &
+                           hla.a2.repertoire > 0 &
+                           hla.b1.repertoire > 0 &
+                           hla.b2.repertoire > 0)
+
+    chow1$zOS  <- Chowell.zscore(log(chow1$OS_Months))
+    chow1$zHLA <- Chowell.zscore(log(chow1$repertoireSize))
+    chow1$zTMB <- Chowell.zscore(log(chow1$MutCnt))
+
+    chow2$zOS  <- Chowell.zscore(log(1 + chow2$OS_Months))
+    chow2$zHLA <- Chowell.zscore(log(chow2$repertoireSize))
+    chow2$zTMB <- Chowell.zscore(log(1 + chow2$IMPACT_MutCnt))
+
+    colnames <- c("OS_Months", "zOS", "OS_Event", "zHLA", "zTMB")
+
+    chow1  <- chow1[,colnames]
+    chow2  <- chow2[,colnames]
+    joined <- rbind(chow1, chow2)
+
+    list(chow1 = chow1, chow2 = chow2, joined = joined)
+}
+
 Chowell.expandHLA <- function(master) {
     master$hla.list <- strsplit(master$HLA_Class_I_Alleles, ",")
 
@@ -171,150 +208,22 @@ Chowell.plotQQ <- function() {
     zQQ(master$zHLA, "HLA Presentation Rate (HLA)", "Theoretical Quantiles", "")
 }
 
-Miao.vioplotBenefit <- function(master, colName, logy = FALSE, ...) {
-    require(vioplot)
+Chowell.writeGenotype <- function(dframe, fileName) {
+    keys <- dframe$Sample
+    alleles <- strsplit(dframe$HLA_Class_I_Alleles, ",")
 
-    kCR <- which(master$RECIST == "CR")
-    kPR <- which(master$RECIST == "PR")
-    kSD <- which(master$RECIST == "SD")
-    kPD <- which(master$RECIST == "PD")
+    alleles <-
+        lapply(alleles,
+               function(x) sprintf("HLA-A*%s:%s HLA-A*%s:%s HLA-B*%s:%s HLA-B*%s:%s HLA-C*%s:%s HLA-C*%s:%s",
+                                   substr(x[1], 2, 3), substr(x[1], 4, 5),
+                                   substr(x[2], 2, 3), substr(x[2], 4, 5),
+                                   substr(x[3], 2, 3), substr(x[3], 4, 5),
+                                   substr(x[4], 2, 3), substr(x[4], 4, 5),
+                                   substr(x[5], 2, 3), substr(x[5], 4, 5),
+                                   substr(x[6], 2, 3), substr(x[6], 4, 5)))
 
-    yCR <- master[kCR, colName]
-    yPR <- master[kPR, colName]
-    ySD <- master[kSD, colName]
-    yPD <- master[kPD, colName]
+    keys <- c("Sample", keys)
+    alleles <- c("Alleles", as.character(alleles))
 
-    if (logy) {
-        yCR <- log10(yCR)
-        yPR <- log10(yPR)
-        ySD <- log10(ySD)
-        yPD <- log10(yPD)
-    }
-
-    par(las = 1)
-    par(fig = c(0, 1, 0.1, 0.9))
-
-    vioplot(c(yCR, yPR), yPD,
-            col   = "cadetblue3",
-            names = c("CR/PR", "PD"),
-            ...)
-
-    wilcox.test(c(yCR, yPR), yPD)
-}
-
-Miao.vioplot1 <- function(master, colName, ylim) {
-    require(vioplot)
-
-    kCR <- which(master$RECIST == "CR")
-    kPR <- which(master$RECIST == "PR")
-    kSD <- which(master$RECIST == "SD")
-    kPD <- which(master$RECIST == "PD")
-
-    xCR <- master[kCR, colName]
-    xPR <- master[kPR, colName]
-    xSD <- master[kSD, colName]
-    xPD <- master[kPD, colName]
-
-    par(las = 1)
-    par(fig = c(0, 1, 0.1, 0.9))
-
-    vioplot(xCR, xPR, xSD, xPD, ylim = ylim,
-            names = c("CR", "PR", "SD", "PD"), col = "cadetblue3")
-}
-
-Miao.aggregateByAllele <- function(neoAg) {
-    aggFunc <- function(slice) {
-        data.frame(HLA   = slice$HLA[1],
-                   total = nrow(slice),
-                   nm50  = mean(slice$affinity_mut <  50),
-                   nm100 = mean(slice$affinity_mut < 100),
-                   nm250 = mean(slice$affinity_mut < 250),
-                   nm500 = mean(slice$affinity_mut < 500))
-    }
-    
-    result <- do.call(rbind, by(neoAg, neoAg$HLA, aggFunc))
-    result
-}
-
-Miao.aggregateByCancerType <- function(master) {
-    aggFunc <- function(slice) {
-        slice$zOS  <- Miao.zscore(log(slice$os_days))
-        slice$zPFS <- Miao.zscore(log(slice$pfs_days))
-
-        slice$zMissense  <- Miao.zscore(log(slice$missenseCount))
-        slice$zNonSilent <- Miao.zscore(log(slice$nonSilentCount))
-
-        slice$zTotalNeo <- Miao.zscore(log(slice$totalNeo))
-        slice$zCount50  <- Miao.zscore(log(slice$count50))
-        slice$zCount100 <- Miao.zscore(log(slice$count100))
-        slice$zCount250 <- Miao.zscore(log(slice$count250))
-        slice$zCount500 <- Miao.zscore(log(slice$count500))
-
-        slice$zFrac50  <- Miao.zscore(log(slice$count50  / slice$nonSilentCount))
-        slice$zFrac100 <- Miao.zscore(log(slice$count100 / slice$nonSilentCount))
-        slice$zFrac250 <- Miao.zscore(log(slice$count250 / slice$nonSilentCount))
-        slice$zFrac500 <- Miao.zscore(log(slice$count500 / slice$nonSilentCount))
-
-        slice
-    }
-    
-    result <- do.call(rbind, by(master, master$cancer_type, aggFunc))
-    rownames(result) <- NULL
-
-    result
-}
-
-Miao.aggregateMutByTumor <- function(mutDetail) {
-    aggFunc <- function(slice) {
-        data.frame(pair_id        = slice$pair_id[1],
-                   missenseCount  = sum(slice$Variant_Classification == "Missense_Mutation"),
-                   nonSilentCount = sum(slice$Variant_Classification %in%
-                                        c("Nonstop_Mutation",
-                                          "In_Frame_Ins",
-                                          "In_Frame_Del",
-                                          "Frame_Shift_Ins",
-                                          "Frame_Shift_Del",
-                                          "Missense_Mutation")))
-    }
-    
-    result <- do.call(rbind, by(mutDetail, mutDetail$pair_id, aggFunc))
-    rownames(result) <- NULL
-
-    result
-}
-
-Miao.aggregateNeoByTumor <- function(neoAg) {
-    aggFunc <- function(slice) {
-        ##
-        ## Multiple alleles may present the same peptide, so order
-        ## with strongest binders first and then eliminate
-        ## duplicates...
-        ##
-        slice <- slice[order(slice$affinity_mut),]
-        slice <- slice[!duplicated(slice$pep_mut),]
-
-        data.frame(Tumor_Sample_Barcode = slice$Tumor_Sample_Barcode[1],
-                   totalNeo = nrow(slice),
-                   count50  = sum(slice$affinity_mut <  50),
-                   count100 = sum(slice$affinity_mut < 100),
-                   count250 = sum(slice$affinity_mut < 250),
-                   count500 = sum(slice$affinity_mut < 500))
-    }
-    
-    result <- do.call(rbind, by(neoAg, neoAg$Tumor_Sample_Barcode, aggFunc))
-    rownames(result) <- NULL
-
-    result
-}
-
-Miao.decile <- function(x) {
-    ceiling(10 * rank(x, na.last = "keep") / sum(!is.na(x)))
-}
-
-Miao.quintile <- function(x) {
-    ceiling(5 * rank(x, na.last = "keep") / sum(!is.na(x)))
-}
-
-Miao.zscore <- function(x) {
-    (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+    writeLines(sprintf("%s,%s", keys, alleles), fileName)
 }
