@@ -8,7 +8,6 @@ import jam.app.JamHome;
 import jam.io.FileUtil;
 import jam.lang.JamException;
 import jam.pepmhc.PredictionMethod;
-import jam.pepmhc.PredictorKey;
 import jam.peptide.Peptide;
 import jam.peptide.Residue;
 
@@ -26,14 +25,20 @@ public final class StabilizedMatrix {
     }
 
     /**
-     * Returns the stabilized matrix for a given predictor key.
+     * Returns the stabilized matrix for a given method, allele, and
+     * peptide length.
      *
-     * @param key the key of the desired predictor.
+     * @param method the desired prediction method.
      *
-     * @return the stabilized matrix for the specified key.
+     * @param allele the desired MHC allele.
+     *
+     * @param length the desired peptide length.
+     *
+     * @return the stabilized matrix for the specified method and
+     * allele.
      */
-    public static StabilizedMatrix instance(PredictorKey key) {
-        return load(resolveFileName(key));
+    public static StabilizedMatrix instance(PredictionMethod method, String allele, int length) {
+        return load(resolveFileName(method, allele, length));
     }
 
     /**
@@ -48,20 +53,8 @@ public final class StabilizedMatrix {
         return MatrixReader.load(fileName);
     }
 
-    /**
-     * Returns the data file for a specified predictor.
-     *
-     * @param key the key of the desired predictor.
-     *
-     * @return the name of the data file containing parameters for the
-     * given predictor.
-     */
-    public static String resolveFileName(PredictorKey key) {
-        return FileUtil.join(dirName(key), baseName(key));
-    }
-
-    private static String dirName(PredictorKey key) {
-        return dirName(key.getPredictionMethod());
+    private static String resolveFileName(PredictionMethod method, String allele, int length) {
+        return FileUtil.join(dirName(method), baseName(allele, length));
     }
 
     private static String dirName(PredictionMethod method) {
@@ -77,12 +70,8 @@ public final class StabilizedMatrix {
         }
     }
 
-    private static String baseName(PredictorKey key) {
-        return baseName(key.getAlleleCode(), key.getPeptideLength());
-    }
-
-    private static String baseName(String alleleCode, int peptideLength) {
-        return String.format("%s-%d.txt", alleleCode.replace('*', '-'), peptideLength);
+    private static String baseName(String allele, int length) {
+        return String.format("%s-%d.txt", allele.replace('*', '-'), length);
     }
 
     /**

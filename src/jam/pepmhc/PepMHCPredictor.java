@@ -3,115 +3,80 @@ package jam.pepmhc;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import jam.lang.JamException;
 import jam.peptide.Peptide;
+import jam.pepmhc.net.NetMHCPan;
+import jam.pepmhc.smm.SMMPredictor;
+import jam.pepmhc.smm.SMMPmbecPredictor;
 
 public interface PepMHCPredictor {
     /**
-     * Returns the key for this predictor.
+     * Returns a predictor for a given prediction method.
      *
-     * @return the key for this predictor.
+     * @param method the prediction method.
+     *
+     * @return the predictor with the specified prediction method.
      */
-    public abstract PredictorKey getKey();
+    public static PepMHCPredictor instance(PredictionMethod method) {
+        switch (method) {
+        case NETMHCPAN:
+            return NetMHCPan.INSTANCE;
+
+        case SMM:
+            return SMMPredictor.INSTANCE;
+
+        case SMM_PMBEC:
+            return SMMPmbecPredictor.INSTANCE;
+
+        default:
+            throw JamException.runtime("Unknown prediction method: [%s].", method);
+        }
+    }
+
+    /**
+     * Returns the prediction method for this predictor.
+     *
+     * @return the prediction method for this predictor.
+     */
+    public abstract PredictionMethod getMethod();
 
     /**
      * Predicts the binding affinity (as the nanomolar IC50
-     * concentration) of a given peptide to the allele.
+     * concentration) of a given peptide to an allele.
      *
-     * @param peptide the peptide to predict.
+     * @param allele the code of the MHC allele presenting the
+     * peptide.
      *
-     * @return the binding affinity of the specified peptide.
+     * @param peptide the peptide being presented.
+     *
+     * @return the binding affinity of the specified peptide to
+     * the specified allele.
      */
-    public abstract double predictIC50(Peptide peptide);
+    public abstract double predictIC50(String allele, Peptide peptide);
 
     /**
-     * Returns a predictor for a given key.
+     * Predicts the binding affinities (as nanomolar IC50
+     * concentrations) for a collection of peptides binding
+     * to a single MHC allele.
      *
-     * @param key the predictor key.
+     * @param allele the code of the MHC allele presenting the
+     * peptides.
      *
-     * @return the predictor with the specified key.
+     * @param peptides the peptides being presented.
      *
-     * @throws RuntimeException unless the specified key defines a
-     * valid predictor.
+     * @return a mapping from each peptide to its binding affinity.
      */
-    public static PepMHCPredictor instance(PredictorKey key) {
-        return PredictorCache.INSTANCE.get(key);
-    }
+    public default Map<Peptide, Double> predictIC50(String allele, Collection<Peptide> peptides) {
+        Map<Peptide, Double> ic50 = new LinkedHashMap<Peptide, Double>(peptides.size());
 
-    /**
-     * Returns a predictor for a given method, allele, and peptide
-     * length.
-     *
-     * @param predictionMethod the underlying prediction method.
-     *
-     * @param alleleCode the key of the MHC allele for the predictor.
-     *
-     * @param peptideLength the peptide length for the predictor.
-     *
-     * @return the predictor for the specified method, allele, and
-     * peptide length.
-     *
-     * @throws RuntimeException unless the specified arguments define
-     * a valid predictor.
-     */
-    public static PepMHCPredictor instance(PredictionMethod predictionMethod,
-                                           String           alleleCode,
-                                           int              peptideLength) {
-        return instance(new PredictorKey(predictionMethod, alleleCode, peptideLength));
-    }
+        for (Peptide peptide : peptides)
+            ic50.put(peptide, predictIC50(allele, peptide));
 
-    /**
-     * Returns a predictor for a given method, allele, and peptide
-     * length.
-     *
-     * @param args an array of command-line arguments that specify the
-     * prediction method, allele code, and peptide length.
-     *
-     * @return the predictor for the specified method, allele, and
-     * peptide length.
-     *
-     * @throws RuntimeException unless the specified arguments define
-     * a valid predictor.
-     */
-    public static PepMHCPredictor instance(String... args) {
-        if (args.length != 3)
-            throw new IllegalArgumentException("Exactly three arguments are required.");
-
-        PredictionMethod method = PredictionMethod.valueOf(args[0]);
-        String           allele = args[1].toUpperCase();
-        int              length = Integer.parseInt(args[2]);
-
-        return instance(method, allele, length);
-    }
-
-    /**
-     * Returns a list of predictors for a given method, peptide
-     * length, and collection of alleles.
-     *
-     * @param predictionMethod the underlying prediction method.
-     *
-     * @param alleleCodes the keys of the MHC alleles for the
-     * predictors.
-     *
-     * @param peptideLength the peptide length for the predictor.
-     *
-     * @return the predictor for the specified method, allele, and
-     * peptide length.
-     *
-     * @throws RuntimeException unless the specified arguments define
-     * valid predictors.
-     */
-    public static List<PepMHCPredictor> instances(PredictionMethod   predictionMethod,
-                                                  Collection<String> alleleCodes,
-                                                  int                peptideLength) {
-        List<PepMHCPredictor> predictors =
-            new ArrayList<PepMHCPredictor>(alleleCodes.size());
-
-        for (String alleleCode : alleleCodes)
-            predictors.add(instance(predictionMethod, alleleCode, peptideLength));
-
-        return predictors;
+        return ic50;
     }
 
     /**
@@ -126,6 +91,7 @@ public interface PepMHCPredictor {
      * @return the minimum IC50 of the specified peptide over the
      * given predictors.
      */
+    /*
     public static double minimumIC50(Collection<PepMHCPredictor> predictors, Peptide peptide) {
         double result = Double.POSITIVE_INFINITY;
 
@@ -134,4 +100,5 @@ public interface PepMHCPredictor {
 
         return result;
     }
+    */
 }

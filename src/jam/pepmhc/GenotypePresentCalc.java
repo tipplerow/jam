@@ -204,6 +204,7 @@ public final class GenotypePresentCalc extends JamApp {
     }
 
     private void processGenotype(String line) {
+        /*
         String patientKey = parsePatientKey(line);
         Set<String> alleleSet = parseAlleleSet(line);
         List<PepMHCPredictor> predictors;
@@ -225,6 +226,7 @@ public final class GenotypePresentCalc extends JamApp {
         double[] presentationRates = computePresentationRates(predictors);
 
         writeReportData(patientKey, presentationRates);
+        */
     }
 
     private String parsePatientKey(String line) {
@@ -246,11 +248,14 @@ public final class GenotypePresentCalc extends JamApp {
         int[] binderCounts = new int[affinityThreshold.length];
 
         for (Peptide fragment : peptideFragments) {
+            throw new UnsupportedOperationException();
+            /*
             double ic50 = PepMHCPredictor.minimumIC50(predictors, fragment);
 
             for (int k = 0; k < affinityThreshold.length; ++k)
                 if (ic50 <= affinityThreshold[k])
                     ++binderCounts[k];
+            */
         }
 
         double[] presentRates = new double[affinityThreshold.length];

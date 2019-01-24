@@ -1,35 +1,17 @@
 
 package jam.pepmhc.smm;
 
-import jam.pepmhc.PepMHCPredictor;
-import jam.pepmhc.PredictorKey;
-import jam.peptide.Peptide;
+import jam.pepmhc.PredictionMethod;
 
-public final class SMMPredictor implements PepMHCPredictor {
-    private final PredictorKey key;
-    private final StabilizedMatrix matrix;
-
-    private SMMPredictor(PredictorKey key, StabilizedMatrix matrix) {
-        this.key = key;
-        this.matrix = matrix;
-    }
+public final class SMMPredictor extends MatrixPredictor {
+    private SMMPredictor() {}
 
     /**
-     * Returns the SMM predictor for a given key.
-     *
-     * @param key the key of the desired predictor.
-     *
-     * @return the SMM predictor for the specified key.
+     * The single instance.
      */
-    public static SMMPredictor instance(PredictorKey key) {
-        return new SMMPredictor(key, StabilizedMatrix.instance(key));
-    }
+    public static final SMMPredictor INSTANCE = new SMMPredictor();
 
-    @Override public PredictorKey getKey() {
-        return key;
-    }
-
-    @Override public double predictIC50(Peptide peptide) {
-        return matrix.computeIC50(peptide);
+    @Override public PredictionMethod getMethod() {
+        return PredictionMethod.SMM;
     }
 }

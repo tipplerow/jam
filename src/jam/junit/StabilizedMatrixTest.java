@@ -1,7 +1,6 @@
 
 package jam.junit;
 
-import jam.pepmhc.PredictorKey;
 import jam.pepmhc.PredictionMethod;
 import jam.pepmhc.smm.StabilizedMatrix;
 import jam.peptide.Peptide;
@@ -11,11 +10,8 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class StabilizedMatrixTest extends NumericTestBase {
-    PredictorKey smmKey =
-        new PredictorKey(PredictionMethod.SMM, "HLA-A*01:01", 9);
-
     @Test public void testSMM() {
-        StabilizedMatrix mat = StabilizedMatrix.instance(smmKey);
+        StabilizedMatrix mat = StabilizedMatrix.instance(PredictionMethod.SMM, "HLA-A*01:01", 9);
 
         assertEquals(9, mat.getPeptideLength());
         assertEquals(5.07755, mat.getIntercept(), 0.00001);
