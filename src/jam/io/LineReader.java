@@ -40,17 +40,8 @@ public final class LineReader implements Closeable, Iterable<String> {
      * reading.
      */
     public static LineReader open(File file) {
-        LineReader reader = null;
-        JamLogger.info("Reading file [%s]...", file);
-
-        try {
-            reader = new LineReader(FileUtils.lineIterator(file));
-        }
-        catch (IOException ioex) {
-            throw JamException.runtime(ioex);
-        }
-
-        return reader;
+        JamLogger.info("Opening LineReader(%s)...", file);
+        return new LineReader(IOUtil.openReader(file));
     }
 
     /**
