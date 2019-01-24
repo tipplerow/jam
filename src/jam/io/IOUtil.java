@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Flushable;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -165,6 +167,22 @@ public final class IOUtil {
         catch (IOException ioex) {
             throw JamException.runtime(ioex);
         }
+    }
+
+    /**
+     * Opens a buffered reader for an input stream.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * @param stream an open input stream.
+     *
+     * @return a reader for the specified stream.
+     *
+     * @throws RuntimeException unless the file is open for reading.
+     */
+    public static BufferedReader openReader(InputStream stream) {
+        return new BufferedReader(new InputStreamReader(stream));
     }
 
     /**
