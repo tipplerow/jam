@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 
+import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
@@ -30,6 +31,8 @@ final class NetMHCPanRunner {
     }
 
     private Map<Peptide, Double> run() {
+        JamLogger.info("Predicting binding affinity for [%d] peptides to allele [%s]...", peptides.size(), allele);
+
         try {
             initPeptideFile();
             writePeptideFile();

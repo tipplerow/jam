@@ -3,9 +3,12 @@ package jam.pepmhc;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -14,41 +17,59 @@ import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.io.IOUtil;
 import jam.io.LineReader;
-import jam.fasta.FastaReader;
-import jam.fasta.FastaRecord;
 import jam.math.DoubleUtil;
-import jam.math.IntUtil;
+import jam.math.StatSummary;
 import jam.peptide.Peptide;
 import jam.report.LineBuilder;
+import jam.util.ListUtil;
 import jam.util.RegexUtil;
 
 public final class GenotypePresentCalc extends JamApp {
-    private final int peptideLength;
+    private final int threshold;
+    private final int trialCount;
+    private final int sampleSize;
 
+    private final String alleleReportFile;
+    private final String patientReportFile;
+
+    private final String peptideFileName;
     private final String genotypeFileName;
-    private final String peptidomeFileName;
-    private final String reportFileName;
 
-    private final PredictionMethod predictionMethod;
+    private final PepMHCPredictor predictor;
+    private final List<List<Peptide>> peptideSamples;
 
-    private final int[] affinityThreshold;
+    private final Set<String> alleleSet;
+    private final Map<String, StatSummary> alleleSummaries;
 
-    private final Set<Peptide> peptideFragments;
+    // binderCache.get(trialIndex).get(allele) contains all peptides
+    // from sample "trialIndex" that bind to "allele" with an affinity
+    // below the threshold...
+    private final List<Map<String, Set<Peptide>>> binderCache;
 
     private String patientKeyName;
     private LineReader genotypeReader;
-    private PrintWriter reportWriter;
+    private PrintWriter alleleReportWriter;
+    private PrintWriter patientReportWriter;
 
     private GenotypePresentCalc(String... propFiles) {
         super(propFiles);
 
-        this.genotypeFileName  = resolveGenotypeFileName();
-        this.peptidomeFileName = resolvePeptidomeFileName();
-        this.reportFileName    = resolveReportFileName();   
-        this.predictionMethod  = resolvePredictionMethod();
-        this.peptideLength     = resolvePeptideLength();
-        this.affinityThreshold = resolveAffinityThreshold();
-        this.peptideFragments  = new HashSet<Peptide>();
+        this.threshold = resolveThreshold();
+        this.trialCount = resolveTrialCount();
+        this.sampleSize = resolveSampleSize();
+
+        this.alleleReportFile = resolveAlleleReportFile();
+        this.patientReportFile = resolvePatientReportFile();
+
+        this.peptideFileName = resolvePeptideFileName();
+        this.genotypeFileName = resolveGenotypeFileName();
+
+        this.predictor = resolvePredictor();
+        this.peptideSamples = new ArrayList<List<Peptide>>();
+
+        this.alleleSet = new TreeSet<String>();
+        this.binderCache = new ArrayList<Map<String, Set<Peptide>>>();
+        this.alleleSummaries = new HashMap<String, StatSummary>();
     }
 
     /**
@@ -60,6 +81,12 @@ public final class GenotypePresentCalc extends JamApp {
      * Allele delimiter for the genotype input file.
      */
     public static final Pattern GENOTYPE_ALLELE_DELIM = RegexUtil.MULTI_WHITE_SPACE;
+
+    /**
+     * Name of the system property that specifies the affinity
+     * threshold for peptide-MHC binding.
+     */
+    public static final String AFFINITY_THRESHOLD_PROPERTY = "jam.pepmhc.affinityThreshold";
 
     /**
      * Name of the system property that specifies the full path name
@@ -74,16 +101,9 @@ public final class GenotypePresentCalc extends JamApp {
 
     /**
      * Name of the system property that specifies the full path name
-     * of a FASTA file containing the peptidome from which the peptide
-     * binding targets will be derived.
+     * to a flat file containing the peptides to examine.
      */
-    public static final String PEPTIDOME_FILE_PROPERTY = "jam.pepmhc.peptidomeFile";
-
-    /**
-     * Name of the system property that specifies the base name of the
-     * report file (written to the report directory.)
-     */
-    public static final String REPORT_FILE_PROPERTY = "jam.pepmhc.reportFile";
+    public static final String PEPTIDE_FILE_PROPERTY = "jam.pepmhc.peptideFile";
 
     /**
      * Name of the system property that specifies the peptide-MHC
@@ -92,86 +112,231 @@ public final class GenotypePresentCalc extends JamApp {
     public static final String PREDICTION_METHOD_PROPERTY = "jam.pepmhc.predictionMethod";
 
     /**
-     * Name of the system property that specifies the length of the
-     * peptides for the binding prediction.
+     * Name of the system property that specifies the base name of the
+     * allele report file (written to the report directory.)
      */
-    public static final String PEPTIDE_LENGTH_PROPERTY = "jam.pepmhc.peptideLength";
+    public static final String ALLELE_REPORT_FILE_PROPERTY = "jam.pepmhc.alleleReportFile";
 
     /**
-     * Name of the system property that specifies the affinity
-     * thresholds to report.  Multiple thresholds may be given,
-     * separated by commas.
+     * Name of the system property that specifies the base name of the
+     * patient report file (written to the report directory.)
      */
-    public static final String AFFINITY_THRESHOLD_PROPERTY = "jam.pepmhc.affinityThreshold";
+    public static final String PATIENT_REPORT_FILE_PROPERTY = "jam.pepmhc.patientReportFile";
+
+    /**
+     * Name of the system property that specifies the number of
+     * peptides to include in each binding trial.
+     */
+    public static final String SAMPLE_SIZE_PROPERTY = "jam.pepmhc.sampleSize";
+
+    /**
+     * Name of the system property that specifies the number of
+     * independent binding trials to conduct.
+     */
+    public static final String TRIAL_COUNT_PROPERTY = "jam.pepmhc.trialCount";
 
     private static String resolveGenotypeFileName() {
         return JamProperties.getRequired(GENOTYPE_FILE_PROPERTY);
     }
 
-    private static String resolvePeptidomeFileName() {
-        return JamProperties.getRequired(PEPTIDOME_FILE_PROPERTY);
+    private static String resolvePeptideFileName() {
+        return JamProperties.getRequired(PEPTIDE_FILE_PROPERTY);
     }
 
-    private static String resolveReportFileName() {   
-        return JamProperties.getRequired(REPORT_FILE_PROPERTY);
+    private static PepMHCPredictor resolvePredictor() {
+        return PepMHCPredictor.instance(JamProperties.getRequiredEnum(PREDICTION_METHOD_PROPERTY, PredictionMethod.class));
     }
 
-    private static PredictionMethod resolvePredictionMethod() {
-        return JamProperties.getRequiredEnum(PREDICTION_METHOD_PROPERTY, PredictionMethod.class);
+    private static String resolveAlleleReportFile() {   
+        return JamProperties.getRequired(ALLELE_REPORT_FILE_PROPERTY);
     }
 
-    private static int resolvePeptideLength() {
-        return JamProperties.getRequiredInt(PEPTIDE_LENGTH_PROPERTY);
+    private static String resolvePatientReportFile() {   
+        return JamProperties.getRequired(PATIENT_REPORT_FILE_PROPERTY);
     }
 
-    private static int[] resolveAffinityThreshold() {
-        return IntUtil.parseIntArray(JamProperties.getRequired(AFFINITY_THRESHOLD_PROPERTY), RegexUtil.COMMA);
+    private static int resolveSampleSize() {
+        return JamProperties.getRequiredInt(SAMPLE_SIZE_PROPERTY);
+    }
+
+    private static int resolveThreshold() {
+        return JamProperties.getRequiredInt(AFFINITY_THRESHOLD_PROPERTY);
+    }
+
+    private static int resolveTrialCount() {
+        return JamProperties.getRequiredInt(TRIAL_COUNT_PROPERTY);
     }
 
     private void run() {
-        generateFragments();
+        samplePeptides();
+        readAlleleSet();
+        findBinders();
+        processAlleles();
         processGenotypes();
     }
-        
-        /*
-        predictor    = PepMHCPredictor.instance(predMethod, alleleCode, peptideLength);
-        inputReader  = FastaReader.open(inputFile);
-        pepFragments = new HashSet<Peptide>();
-        binderCount  = 0;
-
-        for (FastaRecord record : inputReader)
-            processPeptide(record.getPeptide());
-
-        outputWriter = IOUtil.openWriter(outputFile());
-        outputWriter.println("predMethod,alleleCode,peptideLength,fragmentCount,binderFrac");
-        outputWriter.println(String.format("%s,%s,%d,%d,%8.6f",
-                                           predMethod,
-                                           alleleCode,
-                                           peptideLength,
-                                           pepFragments.size(),
-                                           DoubleUtil.ratio(binderCount, pepFragments.size())));
-
-        inputReader.close();
-        outputWriter.close();
-        */
   
-    private void generateFragments() {
-        JamLogger.info("Reading peptidome...");
-        List<FastaRecord> records = FastaReader.read(peptidomeFileName);
+    private void samplePeptides() {
+        List<Peptide> allPeptides = readPeptideFile();
 
-        for (FastaRecord record : records) {
-            Peptide protein = record.getPeptide();
+        while (peptideSamples.size() < trialCount)
+            peptideSamples.add(samplePeptides(allPeptides));
+    }
 
-            for (Peptide fragment : protein.nativeFragments(peptideLength))
-                peptideFragments.add(fragment);
+    private List<Peptide> readPeptideFile() {
+        JamLogger.info("Reading peptide file...");
+
+        LineReader reader = LineReader.open(peptideFileName);
+        List<Peptide> peptides = new ArrayList<Peptide>();
+
+        try {
+            for (String line : reader)
+                peptides.add(Peptide.parse(line));
+        }
+        finally {
+            IOUtil.close(reader);
         }
 
-        JamLogger.info("Generated [%d] unique peptides...", peptideFragments.size());
+        return peptides;
+    }
+
+    private List<Peptide> samplePeptides(List<Peptide> allPeptides) {
+        JamLogger.info("Sampling [%d] of [%d] peptides...", sampleSize, allPeptides.size());
+
+        List<Peptide> sampledPeptides = new ArrayList<Peptide>(sampleSize);
+
+        while (sampledPeptides.size() < sampleSize)
+            sampledPeptides.add(ListUtil.select(allPeptides));
+
+        return sampledPeptides;
+    }
+
+    private void readAlleleSet() {
+        LineReader reader = LineReader.open(genotypeFileName);
+
+        try {
+            // Skip header line...
+            reader.next();
+
+            for (String line : reader)
+                alleleSet.addAll(parseAlleleSet(line));
+        }
+        finally {
+            IOUtil.close(reader);
+        }
+    }
+
+    private String parsePatientKey(String line) {
+        String[] columns = RegexUtil.split(GENOTYPE_COLUMN_DELIM, line, 2);
+        String   genoKey = columns[0];
+
+        return genoKey;
+    }
+
+    private Set<String> parseAlleleSet(String line) {
+        String[] columns = RegexUtil.split(GENOTYPE_COLUMN_DELIM, line, 2);
+        String[] alleles = RegexUtil.split(GENOTYPE_ALLELE_DELIM, columns[1]);
+
+        return new TreeSet<String>(List.of(alleles));
+    }
+
+    private void findBinders() {
+        for (int trialIndex = 0; trialIndex < trialCount; ++trialIndex)
+            findBinders(trialIndex);
+    }
+
+    private void findBinders(int trialIndex) {
+        JamLogger.info("Testing peptide sample [%d]...", trialIndex);
+
+        if (binderCache.size() != trialIndex)
+            throw new IllegalStateException("Inconsistent cache size.");
+
+        binderCache.add(new HashMap<String, Set<Peptide>>());
+
+        for (String allele : alleleSet)
+            findBinders(trialIndex, allele);
+    }
+
+    private void findBinders(int trialIndex, String allele) {
+        Set<Peptide> binderSet = new HashSet<Peptide>();
+
+        try {
+            Map<Peptide, Double> affinities =
+                predictor.predictIC50(allele, peptideSamples.get(trialIndex));
+
+            for (Map.Entry<Peptide, Double> entry : affinities.entrySet())
+                if (entry.getValue() <= (double) threshold)
+                    binderSet.add(entry.getKey());
+        }
+        catch (Exception ex) {
+            //
+            // Some prediction models are parameterized only for
+            // common alleles.  An exception indicates that this
+            // is a rare allele with no available predictor, so
+            // skip it...
+            //
+            JamLogger.warn("Prediction failed for allele [%s]!", allele);
+        }
+
+        binderCache.get(trialIndex).put(allele, binderSet);
+    }
+
+    private void processAlleles() {
+        for (String allele : alleleSet)
+            alleleSummaries.put(allele, processAllele(allele));
+
+        writeAlleleReport();
+    }
+
+    private StatSummary processAllele(String allele) {
+        return computeRateSummary(Set.of(allele));
+    }
+
+    private StatSummary computeRateSummary(Set<String> alleleSet) {
+        return StatSummary.compute(computePresentationRates(alleleSet));
+    }
+
+    private double[] computePresentationRates(Set<String> alleleSet) {
+        double[] rates = new double[trialCount];
+
+        for (int trialIndex = 0; trialIndex < trialCount; ++trialIndex)
+            rates[trialIndex] =
+                computePresentationRate(trialIndex, alleleSet);
+
+        return rates;
+    }
+
+    private double computePresentationRate(int trialIndex, Set<String> alleleSet) {
+        int totalCount = peptideSamples.get(trialIndex).size();
+        int binderCount = findBinderPeptides(trialIndex, alleleSet).size();
+
+        return DoubleUtil.ratio(binderCount, totalCount);
+    }
+
+    private Set<Peptide> findBinderPeptides(int trialIndex, Set<String> alleleSet) {
+        Set<Peptide> genotypeBinders = new HashSet<Peptide>();
+
+        for (String allele : alleleSet)
+            genotypeBinders.addAll(binderCache.get(trialIndex).get(allele));
+
+        return genotypeBinders;
+    }
+
+    private void writeAlleleReport() {
+        alleleReportWriter = IOUtil.openWriter(alleleReportFile);
+        alleleReportWriter.println("allele,presentRate.mean,presentRate.sterr");
+
+        for (String allele : alleleSet)
+            alleleReportWriter.println(String.format("%s,%.8f,%.8f",
+                                                     allele,
+                                                     alleleSummaries.get(allele).getMean(),
+                                                     alleleSummaries.get(allele).getError()));
+
+        IOUtil.close(alleleReportWriter);
     }
 
     private void processGenotypes() {
         genotypeReader = LineReader.open(genotypeFileName);
-        reportWriter   = IOUtil.openWriter(reportFileName);
+        patientReportWriter = IOUtil.openWriter(patientReportFile);
 
         try {
             readGenotypeHeader();
@@ -182,7 +347,7 @@ public final class GenotypePresentCalc extends JamApp {
         }
         finally {
             IOUtil.close(genotypeReader);
-            IOUtil.close(reportWriter);
+            IOUtil.close(patientReportWriter);
         }
     }
 
@@ -195,86 +360,63 @@ public final class GenotypePresentCalc extends JamApp {
 
     private void writeReportHeader() {
         LineBuilder builder = LineBuilder.csv();
+
         builder.append(patientKeyName);
+        builder.append("presentRate.mean");
+        builder.append("presentRate.sterr");
+        builder.append("idealRate.mean");
 
-        for (int threshold : affinityThreshold)
-            builder.append(String.format("rate.%d", threshold));
-
-        reportWriter.println(builder);
+        patientReportWriter.println(builder);
     }
 
     private void processGenotype(String line) {
-        /*
         String patientKey = parsePatientKey(line);
         Set<String> alleleSet = parseAlleleSet(line);
-        List<PepMHCPredictor> predictors;
 
-        try {
-            predictors = PepMHCPredictor.instances(predictionMethod, alleleSet, peptideLength);
-        }
-        catch (Exception ex) {
-            //
-            // Many of the prediction models are fit only for common
-            // alleles. This genotype contains a rare allele with no
-            // available predictor, so skip it...
-            //
-            JamLogger.info("No predictor for patient [%s], skipping...", patientKey);
+        processGenotype(patientKey, alleleSet);
+    }
+
+    private void processGenotype(String patientKey, Set<String> alleleSet) {
+        if (!isCovered(alleleSet)) {
+            JamLogger.info("Incomplete allele coverage for patient [%s], skipping...", patientKey);
             return;
         }
 
         JamLogger.info("Processing patient [%s]...", patientKey);
-        double[] presentationRates = computePresentationRates(predictors);
 
-        writeReportData(patientKey, presentationRates);
-        */
+        double idealRates = computeIdealRate(alleleSet);
+        StatSummary rateSummary = computeRateSummary(alleleSet);
+
+        writeReportData(patientKey, idealRates, rateSummary);
     }
 
-    private String parsePatientKey(String line) {
-        String[] columns = RegexUtil.split(GENOTYPE_COLUMN_DELIM, line, 2);
-        String   genoKey = columns[0];
+    private boolean isCovered(Set<String> alleleSet) {
+        for (String allele : alleleSet)
+            if (!binderCache.get(0).containsKey(allele))
+                return false;
 
-        return genoKey;
+        return true;
     }
 
-    private Set<String> parseAlleleSet(String line) {
-        String[]    columns   = RegexUtil.split(GENOTYPE_COLUMN_DELIM, line, 2);
-        String[]    alleleVec = RegexUtil.split(GENOTYPE_ALLELE_DELIM, columns[1]);
-        Set<String> alleleSet = new TreeSet<String>(List.of(alleleVec));
+    private double computeIdealRate(Set<String> alleleSet) {
+        double idealRate = 0.0;
 
-        return alleleSet;
+        for (String allele : alleleSet)
+            idealRate += alleleSummaries.get(allele).getMean();
+
+        return idealRate;
     }
 
-    private double[] computePresentationRates(List<PepMHCPredictor> predictors) {
-        int[] binderCounts = new int[affinityThreshold.length];
-
-        for (Peptide fragment : peptideFragments) {
-            throw new UnsupportedOperationException();
-            /*
-            double ic50 = PepMHCPredictor.minimumIC50(predictors, fragment);
-
-            for (int k = 0; k < affinityThreshold.length; ++k)
-                if (ic50 <= affinityThreshold[k])
-                    ++binderCounts[k];
-            */
-        }
-
-        double[] presentRates = new double[affinityThreshold.length];
-
-        for (int k = 0; k < affinityThreshold.length; ++k)
-            presentRates[k] = DoubleUtil.ratio(binderCounts[k], peptideFragments.size());
-
-        return presentRates;
-    }
-
-    private void writeReportData(String patientKey, double[] presentationRates) {
+    private void writeReportData(String patientKey, double idealRate, StatSummary rateSummary) {
         LineBuilder builder = LineBuilder.csv();
         builder.append(patientKey);
 
-        for (double rate : presentationRates)
-            builder.append(rate, "%.8f");
-
-        reportWriter.println(builder);
-        reportWriter.flush();
+        builder.append(rateSummary.getMean(), "%.8f");
+        builder.append(rateSummary.getError(), "%.8f");
+        builder.append(idealRate, "%.8f");
+    
+        patientReportWriter.println(builder);
+        patientReportWriter.flush();
     }
 
     public static void main(String[] propFiles) {
