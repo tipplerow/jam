@@ -94,5 +94,8 @@ public abstract class NetRunner {
         BufferedReader reader  = IOUtil.openReader(process.getInputStream());
 
         records = NetParser.parse(reader);
+
+        if (records.size() != peptides.size())
+            throw JamException.runtime("Affinity prediction failed for allele [%s]!", allele);
     }
 }
