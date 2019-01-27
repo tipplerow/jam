@@ -40,7 +40,7 @@ public final class GenotypePresentCalc extends JamApp {
     private final String genotypeFileName;
 
     private final PredictionMethod method;
-    private final List<List<Peptide>> peptideSamples;
+    private final List<Set<Peptide>> peptideSamples;
 
     private final Set<String> alleleSet;
     private final Map<String, StatSummary> alleleSummaries;
@@ -71,7 +71,7 @@ public final class GenotypePresentCalc extends JamApp {
         this.genotypeFileName = resolveGenotypeFileName();
 
         this.method = resolvePredictionMethod();
-        this.peptideSamples = new ArrayList<List<Peptide>>();
+        this.peptideSamples = new ArrayList<Set<Peptide>>();
 
         this.alleleSet = new TreeSet<String>();
         this.binderCache = new ArrayList<Map<String, Set<Peptide>>>();
@@ -216,10 +216,10 @@ public final class GenotypePresentCalc extends JamApp {
         return peptides;
     }
 
-    private List<Peptide> samplePeptides(List<Peptide> allPeptides) {
+    private Set<Peptide> samplePeptides(List<Peptide> allPeptides) {
         JamLogger.info("Sampling [%d] of [%d] peptides...", sampleSize, allPeptides.size());
 
-        List<Peptide> sampledPeptides = new ArrayList<Peptide>(sampleSize);
+        Set<Peptide> sampledPeptides = new HashSet<Peptide>(sampleSize);
 
         while (sampledPeptides.size() < sampleSize)
             sampledPeptides.add(ListUtil.select(allPeptides));
