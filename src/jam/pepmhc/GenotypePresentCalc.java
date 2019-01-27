@@ -17,6 +17,7 @@ import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.io.IOUtil;
 import jam.io.LineReader;
+import jam.lang.JamException;
 import jam.math.DoubleUtil;
 import jam.math.StatSummary;
 import jam.peptide.Peptide;
@@ -38,7 +39,7 @@ public final class GenotypePresentCalc extends JamApp {
     private final String peptideFileName;
     private final String genotypeFileName;
 
-    private final PepMHCPredictor predictor;
+    private final PredictionMethod method;
     private final List<List<Peptide>> peptideSamples;
 
     private final Set<String> alleleSet;
@@ -69,7 +70,7 @@ public final class GenotypePresentCalc extends JamApp {
         this.peptideFileName = resolvePeptideFileName();
         this.genotypeFileName = resolveGenotypeFileName();
 
-        this.predictor = resolvePredictor();
+        this.method = resolvePredictionMethod();
         this.peptideSamples = new ArrayList<List<Peptide>>();
 
         this.alleleSet = new TreeSet<String>();
@@ -159,8 +160,8 @@ public final class GenotypePresentCalc extends JamApp {
         return JamProperties.getRequired(PEPTIDE_FILE_PROPERTY);
     }
 
-    private static PepMHCPredictor resolvePredictor() {
-        return PepMHCPredictor.instance(JamProperties.getRequiredEnum(PREDICTION_METHOD_PROPERTY, PredictionMethod.class));
+    private static PredictionMethod resolvePredictionMethod() {
+        return JamProperties.getRequiredEnum(PREDICTION_METHOD_PROPERTY, PredictionMethod.class);
     }
 
     private static String resolveAlleleReportFile() {   
@@ -275,23 +276,15 @@ public final class GenotypePresentCalc extends JamApp {
     private void findBinders(int trialIndex, String allele) {
         Set<Peptide> binderSet = new HashSet<Peptide>();
 
-        try {
-            List<BindingRecord> records = 
-                predictor.predict(allele, peptideSamples.get(trialIndex));
+        List<BindingRecord> records =
+            AffinityCache.get(method, allele, peptideSamples.get(trialIndex));
 
-            for (BindingRecord record : records)
-                if (isBound(record))
-                    binderSet.add(record.getPeptide());
-        }
-        catch (Exception ex) {
-            //
-            // Some prediction models are parameterized only for
-            // common alleles.  An exception indicates that this
-            // is a rare allele with no available predictor, so
-            // skip it...
-            //
-            JamLogger.warn("Prediction failed for allele [%s]!", allele);
-        }
+        if (records.size() != peptideSamples.get(trialIndex).size())
+            throw JamException.runtime("Affinity computation failed for allele [%s]!", allele);
+
+        for (BindingRecord record : records)
+            if (isBound(record))
+                binderSet.add(record.getPeptide());
 
         binderCache.get(trialIndex).put(allele, binderSet);
     }
