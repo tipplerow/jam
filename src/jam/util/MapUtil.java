@@ -19,6 +19,10 @@ public final class MapUtil {
     /**
      * Gets a list of values from a map.
      *
+     * @param <K> the runtime key type.
+     *
+     * @param <V> the runtime value type.
+     *
      * @param map the map on which to operate.
      *
      * @param keys the keys of the values to get.
