@@ -25,9 +25,12 @@ import jam.util.ListUtil;
 import jam.util.RegexUtil;
 
 public final class GenotypePresentCalc extends JamApp {
-    private final int threshold;
     private final int trialCount;
     private final int sampleSize;
+
+    // Note that the PERCENTILE threshold takes precedence...
+    private final double affinityThreshold;
+    private final double percentileThreshold;
 
     private final String alleleReportFile;
     private final String patientReportFile;
@@ -54,9 +57,11 @@ public final class GenotypePresentCalc extends JamApp {
     private GenotypePresentCalc(String... propFiles) {
         super(propFiles);
 
-        this.threshold = resolveThreshold();
         this.trialCount = resolveTrialCount();
         this.sampleSize = resolveSampleSize();
+
+        this.affinityThreshold = resolveAffinityThreshold();
+        this.percentileThreshold = resolvePercentileThreshold();
 
         this.alleleReportFile = resolveAlleleReportFile();
         this.patientReportFile = resolvePatientReportFile();
@@ -87,6 +92,13 @@ public final class GenotypePresentCalc extends JamApp {
      * threshold for peptide-MHC binding.
      */
     public static final String AFFINITY_THRESHOLD_PROPERTY = "jam.pepmhc.affinityThreshold";
+
+    /**
+     * Name of the system property that specifies the percentile rank
+     * threshold for peptide-MHC binding.  (The percentile threshold
+     * takes precedence over the affinity threshold.)
+     */
+    public static final String PERCENTILE_THRESHOLD_PROPERTY = "jam.pepmhc.percentileThreshold";
 
     /**
      * Name of the system property that specifies the full path name
@@ -135,6 +147,10 @@ public final class GenotypePresentCalc extends JamApp {
      */
     public static final String TRIAL_COUNT_PROPERTY = "jam.pepmhc.trialCount";
 
+    private static double resolveAffinityThreshold() {
+        return JamProperties.getRequiredDouble(AFFINITY_THRESHOLD_PROPERTY);
+    }
+
     private static String resolveGenotypeFileName() {
         return JamProperties.getRequired(GENOTYPE_FILE_PROPERTY);
     }
@@ -155,12 +171,12 @@ public final class GenotypePresentCalc extends JamApp {
         return JamProperties.getRequired(PATIENT_REPORT_FILE_PROPERTY);
     }
 
-    private static int resolveSampleSize() {
-        return JamProperties.getRequiredInt(SAMPLE_SIZE_PROPERTY);
+    private static double resolvePercentileThreshold() {
+        return JamProperties.getRequiredDouble(PERCENTILE_THRESHOLD_PROPERTY);
     }
 
-    private static int resolveThreshold() {
-        return JamProperties.getRequiredInt(AFFINITY_THRESHOLD_PROPERTY);
+    private static int resolveSampleSize() {
+        return JamProperties.getRequiredInt(SAMPLE_SIZE_PROPERTY);
     }
 
     private static int resolveTrialCount() {
@@ -260,12 +276,12 @@ public final class GenotypePresentCalc extends JamApp {
         Set<Peptide> binderSet = new HashSet<Peptide>();
 
         try {
-            Map<Peptide, Double> affinities =
-                predictor.predictIC50(allele, peptideSamples.get(trialIndex));
+            List<BindingRecord> records = 
+                predictor.predict(allele, peptideSamples.get(trialIndex));
 
-            for (Map.Entry<Peptide, Double> entry : affinities.entrySet())
-                if (entry.getValue() <= (double) threshold)
-                    binderSet.add(entry.getKey());
+            for (BindingRecord record : records)
+                if (isBound(record))
+                    binderSet.add(record.getPeptide());
         }
         catch (Exception ex) {
             //
@@ -278,6 +294,10 @@ public final class GenotypePresentCalc extends JamApp {
         }
 
         binderCache.get(trialIndex).put(allele, binderSet);
+    }
+
+    private boolean isBound(BindingRecord record) {
+        return record.getPercentile() <= percentileThreshold || record.getAffinity() <= affinityThreshold;
     }
 
     private void processAlleles() {

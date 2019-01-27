@@ -9,15 +9,15 @@ import jam.pepmhc.BindingRecord;
 import jam.peptide.Peptide;
 
 /**
- * Executes {@code netMHCpan} command-line processes.
+ * Executes {@code netMHC} command-line processes.
  */
-public final class NetMHCPanRunner extends NetRunner {
-    private NetMHCPanRunner(String allele, Collection<Peptide> peptides) {
+public final class NetMHCRunner extends NetRunner {
+    private NetMHCRunner(String allele, Collection<Peptide> peptides) {
         super(allele, peptides);
     }
 
     /**
-     * Executes a {@code netMHCpan} command-line process.
+     * Executes a {@code netMHC} command-line process.
      *
      * @param allele the string code for the binding MHC allele.
      *
@@ -27,17 +27,17 @@ public final class NetMHCPanRunner extends NetRunner {
      * prediction process.
      */
     public static List<BindingRecord> run(String allele, Collection<Peptide> peptides) {
-        NetMHCPanRunner runner = new NetMHCPanRunner(allele, peptides);
+        NetMHCRunner runner = new NetMHCRunner(allele, peptides);
         return runner.run();
     }
 
-    @Override protected List<String>formatCommand(String allele, File peptideFile) {
-        return List.of(NetMHCPan.resolveExecutableName(), 
+    @Override protected List<String> formatCommand(String allele, File peptideFile) {
+        return List.of(NetMHC.resolveExecutableName(), 
                        "-a", formatAllele(allele),
-                       "-BA", "-p", peptideFile.getAbsolutePath());
+                       "-p", peptideFile.getAbsolutePath());
     }
 
     private static String formatAllele(String allele) {
-        return allele.replace("*", "");
+        return allele.replace("*", "").replace(":", "");
     }
 }

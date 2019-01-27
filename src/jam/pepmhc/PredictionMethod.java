@@ -5,5 +5,5 @@ package jam.pepmhc;
  * Enumerates peptide-MHC binding affinity prediction methods.
  */
 public enum PredictionMethod {
-    NETMHCPAN, SMM, SMM_PMBEC;
+    NET_MHC, NET_MHC_PAN, SMM, SMM_PMBEC;
 }

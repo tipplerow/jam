@@ -11,28 +11,28 @@ import jam.pepmhc.PepMHCPredictor;
 import jam.pepmhc.PredictionMethod;
 import jam.peptide.Peptide;
 
-public final class NetMHCPan implements PepMHCPredictor {
-    private NetMHCPan() {}
+public final class NetMHC implements PepMHCPredictor {
+    private NetMHC() {}
 
     /**
      * The single instance.
      */
-    public static final NetMHCPan INSTANCE = new NetMHCPan();
+    public static final NetMHC INSTANCE = new NetMHC();
 
     /**
      * Name of the system property that defines the full path to the
-     * {@code netMHCpan} executable file.
+     * {@code netMHC} executable file.
      */
-    public static final String EXECUTABLE_PATH_PROPERTY = "jam.pepmhc.net.netMHCpan";
+    public static final String EXECUTABLE_PATH_PROPERTY = "jam.pepmhc.net.netMHC";
 
     /**
-     * Default value for the path to the {@code netMHCpan} executable
+     * Default value for the path to the {@code netMHC} executable
      * file (assumed to be in the working directory).
      */
-    public static final String EXECUTABLE_PATH_DEFAULT = "netMHCpan";
+    public static final String EXECUTABLE_PATH_DEFAULT = "netMHC";
 
     /**
-     * Determines whether the {@code netMHCpan} executable is installed
+     * Determines whether the {@code netMHC} executable is installed
      * at the location specified by the {@code EXECUTABLE_PATH_PROPERTY}.
      *
      * @return {@code true} iff an executable file is installed at the
@@ -43,10 +43,10 @@ public final class NetMHCPan implements PepMHCPredictor {
     }
 
     /**
-     * Resolves the full path to the {@code netMHCpan} executable file.
+     * Resolves the full path to the {@code netMHC} executable file.
      *
      * @return the path specified by the {@code EXECUTABLE_PATH_PROPERTY},
-     * or {@code netMHCpan} in the working directory if the system property
+     * or {@code netMHC} in the working directory if the system property
      * is not set.
      */
     public static File resolveExecutableFile() {
@@ -54,10 +54,10 @@ public final class NetMHCPan implements PepMHCPredictor {
     }
 
     /**
-     * Resolves the full path to the {@code netMHCpan} executable file.
+     * Resolves the full path to the {@code netMHC} executable file.
      *
      * @return the path specified by the {@code EXECUTABLE_PATH_PROPERTY},
-     * or {@code netMHCpan} in the working directory if the system property
+     * or {@code netMHC} in the working directory if the system property
      * is not set.
      */
     public static String resolveExecutableName() {
@@ -65,10 +65,10 @@ public final class NetMHCPan implements PepMHCPredictor {
     }
 
     @Override public PredictionMethod getMethod() {
-        return PredictionMethod.NET_MHC_PAN;
+        return PredictionMethod.NET_MHC;
     }
 
     @Override public List<BindingRecord> predict(String allele, Collection<Peptide> peptides) {
-        return NetMHCPanRunner.run(allele, peptides);
+        return NetMHCRunner.run(allele, peptides);
     }
 }

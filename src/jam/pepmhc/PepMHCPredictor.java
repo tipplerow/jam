@@ -1,14 +1,12 @@
 
 package jam.pepmhc;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import jam.lang.JamException;
 import jam.peptide.Peptide;
+import jam.pepmhc.net.NetMHC;
 import jam.pepmhc.net.NetMHCPan;
 import jam.pepmhc.smm.SMMPredictor;
 import jam.pepmhc.smm.SMMPmbecPredictor;
@@ -23,7 +21,10 @@ public interface PepMHCPredictor {
      */
     public static PepMHCPredictor instance(PredictionMethod method) {
         switch (method) {
-        case NETMHCPAN:
+        case NET_MHC:
+            return NetMHC.INSTANCE;
+
+        case NET_MHC_PAN:
             return NetMHCPan.INSTANCE;
 
         case SMM:
@@ -45,60 +46,29 @@ public interface PepMHCPredictor {
     public abstract PredictionMethod getMethod();
 
     /**
-     * Predicts the binding affinity (as the nanomolar IC50
-     * concentration) of a given peptide to an allele.
+     * Predicts the binding between an allele and a single peptide.
      *
      * @param allele the code of the MHC allele presenting the
      * peptide.
      *
      * @param peptide the peptide being presented.
      *
-     * @return the binding affinity of the specified peptide to
-     * the specified allele.
+     * @return the binding record for the allele and peptide.
      */
-    public abstract double predictIC50(String allele, Peptide peptide);
+    public default BindingRecord predict(String allele, Peptide peptide) {
+        return predict(allele, List.of(peptide)).get(0);
+    }
 
     /**
-     * Predicts the binding affinities (as nanomolar IC50
-     * concentrations) for a collection of peptides binding
-     * to a single MHC allele.
+     * Predicts the binding between an allele and a collection of
+     * peptides.
      *
      * @param allele the code of the MHC allele presenting the
      * peptides.
      *
      * @param peptides the peptides being presented.
      *
-     * @return a mapping from each peptide to its binding affinity.
+     * @return a list of binding records for the allele and peptides.
      */
-    public default Map<Peptide, Double> predictIC50(String allele, Collection<Peptide> peptides) {
-        Map<Peptide, Double> ic50 = new LinkedHashMap<Peptide, Double>(peptides.size());
-
-        for (Peptide peptide : peptides)
-            ic50.put(peptide, predictIC50(allele, peptide));
-
-        return ic50;
-    }
-
-    /**
-     * Computes the maximum binding affinity (the minimum nanomolar
-     * IC50 concentration) of a given peptide over a collection of
-     * predictors.
-     *
-     * @param predictors the affinity predictors.
-     *
-     * @param peptide the peptide to predict.
-     *
-     * @return the minimum IC50 of the specified peptide over the
-     * given predictors.
-     */
-    /*
-    public static double minimumIC50(Collection<PepMHCPredictor> predictors, Peptide peptide) {
-        double result = Double.POSITIVE_INFINITY;
-
-        for (PepMHCPredictor predictor : predictors)
-            result = Math.min(result, predictor.predictIC50(peptide));
-
-        return result;
-    }
-    */
+    public abstract List<BindingRecord> predict(String allele, Collection<Peptide> peptides);
 }
