@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jam.app.JamLogger;
 import jam.app.JamProperties;
@@ -171,10 +173,7 @@ public final class AffinityCache {
         // Identify peptides from the input collection that are not
         // present in the cache ("missing" peptides)...
         //
-        List<Peptide> missing = flagMissing(peptides);
-
-        JamLogger.info("[%d] peptides cached, [%d] require computation...",
-                       peptides.size() - missing.size(), missing.size());
+        Set<Peptide> missing = flagMissing(peptides);
 
         if (!missing.isEmpty()) {
             // Compute affinity for each missing peptide...
@@ -190,14 +189,14 @@ public final class AffinityCache {
         return MapUtil.get(recordMap, peptides);
     }
 
-    private List<Peptide> flagMissing(Collection<Peptide> peptides) {
-        List<Peptide> targets = new ArrayList<Peptide>();
+    private Set<Peptide> flagMissing(Collection<Peptide> peptides) {
+        Set<Peptide> missing = new HashSet<Peptide>();
 
         for (Peptide peptide : peptides)
             if (!recordMap.containsKey(peptide))
-                targets.add(peptide);
+                missing.add(peptide);
 
-        return targets;
+        return missing;
     }
 
     private void updateCache(List<BindingRecord> records) {
@@ -219,6 +218,7 @@ public final class AffinityCache {
             // No need to halt the program...
             //
             JamLogger.warn("Failed to update database table!");
+            JamLogger.warn(ex);
         }
     }
 
