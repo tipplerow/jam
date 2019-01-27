@@ -17,6 +17,25 @@ public final class MapUtil {
     private MapUtil() {}
 
     /**
+     * Gets a list of values from a map.
+     *
+     * @param map the map on which to operate.
+     *
+     * @param keys the keys of the values to get.
+     *
+     * @return a list containing the value associated with each key in
+     * the input collection.
+     */
+    public static <K, V> List<V> get(Map<K, V> map, Collection<K> keys) {
+        List<V> values = new ArrayList<V>(keys.size());
+
+        for (K key : keys)
+            values.add(map.get(key));
+
+        return values;
+    }
+
+    /**
      * Groups objects in a collection by an arbitrary attribute.
      *
      * @param <K> the runtime type of the attribute (the key type for

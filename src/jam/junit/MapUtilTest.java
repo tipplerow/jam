@@ -2,7 +2,6 @@
 package jam.junit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -14,16 +13,28 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class MapUtilTest {
+    @Test public void testGet() {
+        Map<String, Integer> map =
+            MapUtil.zipHash(List.of("abc", "def", "ghi"), List.of(1, 2, 3));
+
+        List<Integer> values = MapUtil.get(map, List.of("def", "ghi", "foo", "abc"));
+
+        assertEquals(Integer.valueOf(2), values.get(0));
+        assertEquals(Integer.valueOf(3), values.get(1));
+        assertEquals(Integer.valueOf(1), values.get(3));
+        assertNull(values.get(2));
+    }
+
     @Test public void testGroup() {
-        List<String> strings = Arrays.asList("I", "did", "my", "taxes", "today", "it", "was", "not", "fun");
+        List<String> strings = List.of("I", "did", "my", "taxes", "today", "it", "was", "not", "fun");
         Map<Integer, Collection<String>> grouped = MapUtil.group(strings, x -> x.length());
 
         assertEquals(4, grouped.size());
 
-        assertEquals(grouped.get(1), Arrays.asList("I"));
-        assertEquals(grouped.get(2), Arrays.asList("my", "it"));
-        assertEquals(grouped.get(3), Arrays.asList("did", "was", "not", "fun"));
-        assertEquals(grouped.get(5), Arrays.asList("taxes", "today"));
+        assertEquals(grouped.get(1), List.of("I"));
+        assertEquals(grouped.get(2), List.of("my", "it"));
+        assertEquals(grouped.get(3), List.of("did", "was", "not", "fun"));
+        assertEquals(grouped.get(5), List.of("taxes", "today"));
 
         assertFalse(grouped.containsKey(0));
         assertFalse(grouped.containsKey(4));
@@ -31,8 +42,8 @@ public class MapUtilTest {
     }
 
     @Test public void testZip() {
-        List<String>  keys   = Arrays.asList("abc", "def", "ghi");
-        List<Integer> values = Arrays.asList(1, 2, 3);
+        List<String>  keys   = List.of("abc", "def", "ghi");
+        List<Integer> values = List.of(1, 2, 3);
 
         Map<String, Integer> map = MapUtil.zipHash(keys, values);
 
