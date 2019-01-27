@@ -26,12 +26,6 @@ public final class NetMHC implements PepMHCPredictor {
     public static final String EXECUTABLE_PATH_PROPERTY = "jam.pepmhc.net.netMHC";
 
     /**
-     * Default value for the path to the {@code netMHC} executable
-     * file (assumed to be in the working directory).
-     */
-    public static final String EXECUTABLE_PATH_DEFAULT = "netMHC";
-
-    /**
      * Determines whether the {@code netMHC} executable is installed
      * at the location specified by the {@code EXECUTABLE_PATH_PROPERTY}.
      *
@@ -61,7 +55,7 @@ public final class NetMHC implements PepMHCPredictor {
      * is not set.
      */
     public static String resolveExecutableName() {
-        return JamProperties.getOptional(EXECUTABLE_PATH_PROPERTY, EXECUTABLE_PATH_DEFAULT);
+        return JamProperties.getRequired(EXECUTABLE_PATH_PROPERTY);
     }
 
     @Override public PredictionMethod getMethod() {

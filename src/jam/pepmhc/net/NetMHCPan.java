@@ -26,12 +26,6 @@ public final class NetMHCPan implements PepMHCPredictor {
     public static final String EXECUTABLE_PATH_PROPERTY = "jam.pepmhc.net.netMHCpan";
 
     /**
-     * Default value for the path to the {@code netMHCpan} executable
-     * file (assumed to be in the working directory).
-     */
-    public static final String EXECUTABLE_PATH_DEFAULT = "netMHCpan";
-
-    /**
      * Determines whether the {@code netMHCpan} executable is installed
      * at the location specified by the {@code EXECUTABLE_PATH_PROPERTY}.
      *
@@ -61,7 +55,7 @@ public final class NetMHCPan implements PepMHCPredictor {
      * is not set.
      */
     public static String resolveExecutableName() {
-        return JamProperties.getOptional(EXECUTABLE_PATH_PROPERTY, EXECUTABLE_PATH_DEFAULT);
+        return JamProperties.getRequired(EXECUTABLE_PATH_PROPERTY);
     }
 
     @Override public PredictionMethod getMethod() {
