@@ -39,6 +39,39 @@ public interface PepMHCPredictor {
     }
 
     /**
+     * Predicts the binding between an allele and a single peptide.
+     *
+     * @param method the enumerated prediction method.
+     *
+     * @param allele the code of the MHC allele presenting the
+     * peptide.
+     *
+     * @param peptide the peptide being presented.
+     *
+     * @return the binding record for the allele and peptide.
+     */
+    public static BindingRecord predict(PredictionMethod method, String allele, Peptide peptide) {
+        return instance(method).predict(allele, peptide);
+     }
+
+    /**
+     * Predicts the binding between an allele and a collection of
+     * peptides.
+     *
+     * @param method the enumerated prediction method.
+     *
+     * @param allele the code of the MHC allele presenting the
+     * peptides.
+     *
+     * @param peptides the peptides being presented.
+     *
+     * @return a list of binding records for the allele and peptides.
+     */
+    public static List<BindingRecord> predict(PredictionMethod method, String allele, Collection<Peptide> peptides) {
+        return instance(method).predict(allele, peptides);
+    }
+
+    /**
      * Returns the prediction method for this predictor.
      *
      * @return the prediction method for this predictor.
