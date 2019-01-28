@@ -125,4 +125,23 @@ VanAllen.correlation <- function(vanAllen) {
     cormat
 }
 
+VanAllen.writeGenotype <- function(master, genoFile) {
+    lines <- character(nrow(master) + 1)
+    lines[1] <- c("patient,genotype")
+
+    for (k in 1:nrow(master))
+        lines[k + 1] <-
+            sprintf("%s,HLA-A*%s HLA-A*%s HLA-B*%s HLA-B*%s HLA-C*%s HLA-C*%s",
+                    x$patient[k],
+                    substr(x$hla.a1[k], 6, 10),
+                    substr(x$hla.a2[k], 6, 10),
+                    substr(x$hla.b1[k], 6, 10),
+                    substr(x$hla.b2[k], 6, 10),
+                    substr(x$hla.c1[k], 6, 10),
+                    substr(x$hla.c2[k], 6, 10))
+    
+    writeLines(lines, genoFile)
+}
+
+
 
