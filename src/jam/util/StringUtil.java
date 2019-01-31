@@ -88,6 +88,42 @@ public final class StringUtil {
     }
 
     /**
+     * Removes a fixed prefix from a string (if present).
+     *
+     * @param string the string on which to operate.
+     *
+     * @param prefix the prefix to remove.
+     *
+     * @return either a new string with the prefix removed (if the
+     * prefix was present) or the input string (if the prefix was not
+     * present).
+     */
+    public static String removePrefix(String string, String prefix) {
+        if (string.startsWith(prefix))
+            return string.substring(prefix.length());
+        else
+            return string;
+    }
+
+    /**
+     * Removes a fixed suffix from a string (if present).
+     *
+     * @param string the string on which to operate.
+     *
+     * @param suffix the suffix to remove.
+     *
+     * @return either a new string with the suffix removed (if the
+     * suffix was present) or the input string (if the suffix was not
+     * present).
+     */
+    public static String removeSuffix(String string, String suffix) {
+        if (string.endsWith(suffix))
+            return string.substring(0, string.length() - suffix.length());
+        else
+            return string;
+    }
+
+    /**
      * Removes all white space from a string.
      *
      * @param s the string on which to operate.

@@ -56,6 +56,18 @@ public class StringUtilTest {
         assertEquals("",           StringUtil.removeCommentText("// abc def", delim2));
     }
 
+    @Test public void testRemovePrefix() {
+        assertEquals("abc", StringUtil.removePrefix("abc", "def"));
+        assertEquals("abc", StringUtil.removePrefix("abc", "abcdef"));
+        assertEquals("def", StringUtil.removePrefix("abcdef", "abc"));
+    }
+
+    @Test public void testRemoveSuffix() {
+        assertEquals("abc", StringUtil.removeSuffix("abc", "def"));
+        assertEquals("abc", StringUtil.removeSuffix("abc", "defabc"));
+        assertEquals("def", StringUtil.removeSuffix("defabc", "abc"));
+    }
+
     @Test public void testRemoveWhiteSpace() {
         assertEquals("", StringUtil.removeWhiteSpace(""));
         assertEquals("abc", StringUtil.removeWhiteSpace("abc")); 
