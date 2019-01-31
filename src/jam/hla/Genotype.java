@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Multiset;
@@ -42,6 +43,26 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
      */
     public static Genotype instance(Collection<Allele> alleles) {
         return new Genotype(ImmutableSortedMultiset.copyOf(alleles));
+    }
+
+    /**
+     * Constructs a new fixed genotype by parsing a string
+     * representation.
+     *
+     * @param s the string representation.
+     *
+     * @param delim the delimiter separating the individual alleles.
+     *
+     * @return the fixed genotype described by the input string.
+     */
+    public static Genotype parse(String s, Pattern delim) {
+        String[] fields  = delim.split(s);
+        Allele[] alleles = new Allele[fields.length];
+
+        for (int index = 0; index < fields.length; ++index)
+            alleles[index] = Allele.instance(fields[index]);
+
+        return instance(alleles);
     }
 
     /**
