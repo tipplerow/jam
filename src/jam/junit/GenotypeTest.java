@@ -23,6 +23,18 @@ public class GenotypeTest {
     private static final Genotype homoB1 = Genotype.instance(A1, A2, B1, B1, C1, C2);
     private static final Genotype hetero = Genotype.instance(A1, A2, B1, B2, C1, C2);
 
+    @Test public void testDelete() {
+        assertEquals(Genotype.instance(A1, A2, B1, C1, C2), hetero.delete(B2));
+        assertTrue(hetero.contains(B2));
+
+        assertEquals(Genotype.instance(A2, A2, B1, C2), homoA2.delete(B2, C1));
+        assertTrue(homoA2.contains(B2));
+        assertTrue(homoA2.contains(C1));
+
+        assertEquals(Genotype.instance(B1, B2, C1, C2), homoA2.delete(A2));
+        assertTrue(homoA2.contains(A2));
+    }
+
     @Test public void testEnumerateLOH3() {
         Genotype hetero = Genotype.instance(A1, B1, C1);
 

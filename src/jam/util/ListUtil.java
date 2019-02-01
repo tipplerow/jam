@@ -113,6 +113,30 @@ public final class ListUtil {
     }
 
     /**
+     * Retrieves elements from a list by index position.
+     *
+     * @param <V> the element type.
+     *
+     * @param list the list to select from.
+     *
+     * @param indexes the indexes of the desired elements.
+     *
+     * @return a list {@code L} with {@code L.get(k)} containing the
+     * element from position {@code indexes[k]} in the input list.
+     *
+     * @throws IndexOutOfBoundsException if any indexes are out of
+     * bounds.
+     */
+    public static <V> List<V> get(List<V> list, int[] indexes) {
+        List<V> elements = new ArrayList<V>(indexes.length);
+
+        for (int index : indexes)
+            elements.add(list.get(index));
+
+        return elements;
+    }
+
+    /**
      * Returns the last element from a list.
      *
      * @param <V> the element type.

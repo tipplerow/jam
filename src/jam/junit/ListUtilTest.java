@@ -58,6 +58,10 @@ public class ListUtilTest {
         assertEquals("abc", ListUtil.first(Arrays.asList("abc", "def", "ghi")));
     }
 
+    @Test public void testGet() {
+        assertEquals(List.of("C", "A", "D"), ListUtil.get(List.of("A", "B", "C", "D", "E", "F"), new int[] { 2, 0, 3 }));
+    }
+
     @Test public void testLast() {
         assertEquals("abc", ListUtil.last(Arrays.asList("abc")));
         assertEquals("ghi", ListUtil.last(Arrays.asList("abc", "def", "ghi")));
