@@ -8,11 +8,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Multiset;
 
 import org.apache.commons.math3.util.Combinations;
 
+import jam.lang.JamException;
 import jam.util.AbstractImmutableMultiset;
 
 /**
@@ -63,6 +65,59 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
             alleles[index] = Allele.instance(fields[index]);
 
         return instance(alleles);
+    }
+
+    /**
+     * Returns the number of unique alleles in this genotype.
+     *
+     * @return the number of unique alleles in this genotype.
+     */
+    public int countUniqueAlleles() {
+        return elementSet().size();
+    }
+
+    /**
+     * Removes one or more alleles from this genotype to simulate a
+     * loss-of-heterozygosity event.
+     *
+     * <p>If this genotype contains more than one copy of an allele in
+     * the argument list, all copies of that allele will be removed.
+     *
+     * @param alleles the alleles to remove.
+     *
+     * @return a new genotype with the specified alleles removed.
+     *
+     * @throws RuntimeException unless this genotype contains every
+     * allele in the argument list.
+     */
+    public Genotype delete(Allele... alleles) {
+        return delete(List.of(alleles));
+    }
+
+    /**
+     * Removes one or more alleles from this genotype to simulate a
+     * loss-of-heterozygosity event.
+     *
+     * <p>If this genotype contains more than one copy of an allele in
+     * the argument collection, all copies of that allele will be removed.
+     *
+     * @param alleles the alleles to remove.
+     *
+     * @return a new genotype with the specified alleles removed.
+     *
+     * @throws RuntimeException unless this genotype contains every
+     * allele in the argument collection.
+     */
+    public Genotype delete(Collection<Allele> alleles) {
+        Multiset<Allele> keep = HashMultiset.create(this);
+
+        for (Allele allele : alleles)
+            if (keep.contains(allele))
+                keep.setCount(allele, 0);
+            else
+                throw JamException.runtime("Genotype does not contain allele [%s].", allele);
+
+        return instance(keep);
     }
 
     /**
