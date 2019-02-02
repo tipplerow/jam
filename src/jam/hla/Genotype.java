@@ -16,6 +16,7 @@ import org.apache.commons.math3.util.Combinations;
 
 import jam.lang.JamException;
 import jam.util.AbstractImmutableMultiset;
+import jam.util.CollectionUtil;
 
 /**
  * Represents the complete HLA genotype for a single MHC class.
@@ -196,19 +197,6 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
     }
 
     @Override public int compareTo(Genotype that) {
-        List<Allele> thisAlleles = new ArrayList<Allele>(this.elementSet());
-        List<Allele> thatAlleles = new ArrayList<Allele>(that.elementSet());
-
-        int minLength =
-            Math.min(thisAlleles.size(), thatAlleles.size());
-
-        for (int index = 0; index < minLength; ++index) {
-            int alleleComp = thisAlleles.get(index).compareTo(thatAlleles.get(index));
-
-            if (alleleComp != 0)
-                return alleleComp;
-        }
-        
-        return 0;
+        return CollectionUtil.compareIterationOrder(this, that);
     }
 }

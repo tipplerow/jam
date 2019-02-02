@@ -23,6 +23,32 @@ public class GenotypeTest {
     private static final Genotype homoB1 = Genotype.instance(A1, A2, B1, B1, C1, C2);
     private static final Genotype hetero = Genotype.instance(A1, A2, B1, B2, C1, C2);
 
+    @Test public void testCompare() {
+        assertTrue(homoA2.compareTo(homoA2) == 0);
+        assertTrue(homoA2.compareTo(homoB1)  > 0);
+        assertTrue(homoA2.compareTo(hetero)  > 0);
+
+        assertTrue(homoB1.compareTo(homoA2)  < 0);
+        assertTrue(homoB1.compareTo(homoB1) == 0);
+        assertTrue(homoB1.compareTo(hetero)  < 0);
+
+        assertTrue(hetero.compareTo(homoA2)  < 0);
+        assertTrue(hetero.compareTo(homoB1)  > 0);
+        assertTrue(hetero.compareTo(hetero) == 0);
+
+        Genotype g1 = Genotype.instance(C1, A1);
+        Genotype g2 = Genotype.instance(A2, B1);
+
+        // g1 is "less than" g2 because the alleles are sorted...
+        assertTrue(g1.compareTo(g2) < 0);
+
+        // All else equal, the longer genotype is "greater"...
+        Genotype g3 = Genotype.instance(A1, A2, B1);
+        Genotype g4 = Genotype.instance(A1, A2, B1, B2);
+
+        assertTrue(g3.compareTo(g4) < 0);
+    }
+
     @Test public void testDelete() {
         assertEquals(Genotype.instance(A1, A2, B1, C1, C2), hetero.delete(B2));
         assertTrue(hetero.contains(B2));
