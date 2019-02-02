@@ -18,6 +18,42 @@ public final class FileUtil {
     private FileUtil() {}
 
     /**
+     * Creates a required directory (including all nonexistent parent
+     * directories) if it does not already exist.
+     *
+     * @param dir the required directory.
+     *
+     * @throws RuntimeException if the input directory does not exist
+     * and cannot be created, or if the {@code dir} path does exist
+     * but is not a directory.
+     */
+    public static void ensureDir(File dir) {
+	if (!dir.exists()) {
+	    boolean success = dir.mkdirs();
+
+	    if (!success)
+		throw JamException.runtime("Failed to create directory [%s].", dir.getAbsolutePath());
+	}
+        else if (!dir.isDirectory()) {
+            throw JamException.runtime("Path [%s] exists but is not a directory.", dir.getAbsolutePath());
+        }
+    }
+
+    /**
+     * Creates a required directory (including all nonexistent parent
+     * directories) if it does not already exist.
+     *
+     * @param dirName the name of the required directory.
+     *
+     * @throws RuntimeException if the input directory does not exist
+     * and cannot be created, or if the {@code dir} path does exist
+     * but is not a directory.
+     */
+    public static void ensureDir(String dirName) {
+        ensureDir(new File(dirName));
+    }
+
+    /**
      * Creates the parent directories of a file if they do not already
      * exist (e.g., before attempting to open a new file for writing).
      *
@@ -27,14 +63,7 @@ public final class FileUtil {
      * already exist and could not be created.
      */
     public static void ensureParentDirs(File file) {
-	File parent = FileUtil.getParentFile(file);
-
-	if (!parent.exists()) {
-	    boolean success = parent.mkdirs();
-
-	    if (!success)
-		throw JamException.runtime("Failed to create parent directory [%s].", parent.getAbsolutePath());
-	}
+        ensureDir(FileUtil.getParentFile(file));
     }
 
     /**
