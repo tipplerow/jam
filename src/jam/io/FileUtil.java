@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jam.app.JamLogger;
 import jam.lang.JamException;
 
 /**
@@ -31,7 +32,9 @@ public final class FileUtil {
 	if (!dir.exists()) {
 	    boolean success = dir.mkdirs();
 
-	    if (!success)
+	    if (success)
+                JamLogger.info("Created directory [%s]...", dir.getAbsolutePath());
+            else
 		throw JamException.runtime("Failed to create directory [%s].", dir.getAbsolutePath());
 	}
         else if (!dir.isDirectory()) {
