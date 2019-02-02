@@ -117,6 +117,44 @@ public final class CollectionUtil {
     }
 
     /**
+     * Compares two collections by their iteration order.
+     *
+     * <p>This method iterates over both collections simultaneously and
+     * compares the elements returned by the iterators.  The iteration
+     * continues until either (1) the elements compare as "not equal",
+     * and the method returns the result of the element comparison, or
+     * (2) one iterator reaches the end of its collection, and the 
+     * method returns the result of comparing the collection sizes.
+     *
+     * @param <E> the runtime collection type.
+     *
+     * @param coll1 the first collection to compare.
+     *
+     * @param coll2 the second collection to compare.
+     *
+     * @return an integer less than, equal to, or greater than zero
+     * according to whether the first collection compares as "less
+     * than", "equal to", or "greater than" the second.
+     */
+    public static <E extends Comparable<E>> int compareIterationOrder(Collection<? extends E> coll1,
+                                                                      Collection<? extends E> coll2) {
+        Iterator<? extends E> iter1 = coll1.iterator();
+        Iterator<? extends E> iter2 = coll2.iterator();
+
+        while (iter1.hasNext() && iter2.hasNext()) {
+            int comp = iter1.next().compareTo(iter2.next());
+
+            if (comp != 0)
+                return comp;
+        }
+
+        // Every element in the smaller collection compared as equal
+        // to the corresponding element in the larger collection; the
+        // smaller collection is therefore "less than" the larger one...
+        return Integer.compare(coll1.size(), coll2.size());
+    }
+
+    /**
      * Counts the number of items returned by an iterator (and moves
      * the iterator to the end of the underlying collection).
      *

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -100,6 +101,37 @@ public class CollectionUtilTest extends NumericTestBase {
         assertDouble(3.0, CollectionUtil.average(Arrays.asList("abc"), s -> s.length()));
         assertDouble(2.5, CollectionUtil.average(Arrays.asList("abc", "de"), s -> s.length()));
         assertDouble(2.0, CollectionUtil.average(Arrays.asList("abc", "de", "f"), s -> s.length()));
+    }
+
+    @Test public void testCompareIterationOrder() {
+        Collection<String> set1 = new TreeSet<String>();
+        Collection<String> set2 = new TreeSet<String>();
+
+        Collection<String> list1 = new ArrayList<String>();
+        Collection<String> list2 = new ArrayList<String>();
+
+        assertTrue(CollectionUtil.compareIterationOrder(set1,  set2)  == 0);
+        assertTrue(CollectionUtil.compareIterationOrder(list1, list2) == 0);
+
+        set1.add("def");
+        list1.add("def");
+
+        assertTrue(CollectionUtil.compareIterationOrder(set1,  set2)  > 0);
+        assertTrue(CollectionUtil.compareIterationOrder(list1, list2) > 0);
+
+        set2.add("ghi");
+        list2.add("ghi");
+
+        assertTrue(CollectionUtil.compareIterationOrder(set1, set2)   < 0);
+        assertTrue(CollectionUtil.compareIterationOrder(list1, list2) < 0);
+
+        // Note the difference between the list and set, reflecting
+        // differences in the iteration order...
+        set2.add("abc");
+        list2.add("abc");
+
+        assertTrue(CollectionUtil.compareIterationOrder(set1,  set2)  > 0);
+        assertTrue(CollectionUtil.compareIterationOrder(list1, list2) < 0);
     }
 
     @Test public void testCountIterator() {
