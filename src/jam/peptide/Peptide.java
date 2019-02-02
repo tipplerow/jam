@@ -268,6 +268,26 @@ public interface Peptide extends Iterable<Residue> {
     }
 
     /**
+     * Creates new peptides with native residues chosen randomly with
+     * equal probability.
+     *
+     * @param length the desired number of residues.
+     *
+     * @param count the desired number of peptides.
+     *
+     * @return a list of {@code count} new peptides, each with exactly
+     * {@code length} randomly chosen native residues.
+     */
+    public static List<Peptide> newNative(int length, int count) {
+        List<Peptide> peptides = new ArrayList<Peptide>(count);
+
+        while (peptides.size() < count)
+            peptides.add(newNative(length));
+
+        return peptides;
+    }
+
+    /**
      * Returns the header line for CSV files containing peptides of a
      * given length.
      *
