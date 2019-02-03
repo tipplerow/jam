@@ -15,6 +15,8 @@ import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;
 
+import jam.io.IOUtil;
+import jam.io.LineReader;
 import jam.lang.ObjectFactory;
 import jam.math.IntRange;
 import jam.math.JamRandom;
@@ -155,6 +157,24 @@ public interface Peptide extends Iterable<Residue> {
     }
 
     /**
+     * Returns the header line for CSV files containing peptides of a
+     * given length.
+     *
+     * @param length the number of residues in the peptides.
+     *
+     * @return the header line for CSV files containing peptides with
+     * the specified length.
+     */
+    public static String headerCSV(int length) {
+        LineBuilder builder = LineBuilder.csv();
+
+        for (int k = 0; k < length; ++k)
+            builder.append(String.format("R%d", k));
+
+        return builder.toString();
+    }
+
+    /**
      * Identifies native peptides.
      *
      * @return {@code true} iff every residue in this peptide is a
@@ -181,6 +201,31 @@ public interface Peptide extends Iterable<Residue> {
 
         Arrays.sort(codes);
         return String.valueOf(codes);
+    }
+
+    /**
+     * Reads peptides from a flat file containing one peptide per line
+     * (and no header line).
+     *
+     * @param fileName the name of the flat file to read.
+     *
+     * @return a list of the peptides contained in the specified file.
+     *
+     * @throws RuntimeException if any I/O errors occur.
+     */
+    public static List<Peptide> loadFlatFile(String fileName) {
+        LineReader reader = LineReader.open(fileName);
+        List<Peptide> peptides = new ArrayList<Peptide>();
+
+        try {
+            for (String line : reader)
+                peptides.add(Peptide.parse(line));
+        }
+        finally {
+            IOUtil.close(reader);
+        }
+
+        return peptides;
     }
 
     /**
@@ -285,24 +330,6 @@ public interface Peptide extends Iterable<Residue> {
             peptides.add(newNative(length));
 
         return peptides;
-    }
-
-    /**
-     * Returns the header line for CSV files containing peptides of a
-     * given length.
-     *
-     * @param length the number of residues in the peptides.
-     *
-     * @return the header line for CSV files containing peptides with
-     * the specified length.
-     */
-    public static String headerCSV(int length) {
-        LineBuilder builder = LineBuilder.csv();
-
-        for (int k = 0; k < length; ++k)
-            builder.append(String.format("R%d", k));
-
-        return builder.toString();
     }
 
     /**
