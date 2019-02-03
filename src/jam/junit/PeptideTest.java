@@ -125,6 +125,14 @@ public class PeptideTest {
         assertEquals("ACCHKQQQ", pep.isomerKey());
     }
 
+    @Test public void testLoadFlatFile() {
+        List<Peptide> peptides = Peptide.loadFlatFile("data/test/peptide_flat.txt");
+
+        assertEquals(10, peptides.size());
+        assertEquals(Peptide.parse("QVSRDQVLD"), peptides.get(0));
+        assertEquals(Peptide.parse("QVSREQYLE"), peptides.get(9));
+    }
+
     @Test public void testMapIsomers() {
         assertEquals( 210, Peptide.mapIsomers(2).elementSet().size());
         assertEquals(1540, Peptide.mapIsomers(3).elementSet().size());

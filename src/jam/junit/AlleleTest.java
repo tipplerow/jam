@@ -1,8 +1,12 @@
 
 package jam.junit;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 import jam.hla.Allele;
 import jam.hla.Locus;
+import jam.util.RegexUtil;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -42,10 +46,14 @@ public class AlleleTest {
         assertEquals(20702, C2.hashCode());
     }
 
-    @Test public void testParse() {
+    @Test public void testInstance() {
         assertEquals(A1, Allele.instance("HLA-A*02:01"));
         assertEquals(A1, Allele.instance("HLA-A-02:01"));
         assertEquals(A1, Allele.instance("HLA-A-02-01"));
+    }
+
+    @Test public void testParse() {
+        assertEquals(List.of(C2, A1, B2), Allele.parse("C0702 A0201 B3501", RegexUtil.MULTI_WHITE_SPACE));
     }
 
     public static void main(String[] args) {

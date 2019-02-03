@@ -59,13 +59,7 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
      * @return the fixed genotype described by the input string.
      */
     public static Genotype parse(String s, Pattern delim) {
-        String[] fields  = delim.split(s);
-        Allele[] alleles = new Allele[fields.length];
-
-        for (int index = 0; index < fields.length; ++index)
-            alleles[index] = Allele.instance(fields[index]);
-
-        return instance(alleles);
+        return instance(Allele.parse(s, delim));
     }
 
     /**

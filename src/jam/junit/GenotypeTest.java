@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jam.hla.Allele;
 import jam.hla.Genotype;
+import jam.util.RegexUtil;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -124,6 +125,10 @@ public class GenotypeTest {
         assertFalse(homoA2.isHeterozygous());
         assertFalse(homoB1.isHeterozygous());
         assertFalse(hetero.isHomozygous());
+    }
+
+    @Test public void testParse() {
+        assertEquals(Genotype.instance(C2, A1, B2), Genotype.parse("C0702 A0201 B3501", RegexUtil.MULTI_WHITE_SPACE));
     }
 
     public static void main(String[] args) {

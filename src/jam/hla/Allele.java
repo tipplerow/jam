@@ -1,6 +1,10 @@
 
 package jam.hla;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 /**
  * Represents a single HLA allele.
  */
@@ -83,6 +87,29 @@ public final class Allele implements Comparable<Allele> {
      */
     public static Allele instance(String s) {
         return Parser.parse(s);
+    }
+
+    /**
+     * Returns the alleles encoded in a delimited string.
+     *
+     * @param s a string that encodes alleles separated by a
+     * delimiting pattern.
+     *
+     * @param delim the allele-separating delimiter.
+     *
+     * @return a list containing the encoded alleles.
+     *
+     * @throws RuntimeException unless the input string encodes one or
+     * more valid alleles.
+     */
+    public static List<Allele> parse(String s, Pattern delim) {
+        String[] fields = delim.split(s);
+        List<Allele> alleles = new ArrayList<Allele>(fields.length);
+
+        for (String field : fields)
+            alleles.add(instance(field));
+
+        return alleles;
     }
 
     /**
