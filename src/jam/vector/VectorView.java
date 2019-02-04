@@ -281,6 +281,22 @@ public interface VectorView extends Traversable {
     }
 
     /**
+     * Wraps a bare integer array in a read-only vector view.
+     *
+     * <p>The view is a shallow wrapper around the underlying array,
+     * so changes to the bare array will be reflected in the view.
+     * Therefore, this construction is most appropriate for vector
+     * views returned from functions that have created new arrays.
+     *
+     * @param array the array to wrap.
+     *
+     * @return a vector view of the input array.
+     */
+    public static VectorView wrap(int... array) {
+        return new IntArrayWrapper(array);
+    }
+
+    /**
      * Wraps a list of {@code Double} objects in a read-only vector
      * view.  In the interest of efficiency, the list must implement
      * the {@link java.util.RandomAccess} interface.
