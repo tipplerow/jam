@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 import jam.lang.ObjectFactory;
+import jam.math.IntUtil;
 import jam.math.JamRandom;
 
 /**
@@ -232,6 +233,54 @@ public final class ListUtil {
         return list.get(random.nextInt(list.size()));
     }
     
+    /**
+     * Selects a number of unique list elements (without replacement)
+     * at random using the global random number generator.
+     *
+     * @param <V> the element type.
+     *
+     * @param list the list to select from.
+     *
+     * @param count the number of elements to select.
+     *
+     * @return a new list containing {@code count} unique elements
+     * selected at random (without replacement).
+     *
+     * @throws IllegalArgumentException if the number of selected
+     * elements exceeds the size of the list.
+     */
+    public static <V> List<V> select(List<V> list, int count) {
+        return select(list, count, JamRandom.global());
+    }
+    
+    /**
+     * Selects a number of unique list elements (without replacement)
+     * at random.
+     *
+     * @param <V> the element type.
+     *
+     * @param list the list to select from.
+     *
+     * @param count the number of elements to select.
+     *
+     * @param random the random number source.
+     *
+     * @return a new list containing {@code count} unique elements
+     * selected at random (without replacement).
+     *
+     * @throws IllegalArgumentException if the number of selected
+     * elements exceeds the size of the list.
+     */
+    public static <V> List<V> select(List<V> list, int count, JamRandom random) {
+        int[] indexes = IntUtil.sample(list.size(), count, random);
+        List<V> selected = new ArrayList<V>(count);
+
+        for (int index : indexes)
+            selected.add(list.get(index));
+
+        return selected;
+    }
+
     /**
      * Randomly reorders elements in a list (in place) using the
      * global random number generator.

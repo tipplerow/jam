@@ -6,14 +6,17 @@ import java.util.ArrayList;
 
 import com.google.common.collect.Multiset;
 
+import jam.math.DoubleUtil;
 import jam.math.IntUtil;
+import jam.math.StatUtil;
 import jam.util.RegexUtil;
 import jam.vector.VectorUtil;
+import jam.vector.VectorView;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class IntUtilTest {
+public class IntUtilTest extends NumericTestBase {
     private static final double TOLERANCE = 1.0e-12;
 
     @Test public void testCount1() {
@@ -53,6 +56,29 @@ public class IntUtilTest {
         int[] expected = new int[] { 1, 2, 3 };
 
         assertTrue(Arrays.equals(actual, expected));
+    }
+
+    @Test public void testSample() {
+        int ITER_COUNT = 10000;
+        int SAMPLE_SIZE = 80;
+        int ELEMENT_COUNT = 101;
+
+        double[] corr  = new double[ITER_COUNT];
+        double[] mean1 = new double[ITER_COUNT];
+        double[] mean2 = new double[ITER_COUNT];
+
+        for (int iter = 0; iter < ITER_COUNT; ++iter) {
+            VectorView sample1 = VectorView.wrap(IntUtil.sample(ELEMENT_COUNT, SAMPLE_SIZE));
+            VectorView sample2 = VectorView.wrap(IntUtil.sample(ELEMENT_COUNT, SAMPLE_SIZE));
+
+            corr[iter]  = StatUtil.cor(sample1, sample2);
+            mean1[iter] = StatUtil.mean(sample1);
+            mean2[iter] = StatUtil.mean(sample2);
+        }
+
+        assertEquals( 0.0, StatUtil.mean(VectorView.wrap(corr)), 0.002);
+        assertEquals(50.0, StatUtil.mean(VectorView.wrap(mean1)), 0.1);
+        assertEquals(50.0, StatUtil.mean(VectorView.wrap(mean2)), 0.1);
     }
 
     @Test public void testToArray() {

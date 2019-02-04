@@ -1,6 +1,7 @@
 
 package jam.math;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
@@ -105,6 +106,95 @@ public final class IntUtil {
             elements[index] = parseInt(fields[index].trim());
 
         return elements;
+    }
+
+    /**
+     * Generates indexes required for a random sample of array or list
+     * elements (using the global random number source).
+     *
+     * @param elementCount the number of elements to choose from (the
+     * array length or list size).
+     *
+     * @param sampleSize the number of elements to choose.
+     *
+     * @return an array of length {@code sampleSize} containing the
+     * indexes of the elements to choose.
+     *
+     * @throws IllegalArgumentException if the sample size is negative
+     * or greater than the element count.
+     */
+    public static int[] sample(int elementCount, int sampleSize) {
+        return sample(elementCount, sampleSize, JamRandom.global());
+    }
+
+    /**
+     * Generates indexes required for a random sample of array or list
+     * elements.
+     *
+     * @param elementCount the number of elements to choose from (the
+     * array length or list size).
+     *
+     * @param sampleSize the number of elements to choose.
+     *
+     * @param random the random number source.
+     *
+     * @return an array of length {@code sampleSize} containing the
+     * indexes of the elements to choose.
+     *
+     * @throws IllegalArgumentException if the sample size is negative
+     * or greater than the element count.
+     */
+    public static int[] sample(int elementCount, int sampleSize, JamRandom random) {
+        if (sampleSize < 0)
+            throw new IllegalArgumentException("Sample size may not be negative.");
+
+        if (sampleSize > elementCount)
+            throw new IllegalArgumentException("Sample size may not exceed the element count.");
+
+        int[] indexes = new int[elementCount];
+
+        for (int k = 0; k < elementCount; ++k)
+            indexes[k] = k;
+
+        shuffle(indexes, random);
+        return Arrays.copyOfRange(indexes, 0, sampleSize);
+    }
+
+    /**
+     * Randomly reorders elements in an array (in place) using the
+     * global random number source.
+     *
+     * @param elements the array to shuffle.
+     */
+    public static void shuffle(int[] elements) {
+        shuffle(elements, JamRandom.global());
+    }
+
+    /**
+     * Randomly reorders elements in an array (in place).
+     *
+     * @param elements the array to shuffle.
+     *
+     * @param random the random number source.
+     */
+    public static void shuffle(int[] elements, JamRandom random) {
+        for (int k = elements.length - 1; k > 0; k--)
+            swap(elements, k, random.nextInt(k));
+    }
+
+    /**
+     * Swaps two array elements.
+     *
+     * @param elements the array on which to operate.
+     *
+     * @param j the index of the first element to swap.
+     *
+     * @param k the index of the second element to swap.
+     */
+    public static void swap(int[] elements, int j, int k) {
+        int tmp = elements[j];
+        elements[j] = elements[k];
+        elements[k] = tmp;
     }
 
     /**
