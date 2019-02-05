@@ -1,6 +1,9 @@
 
 package jam.app;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import jam.lang.JamException;
 
 /**
@@ -8,6 +11,12 @@ import jam.lang.JamException;
  */
 public final class JamEnv {
     private JamEnv() {}
+
+    private static final String OPEN_DELIM = "${";
+    private static final String CLOSE_DELIM = "}";
+
+    private static final Pattern SYSTEM_ENV_PATTERN =
+        Pattern.compile(Pattern.quote(OPEN_DELIM) + "(\\w+)" + Pattern.quote(CLOSE_DELIM));
 
     /**
      * Returns a required environment variable.
@@ -71,5 +80,33 @@ public final class JamEnv {
      */
     public static boolean isUnset(String varName) {
         return !isSet(varName);
+    }
+
+    /**
+     * Replaces environment variables delimited by <tt>${...}</tt>
+     * with their values (and removes the delimiters).
+     *
+     * @param s the string to examine.
+     *
+     * @return a string with all environment variables named in the
+     * input string replaced with their environment values (and the
+     * delimiters removed).
+     *
+     * @throws RuntimeException if a referenced environment variable
+     * is not set.
+     */
+    public static String replaceVariable(String s) {
+        Matcher matcher = SYSTEM_ENV_PATTERN.matcher(s);
+
+        while (matcher.find()) {
+            String envName = matcher.group(1);
+            String envValue = getRequired(envName);
+
+            s = s.replace(envName, envValue);
+            s = s.replace(OPEN_DELIM, "");
+            s = s.replace(CLOSE_DELIM, "");
+        }
+
+        return s;
     }
 }

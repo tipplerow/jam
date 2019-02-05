@@ -147,6 +147,11 @@ public class JamPropertiesTest {
         assertEquals("123", JamProperties.getRequired("test.prop"));
     }
 
+    @Test public void testReplace() {
+        assertEquals("abc/GHI/foo/XYZ/bar",
+                     JamProperties.replaceProperty("abc/<jam.enum.ghi>/foo/<jam.enum.xyz>/bar"));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.JamPropertiesTest");
     }

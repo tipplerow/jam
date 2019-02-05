@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jam.io.DataReader;
@@ -29,10 +30,10 @@ import jam.util.StringUtil;
  * then read additional properties from the specified properties file
  * and assign them to the system properties.
  *
- * <p>Property values with the special form <tt>${VARNAME}</tt> are
- * expanded to the value of the <em>environment variable</em> with
- * that name.  Property values enclosed in double quotation marks
- * (e.g., {@code "user.name"}) are expanded to the value of the
+ * <p>Property values with the special form <tt>${VARNAME}</tt> (e.g.,
+ * <tt>${JAM_HOME}</tt>) are expanded to the value of the <em>environment
+ * variable</em> with that name.  Property values enclosed in brackets
+ * (e.g., {@code &lt;user.name&gt;}) are expanded to the value of the
  * <em>system property</em> with that name.
  *
  * <p>Property files must contain key-value pairs separated by an
@@ -47,6 +48,12 @@ public final class JamProperties {
 
     private static final Pattern COMMENT_PATTERN = RegexUtil.PYTHON_COMMENT;
     private static final Pattern KEY_VALUE_DELIM = Pattern.compile("=");
+
+    private static final String OPEN_DELIM = "<";
+    private static final String CLOSE_DELIM = ">";
+
+    private static final Pattern PROPERTY_PATTERN =
+        Pattern.compile(Pattern.quote(OPEN_DELIM) + "([\\w+\\.]+)" +  Pattern.quote(CLOSE_DELIM));
 
     /**
      * Returns a read-only view of all system properties, with the
@@ -569,6 +576,33 @@ public final class JamProperties {
     }
 
     /**
+     * Replaces system properties delimited by {@code &lt;...&gt;}
+     * with their values (and removes the delimiters).
+     *
+     * @param s the string to examine.
+     *
+     * @return a string with any system properties named in the input
+     * string replaced with their values (and the delimiters removed).
+     *
+     * @throws RuntimeException if a referenced system property is not
+     * set.
+     */
+    public static String replaceProperty(String s) {
+        Matcher matcher = PROPERTY_PATTERN.matcher(s);
+
+        while (matcher.find()) {
+            String refPropName = matcher.group(1);
+            String refPropValue = getRequired(refPropName);
+
+            s = s.replace(refPropName, refPropValue);
+            s = s.replace(OPEN_DELIM, "");
+            s = s.replace(CLOSE_DELIM, "");
+        }
+
+        return s;
+    }
+
+    /**
      * Assigns a system property.
      *
      * <p>Previously assigned values will be overwritten.
@@ -596,16 +630,14 @@ public final class JamProperties {
     public static void setProperty(String propertyName, String propertyValue, boolean override) {
         if (!override && isSet(propertyName)) {
             JamLogger.info("System property is already set: [%s] = [%s]", propertyName, System.getProperty(propertyName));
+            return;
         }
-        else if (isEnvironmentVariable(propertyValue)) {
-            setEnvironmentProperty(propertyName, propertyValue);
-        }
-        else if (isPropertyReference(propertyValue)) {
-            setPropertyReference(propertyName, propertyValue);
-        }
-        else {
-            System.setProperty(propertyName, propertyValue);
-        }
+
+        // Expand symbolic property names and environment variables...
+        propertyValue = replaceProperty(propertyValue);
+        propertyValue = JamEnv.replaceVariable(propertyValue);
+
+        System.setProperty(propertyName, propertyValue);
     }
 
     private static boolean isEnvironmentVariable(String propertyValue) {

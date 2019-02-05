@@ -1,6 +1,9 @@
 
 package jam.junit;
 
+import java.io.File;
+import java.io.IOException;
+
 import jam.app.JamEnv;;
 
 import org.junit.*;
@@ -15,6 +18,19 @@ public class JamEnvTest {
     @Test public void testIsUnset() {
         assertTrue(JamEnv.isUnset("no such variable"));
         assertFalse(JamEnv.isUnset("JAM_HOME"));
+    }
+
+    @Test public void testReplace() throws IOException {
+        String jamHome = System.getenv("JAM_HOME");
+        String userName = System.getenv("USER");
+
+        assertEquals(jamHome, JamEnv.replaceVariable("${JAM_HOME}"));
+        assertEquals("foo/" + jamHome + "/xyz/" + userName, JamEnv.replaceVariable("foo/${JAM_HOME}/xyz/${USER}"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testReplaceUnset() {
+        JamEnv.replaceVariable("${__NOSUCHVAR__}");
     }
 
     public static void main(String[] args) {
