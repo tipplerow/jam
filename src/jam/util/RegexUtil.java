@@ -41,6 +41,11 @@ public final class RegexUtil {
     public static final Pattern OPEN_PAREN = Pattern.compile("\\(");
 
     /**
+     * Matches a single pipe ({@code |}) character.
+     */
+    public static final Pattern PIPE = Pattern.compile(Pattern.quote("|"));
+
+    /**
      * Matches the Python and R single-line comment markers.
      */
     public static final Pattern PYTHON_COMMENT = Pattern.compile("#");

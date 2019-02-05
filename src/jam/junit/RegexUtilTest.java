@@ -70,6 +70,11 @@ public class RegexUtilTest extends NumericTestBase {
         RegexUtil.parseInt(RegexUtil.COMMA, "1, 2, 3", 4);
     }
 
+    @Test public void testPipe() {
+        testSplit(RegexUtil.PIPE, "abc def", 1, "abc def");
+        testSplit(RegexUtil.PIPE, "abc|def", 2, "abc", "def");
+    }
+
     @Test public void testPythonComment() {
         testSplit(RegexUtil.CPP_COMMENT,    "abc//def", 1, "abc//def");
         testSplit(RegexUtil.PYTHON_COMMENT, "abc#def",  2, "abc", "def");
