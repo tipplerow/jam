@@ -22,6 +22,7 @@ final class Parser {
     }
 
     private Allele parse() {
+        trimWhiteSpace();
         removePrefix();
         parseLocus();
         removeDelim1();
@@ -30,6 +31,10 @@ final class Parser {
         parseSubType();
 
         return Allele.instance(locus, superType, subType);
+    }
+
+    private void trimWhiteSpace() {
+        substr = original.trim();
     }
 
     private void removePrefix() {

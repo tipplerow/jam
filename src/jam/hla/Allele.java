@@ -103,7 +103,7 @@ public final class Allele implements Comparable<Allele> {
      * more valid alleles.
      */
     public static List<Allele> parse(String s, Pattern delim) {
-        String[] fields = delim.split(s);
+        String[] fields = delim.split(s.trim());
         List<Allele> alleles = new ArrayList<Allele>(fields.length);
 
         for (String field : fields)
