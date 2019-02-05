@@ -1,6 +1,7 @@
 
 package jam.io;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -17,7 +18,7 @@ import jam.util.StringUtil;
  * All continuation lines will be appended to the previous line (after
  * adding a leading space character).
  */
-public final class DataReader implements Iterable<String> {
+public final class DataReader implements Closeable, Iterable<String> {
     private final LineReader reader;
     private final Pattern comment;
     private String nextLine;
@@ -100,7 +101,7 @@ public final class DataReader implements Iterable<String> {
     /**
      * Closes the underlying reader.
      */
-    public void close() {
+    @Override public void close() {
         reader.close();
     }
 
