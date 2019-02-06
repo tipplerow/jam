@@ -47,6 +47,18 @@ public class StatSummaryTest extends NumericTestBase {
 
         assertEquals(sdev, summary.getSD(), 0.01);
         assertEquals(sdev, summary.getMAD(), 0.01);
+
+        double[] zscores = new double[100000];
+
+        for (int k = 0; k < zscores.length; ++k)
+            zscores[k] = summary.zScore(RANDOM.nextGaussian(mean, sdev));
+
+        StatSummary zSummary = StatSummary.compute(zscores);
+
+        assertEquals(0.0, zSummary.getMean(), 0.01);
+        assertEquals(0.0, zSummary.getMedian(), 0.01);
+        assertEquals(1.0, zSummary.getSD(), 0.01);
+        assertEquals(1.0, zSummary.getMAD(), 0.01);
     }
 
     @Test public void testLogNormal() {

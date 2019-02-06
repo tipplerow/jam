@@ -404,6 +404,18 @@ public final class StatSummary {
         return quartile3 - quartile1;
     }
 
+    /**
+     * Computes the z-score for an observation (not required to be in
+     * the initial data set): {@code (x - mean) / SD}.
+     *
+     * @param x the observation of interest.
+     *
+     * @return the z-score for the given observation.
+     */
+    public double zScore(double x) {
+        return (x - getMean()) / getSD();
+    }
+
     @Override public String toString() {
         String fmtstr = "%s %12.8f\n";
         StringBuilder builder = new StringBuilder();
