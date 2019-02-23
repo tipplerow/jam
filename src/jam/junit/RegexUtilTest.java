@@ -33,6 +33,11 @@ public class RegexUtilTest extends NumericTestBase {
         testSplit(RegexUtil.PYTHON_COMMENT, "abc#def",  1, "abc#def");
     }
 
+    @Test public void testDot() {
+        testSplit(RegexUtil.DOT,   "abc.def", 2, "abc", "def");
+        testSplit(RegexUtil.COLON, "abc.def", 1, "abc.def");
+    }
+
     @Test public void testMultiWhiteSpace() {
 	testSplit(RegexUtil.MULTI_WHITE_SPACE, "", 0, "");
 	testSplit(RegexUtil.MULTI_WHITE_SPACE, "abc", 0, "abc");

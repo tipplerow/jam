@@ -31,6 +31,11 @@ public final class RegexUtil {
     public static final Pattern CPP_COMMENT = Pattern.compile("//");
 
     /**
+     * Matches a single dot (period) character.
+     */
+    public static final Pattern DOT = Pattern.compile("\\.");
+
+    /**
      * Matches one or more whitespace characters.
      */
     public static final Pattern MULTI_WHITE_SPACE = Pattern.compile("\\s+");
