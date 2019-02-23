@@ -142,7 +142,7 @@ public class JamPropertiesTest {
 
     @Test public void testPropertyReference() {
         JamProperties.setProperty("base.prop", "123", true);
-        JamProperties.setProperty("test.prop", "\"base.prop\"", true);
+        JamProperties.setProperty("test.prop", "<base.prop>", true);
 
         assertEquals("123", JamProperties.getRequired("test.prop"));
     }
