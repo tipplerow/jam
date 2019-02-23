@@ -20,7 +20,6 @@ import jam.math.LongRange;
 import jam.math.LongUtil;
 import jam.util.EnumUtil;
 import jam.util.RegexUtil;
-import jam.util.StringUtil;
 
 /**
  * Helps to manange system properties.
@@ -660,10 +659,6 @@ public final class JamProperties {
         // First two characters are ${, last character is }
         //
         return propertyValue.substring(2, propertyValue.length() - 1);
-    }
-
-    private static boolean isPropertyReference(String propertyValue) {
-        return StringUtil.isDoubleQuoted(propertyValue);
     }
 
     private static void setPropertyReference(String propertyName, String propertyValue) {
