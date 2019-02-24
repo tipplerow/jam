@@ -26,6 +26,17 @@ public final class EnsemblGene extends KeyedObject<String> {
     }
 
     /**
+     * Returns a gene object corresponding to a given key string.
+     *
+     * @param key the key string.
+     *
+     * @return a gene object corresponding to a given key string.
+     */
+    public static EnsemblGene instance(String key) {
+        return new EnsemblGene(key);
+    }
+
+    /**
      * Extracts the gene key from an Ensembl FASTA record.
      *
      * @param record the FASTA record to parse.

@@ -47,6 +47,8 @@ public final class EnsemblMap {
 
     /**
      * Returns the single global instance.
+     *
+     * @return the single global instance.
      */
     public static EnsemblMap instance() {
         if (instance == null)
