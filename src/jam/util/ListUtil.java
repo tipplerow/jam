@@ -304,6 +304,32 @@ public final class ListUtil {
     }
 
     /**
+     * Splits a list into sublists of equal length, except for the
+     * last sublist when the original list cannot be split exactly.
+     *
+     * @param <V> the element type.
+     *
+     * @param list the list to split.
+     *
+     * @param size the desired size of the sublists.
+     *
+     * @return a list containing the sublists.
+     *
+     * @throws IllegalArgumentException unless the size is positive.
+     */
+    public static <V> List<List<V>> split(List<V> list, int size) {
+        if (size < 1)
+            throw new IllegalArgumentException("Sublist size must be positive.");
+
+        List<List<V>> subLists = new ArrayList<List<V>>();
+
+        for (int fromIndex = 0; fromIndex < list.size(); fromIndex += size)
+            subLists.add(list.subList(fromIndex, Math.min(fromIndex + size, list.size())));
+
+        return subLists;
+    }
+
+    /**
      * Constructs the transpose of a ragged array.
      *
      * <p>For example, the following ragged array:

@@ -126,6 +126,41 @@ public class ListUtilTest {
         assertEquals(0.0, StatUtil.cor(ordered, shuffled), 0.01);
     }
 
+    @Test public void testSplit() {
+        List<String> list = List.of("A", "B", "C", "D", "E");
+        List<List<String>> subLists = ListUtil.split(list, 1);
+
+        assertEquals(5, subLists.size());
+        assertEquals(List.of("A"), subLists.get(0));
+        assertEquals(List.of("B"), subLists.get(1));
+        assertEquals(List.of("C"), subLists.get(2));
+        assertEquals(List.of("D"), subLists.get(3));
+        assertEquals(List.of("E"), subLists.get(4));
+
+        subLists = ListUtil.split(list, 2);
+
+        assertEquals(3, subLists.size());
+        assertEquals(List.of("A", "B"), subLists.get(0));
+        assertEquals(List.of("C", "D"), subLists.get(1));
+        assertEquals(List.of("E"), subLists.get(2));
+
+        subLists = ListUtil.split(list, 3);
+
+        assertEquals(2, subLists.size());
+        assertEquals(List.of("A", "B", "C"), subLists.get(0));
+        assertEquals(List.of("D", "E"), subLists.get(1));
+
+        subLists = ListUtil.split(list, 5);
+
+        assertEquals(1, subLists.size());
+        assertEquals(List.of("A", "B", "C", "D", "E"), subLists.get(0));
+
+        subLists = ListUtil.split(list, 10);
+
+        assertEquals(1, subLists.size());
+        assertEquals(List.of("A", "B", "C", "D", "E"), subLists.get(0));
+    }
+
     @Test public void testTranspose() {
         List<String> row1 = Arrays.asList("A", "B");
         List<String> row2 = Arrays.asList("C", "D", "E", "F");
