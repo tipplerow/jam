@@ -2,7 +2,7 @@
 package jam.junit;
 
 import java.util.Arrays;
-import java.util.ArrayList;
+import java.util.List;
 
 import com.google.common.collect.Multiset;
 
@@ -56,6 +56,13 @@ public class IntUtilTest extends NumericTestBase {
         int[] expected = new int[] { 1, 2, 3 };
 
         assertTrue(Arrays.equals(actual, expected));
+    }
+
+    @Test public void testParseIntList() {
+        List<Integer> actual   = IntUtil.parseIntList("1, 2, 3", RegexUtil.COMMA);
+        List<Integer> expected = List.of(1, 2, 3);
+
+        assertEquals(actual, expected);
     }
 
     @Test public void testSample() {

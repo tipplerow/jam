@@ -1,8 +1,10 @@
 
 package jam.math;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.HashMultiset;
@@ -104,6 +106,28 @@ public final class IntUtil {
 
         for (int index = 0; index < fields.length; index++)
             elements[index] = parseInt(fields[index].trim());
+
+        return elements;
+    }
+
+    /**
+     * Parses a delimited string of integer values.
+     *
+     * @param string the delimited string to parse.
+     *
+     * @param pattern the element delimiter.
+     *
+     * @return the integer list represented by the given string.
+     *
+     * @throws RuntimeException unless the string is properly
+     * formatted.
+     */
+    public static List<Integer> parseIntList(String string, Pattern pattern) {
+        String[] fields = pattern.split(string);
+        List<Integer> elements = new ArrayList<Integer>(fields.length);
+
+        for (String field : fields)
+            elements.add(parseInt(field.trim()));
 
         return elements;
     }
