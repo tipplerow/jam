@@ -60,6 +60,94 @@ public final class IntUtil {
     }
 
     /**
+     * Finds the maximum value in a sequence of integers.
+     *
+     * @param elements the elements to examine.
+     *
+     * @return the maximum value in the input sequence.
+     *
+     * @throws IllegalArgumentException unless the sequence contains
+     * at least one element.
+     */
+    public static int max(int... elements) {
+        if (elements.length < 1)
+            throw new IllegalArgumentException("At least one element is required.");
+
+        int result = Integer.MIN_VALUE;
+
+        for (int element : elements)
+            result = Math.max(result, element);
+
+        return result;
+    }
+
+    /**
+     * Finds the maximum value in a list of integers.
+     *
+     * @param elements the elements to examine.
+     *
+     * @return the maximum value in the input list.
+     *
+     * @throws IllegalArgumentException unless the list contains
+     * at least one element.
+     */
+    public static int max(List<Integer> elements) {
+        if (elements.isEmpty())
+            throw new IllegalArgumentException("At least one element is required.");
+
+        int result = Integer.MIN_VALUE;
+
+        for (int element : elements)
+            result = Math.max(result, element);
+
+        return result;
+    }
+
+    /**
+     * Finds the minimum value in a sequence of integers.
+     *
+     * @param elements the elements to examine.
+     *
+     * @return the minimum value in the input sequence.
+     *
+     * @throws IllegalArgumentException unless the sequence contains
+     * at least one element.
+     */
+    public static int min(int... elements) {
+        if (elements.length < 1)
+            throw new IllegalArgumentException("At least one element is required.");
+
+        int result = Integer.MAX_VALUE;
+
+        for (int element : elements)
+            result = Math.min(result, element);
+
+        return result;
+    }
+
+    /**
+     * Finds the minimum value in a list of integers.
+     *
+     * @param elements the elements to examine.
+     *
+     * @return the minimum value in the input list.
+     *
+     * @throws IllegalArgumentException unless the list contains
+     * at least one element.
+     */
+    public static int min(List<Integer> elements) {
+        if (elements.isEmpty())
+            throw new IllegalArgumentException("At least one element is required.");
+
+        int result = Integer.MAX_VALUE;
+
+        for (int element : elements)
+            result = Math.min(result, element);
+
+        return result;
+    }
+
+    /**
      * Parses a string representation of an integer value.
      *
      * <p>In addition to all formats accepted by the built-in 

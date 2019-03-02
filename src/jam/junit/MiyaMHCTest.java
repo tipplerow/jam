@@ -23,15 +23,12 @@ public class MiyaMHCTest extends NumericTestBase {
     private static final RIM MJ = RIM.MiyazawaJernigan;
 
     static {
-        System.setProperty(MHCProperties.ANCHOR_LENGTH_PROPERTY, "4");
-        System.setProperty(MHCProperties.ANCHOR_REGION_PROPERTY, "[1, 3]");
-        System.setProperty(MHCProperties.TARGET_REGION_PROPERTY, "[4, 6]");
-
+        System.setProperty(MHCProperties.TIPS_PROPERTY, "4, 5, 6");
         System.setProperty(MHCProperties.ACTIVATION_ENERGY_PROPERTY, "0.0");
         System.setProperty(MHCProperties.AFFINITY_THRESHOLD_PROPERTY, "10.0");
     }
 
-    private final MiyaMHC mhc  = MiyaMHC.of(G, A, C, D);
+    private final MiyaMHC mhc  = MiyaMHC.of(A, C, D);
     private final Peptide pep1 = Peptide.of(A, A, A, A, E, F, G);
     private final Peptide pep2 = Peptide.of(A, A, A, A, F, L, V);
         

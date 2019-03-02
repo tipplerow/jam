@@ -2,11 +2,12 @@
 package jam.miya;
 
 import jam.lang.ObjectFactory;
+import jam.math.IntUtil;
 import jam.mhc.MHC;
 import jam.neo.NeoAntigenSim;
 import jam.peptide.Peptide;
-import jam.peptide.TargetProperties;
 import jam.tcell.TCR;
+import jam.tcell.TCellProperties;
 
 public final class MiyaSim extends NeoAntigenSim {
     private MiyaSim(String[] propertyFiles) {
@@ -18,7 +19,7 @@ public final class MiyaSim extends NeoAntigenSim {
     }
 
     @Override protected ObjectFactory<? extends Peptide> getPeptideFactory() {
-        return Peptide.nativeFactory(TargetProperties.getTargetLength());
+        return Peptide.nativeFactory(1 + IntUtil.max(TCellProperties.viewTIPs()));
     }
 
     @Override protected ObjectFactory<? extends TCR> getTCRFactory() {

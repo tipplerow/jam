@@ -122,6 +122,38 @@ public final class RIM {
     }
 
     /**
+     * Computes the nearest-neighbor interaction energy between a
+     * binder and target peptide, given a mapping from binder to
+     * target residues.
+     *
+     * @param binder the binder peptide.
+     *
+     * @param target the target peptide.
+     *
+     * @param TIPs the <em>target interaction points</em>, defined as
+     * follows: residue {@code k} in the binder peptide interacts with
+     * residue {@code TIPs.get(k)} of the target peptide.
+     *
+     * @return the nearest-neighbor interaction energy between the
+     * binder and target.
+     *
+     * @throws IllegalArgumentException unless the binder peptide and
+     * {@code TIPs} list have equal lengths and all interaction points
+     * refer to valid locations in the target peptide.
+     */
+    public double computeNearest(Peptide binder, Peptide target, List<Integer> TIPs) {
+        if (binder.length() != TIPs.size())
+            throw new IllegalArgumentException("Invalid target interaction points.");
+
+        double result = 0.0;
+
+        for (int binderIndex = 0; binderIndex < binder.length(); ++binderIndex)
+            result += get(binder.at(binderIndex), target.at(TIPs.get(binderIndex)));
+
+        return result;
+    }
+
+    /**
      * Computes the average nearest-neighbor interaction energy for a
      * given binder peptide averaged over all possible target peptides
      * of the same length, assuming that amino acids are distributed

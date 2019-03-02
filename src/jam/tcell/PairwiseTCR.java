@@ -1,7 +1,8 @@
 
 package jam.tcell;
 
-import jam.math.IntRange;
+import java.util.List;
+
 import jam.peptide.PairwiseBinder;
 import jam.peptide.Peptide;
 import jam.peptide.RIM;
@@ -31,11 +32,7 @@ public abstract class PairwiseTCR extends AbstractTCR implements PairwiseBinder 
         return binder;
     }
 
-    @Override public IntRange getBinderRegion() {
-        return TCellProperties.getBinderRegion();
-    }
-
-    @Override public IntRange getTargetRegion() {
-        return TCellProperties.getTargetRegion();
+    @Override public List<Integer> getTargetInteractionPoints() {
+        return TCellProperties.viewTIPs();
     }
 }

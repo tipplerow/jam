@@ -1,7 +1,8 @@
 
 package jam.mhc;
 
-import jam.math.IntRange;
+import java.util.List;
+
 import jam.peptide.PairwiseBinder;
 import jam.peptide.Peptide;
 
@@ -27,11 +28,7 @@ public abstract class PairwiseMHC extends AbstractMHC implements PairwiseBinder 
         return anchor;
     }
 
-    @Override public IntRange getBinderRegion() {
-        return MHCProperties.getAnchorRegion();
-    }
-
-    @Override public IntRange getTargetRegion() {
-        return MHCProperties.getTargetRegion();
+    @Override public List<Integer> getTargetInteractionPoints() {
+        return MHCProperties.viewTIPs();
     }
 }
