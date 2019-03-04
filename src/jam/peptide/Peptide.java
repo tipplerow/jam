@@ -16,12 +16,19 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;
 
 import jam.io.IOUtil;
-import jam.io.LineReader;
+import jam.io.ObjectParser;
+import jam.io.ObjectReader;
 import jam.lang.ObjectFactory;
 import jam.math.IntRange;
 import jam.math.JamRandom;
 import jam.report.LineBuilder;
 import jam.util.ListUtil;
+
+final class PeptideParser implements ObjectParser<Peptide> {
+    @Override public Peptide parse(String s) {
+        return Peptide.parse(s);
+    }
+}
 
 /**
  * Defines a fixed linear sequence of amino acids.
@@ -32,6 +39,11 @@ public interface Peptide extends Iterable<Residue> {
      * without exceeding the maximum size of a {@code Collection}.
      */
     public static final int ENUMERATION_LIMIT = 7;
+
+    /**
+     * The global peptide parser.
+     */
+    public static final ObjectParser<Peptide> PARSER = new PeptideParser();
 
     /**
      * Creates a new peptide from a sequence of residues.
@@ -214,18 +226,7 @@ public interface Peptide extends Iterable<Residue> {
      * @throws RuntimeException if any I/O errors occur.
      */
     public static List<Peptide> loadFlatFile(String fileName) {
-        LineReader reader = LineReader.open(fileName);
-        List<Peptide> peptides = new ArrayList<Peptide>();
-
-        try {
-            for (String line : reader)
-                peptides.add(Peptide.parse(line));
-        }
-        finally {
-            IOUtil.close(reader);
-        }
-
-        return peptides;
+        return ObjectReader.load(fileName, PARSER);
     }
 
     /**

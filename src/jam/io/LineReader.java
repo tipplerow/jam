@@ -4,7 +4,6 @@ package jam.io;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
