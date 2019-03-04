@@ -14,6 +14,8 @@ import com.google.common.collect.Multiset;
 
 import org.apache.commons.math3.util.Combinations;
 
+import jam.io.ObjectParser;
+import jam.io.ObjectReader;
 import jam.lang.JamException;
 import jam.util.AbstractImmutableMultiset;
 import jam.util.CollectionUtil;
@@ -46,6 +48,34 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
      */
     public static Genotype instance(Collection<Allele> alleles) {
         return new Genotype(ImmutableSortedMultiset.copyOf(alleles));
+    }
+
+    /**
+     * Reads genotypes from a flat file containing one genotype per
+     * line (and no header line).
+     *
+     * @param fileName the name of the flat file to read.
+     *
+     * @param delim the delimiter separating the individual alleles.
+     *
+     * @return a list containing the genotypes in the flat file.
+     *
+     * @throws RuntimeException if any I/O errors occur.
+     */
+    public static List<Genotype> loadFlatFile(String fileName, Pattern delim) {
+        return ObjectReader.load(fileName, new GenotypeParser(delim));
+    }
+
+    private static final class GenotypeParser implements ObjectParser<Genotype> {
+        private final Pattern delim;
+
+        private GenotypeParser(Pattern delim) {
+            this.delim = delim;
+        }
+
+        @Override public Genotype parse(String s) {
+            return Genotype.parse(s, delim);
+        }
     }
 
     /**
