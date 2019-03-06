@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,12 +12,14 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class SqliteTest {
+    private static final File DB_FILE = new File("sample.db");
+
     @Test public void testFoo() throws ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
         Connection connection = null;
 
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:sample.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + DB_FILE);
 
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
@@ -43,6 +46,8 @@ public class SqliteTest {
             try {
                 if (connection != null)
                     connection.close();
+
+                DB_FILE.delete();
             }
             catch(SQLException e) {
                 // connection close failed.
