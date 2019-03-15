@@ -55,6 +55,21 @@ public final class Peptidome extends AbstractSet<Peptide> {
     }
 
     /**
+     * Reads peptides from a flat file containing one peptide per line
+     * (and no header line).
+     *
+     * @param fileName the name of the flat file to read.
+     *
+     * @return a peptidome containing all peptides listed in the
+     * specified file.
+     *
+     * @throws RuntimeException if any I/O errors occur.
+     */
+    public static Peptidome load(String fileName) {
+        return Peptidome.create(Peptide.loadFlatFile(fileName));
+    }
+
+    /**
      * Randomly mutates the peptides in this peptidome and returns the
      * mutated peptides in a new peptidome; this peptidome is unchanged.
      *
