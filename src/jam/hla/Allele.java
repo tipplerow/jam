@@ -31,22 +31,16 @@ public final class Allele implements Comparable<Allele> {
     }
 
     private static void validateType(int type) {
-        if (type < 1 || type > 999)
+        if (type < 1 || type > 99)
             throw new IllegalArgumentException("Invalid allele type.");
     }
 
     private static String formatLongKey(Locus locus, int superType, int subType) {
-        if (subType < 100)
-            return String.format("%s%s*%02d:%02d", PREFIX, locus, superType, subType);
-        else
-            return String.format("%s%s*%02d:%3d", PREFIX, locus, superType, subType);
+        return String.format("%s%s*%02d:%02d", PREFIX, locus, superType, subType);
     }
 
     private static String formatShortKey(Locus locus, int superType, int subType) {
-        if (subType < 100)
-            return String.format("%s%02d%02d", locus, superType, subType);
-        else
-            return String.format("%s%02d%3d", locus, superType, subType);
+        return String.format("%s%02d%02d", locus, superType, subType);
     }
 
     private static int computeHashCode(Locus locus, int superType, int subType) {
