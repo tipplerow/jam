@@ -26,6 +26,11 @@ public final class Peptidome extends AbstractSet<Peptide> {
     }
 
     /**
+     * The single peptidome containing no peptides.
+     */
+    public static final Peptidome EMPTY = new Peptidome(Collections.emptySet());
+
+    /**
      * Creates a new peptidome with a fixed set of peptides.
      *
      * @param peptides the members of the peptidome.
