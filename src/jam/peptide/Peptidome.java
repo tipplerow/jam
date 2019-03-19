@@ -75,6 +75,23 @@ public final class Peptidome extends AbstractSet<Peptide> {
     }
 
     /**
+     * Creates the union of several peptidomes.
+     *
+     * @param peptidomes the peptidomes to join.
+     *
+     * @return a new peptidome containing all peptides contained in
+     * any of the specified peptidomes.
+     */
+    public static Peptidome union(Peptidome... peptidomes) {
+        Set<Peptide> peptides = new LinkedHashSet<Peptide>();
+
+        for (Peptidome peptidome : peptidomes)
+            peptides.addAll(peptidome);
+
+        return new Peptidome(peptides);
+    }
+
+    /**
      * Randomly mutates the peptides in this peptidome and returns the
      * mutated peptides in a new peptidome; this peptidome is unchanged.
      *
