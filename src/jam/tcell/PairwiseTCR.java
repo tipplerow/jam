@@ -25,7 +25,7 @@ public abstract class PairwiseTCR extends AbstractTCR implements PairwiseBinder 
     }
 
     @Override public double computeMeanAffinity() {
-        return getRIM().computeMeanNearest(binder);
+        return getActivationEnergy() - getRIM().computeMeanNearest(binder);
     }
 
     @Override public Peptide getBinderPeptide() {
