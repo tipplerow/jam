@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
 
 /**
@@ -29,6 +30,34 @@ public final class Repertoire extends AbstractCollection<TCR> {
      */
     public static Repertoire wrap(Collection<? extends TCR> receptors) {
         return new Repertoire(receptors);
+    }
+
+    /**
+     * Computes the fraction of peptides recognized by this repertoire.
+     *
+     * @param targets the targets to examine.
+     *
+     * @return the fraction of peptides recognized by this repertiore.
+     */
+    public double computeRecognitionRate(Collection<Peptide> targets) {
+        return DoubleUtil.ratio(countRecognized(targets), targets.size());
+    }
+
+    /**
+     * Computes the number of peptides recognized by this repertoire.
+     *
+     * @param targets the targets to examine.
+     *
+     * @return the number of peptides recognized by this repertiore.
+     */
+    public int countRecognized(Collection<Peptide> targets) {
+        int count = 0;
+
+        for (Peptide target : targets)
+            if (isRecognized(target))
+                ++count;
+
+        return count;
     }
 
     /**
