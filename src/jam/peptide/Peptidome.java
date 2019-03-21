@@ -75,6 +75,26 @@ public final class Peptidome extends AbstractSet<Peptide> {
     }
 
     /**
+     * Creates a peptidome composed of peptides with native residues
+     * chosen randomly with equal probability.
+     *
+     * @param length the desired number of residues.
+     *
+     * @param size the desired number of peptides.
+     *
+     * @return a peptidome containing {@code size} new peptides, each
+     * with exactly {@code length} randomly chosen native residues.
+     */
+    public static Peptidome random(int length, int size) {
+        Set<Peptide> peptides = new HashSet<Peptide>(size);
+
+        while (peptides.size() < size)
+            peptides.add(Peptide.newNative(length));
+
+        return new Peptidome(peptides);
+    }
+
+    /**
      * Creates the union of several peptidomes.
      *
      * @param peptidomes the peptidomes to join.
