@@ -138,6 +138,10 @@ public final class Peptidome extends AbstractSet<Peptide> {
         return new Peptidome(mutants);
     }
 
+    @Override public boolean contains(Object obj) {
+        return peptides.contains(obj);
+    }
+
     @Override public Iterator<Peptide> iterator() {
         return peptides.iterator();
     }

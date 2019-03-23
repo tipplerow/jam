@@ -2,7 +2,7 @@
 package jam.peptide;
 
 abstract class AbstractPeptide implements Peptide {
-    private int hashCode;
+    private int hashCode = UNSET_HASH_CODE;
 
     private static final int UNSET_HASH_CODE = 0;
     
