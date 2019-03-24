@@ -43,4 +43,8 @@ public abstract class AbstractTCR implements TCR {
     @Override public double getNegativeThreshold() {
         return TCellProperties.getNegativeThreshold();
     }
+
+    @Override public String formatString() {
+        return binder.formatString();
+    }
 }

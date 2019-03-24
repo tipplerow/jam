@@ -75,4 +75,13 @@ public interface TCR extends PeptideBinder {
     public default boolean isRecognized(Peptide target) {
         return computeAffinity(target) >= getNegativeThreshold();
     }
+
+    /**
+     * Returns a unique and compact string representation of this
+     * receptor suitable to identify the receptor in reports.
+     *
+     * @return a unique and compact string representation of this
+     * receptor.
+     */
+    public abstract String formatString();
 }

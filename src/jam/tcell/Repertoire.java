@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import jam.app.JamLogger;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
 
@@ -15,6 +16,8 @@ import jam.peptide.Peptide;
  */
 public final class Repertoire extends AbstractCollection<TCR> {
     private final Collection<TCR> receptors;
+
+    private final static int LOG_INTERVAL = 1000;
 
     private Repertoire(Collection<? extends TCR> receptors) {
         this.receptors = Collections.unmodifiableCollection(receptors);
@@ -52,10 +55,17 @@ public final class Repertoire extends AbstractCollection<TCR> {
      */
     public int countRecognized(Collection<Peptide> targets) {
         int count = 0;
+        int processed = 0;
 
-        for (Peptide target : targets)
+        for (Peptide target : targets) {
+            ++processed;
+
             if (isRecognized(target))
                 ++count;
+
+            if (processed % LOG_INTERVAL == 0)
+                JamLogger.info("Processed [%d] target peptides...", processed);
+        }
 
         return count;
     }
