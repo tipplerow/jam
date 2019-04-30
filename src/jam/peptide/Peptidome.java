@@ -132,10 +132,16 @@ public final class Peptidome extends AbstractSet<Peptide> {
         List<Peptide> parents = new ArrayList<Peptide>(peptides);
         Set<Peptide>  mutants = new HashSet<Peptide>(mutationCount);
 
-        while (mutants.size() < mutationCount)
+        int maxIter = 10 * mutationCount;
+
+        for (int iter = 0; iter < maxIter; ++ iter) {
             mutants.add(ListUtil.select(parents).mutate());
 
-        return new Peptidome(mutants);
+            if (mutants.size() == mutationCount)
+                return new Peptidome(mutants);
+        }
+
+        throw new IllegalStateException("Exceeded maximum iteration count.");
     }
 
     @Override public boolean contains(Object obj) {
