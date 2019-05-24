@@ -36,6 +36,11 @@ public final class DoubleRange {
     public static DoubleRange FRACTIONAL = closed(0.0, 1.0);
 
     /**
+     * The range of valid percentiles: {@code [0.0, 100.0]}.
+     */
+    public static DoubleRange PERCENTILE = closed(0.0, 100.0);
+
+    /**
      * The range containing all real numbers: {@code [-Inf, +Inf]}.
      */
     public static DoubleRange INFINITE = closed(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
