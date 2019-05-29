@@ -2,6 +2,7 @@
 package jam.fasta;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import jam.util.RegexUtil;
 /**
  * Reads FASTA records sequentially from a FASTA-formatted file.
  */
-public final class FastaReader implements Iterable<FastaRecord>, Iterator<FastaRecord> {
+public final class FastaReader implements Closeable, Iterable<FastaRecord>, Iterator<FastaRecord> {
     private final File file;
     private final BufferedReader reader;
 
@@ -109,7 +110,7 @@ public final class FastaReader implements Iterable<FastaRecord>, Iterator<FastaR
     /**
      * Closes this reader.
      */
-    public void close() {
+    @Override public void close() {
         IOUtil.close(reader);
     }
 
