@@ -4,6 +4,8 @@ package jam.ensembl;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
@@ -13,13 +15,27 @@ import jam.app.JamEnv;
 import jam.app.JamLogger;
 import jam.fasta.FastaReader;
 import jam.fasta.FastaRecord;
+import jam.lang.JamException;
+import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 /**
  * Manages the human genome data from Ensembl.
  */
 public final class EnsemblMap {
-    private final Multimap<EnsemblGene, Peptide> map = HashMultimap.create();
+    //
+    // Protein and transcript keys map uniquely to peptide
+    // structures...
+    //
+    private final Map<EnsemblProtein, EnsemblRecord> proteinMap =
+        new HashMap<EnsemblProtein, EnsemblRecord>();
+
+    private final Map<EnsemblTranscript, EnsemblRecord> transcriptMap =
+        new HashMap<EnsemblTranscript, EnsemblRecord>();
+
+    // Gene identifiers may map to multiple peptide structures...
+    private final Multimap<HugoSymbol, EnsemblRecord> hugoMap = HashMultimap.create();
+    private final Multimap<EnsemblGene, EnsemblRecord> geneMap = HashMultimap.create();
 
     private static EnsemblMap instance = null;
 
@@ -41,8 +57,17 @@ public final class EnsemblMap {
     }
 
 
-    private void processRecord(FastaRecord record) {
-        map.put(EnsemblGene.parse(record), record.getPeptide());
+    private void processRecord(FastaRecord fastaRecord) {
+        EnsemblRecord ensemblRecord = EnsemblRecord.parse(fastaRecord);
+
+        if (proteinMap.put(ensemblRecord.getEnsemblProtein(), ensemblRecord) != null)
+            throw JamException.runtime("Duplicate protein key: [%s]", ensemblRecord.getEnsemblProtein());
+
+        if (transcriptMap.put(ensemblRecord.getEnsemblTranscript(), ensemblRecord) != null)
+            throw JamException.runtime("Duplicate transcript key: [%s]", ensemblRecord.getEnsemblTranscript());
+
+        hugoMap.put(ensemblRecord.getHugoSymbol(), ensemblRecord);
+        geneMap.put(ensemblRecord.getEnsemblGene(), ensemblRecord);
     }
 
     /**
@@ -65,7 +90,7 @@ public final class EnsemblMap {
      * @return {@code true} iff this map contains the specified gene.
      */
     public boolean contains(EnsemblGene gene) {
-        return map.containsKey(gene);
+        return geneMap.containsKey(gene);
     }
 
     /**
@@ -76,7 +101,7 @@ public final class EnsemblMap {
      * @return the number of peptides mapped to the given gene.
      */
     public int count(EnsemblGene gene) {
-        return map.get(gene).size();
+        return geneMap.get(gene).size();
     }
 
     /**
@@ -85,20 +110,20 @@ public final class EnsemblMap {
      * @return a read-only set containing the genes in this map.
      */
     public Set<EnsemblGene> geneSet() {
-        return Collections.unmodifiableSet(map.keySet());
+        return Collections.unmodifiableSet(geneMap.keySet());
     }
 
     /**
-     * Returns a read-only view of the peptides mapped to a given
+     * Returns a read-only view of the records mapped to a given
      * gene.
      *
      * @param gene the gene of interest.
      *
-     * @return a read-only collection containing the peptides mapped
+     * @return a read-only collection containing the records mapped
      * to the specified gene (an empty collection if the gene is not
      * mapped).
      */
-    public Collection<Peptide> get(EnsemblGene gene) {
-        return Collections.unmodifiableCollection(map.get(gene));
+    public Collection<EnsemblRecord> get(EnsemblGene gene) {
+        return Collections.unmodifiableCollection(geneMap.get(gene));
     }
 }

@@ -48,10 +48,10 @@ public final class EnsemblChopper {
     }
 
     private void processGene(EnsemblGene gene) {
-        Collection<Peptide> peptides = EnsemblMap.instance().get(gene);
+        Collection<EnsemblRecord> records = EnsemblMap.instance().get(gene);
 
-        for (Peptide peptide : peptides)
-            processPeptide(peptide);
+        for (EnsemblRecord record : records)
+            processPeptide(record.getPeptide());
     }
 
     private void processPeptide(Peptide peptide) {

@@ -11,7 +11,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class FastaReaderTest {
-    private static final String ENSEMBL_FILE = "data/test/ensembl_test.fa";
+    private static final String ENSEMBL_FILE = "data/test/ensembl_test1.fa";
 
     @Test public void testEnsembl() {
         FastaRecord record;
