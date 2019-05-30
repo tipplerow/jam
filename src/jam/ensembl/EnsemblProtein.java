@@ -33,6 +33,6 @@ public final class EnsemblProtein extends EnsemblID {
      * properly formatted protein key.
      */
     public static EnsemblProtein parseHeader(String headerLine) {
-        return instance(RegexUtil.split(HEADER_FIELD_DELIM, headerLine)[0]);
+        return instance(stripVersion(RegexUtil.split(HEADER_FIELD_DELIM, headerLine)[0]));
     }
 }

@@ -176,6 +176,17 @@ public final class EnsemblDb {
     }
 
     /**
+     * Counts the number of peptides mapped to a given HUGO symbol.
+     *
+     * @param hugo a HUGO symbol of interest.
+     *
+     * @return the number of peptides mapped to the given HUGO symbol.
+     */
+    public int count(HugoSymbol hugo) {
+        return hugoMap.get(hugo).size();
+    }
+
+    /**
      * Returns a read-only view of the records mapped to a given
      * gene.
      *
