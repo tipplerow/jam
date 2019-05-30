@@ -25,11 +25,12 @@ public final class EnsemblRecord {
     }
 
     public static EnsemblRecord parse(FastaRecord fastaRecord) {
+        String fastaKey = fastaRecord.getKey();
         String headerLine = fastaRecord.getComment();
 
         HugoSymbol hugoKey = EnsemblHugo.parseHeader(headerLine).hugoSymbol();
         EnsemblGene geneKey = EnsemblGene.parseHeader(headerLine);
-        EnsemblProtein proteinKey = EnsemblProtein.parseHeader(headerLine);
+        EnsemblProtein proteinKey = EnsemblProtein.parseKey(fastaKey);
         EnsemblTranscript transcriptKey = EnsemblTranscript.parseHeader(headerLine);
 
         return new EnsemblRecord(fastaRecord.getPeptide(), hugoKey, geneKey, proteinKey, transcriptKey);

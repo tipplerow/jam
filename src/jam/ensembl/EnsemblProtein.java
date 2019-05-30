@@ -33,6 +33,18 @@ public final class EnsemblProtein extends EnsemblID {
      * properly formatted protein key.
      */
     public static EnsemblProtein parseHeader(String headerLine) {
-        return instance(stripVersion(RegexUtil.split(HEADER_FIELD_DELIM, headerLine)[0]));
+        return parseKey(RegexUtil.split(HEADER_FIELD_DELIM, headerLine)[0]);
+    }
+
+    /**
+     * Extracts the protein key from a FASTA record key (by stripping
+     * the version number).
+     *
+     * @param fastaKey the FASTA key from an Ensembl record.
+     *
+     * @return the protein key contained in the given FASTA key.
+     */
+    public static EnsemblProtein parseKey(String fastaKey) {
+        return instance(stripVersion(fastaKey));
     }
 }

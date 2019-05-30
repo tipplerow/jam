@@ -274,4 +274,13 @@ public final class EnsemblDb {
     public Set<EnsemblTranscript> transcriptSet() {
         return Collections.unmodifiableSet(transcriptMap.keySet());
     }
+
+    /**
+     * Returns the number of records in this database.
+     *
+     * @return the number of records in this database.
+     */
+    public int size() {
+        return proteinMap.size();
+    }
 }
