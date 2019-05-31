@@ -470,7 +470,7 @@ public interface Peptide extends Iterable<Residue> {
      * as the original residue and the mutation position lies within
      * this peptide.
      */
-    public abstract Peptide mutate(PeptideChange mutation);
+    public abstract Peptide mutate(ProteinChange mutation);
 
     /**
      * Returns an unordered view of this peptide: a multiset counting

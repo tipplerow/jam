@@ -9,7 +9,7 @@ import com.google.common.collect.Multiset;
 
 import jam.math.IntRange;
 import jam.peptide.Peptide;
-import jam.peptide.PeptideChange;
+import jam.peptide.ProteinChange;
 import jam.peptide.Residue;
 
 import org.junit.*;
@@ -141,7 +141,7 @@ public class PeptideTest {
     }
 
     @Test public void testMutate() {
-        PeptideChange change = PeptideChange.parse("K3A");
+        ProteinChange change = ProteinChange.parse("K3A");
 
         Peptide native_ = Peptide.parse("MPKLNSTF");
         Peptide mutated = native_.mutate(change);
@@ -151,7 +151,7 @@ public class PeptideTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testMutateInvalid1() {
-        PeptideChange change = PeptideChange.parse("K0A");
+        ProteinChange change = ProteinChange.parse("K0A");
 
         Peptide native_ = Peptide.parse("MPKLNSTF");
         Peptide mutated = native_.mutate(change);
@@ -159,7 +159,7 @@ public class PeptideTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testMutateInvalid2() {
-        PeptideChange change = PeptideChange.parse("K100A");
+        ProteinChange change = ProteinChange.parse("K100A");
 
         Peptide native_ = Peptide.parse("MPKLNSTF");
         Peptide mutated = native_.mutate(change);
@@ -167,7 +167,7 @@ public class PeptideTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testMutateInvalid3() {
-        PeptideChange change = PeptideChange.parse("M3A");
+        ProteinChange change = ProteinChange.parse("M3A");
 
         Peptide native_ = Peptide.parse("MPKLNSTF");
         Peptide mutated = native_.mutate(change);

@@ -4,7 +4,7 @@ package jam.peptide;
 /**
  * Represents a single missense mutation in a peptide.
  */
-public final class PeptideChange {
+public final class ProteinChange {
     private final int position;
     private final Residue native_;
     private final Residue mutated;
@@ -12,14 +12,14 @@ public final class PeptideChange {
     /**
      * Creates a new single missense mutation.
      *
-     * @param position the position in the peptide at which the
+     * @param position the position in the protein at which the
      * residue change occurs (starting at position 1, not zero).
      *
      * @param native_ the original (native) residue.
      *
      * @param mutated the final (mutated) residue.
      */
-    public PeptideChange(int position, Residue native_, Residue mutated) {
+    public ProteinChange(int position, Residue native_, Residue mutated) {
         this.position = position;
         this.native_  = native_;
         this.mutated  = mutated;
@@ -38,32 +38,32 @@ public final class PeptideChange {
     }
 
     /**
-     * Parses a peptide change string in standard format.
+     * Parses a protein change string in standard format.
      *
-     * <p>The standard format for a peptide change from residue {@code X}
+     * <p>The standard format for a protein change from residue {@code X}
      * to residue {@code Y} at position {@code k} is {@code XkY}, where
      * {@code X} and {@code Y} are the single-character residue codes.
      *
-     * @param s a peptide-change string in standard format.
+     * @param s a protein-change string in standard format.
      *
-     * @return the peptide change encoded in the given string.
+     * @return the protein change encoded in the given string.
      *
      * @throws RuntimeException unless the string is properly formatted.
      */
-    public static PeptideChange parse(String s) {
+    public static ProteinChange parse(String s) {
         char nativeChar = s.charAt(0);
         char mutatedChar = s.charAt(s.length() - 1);
         String positionStr = s.substring(1, s.length() - 1);
 
-        return new PeptideChange(Integer.parseInt(positionStr),
+        return new ProteinChange(Integer.parseInt(positionStr),
                                  Residue.valueOfCode1(nativeChar),
                                  Residue.valueOfCode1(mutatedChar));
     }
 
     /**
-     * Encodes this peptide change in the standard format.
+     * Encodes this protein change in the standard format.
      *
-     * @return a string describing this peptide change in standard
+     * @return a string describing this protein change in standard
      * format.
      */
     public String format() {
@@ -91,10 +91,10 @@ public final class PeptideChange {
     }
 
     /** 
-     * Returns the position the position in the peptide at which the
+     * Returns the position the position in the protein at which the
      * residue change occurs (starting at position 1, not zero).
      *
-     * @return the position the position in the peptide at which the
+     * @return the position the position in the protein at which the
      * residue change occurs.
      */
     public int getPosition() {
@@ -102,10 +102,10 @@ public final class PeptideChange {
     }
          
     @Override public boolean equals(Object obj) {
-        return (obj instanceof PeptideChange) && equalsPeptideChange((PeptideChange) obj);
+        return (obj instanceof ProteinChange) && equalsProteinChange((ProteinChange) obj);
     }
 
-    private boolean equalsPeptideChange(PeptideChange that) {
+    private boolean equalsProteinChange(ProteinChange that) {
         return this.position == that.position
             && this.native_.equals(that.native_)
             && this.mutated.equals(that.mutated);
@@ -116,6 +116,6 @@ public final class PeptideChange {
     }
 
     @Override public String toString() {
-        return "PeptideChange(" + format() + ")";
+        return "ProteinChange(" + format() + ")";
     }
 }

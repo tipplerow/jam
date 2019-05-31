@@ -86,7 +86,7 @@ final class ArrayPeptide extends AbstractPeptide {
         return new ArrayPeptide(newResidues, false);
     }
 
-    @Override public Peptide mutate(PeptideChange mutation) {
+    @Override public Peptide mutate(ProteinChange mutation) {
         //
         // Recall that the mutation specification uses indexing
         // starting at 1, not zero...
