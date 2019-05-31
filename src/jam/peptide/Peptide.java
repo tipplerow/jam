@@ -459,6 +459,20 @@ public interface Peptide extends Iterable<Residue> {
     public abstract Peptide mutate();
 
     /**
+     * Applies a single-residue mutation to this peptide.
+     *
+     * @param mutation the mutation to apply.
+     *
+     * @return a new peptide with the specified mutation applied.
+     *
+     * @throws IllegalArgumentException unless the residue at the
+     * mutation location in this peptide matches the one specified
+     * as the original residue and the mutation position lies within
+     * this peptide.
+     */
+    public abstract Peptide mutate(PeptideChange mutation);
+
+    /**
      * Returns an unordered view of this peptide: a multiset counting
      * the number of times each residue occurs in this peptide.
      *

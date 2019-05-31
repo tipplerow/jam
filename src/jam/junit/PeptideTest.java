@@ -9,6 +9,7 @@ import com.google.common.collect.Multiset;
 
 import jam.math.IntRange;
 import jam.peptide.Peptide;
+import jam.peptide.PeptideChange;
 import jam.peptide.Residue;
 
 import org.junit.*;
@@ -137,6 +138,39 @@ public class PeptideTest {
         assertEquals( 210, Peptide.mapIsomers(2).elementSet().size());
         assertEquals(1540, Peptide.mapIsomers(3).elementSet().size());
         assertEquals(8855, Peptide.mapIsomers(4).elementSet().size());
+    }
+
+    @Test public void testMutate() {
+        PeptideChange change = PeptideChange.parse("K3A");
+
+        Peptide native_ = Peptide.parse("MPKLNSTF");
+        Peptide mutated = native_.mutate(change);
+        
+        assertEquals(Peptide.parse("MPALNSTF"), mutated);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMutateInvalid1() {
+        PeptideChange change = PeptideChange.parse("K0A");
+
+        Peptide native_ = Peptide.parse("MPKLNSTF");
+        Peptide mutated = native_.mutate(change);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMutateInvalid2() {
+        PeptideChange change = PeptideChange.parse("K100A");
+
+        Peptide native_ = Peptide.parse("MPKLNSTF");
+        Peptide mutated = native_.mutate(change);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMutateInvalid3() {
+        PeptideChange change = PeptideChange.parse("M3A");
+
+        Peptide native_ = Peptide.parse("MPKLNSTF");
+        Peptide mutated = native_.mutate(change);
     }
 
     @Test public void testNativeFragments() {

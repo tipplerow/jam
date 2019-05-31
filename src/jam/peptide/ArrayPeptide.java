@@ -86,6 +86,25 @@ final class ArrayPeptide extends AbstractPeptide {
         return new ArrayPeptide(newResidues, false);
     }
 
+    @Override public Peptide mutate(PeptideChange mutation) {
+        //
+        // Recall that the mutation specification uses indexing
+        // starting at 1, not zero...
+        //
+        int residueIndex = mutation.getPosition() - 1;
+
+        if (residueIndex >= length())
+            throw new IllegalArgumentException("Mutation position lies outside this peptide.");
+
+        if (!at(residueIndex).equals(mutation.getNative()))
+            throw new IllegalArgumentException("Mismatch in the original residue.");
+
+        List<Residue> newResidues = new ArrayList<Residue>(residues);
+        newResidues.set(residueIndex, mutation.getMutated());
+
+        return new ArrayPeptide(newResidues, false);
+    }
+
     @Override public List<Residue> viewResidues() {
         return Collections.unmodifiableList(residues);
     }
