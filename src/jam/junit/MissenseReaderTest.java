@@ -3,13 +3,8 @@ package jam.junit;
 
 import java.util.List;
 
-import jam.ensembl.EnsemblTranscript;
-import jam.peptide.HugoSymbol;
-import jam.peptide.ProteinChange;
 import jam.tcga.MissenseReader;
 import jam.tcga.MissenseRecord;
-import jam.tcga.PatientID;
-import jam.tcga.TumorBarcode;
 
 import org.junit.*;
 import static org.junit.Assert.*;
