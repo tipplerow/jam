@@ -12,6 +12,12 @@ public final class HugoSymbol extends KeyedObject<String> {
     }
 
     /**
+     * The canonical column name for HUGO symbols in the header line
+     * of data files to be analyzed by the {@code jam} library.
+     */
+    public static final String COLUMN_NAME = "Hugo_Symbol";
+
+    /**
      * Returns the HUGO symbol object for a given key string.
      *
      * @param key the HUGO symbol key.

@@ -10,6 +10,12 @@ public final class ProteinChange {
     private final Residue mutated;
 
     /**
+     * The canonical column name for protein changes in the header
+     * line of data files to be analyzed by the {@code jam} library.
+     */
+    public static final String COLUMN_NAME = "Protein_Change";
+
+    /**
      * Creates a new single missense mutation.
      *
      * @param position the position in the protein at which the

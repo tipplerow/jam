@@ -12,6 +12,12 @@ public final class EnsemblGene extends EnsemblID {
     }
 
     /**
+     * The canonical column name for gene identifiers in the header
+     * line of data files to be analyzed by the {@code jam} library.
+     */
+    public static final String COLUMN_NAME = "Gene_ID";
+
+    /**
      * Returns the Ensemble gene identifier for a given key string.
      *
      * @param key the key string.

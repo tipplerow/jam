@@ -10,13 +10,19 @@ import jam.lang.KeyedObject;
 public final class TumorBarcode extends KeyedObject<String> {
     private TumorBarcode(String key) {
         super(key);
-        validate(key);
     }
 
-    private static final void validate(String key) {
-        if (key.length() < 16)
-            throw JamException.runtime("Invalid tumor barcode: [%s].", key);
-    }
+    /**
+     * The canonical column name for tumor identifiers in the header
+     * line of data files to be analyzed by the {@code jam} library.
+     */
+    public static final String COLUMN_NAME = "Tumor_Sample_Barcode";
+
+    /**
+     * String length of the patient key encoded at the beginning of
+     * TCGA barcodes.
+     */
+    public static final int PATIENT_KEY_LENGTH = 12;
 
     /**
      * Returns the tumor barcode for a given key string.
@@ -37,6 +43,6 @@ public final class TumorBarcode extends KeyedObject<String> {
      * sampled.
      */
     public PatientID patientID() {
-        return PatientID.instance(getKey().substring(0, PatientID.KEY_LENGTH));
+        return PatientID.instance(getKey().substring(0, PATIENT_KEY_LENGTH));
     }
 }

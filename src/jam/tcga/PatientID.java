@@ -10,18 +10,13 @@ import jam.lang.KeyedObject;
 public final class PatientID extends KeyedObject<String> {
     private PatientID(String key) {
         super(key);
-        validate(key);
-    }
-
-    private static final void validate(String key) {
-        if (key.length() != KEY_LENGTH)
-            throw JamException.runtime("Invalid patient ID: [%s].", key);
     }
 
     /**
-     * String length of all valid identifiers.
+     * The canonical column name for patient identifiers in the header
+     * line of data files to be analyzed by the {@code jam} library.
      */
-    public static final int KEY_LENGTH = 12;
+    public static final String COLUMN_NAME = "Patient_ID";
 
     /**
      * Returns the patient ID for a given key string.

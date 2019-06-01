@@ -12,6 +12,13 @@ public final class EnsemblTranscript extends EnsemblID {
     }
 
     /**
+     * The canonical column name for transcript identifiers in the
+     * header line of data files to be analyzed by the {@code jam}
+     * library.
+     */
+    public static final String COLUMN_NAME = "Transcript_ID";
+
+    /**
      * Returns the Ensemble transcript identifier for a given key
      * string.
      *
