@@ -2,7 +2,6 @@
 package jam.junit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,12 +19,12 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class CollectionUtilTest extends NumericTestBase {
-    private final List<String> emptyList = Arrays.asList();
+    private final List<String> emptyList = List.of();
 
     @Test public void testAddAll1() {
-        List<String> list1 = Arrays.asList("A");
-        List<String> list2 = Arrays.asList("A", "B");
-        List<String> list3 = Arrays.asList("A", "B", "C");
+        List<String> list1 = List.of("A");
+        List<String> list2 = List.of("A", "B");
+        List<String> list3 = List.of("A", "B", "C");
 
         List<String> concat = new ArrayList<String>();
 
@@ -37,12 +36,12 @@ public class CollectionUtilTest extends NumericTestBase {
     }
 
     @Test public void testAddAll2() {
-        List<String> list1 = Arrays.asList("A");
-        List<String> list2 = Arrays.asList("A", "B");
-        List<String> list3 = Arrays.asList("A", "B", "C");
+        List<String> list1 = List.of("A");
+        List<String> list2 = List.of("A", "B");
+        List<String> list3 = List.of("A", "B", "C");
 
         Multiset<String> set = HashMultiset.create();
-        CollectionUtil.addAll(set, Arrays.asList(list1, list2, list3));
+        CollectionUtil.addAll(set, List.of(list1, list2, list3));
 
         assertEquals(6, set.size());
         assertEquals(3, set.count("A"));
@@ -98,9 +97,9 @@ public class CollectionUtilTest extends NumericTestBase {
 
     @Test public void testAverage() {
         assertTrue(Double.isNaN(CollectionUtil.average(emptyList, s -> s.length())));
-        assertDouble(3.0, CollectionUtil.average(Arrays.asList("abc"), s -> s.length()));
-        assertDouble(2.5, CollectionUtil.average(Arrays.asList("abc", "de"), s -> s.length()));
-        assertDouble(2.0, CollectionUtil.average(Arrays.asList("abc", "de", "f"), s -> s.length()));
+        assertDouble(3.0, CollectionUtil.average(List.of("abc"), s -> s.length()));
+        assertDouble(2.5, CollectionUtil.average(List.of("abc", "de"), s -> s.length()));
+        assertDouble(2.0, CollectionUtil.average(List.of("abc", "de", "f"), s -> s.length()));
     }
 
     @Test public void testCompareIterationOrder() {
@@ -140,10 +139,10 @@ public class CollectionUtilTest extends NumericTestBase {
     }
 
     @Test public void testCountCommon() {
-        List<String> ABC   = Arrays.asList("A", "B", "C");
-        List<String> ABCDE = Arrays.asList("A", "B", "C", "D", "E");
-        List<String> BCD   = Arrays.asList("B", "C", "D");
-        List<String> DEF   = Arrays.asList("D", "E", "F");
+        List<String> ABC   = List.of("A", "B", "C");
+        List<String> ABCDE = List.of("A", "B", "C", "D", "E");
+        List<String> BCD   = List.of("B", "C", "D");
+        List<String> DEF   = List.of("D", "E", "F");
 
         assertEquals(0, CollectionUtil.countCommon(ABC, DEF));
         assertEquals(0, CollectionUtil.countCommon(DEF, ABC));
@@ -158,34 +157,34 @@ public class CollectionUtilTest extends NumericTestBase {
 
     @Test public void testCountUnique() {
         assertEquals(0, CollectionUtil.countUnique(emptyList));
-        assertEquals(1, CollectionUtil.countUnique(Arrays.asList("abc")));
-        assertEquals(1, CollectionUtil.countUnique(Arrays.asList("abc", "abc", "abc")));
-        assertEquals(2, CollectionUtil.countUnique(Arrays.asList("abc", "def", "abc")));
-        assertEquals(3, CollectionUtil.countUnique(Arrays.asList("abc", "def", "ghi")));
+        assertEquals(1, CollectionUtil.countUnique(List.of("abc")));
+        assertEquals(1, CollectionUtil.countUnique(List.of("abc", "abc", "abc")));
+        assertEquals(2, CollectionUtil.countUnique(List.of("abc", "def", "abc")));
+        assertEquals(3, CollectionUtil.countUnique(List.of("abc", "def", "ghi")));
     }
 
     @Test public void testPeek() {
         assertNull(CollectionUtil.peek(emptyList));
-        assertEquals("abc", CollectionUtil.peek(Arrays.asList("abc")));
-        assertEquals("abc", CollectionUtil.peek(Arrays.asList("abc", "def", "ghi")));
+        assertEquals("abc", CollectionUtil.peek(List.of("abc")));
+        assertEquals("abc", CollectionUtil.peek(List.of("abc", "def", "ghi")));
     }
 
     @Test public void testMax() {
         assertTrue(Double.isNaN(CollectionUtil.max(emptyList, s -> s.length())));
-        assertDouble(3.0, CollectionUtil.max(Arrays.asList("abc"), s -> s.length()));
-        assertDouble(3.0, CollectionUtil.max(Arrays.asList("abc", "de"), s -> s.length()));
-        assertDouble(5.0, CollectionUtil.max(Arrays.asList("abc", "de", "f", "ghijk"), s -> s.length()));
+        assertDouble(3.0, CollectionUtil.max(List.of("abc"), s -> s.length()));
+        assertDouble(3.0, CollectionUtil.max(List.of("abc", "de"), s -> s.length()));
+        assertDouble(5.0, CollectionUtil.max(List.of("abc", "de", "f", "ghijk"), s -> s.length()));
     }
 
     @Test public void testMin() {
         assertTrue(Double.isNaN(CollectionUtil.min(emptyList, s -> s.length())));
-        assertDouble(3.0, CollectionUtil.min(Arrays.asList("abc"), s -> s.length()));
-        assertDouble(2.0, CollectionUtil.min(Arrays.asList("abc", "de"), s -> s.length()));
-        assertDouble(1.0, CollectionUtil.min(Arrays.asList("abc", "de", "f", "ghijk"), s -> s.length()));
+        assertDouble(3.0, CollectionUtil.min(List.of("abc"), s -> s.length()));
+        assertDouble(2.0, CollectionUtil.min(List.of("abc", "de"), s -> s.length()));
+        assertDouble(1.0, CollectionUtil.min(List.of("abc", "de", "f", "ghijk"), s -> s.length()));
     }
 
     @Test public void testSample() {
-        Set<String>  strings = new HashSet<String>(Arrays.asList("A", "B", "C", "D", "E"));
+        Set<String>  strings = new HashSet<String>(List.of("A", "B", "C", "D", "E"));
         List<String> sampled = CollectionUtil.sample(strings, 100000, random());
 
         Multiset<String> counts = HashMultiset.create();
@@ -195,11 +194,50 @@ public class CollectionUtilTest extends NumericTestBase {
             assertEquals(0.20, MultisetUtil.frequency(counts, s), 0.002);
     }
 
+    @Test public void testSplit() {
+        Set<String> strings = new TreeSet<String>(List.of("1", "2", "3", "4", "5", "6"));
+
+        List<List<String>> subLists = CollectionUtil.split(strings, 2);
+
+        assertEquals(3, subLists.size());
+        assertEquals(List.of("1", "2"), subLists.get(0));
+        assertEquals(List.of("3", "4"), subLists.get(1));
+        assertEquals(List.of("5", "6"), subLists.get(2));
+
+        subLists = CollectionUtil.split(strings, 3);
+
+        assertEquals(2, subLists.size());
+        assertEquals(List.of("1", "2", "3"), subLists.get(0));
+        assertEquals(List.of("4", "5", "6"), subLists.get(1));
+
+        subLists = CollectionUtil.split(strings, 4);
+
+        assertEquals(2, subLists.size());
+        assertEquals(List.of("1", "2", "3", "4"), subLists.get(0));
+        assertEquals(List.of("5", "6"), subLists.get(1));
+
+        subLists = CollectionUtil.split(strings, 5);
+
+        assertEquals(2, subLists.size());
+        assertEquals(List.of("1", "2", "3", "4", "5"), subLists.get(0));
+        assertEquals(List.of("6"), subLists.get(1));
+
+        subLists = CollectionUtil.split(strings, 6);
+
+        assertEquals(1, subLists.size());
+        assertEquals(List.of("1", "2", "3", "4", "5", "6"), subLists.get(0));
+
+        subLists = CollectionUtil.split(strings, 10);
+
+        assertEquals(1, subLists.size());
+        assertEquals(List.of("1", "2", "3", "4", "5", "6"), subLists.get(0));
+    }
+
     @Test public void testSum() {
         assertDouble(0.0, CollectionUtil.sum(emptyList, s -> s.length()));
-        assertDouble(3.0, CollectionUtil.sum(Arrays.asList("abc"), s -> s.length()));
-        assertDouble(5.0, CollectionUtil.sum(Arrays.asList("abc", "de"), s -> s.length()));
-        assertDouble(6.0, CollectionUtil.sum(Arrays.asList("abc", "de", "f"), s -> s.length()));
+        assertDouble(3.0, CollectionUtil.sum(List.of("abc"), s -> s.length()));
+        assertDouble(5.0, CollectionUtil.sum(List.of("abc", "de"), s -> s.length()));
+        assertDouble(6.0, CollectionUtil.sum(List.of("abc", "de", "f"), s -> s.length()));
     }
 
     public static void main(String[] args) {

@@ -295,6 +295,43 @@ public final class CollectionUtil {
     }
 
     /**
+     * Splits a collection into lists of equal length, except for the
+     * last list when the original collection cannot be split exactly.
+     *
+     * @param <V> the element type.
+     *
+     * @param collection the collection to split.
+     *
+     * @param splitSize the desired size of the sublists.
+     *
+     * @return a list containing the sublists.
+     *
+     * @throws IllegalArgumentException unless the size is positive.
+     */
+    public static <V> List<List<V>> split(Collection<V> collection, int splitSize) {
+        if (splitSize < 1)
+            throw new IllegalArgumentException("Sublist size must be positive.");
+
+        List<V> subList = new ArrayList<V>(splitSize);
+        Iterator<V> iterator = collection.iterator();
+        List<List<V>> subLists = new ArrayList<List<V>>();
+
+        while (iterator.hasNext()) {
+            subList.add(iterator.next());
+
+            if (subList.size() == splitSize) {
+                subLists.add(subList);
+                subList = new ArrayList<V>(splitSize);
+            }
+        }
+
+        if (!subList.isEmpty())
+            subLists.add(subList);
+
+        return subLists;
+    }
+
+    /**
      * Computes the sum of an attribute over a collection of objects.
      *
      * @param <V> the type of object contained in the collection.
