@@ -11,17 +11,20 @@ public final class EnsemblRecord {
     private final EnsemblGene geneKey;
     private final EnsemblProtein proteinKey;
     private final EnsemblTranscript transcriptKey;
+    private final TranscriptBiotype transcriptBiotype;
 
     private EnsemblRecord(Peptide peptide,
                           HugoSymbol hugoKey,
                           EnsemblGene geneKey,
                           EnsemblProtein proteinKey,
-                          EnsemblTranscript transcriptKey) {
+                          EnsemblTranscript transcriptKey,
+                          TranscriptBiotype transcriptBiotype) {
         this.peptide = peptide;
         this.hugoKey = hugoKey;
         this.geneKey = geneKey;
         this.proteinKey = proteinKey;
         this.transcriptKey = transcriptKey;
+        this.transcriptBiotype = transcriptBiotype;
     }
 
     public static EnsemblRecord parse(FastaRecord fastaRecord) {
@@ -32,8 +35,10 @@ public final class EnsemblRecord {
         EnsemblGene geneKey = EnsemblGene.parseHeader(headerLine);
         EnsemblProtein proteinKey = EnsemblProtein.parseKey(fastaKey);
         EnsemblTranscript transcriptKey = EnsemblTranscript.parseHeader(headerLine);
+        TranscriptBiotype transcriptBiotype = TranscriptBiotype.parseHeader(headerLine);
 
-        return new EnsemblRecord(fastaRecord.getPeptide(), hugoKey, geneKey, proteinKey, transcriptKey);
+        return new EnsemblRecord(fastaRecord.getPeptide(), hugoKey, geneKey,
+                                 proteinKey, transcriptKey, transcriptBiotype);
     }
 
     public EnsemblGene getEnsemblGene() {
@@ -54,5 +59,9 @@ public final class EnsemblRecord {
 
     public Peptide getPeptide() {
         return peptide;
+    }
+
+    public TranscriptBiotype getTranscriptBiotype() {
+        return transcriptBiotype;
     }
 }
