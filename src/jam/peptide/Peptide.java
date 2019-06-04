@@ -526,6 +526,23 @@ public interface Peptide extends Iterable<Residue> {
     }
 
     /**
+     * Formats each peptide in a collection.
+     *
+     * @param peptides the peptides to format.
+     *
+     * @return the formatted peptide strings in the order returned by
+     * the collection iterator.
+     */
+    public static List<String> formatString(Collection<Peptide> peptides) {
+        List<String> strings = new ArrayList<String>(peptides.size());
+
+        for (Peptide peptide : peptides)
+            strings.add(peptide.formatString());
+
+        return strings;
+    }
+
+    /**
      * Returns the header line for CSV files containing peptides with
      * the same length as this peptide.
      *
