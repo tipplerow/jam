@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import jam.lang.JamException;
+
 /**
  * Provides utility operations on maps.
  */
@@ -92,11 +94,11 @@ public final class MapUtil {
      *
      * @param <V> the runtime value type.
      *
+     * @param map the map to fill.
+     *
      * @param keys the mapping keys.
      *
      * @param values the mapping values.
-     *
-     * @param map the map to fill.
      *
      * @throws IllegalArgumentException unless the keys and values
      * have the same length.
@@ -116,11 +118,11 @@ public final class MapUtil {
      *
      * @param <V> the runtime value type.
      *
+     * @param map the map to fill.
+     *
      * @param keys the mapping keys.
      *
      * @param values the mapping values.
-     *
-     * @param map the map to fill.
      *
      * @throws IllegalArgumentException unless the keys and values
      * have the same size.
@@ -134,6 +136,27 @@ public final class MapUtil {
 
         while (keyItr.hasNext())
             map.put(keyItr.next(), valItr.next());
+    }
+
+    /**
+     * Add a mapping to an existing map and requires the key to be
+     * unique (not already present in the map).
+     *
+     * @param <K> the runtime key type.
+     *
+     * @param <V> the runtime value type.
+     *
+     * @param map the map to fill.
+     *
+     * @param key the mapping key.
+     *
+     * @param value the mapping value.
+     *
+     * @throws RuntimeException if the map already contains the key.
+     */
+    public static <K, V> void putUnique(Map<K, V> map, K key, V value) {
+        if (map.put(key, value) != null)
+            throw JamException.runtime("Duplicate key: [%s]", key);
     }
 
     /**

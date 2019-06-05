@@ -41,6 +41,25 @@ public class MapUtilTest {
         assertFalse(grouped.containsKey(6));
     }
 
+    @Test public void testPutUnique1() {
+        Map<String, Integer> map = new TreeMap<String, Integer>();
+
+        MapUtil.putUnique(map, "abc", 1);
+        MapUtil.putUnique(map, "def", 2);
+
+        assertEquals(2, map.size());
+        assertEquals(Integer.valueOf(1), map.get("abc"));
+        assertEquals(Integer.valueOf(2), map.get("def"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testPutUnique2() {
+        Map<String, Integer> map = new TreeMap<String, Integer>();
+
+        MapUtil.putUnique(map, "abc", 1);
+        MapUtil.putUnique(map, "abc", 2);
+    }
+
     @Test public void testZip() {
         List<String>  keys   = List.of("abc", "def", "ghi");
         List<Integer> values = List.of(1, 2, 3);
