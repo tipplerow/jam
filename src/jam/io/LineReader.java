@@ -70,7 +70,6 @@ public final class LineReader implements Closeable, Iterable<String>, Iterator<S
         return iterator.hasNext();
     }
 
-
     /**
      * Returns the next line in the file.
      *
