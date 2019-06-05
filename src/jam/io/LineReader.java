@@ -8,16 +8,14 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 
 import jam.app.JamLogger;
-import jam.lang.JamException;
 
 /**
  * Provides for {@code Iterable} file reading, line by line.
  */
-public final class LineReader implements Closeable, Iterable<String> {
+public final class LineReader implements Closeable, Iterable<String>, Iterator<String> {
     private final LineIterator iterator;
 
     private LineReader(LineIterator iterator) {
@@ -68,7 +66,7 @@ public final class LineReader implements Closeable, Iterable<String> {
      *
      * @return {@code true} iff there is another line to read.
      */
-    public boolean hasNext() {
+    @Override public boolean hasNext() {
         return iterator.hasNext();
     }
 
@@ -81,11 +79,21 @@ public final class LineReader implements Closeable, Iterable<String> {
      * @throws NoSuchElementException if the reader has reached the
      * end of the file.
      */
-    public String next() {
+    @Override public String next() {
         return iterator.next();
     }
 
+    /**
+     * Throws an {@code UnsupportedOperationException} as removal is
+     * not supported.
+     *
+     * @throws UnsupportedOperationException always.
+     */
+    @Override public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public Iterator<String> iterator() {
-        return iterator;
+        return this;
     }
 }
