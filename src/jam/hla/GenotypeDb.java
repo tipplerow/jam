@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jam.app.JamLogger;
 import jam.io.TableReader;
 import jam.lang.JamException;
 import jam.tcga.PatientID;
@@ -89,6 +90,8 @@ public final class GenotypeDb {
         finally {
             reader.close();
         }
+
+        JamLogger.info("GenotypeDb: Loaded [%d] genoypes.", size());
     }
 
     private void parseColumns(List<String> columns) {
