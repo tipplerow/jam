@@ -40,10 +40,10 @@ public class MissenseReaderTest {
 
     @Test public void testMiao() {
         List<MissenseRecord> records = MissenseReader.read(MIAO_FILE);
-        assertEquals(6, records.size());
+        assertEquals(9, records.size());
 
         assertRecord(records.get(0), "AC_PD1-1", "AC-DFCI_AC_PD1-1-Tumor-SM-9LRI9", "ASPM", "ENST00000367409", "S162F");
-        assertRecord(records.get(5), "Y2087", "Y2087_T", "ALMS1", "ENST00000264448", "G3501E");
+        assertRecord(records.get(8), "Y2087", "Y2087_T", "ALMS1", "ENST00000264448", "G3501E");
     }                     
 
     public static void main(String[] args) {
