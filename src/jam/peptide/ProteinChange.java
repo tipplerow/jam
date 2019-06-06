@@ -1,6 +1,13 @@
 
 package jam.peptide;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import jam.lang.JamException;
+
 /**
  * Represents a single missense mutation in a peptide.
  */
@@ -29,6 +36,7 @@ public final class ProteinChange {
         this.position = position;
         this.native_  = native_;
         this.mutated  = mutated;
+
         validate();
     }
 
@@ -41,6 +49,59 @@ public final class ProteinChange {
 
         if (!mutated.isNative())
             throw new IllegalArgumentException("Final residue must be naturally occurring.");
+    }
+
+    /**
+     * Applies this mutation to a list of residues (representing the
+     * original native peptide structure).
+     *
+     * @param residues the original native peptide structure.
+     *
+     * @throws RuntimeException unless this mutation lies within the
+     * residue list and the residue at the mutation location matches
+     * the native residue in this mutation.
+     */
+    public void apply(List<Residue> residues) {
+        int residueIndex = getResidueIndex();
+
+        if (residueIndex >= residues.size())
+            throw new IllegalArgumentException("Mutation position lies outside the peptide.");
+
+        if (!residues.get(residueIndex).equals(getNative()))
+            throw new IllegalArgumentException("Mismatch in the native residue.");
+
+        residues.set(residueIndex, getMutated());
+    }
+
+    /**
+     * Applies a collection of mutations to a list of residues
+     * (representing the original native peptide structure).
+     *
+     * @param mutations the mutations to apply.
+     *
+     * @param residues the original native peptide structure.
+     *
+     * @throws RuntimeException unless all native residues in the
+     * mutations match those in the native peptide, all mutations
+     * occur at different locations in the native peptide, and all
+     * mutations occur at valid locations within the peptide.
+     */
+    public static void apply(Collection<ProteinChange> mutations, List<Residue> residues) {
+        //
+        // Ensure that all mutations occur at different locations by
+        // keeping a record of those locations...
+        //
+        Set<Integer> residueIndexes = new HashSet<Integer>();
+
+        for (ProteinChange mutation : mutations) {
+            int residueIndex = mutation.getResidueIndex();
+
+            if (residueIndexes.contains(residueIndex))
+                throw JamException.runtime("Duplicate mutation location: [%d].", residueIndex);
+
+            mutation.apply(residues);
+            residueIndexes.add(residueIndex);
+        }
     }
 
     /**
@@ -105,6 +166,17 @@ public final class ProteinChange {
      */
     public int getPosition() {
         return position;
+    }
+
+    /** 
+     * Returns the zero-offset index of the residue changed by this
+     * mutation.
+     *
+     * @return the zero-offset index of the residue changed by this
+     * mutation.
+     */
+    public int getResidueIndex() {
+        return position - 1;
     }
          
     @Override public boolean equals(Object obj) {

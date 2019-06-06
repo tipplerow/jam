@@ -3,6 +3,7 @@ package jam.peptide;
 
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -87,20 +88,15 @@ final class ArrayPeptide extends AbstractPeptide {
     }
 
     @Override public Peptide mutate(ProteinChange mutation) {
-        //
-        // Recall that the mutation specification uses indexing
-        // starting at 1, not zero...
-        //
-        int residueIndex = mutation.getPosition() - 1;
-
-        if (residueIndex >= length())
-            throw new IllegalArgumentException("Mutation position lies outside this peptide.");
-
-        if (!at(residueIndex).equals(mutation.getNative()))
-            throw new IllegalArgumentException("Mismatch in the original residue.");
-
         List<Residue> newResidues = new ArrayList<Residue>(residues);
-        newResidues.set(residueIndex, mutation.getMutated());
+        mutation.apply(newResidues);
+
+        return new ArrayPeptide(newResidues, false);
+    }
+
+    @Override public Peptide mutate(Collection<ProteinChange> mutations) {
+        List<Residue> newResidues = new ArrayList<Residue>(residues);
+        ProteinChange.apply(mutations, newResidues);
 
         return new ArrayPeptide(newResidues, false);
     }
