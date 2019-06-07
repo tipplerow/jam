@@ -3,35 +3,35 @@ package jam.junit;
 
 import jam.tcga.CancerType;
 import jam.tcga.CancerTypeDb;
-import jam.tcga.PatientID;
+import jam.tcga.TumorBarcode;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class CancerTypeDbTest {
-    private static final CancerType ACC = CancerType.ACC;
-    private static final CancerType UVM = CancerType.UVM;
+    private static final CancerType LUAD = CancerType.LUAD;
+    private static final CancerType SKCM = CancerType.SKCM;
 
-    private static final PatientID A5J1 = PatientID.instance("TCGA-OR-A5J1");
-    private static final PatientID A5J2 = PatientID.instance("TCGA-OR-A5J2");
-    private static final PatientID A5J9 = PatientID.instance("TCGA-OR-A5J9");
-    private static final PatientID A885 = PatientID.instance("TCGA-WC-A885");
-    private static final PatientID A888 = PatientID.instance("TCGA-WC-A888");
+    private static final TumorBarcode AL4602_T  = TumorBarcode.instance("AL4602_T");
+    private static final TumorBarcode AU5884_T  = TumorBarcode.instance("AU5884_T");
+    private static final TumorBarcode BL3403_T  = TumorBarcode.instance("BL3403_T");
+    private static final TumorBarcode LSD0167_T = TumorBarcode.instance("LSD0167_T");
+    private static final TumorBarcode LSD2057_T = TumorBarcode.instance("LSD2057_T");
 
     @Test public void testAll() {
         CancerTypeDb db = CancerTypeDb.load("data/test/cancer_type.tsv");
         assertEquals(5, db.size());
 
-        assertTrue(db.contains(A5J1));
-        assertFalse(db.contains(PatientID.instance("Missing")));
+        assertTrue(db.contains(AL4602_T));
+        assertFalse(db.contains(TumorBarcode.instance("Missing")));
 
-        assertEquals(ACC, db.require(A5J1));
-        assertEquals(ACC, db.require(A5J2));
-        assertEquals(ACC, db.require(A5J9));
-        assertEquals(UVM, db.require(A885));
-        assertEquals(UVM, db.require(A888));
+        assertEquals(LUAD, db.require(AL4602_T));
+        assertEquals(LUAD, db.require(AU5884_T));
+        assertEquals(LUAD, db.require(BL3403_T));
+        assertEquals(SKCM, db.require(LSD0167_T));
+        assertEquals(SKCM, db.require(LSD2057_T));
 
-        assertNull(db.lookup(PatientID.instance("Missing")));
+        assertNull(db.lookup(TumorBarcode.instance("Missing")));
     }
 
     public static void main(String[] args) {

@@ -15,19 +15,19 @@ import jam.lang.JamException;
 
 /**
  * Reads cancer types from a file and stores them in memory indexed by
- * patient key.
+ * tumor barcode.
  *
  * <p><b>File format.</b> The data file must contain a header line
- * (which is ignored) and every other line must contain the patient
- * key and cancer type separated by a comma, tab, or pipe character.
+ * (which is ignored) and every other line must contain the barcode
+ * and cancer type separated by a comma, tab, or pipe character.
  */
 public final class CancerTypeDb {
-    private final Map<PatientID, CancerType> cancerTypes;
+    private final Map<TumorBarcode, CancerType> cancerTypes;
 
     private static CancerTypeDb global = null;
 
     private CancerTypeDb() {
-        this.cancerTypes = new HashMap<PatientID, CancerType>();
+        this.cancerTypes = new HashMap<TumorBarcode, CancerType>();
     }
 
     /**
@@ -115,54 +115,56 @@ public final class CancerTypeDb {
     private void parseColumns(List<String> columns) {
         assert columns.size() == 2;
 
-        PatientID  patientID  = PatientID.instance(columns.get(0));
+        TumorBarcode  barcode  = TumorBarcode.instance(columns.get(0));
         CancerType cancerType = CancerType.valueOf(columns.get(1));
 
-        if (cancerTypes.containsKey(patientID))
-            throw JamException.runtime("Duplicate patient ID: [%s]", patientID.getKey());
+        if (cancerTypes.containsKey(barcode))
+            throw JamException.runtime("Duplicate barcode: [%s]", barcode.getKey());
 
-        cancerTypes.put(patientID, cancerType);
+        cancerTypes.put(barcode, cancerType);
     }
 
     /**
-     * Identifies patients with cancer types in this database.
+     * Identifies barcodes with cancer types in this database.
      *
-     * @param patientID a patient key of interest.
+     * @param barcode a tumor barcode of interest.
      *
      * @return {@code true} iff this database contains a cancer type
-     * for the specified patient.
+     * for the specified barcode.
      */
-    public boolean contains(PatientID patientID) {
-        return cancerTypes.containsKey(patientID);
+    public boolean contains(TumorBarcode barcode) {
+        return cancerTypes.containsKey(barcode);
     }
 
     /**
-     * Returns the cancer type for a given patient.
+     * Returns the cancer type for a given barcode.
      *
-     * @param patientID a patient key of interest.
+     * @param barcode a tumor barcode of interest.
      *
-     * @return the cancer type for the specified patient ({@code null}
-     * if the patient is not in this database).
+     * @return the cancer type for the specified barcode ({@code null}
+     * if the barcode is not in this database).
      */
-    public CancerType lookup(PatientID patientID) {
-        return cancerTypes.get(patientID);
+    public CancerType lookup(TumorBarcode barcode) {
+        return cancerTypes.get(barcode);
     }
 
     /**
-     * Returns the cancer type for a given patient.
+     * Returns the cancer type for a given barcode.
      *
-     * @param patientID a patient key of interest.
+     * @param barcode a tumor barcode of interest.
      *
-     * @return the cancer type for the specified patient ({@code null}
-     * if the patient is not in this database).
+     * @return the cancer type for the specified barcode ({@code null}
+     * if the barcode is not in this database).
+     *
+     * @throws RuntimeException unless the barcode is present.
      */
-    public CancerType require(PatientID patientID) {
-        CancerType cancerType = lookup(patientID);
+    public CancerType require(TumorBarcode barcode) {
+        CancerType cancerType = lookup(barcode);
 
         if (cancerType != null)
             return cancerType;
         else
-            throw JamException.runtime("No cancer type for patient [%s].", patientID.getKey());
+            throw JamException.runtime("No cancer type for barcode [%s].", barcode.getKey());
     }
 
     /**
@@ -175,12 +177,12 @@ public final class CancerTypeDb {
     }
 
     /**
-     * Returns a read-only view of the patients in this database.
+     * Returns a read-only view of the barcodes in this database.
      *
-     * @return an unmodifiable set containing all patient keys from
-     * this database.
+     * @return an unmodifiable set containing all tumor barcodes
+     * from this database.
      */
-    public Set<PatientID> viewPatients() {
+    public Set<TumorBarcode> viewBarcodes() {
         return Collections.unmodifiableSet(cancerTypes.keySet());
     }
 }
