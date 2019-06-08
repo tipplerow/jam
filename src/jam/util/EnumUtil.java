@@ -3,6 +3,7 @@ package jam.util;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import jam.lang.JamException;
@@ -32,14 +33,35 @@ public final class EnumUtil {
     }
 
     /**
-     * Counts the number of values defined for an enum class.
+     * Lists all values defined for an enum class.
      *
      * @param <E> the enum type.
      *
      * @param type the runtime type of the enum class.
      *
-     * @return the number of values defined for the specified enum
-     * class.
+     * @return a list containing all values defined for the specified
+     * enum class.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E extends Enum<E>> List<E> list(Class<E> type) {
+        try {
+            return List.of((E[]) type.getMethod("values").invoke(null));
+        }
+        catch (Exception ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    /**
+     * Returns a set containing the names of all values defined for an
+     * enum class.
+     *
+     * @param <E> the enum type.
+     *
+     * @param type the runtime type of the enum class.
+     *
+     * @return a set containing the names of all values defined for
+     * the specified enum class.
      */
     @SuppressWarnings("unchecked")
     public static <E extends Enum<E>> Set<String> names(Class<E> type) {
@@ -78,6 +100,27 @@ public final class EnumUtil {
         try {
             Method method = type.getMethod("valueOf", String.class);
             return (E) method.invoke(null, str);
+        }
+        catch (Exception ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    /**
+     * Returns an array containing all values defined for an enum
+     * class.
+     *
+     * @param <E> the enum type.
+     *
+     * @param type the runtime type of the enum class.
+     *
+     * @return an array containing all values defined for the given
+     * enum class.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E extends Enum<E>> E[] values(Class<E> type) {
+        try {
+            return (E[]) type.getMethod("values").invoke(null);
         }
         catch (Exception ex) {
             throw JamException.runtime(ex);

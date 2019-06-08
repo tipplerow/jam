@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import jam.util.EnumUtil;
@@ -13,6 +15,10 @@ public class EnumUtilTest {
 
     @Test public void testCount() {
         assertEquals(3, EnumUtil.count(ABC.class));
+    }
+
+    @Test public void testList() {
+        assertEquals(List.of(ABC.A, ABC.B, ABC.C), EnumUtil.list(ABC.class));
     }
 
     @Test public void testNames() {
@@ -33,6 +39,10 @@ public class EnumUtilTest {
     @Test(expected = RuntimeException.class)
     public void testValueOfInvalid() {
         EnumUtil.valueOf(ABC.class, "FOO");
+    }
+
+    @Test public void testValues() {
+        assertTrue(Arrays.equals(ABC.values(), EnumUtil.values(ABC.class)));
     }
 
     public static void main(String[] args) {
