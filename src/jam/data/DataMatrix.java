@@ -1,98 +1,97 @@
 
 package jam.data;
 
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-
-import jam.math.DoubleComparator;
-import jam.matrix.JamMatrix;
 
 /**
  * Represents a numeric matrix where elements are accessed by row and
- * column key strings rather than integer indexes.
+ * column keys (fixed at the time of creation) in addition to integer
+ * indexes.
  *
- * <p>The row and column keys are fixed at the time of creation, but
- * the element values may change.  As with the {@link java.util.Set}
- * class, the order of the keys is immaterial.
+ * @param ROWTYPE the runtime type of the row keys.
+ *
+ * @param COLTYPE the runtime type of the column keys.
  */
-public final class DataMatrix {
-    private final JamMatrix   elements;
-    private final VectorIndex rowIndex;
-    private final VectorIndex colIndex;
-
+public interface DataMatrix<ROWTYPE, COLTYPE> {
     /**
-     * Creates a new data matrix with fixed keys and assigns each
-     * element to zero.
-     *
-     * @param rowKeys the row keys.
-     *
-     * @param colKeys the column keys.
+     * Special index used to indicate that a row or column key is not
+     * present in this matrix.
      */
-    public DataMatrix(Set<String> rowKeys, Set<String> colKeys) {
-        this(rowKeys, colKeys, 0.0);
-    }
+    public static final int KEY_MISSING = -1;
 
     /**
-     * Creates a new data matrix with fixed keys and assigns each
-     * element to the same value.
+     * Returns the column index mapped to a given column key.
      *
-     * @param rowKeys the row keys.
+     * @param colKey the column key to examine.
      *
-     * @param colKeys the column keys.
-     *
-     * @param fill the value to assign each element.
+     * @return the column index mapped to the specified column key, or
+     * {@code KEY_MISSING} if this matrix does not contain the column.
      */
-    public DataMatrix(Set<String> rowKeys, Set<String> colKeys, double fill) {
-        this.rowIndex = new VectorIndex(rowKeys);
-        this.colIndex = new VectorIndex(colKeys);
-        this.elements = new JamMatrix(rowKeys.size(), colKeys.size(), fill);
-    }
+    public abstract int colIndex(COLTYPE colKey);
 
     /**
-     * Returns the keys of the columns in this data matrix.
+     * Returns the key for a given column.
      *
-     * @return the keys of the columns in this data matrix.
+     * @param colIndex a zero-offset column index.
+     *
+     * @return the key of the specified column.
+     *
+     * @throws IllegalArgumentException unless the column index lies
+     * within this matrix.
      */
-    public Set<String> columnKeys() {
-        return new TreeSet<String>(colIndex.keys());
-    }
+    public abstract COLTYPE colKey(int colIndex);
 
     /**
-     * Identifies keys contained in this data matrix.
+     * Returns a read-only list view of the columns in this matrix.
+     *
+     * @return a read-only list view of the columns in this matrix.
+     */
+    public abstract List<COLTYPE> colKeyList();
+
+    /**
+     * Returns a read-only set view of the columns in this matrix.
+     *
+     * @return a read-only set view of the columns in this matrix.
+     */
+    public abstract Set<COLTYPE> colKeySet();
+
+    /**
+     * Identifies keys contained in this matrix.
      *
      * @param rowKey the row key to examine.
      *
      * @param colKey the column key to examine.
      *
-     * @return {@code true} iff this data matrix contains an element
-     * with the specified keys.
+     * @return {@code true} iff this matrix contains an element with
+     * the specified keys.
      */
-    public boolean contains(String rowKey, String colKey) {
-        return containsRow(rowKey) && containsColumn(colKey);
+    public default boolean contains(ROWTYPE rowKey, COLTYPE colKey) {
+        return containsRow(rowKey) && containsCol(colKey);
     }
 
     /**
-     * Identifies rows contained in this data matrix.
-     *
-     * @param rowKey the row key to examine.
-     *
-     * @return {@code true} iff this data matrix contains a row with
-     * the specified key.
-     */
-    public boolean containsRow(String rowKey) {
-        return rowIndex.contains(rowKey);
-    }
-
-    /**
-     * Identifies columns contained in this data matrix.
+     * Identifies column keys contained in this matrix.
      *
      * @param colKey the column key to examine.
      *
-     * @return {@code true} iff this data matrix contains a column
-     * with the specified key.
+     * @return {@code true} iff this matrix contains the specified
+     * column key.
      */
-    public boolean containsColumn(String colKey) {
-        return colIndex.contains(colKey);
+    public default boolean containsCol(COLTYPE colKey) {
+        return colIndex(colKey) != KEY_MISSING;
+    }
+
+    /**
+     * Identifies row keys contained in this matrix.
+     *
+     * @param rowKey the row key to examine.
+     *
+     * @return {@code true} iff this matrix contains the specified row
+     * key.
+     */
+    public default boolean containsRow(ROWTYPE rowKey) {
+        return rowIndex(rowKey) != KEY_MISSING;
     }
 
     /**
@@ -104,43 +103,96 @@ public final class DataMatrix {
      *
      * @return the value indexed by the specified keys.
      *
-     * @throws IllegalArgumentException unless this data matrix
-     * contains the specified element.
+     * @throws IllegalArgumentException unless this matrix contains
+     * the specified element.
      */
-    public double get(String rowKey, String colKey) {
-        return elements.get(rowIndex.indexOf(rowKey), colIndex.indexOf(colKey));
+    public default double get(ROWTYPE rowKey, COLTYPE colKey) {
+        return get(rowIndex(rowKey), colIndex(colKey));
     }
 
     /**
-     * Returns the number of columns in this data matrix.
+     * Returns the value of an element indexed by row and column
+     * position.
      *
-     * @return the number of columns in this data matrix.
+     * @param rowIndex the (zero-offset) row position of the element
+     * to return.
+     *
+     * @param colIndex the (zero-offset) column position of the
+     * element to return.
+     *
+     * @return the value indexed by the specified keys.
+     *
+     * @throws IllegalArgumentException unless the row and column
+     * indexes lie within this matrix.
      */
-    public int ncol() {
-        return elements.ncol();
+    public abstract double get(int rowIndex, int colIndex);
+
+    /**
+     * Returns an immutable wrapper around this matrix.
+     *
+     * @return an immutable wrapper around this matrix.
+     */
+    public default DataMatrix<ROWTYPE, COLTYPE> immutable() {
+        return new ImmutableDataMatrix<ROWTYPE, COLTYPE>(this);
     }
 
     /**
-     * Returns the number of rows in this data matrix.
+     * Returns the number of columns in this matrix.
      *
-     * @return the number of rows in this data matrix.
+     * @return the number of columns in this matrix.
      */
-    public int nrow() {
-        return elements.nrow();
+    public default int ncol() {
+        return colKeyList().size();
     }
 
     /**
-     * Returns the keys of the rows in this data matrix.
+     * Returns the number of rows in this matrix.
      *
-     * @return the keys of the rows in this data matrix.
+     * @return the number of rows in this matrix.
      */
-    public Set<String> rowKeys() {
-        return new TreeSet<String>(rowIndex.keys());
+    public default int nrow() {
+        return rowKeyList().size();
     }
+
+    /**
+     * Returns the row index mapped to a given row key.
+     *
+     * @param rowKey the row key to examine.
+     *
+     * @return the row index mapped to the specified row key, or
+     * {@code KEY_MISSING} if this matrix does not contain the row.
+     */
+    public abstract int rowIndex(ROWTYPE rowKey);
+
+    /**
+     * Returns the key for a given row.
+     *
+     * @param rowIndex a zero-offset row index.
+     *
+     * @return the key of the specified row.
+     *
+     * @throws IllegalArgumentException unless the row index lies
+     * within this matrix.
+     */
+    public abstract ROWTYPE rowKey(int rowIndex);
+
+    /**
+     * Returns a read-only list view of the rows in this matrix.
+     *
+     * @return a read-only list view of the rows in this matrix.
+     */
+    public abstract List<ROWTYPE> rowKeyList();
+
+    /**
+     * Returns a read-only set view of the rows in this matrix.
+     *
+     * @return a read-only set view of the rows in this matrix.
+     */
+    public abstract Set<ROWTYPE> rowKeySet();
 
     /**
      * Assigns a new value to an element indexed by row and column
-     * key.
+     * key (optional operation).
      *
      * @param rowKey the row key of the element to set.
      *
@@ -148,74 +200,33 @@ public final class DataMatrix {
      *
      * @param value the value to assign.
      *
-     * @throws IllegalArgumentException unless this data matrix
-     * contains the specified element.
+     * @throws IllegalArgumentException unless this matrix contains
+     * the specified element.
+     *
+     * @throws UnsupportedOperationException if this is an
+     * unmodifiable matrix.
      */
-    public void set(String rowKey, String colKey, double value) {
-        elements.set(rowIndex.indexOf(rowKey), colIndex.indexOf(colKey), value);
+    public default void set(ROWTYPE rowKey, COLTYPE colKey, double value) {
+        set(rowIndex(rowKey), colIndex(colKey), value);
     }
 
     /**
-     * Ensures that this data matrix contains a particular element.
+     * Assigns a new value to an element indexed by row and column
+     * position (optional operation).
      *
-     * @param rowKey the row key to validate.
+     * @param rowIndex the (zero-offset) row position of the element
+     * to set.
      *
-     * @param colKey the column key to validate.
+     * @param colIndex the (zero-offset) column position of the
+     * element to set.
      *
-     * @throws IllegalArgumentException unless this data matrix
-     * contains the specified element.
+     * @param value the value to assign.
+     *
+     * @throws IllegalArgumentException unless the row and column
+     * indexes lie within this matrix.
+     *
+     * @throws UnsupportedOperationException if this is an
+     * unmodifiable matrix.
      */
-    public void validateKeys(String rowKey, String colKey) {
-        rowIndex.validateKey(rowKey);
-        colIndex.validateKey(colKey);
-    }
-
-    @Override public boolean equals(Object that) {
-        return (that instanceof DataMatrix) && equalsDataMatrix((DataMatrix) that);
-    }
-
-    private boolean equalsDataMatrix(DataMatrix that) {
-        //
-        // The element ordering may differ, but all key/value pairs
-        // must be identical...
-        //
-        if (this.nrow() != that.nrow())
-            return false;
-
-        if (this.ncol() != that.ncol())
-            return false;
-
-        for (String rowKey : rowIndex.keys()) {
-            if (!that.containsRow(rowKey))
-                return false;
-
-            for (String colKey : colIndex.keys()) {
-                if (!that.containsColumn(colKey))
-                    return false;
-
-                if (DoubleComparator.DEFAULT.NE(this.get(rowKey, colKey), that.get(rowKey, colKey)))
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override public int hashCode() {
-        throw new UnsupportedOperationException("Data matrices should not be used as keys.");
-    }
-
-    @Override public String toString() {
-        StringBuilder builder = new StringBuilder();
-
-        for (String rowKey : rowIndex.keys())
-            for (String colKey : colIndex.keys())
-                builder.append(formatElement(rowKey, colKey));
-
-        return builder.toString();
-    }
-
-    private String formatElement(String rowKey, String colKey) {
-        return "(" + rowKey + ", " + colKey + ") => " + get(rowKey, colKey) + System.lineSeparator();
-    }
+    public abstract void set(int rowIndex, int colIndex, double value);
 }

@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import jam.app.JamProperties;
 import jam.data.DataMatrix;
+import jam.data.DenseDataMatrix;
 import jam.io.FileParser;
 import jam.lang.Formatted;
 import jam.lang.JamException;
@@ -239,23 +240,19 @@ public final class Epitope extends KeyedObject<String> implements Formatted {
      * @return a data matrix containing the mutational distances
      * indexed by epitope key.
      */
-    public static DataMatrix mutationalDistance() {
-	Set<String> keySet = keys();
-	String[]    keyVec = keySet.toArray(new String[0]);
-	DataMatrix  result = new DataMatrix(keySet, keySet, 0.0);
+    public static DataMatrix<Epitope, Epitope> mutationalDistance() {
+	List<Epitope> epitopes =
+            new ArrayList<Epitope>(instances.values());
 
-	for (int i = 0; i < keyVec.length; i++) {
-	    for (int j = i + 1; j < keyVec.length; j++) {
-		String ki = keyVec[i];
-		String kj = keyVec[j];
+	DataMatrix<Epitope, Epitope> result =
+            DenseDataMatrix.square(epitopes);
 
-		Epitope ei = require(ki);
-		Epitope ej = require(kj);
+	for (int i = 0; i < epitopes.size(); i++) {
+	    for (int j = i + 1; j < epitopes.size(); j++) {
+		double md = mutationalDistance(epitopes.get(i), epitopes.get(j));
 
-		double md = mutationalDistance(ei, ej);
-
-		result.set(ki, kj, md);
-		result.set(kj, ki, md);
+		result.set(i, j, md);
+		result.set(j, i, md);
 	    }
 	}
 

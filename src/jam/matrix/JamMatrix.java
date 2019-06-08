@@ -229,7 +229,7 @@ public final class JamMatrix extends MatrixView {
      * @throws IllegalArgumentException unless there is at least one
      * row and all rows have the same (positive) length.
      */
-    public static JamMatrix rbind(Collection<VectorView> rows) {
+    public static JamMatrix rbind(Collection<? extends VectorView> rows) {
         return rbind(rows.toArray(new VectorView[0]));
     }
 

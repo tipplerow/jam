@@ -1,6 +1,11 @@
 
 package jam.data;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
+import jam.matrix.JamMatrix;
 import jam.util.EnumUtil;
 
 /**
@@ -11,11 +16,16 @@ import jam.util.EnumUtil;
  * (and include all defined enum values), but the element values 
  * may change.
  */
-public final class EnumeratedMatrix<ROW extends Enum<ROW>, COL extends Enum<COL>> {
-    private final DataMatrix elements;
+public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
+                                    COLTYPE extends Enum<COLTYPE>> implements DataMatrix<ROWTYPE, COLTYPE> {
+    private final ROWTYPE[] rowKeys;
+    private final COLTYPE[] colKeys;
+    private final JamMatrix elements;
 
-    private EnumeratedMatrix(Class<ROW> rowType, Class<COL> colType, double fill) {
-        this.elements = new DataMatrix(EnumUtil.names(rowType), EnumUtil.names(colType), fill);
+    private EnumeratedMatrix(Class<ROWTYPE> rowType, Class<COLTYPE> colType, double fill) {
+        this.rowKeys  = EnumUtil.values(rowType);
+        this.colKeys  = EnumUtil.values(colType);
+        this.elements = new JamMatrix(rowKeys.length, colKeys.length, fill);
     }
 
     /**
@@ -87,50 +97,52 @@ public final class EnumeratedMatrix<ROW extends Enum<ROW>, COL extends Enum<COL>
         return create(keyType, keyType, fill);
     }
 
-    /**
-     * Returns the value of an element indexed by row and column enum
-     * keys.
-     *
-     * @param rowKey the row key of the element to return.
-     *
-     * @param colKey the column key of the element to return.
-     *
-     * @return the value indexed by the specified enum keys.
-     */
-    public double get(ROW rowKey, COL colKey) {
-        return elements.get(rowKey.name(), colKey.name());
+    @Override public int colIndex(COLTYPE colKey) {
+        return colKey.ordinal();
     }
 
-    /**
-     * Returns the number of columns in this enumerated matrix.
-     *
-     * @return the number of columns in this enumerated matrix.
-     */
-    public int ncol() {
+    @Override public COLTYPE colKey(int colIndex) {
+        return colKeys[colIndex];
+    }
+
+    @Override public List<COLTYPE> colKeyList() {
+        return List.of(colKeys);
+    }
+
+    @Override public Set<COLTYPE> colKeySet() {
+        return Set.of(colKeys);
+    }
+
+    @Override public double get(int rowIndex, int colIndex) {
+        return elements.get(rowIndex, colIndex);
+    }
+
+    @Override public int ncol() {
         return elements.ncol();
     }
 
-    /**
-     * Returns the number of rows in this enumerated matrix.
-     *
-     * @return the number of rows in this enumerated matrix.
-     */
-    public int nrow() {
+    @Override public int nrow() {
         return elements.nrow();
     }
 
-    /**
-     * Assigns a new value to an element indexed by row and column
-     * enum key.
-     *
-     * @param rowKey the row key of the element to set.
-     *
-     * @param colKey the column key of the element to set.
-     *
-     * @param value the value to assign.
-     */
-    public void set(ROW rowKey, COL colKey, double value) {
-        elements.set(rowKey.name(), colKey.name(), value);
+    @Override public int rowIndex(ROWTYPE rowKey) {
+        return rowKey.ordinal();
+    }
+
+    @Override public ROWTYPE rowKey(int rowIndex) {
+        return rowKeys[rowIndex];
+    }
+
+    @Override public List<ROWTYPE> rowKeyList() {
+        return List.of(rowKeys);
+    }
+
+    @Override public Set<ROWTYPE> rowKeySet() {
+        return Set.of(rowKeys);
+    }
+
+    @Override public void set(int rowIndex, int colIndex, double value) {
+        elements.set(rowIndex, colIndex, value);
     }
 
     @Override public boolean equals(Object that) {
@@ -138,14 +150,12 @@ public final class EnumeratedMatrix<ROW extends Enum<ROW>, COL extends Enum<COL>
     }
 
     private boolean equalsEnumeratedMatrix(EnumeratedMatrix that) {
-        return this.elements.equals(that.elements);
+        return Arrays.equals(this.rowKeys, that.rowKeys)
+            && Arrays.equals(this.colKeys, that.colKeys)
+            && this.elements.equals(that.elements);
     }
 
     @Override public int hashCode() {
-        return elements.hashCode();
-    }
-
-    @Override public String toString() {
-        return elements.toString();
+        throw new UnsupportedOperationException("Enumerated matrices should not be used as hash keys.");
     }
 }

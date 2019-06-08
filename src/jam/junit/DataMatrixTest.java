@@ -1,72 +1,139 @@
 
 package jam.junit;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import jam.data.DataMatrix;
+import jam.data.DenseDataMatrix;
+import jam.lang.KeyedObject;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class DataMatrixTest extends NumericTestBase {
-    private final List<String> keyList1 = Arrays.asList("abc", "def");
-    private final List<String> keyList2 = Arrays.asList("def", "ghi", "jkl");
-    private final List<String> keyList3 = Arrays.asList("def", "abc");
-    private final List<String> keyList4 = Arrays.asList("jkl", "ghi", "def");
-    private final List<String> keyList5 = Arrays.asList("abc", "ghi", "jkl");
 
-    private final Set<String> keySet1 = new TreeSet<String>(keyList1);
-    private final Set<String> keySet2 = new TreeSet<String>(keyList2);
-    private final Set<String> keySet3 = new LinkedHashSet<String>(keyList3);
-    private final Set<String> keySet4 = new LinkedHashSet<String>(keyList4);
-    private final Set<String> keySet5 = new TreeSet<String>(keyList5);
-
-    private final DataMatrix matrix1 = new DataMatrix(keySet1, keySet2, 3.3);
-    private final DataMatrix matrix2 = new DataMatrix(keySet3, keySet4, 3.3);
-    private final DataMatrix matrix3 = new DataMatrix(keySet1, keySet5, 3.3);
-
-    @Test public void testBasic() {
-        assertEquals(2, matrix1.nrow());
-        assertEquals(3, matrix1.ncol());
-
-        assertTrue(matrix1.contains("abc", "def"));
-        assertTrue(matrix1.contains("abc", "ghi"));
-        assertTrue(matrix1.contains("abc", "jkl"));
-        assertTrue(matrix1.contains("def", "def"));
-        assertTrue(matrix1.contains("def", "ghi"));
-        assertTrue(matrix1.contains("def", "jkl"));
-
-        assertFalse(matrix1.contains("def", "abc"));
-        assertFalse(matrix1.contains("jkl", "abc"));
-        assertFalse(matrix1.contains("ghi", "def"));
-        assertFalse(matrix1.contains("jkl", "def"));
-
-        matrix1.set("abc", "def", 1.1);
-        matrix1.set("def", "jkl", 2.2);
-
-        assertDouble(1.1, matrix1.get("abc", "def"));
-        assertDouble(2.2, matrix1.get("def", "jkl"));
-        assertDouble(3.3, matrix1.get("def", "ghi"));
-
-        Set<String> rowKeys = matrix1.rowKeys();
-        assertEquals(2, rowKeys.size());
-        assertTrue(rowKeys.contains("abc"));
-        assertTrue(rowKeys.contains("def"));
-
-        Set<String> colKeys = matrix1.columnKeys();
-        assertEquals(3, colKeys.size());
-        assertTrue(colKeys.contains("def"));
-        assertTrue(colKeys.contains("ghi"));
-        assertTrue(colKeys.contains("jkl"));
+    public static final class Asset extends KeyedObject<String> {
+        public Asset(String key) {
+            super(key);
+        }
     }
 
-    @Test public void testEquals() {
-	assertTrue(matrix1.equals(matrix2));
-	assertFalse(matrix1.equals(matrix3));
+    public static final class Factor extends KeyedObject<String> {
+        public Factor(String key) {
+            super(key);
+        }
+    }
+
+    private static Asset AMAT = new Asset("AMAT");
+    private static Asset INTC = new Asset("INTC");
+    private static Asset KLAC = new Asset("KLAC");
+    private static Asset LRCX = new Asset("LRCX");
+
+    private static Factor MOMENTUM = new Factor("MOMENTUM");
+    private static Factor QUALITY  = new Factor("QUALITY");
+    private static Factor VALUE    = new Factor("VALUE");
+
+    private static DataMatrix<Asset, Factor> createMatrix() {
+        return DenseDataMatrix.create(List.of(AMAT, KLAC, LRCX),
+                                      List.of(MOMENTUM, VALUE));
+    }
+
+    @Test public void testIndexing() {
+        DataMatrix<Asset, Factor> matrix = createMatrix();
+
+        matrix.set(AMAT, MOMENTUM, 1.23);
+        matrix.set(2, 1, 2.1);
+        
+        runIndexingTest(matrix);
+        runIndexingTest(matrix.immutable());
+    }
+
+    private void runIndexingTest(DataMatrix<Asset, Factor> matrix) {
+        assertEquals(-1, matrix.colIndex(QUALITY));
+        assertEquals( 0, matrix.colIndex(MOMENTUM));
+        assertEquals( 1, matrix.colIndex(VALUE));
+
+        assertEquals(MOMENTUM, matrix.colKey(0));
+        assertEquals(VALUE,    matrix.colKey(1));
+
+        assertEquals(List.of(MOMENTUM, VALUE), matrix.colKeyList());
+        assertEquals(Set.of( MOMENTUM, VALUE), matrix.colKeySet());
+
+        assertTrue(matrix.contains( AMAT, VALUE));
+        assertFalse(matrix.contains(AMAT, QUALITY));
+        assertFalse(matrix.contains(INTC, VALUE));
+        assertFalse(matrix.contains(INTC, QUALITY));
+
+        assertTrue(matrix.containsCol(VALUE));
+        assertFalse(matrix.containsCol(QUALITY));
+
+        assertTrue(matrix.containsRow(AMAT));
+        assertFalse(matrix.containsRow(INTC));
+
+        assertEquals(3, matrix.nrow());
+        assertEquals(2, matrix.ncol());
+
+        assertEquals(-1, matrix.rowIndex(INTC));
+        assertEquals( 0, matrix.rowIndex(AMAT));
+        assertEquals( 1, matrix.rowIndex(KLAC));
+        assertEquals( 2, matrix.rowIndex(LRCX));
+
+        assertEquals(AMAT, matrix.rowKey(0));
+        assertEquals(KLAC, matrix.rowKey(1));
+        assertEquals(LRCX, matrix.rowKey(2));
+
+        assertEquals(List.of(AMAT, KLAC, LRCX), matrix.rowKeyList());
+        assertEquals(Set.of( AMAT, KLAC, LRCX), matrix.rowKeySet());
+
+        assertDouble(1.23, matrix.get(AMAT, MOMENTUM));
+        assertDouble(2.1,  matrix.get(2, 1));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetInvalidColumnIndex() {
+        createMatrix().get(0, 5);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetInvalidColumnKey() {
+        createMatrix().get(AMAT, QUALITY);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetInvalidRowIndex() {
+        createMatrix().get(3, 0);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetInvalidRowKey() {
+        createMatrix().get(INTC, VALUE);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSetInvalidColumnIndex() {
+        createMatrix().set(0, 5, 1.1);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSetInvalidColumnKey() {
+        createMatrix().set(AMAT, QUALITY, 1.1);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSetInvalidRowIndex() {
+        createMatrix().set(3, 0, 1.1);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSetInvalidRowKey() {
+        createMatrix().set(INTC, VALUE, 1.1);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testImmutable() {
+        DataMatrix<Asset, Factor> matrix = createMatrix();
+        matrix.immutable().set(0, 0, 1.23);
     }
 
     public static void main(String[] args) {
