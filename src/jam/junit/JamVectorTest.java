@@ -1,7 +1,7 @@
 
 package jam.junit;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -345,6 +345,13 @@ public class JamVectorTest extends NumericTestBase {
     @Test public void testParseCSV() {
         JamVector vec1 = JamVector.valueOf(1.0, 2.0, 3.0);
         JamVector vec2 = JamVector.parseCSV("1.0, 2.0, 3.0");
+
+        assertEquals(vec1, vec2);
+    }
+
+    @Test public void testParseCollection() {
+        JamVector vec1 = JamVector.valueOf(1.1, 2.2, 3.3);
+        JamVector vec2 = JamVector.parse(List.of("1.1", "2.2", "3.3"));
 
         assertEquals(vec1, vec2);
     }

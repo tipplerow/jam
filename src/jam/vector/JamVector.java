@@ -780,6 +780,27 @@ public final class JamVector extends AbstractVector {
         return vector;
     }
 
+    /**
+     * Creates a vector by parsing a collection of string elements.
+     *
+     * @param elements the string elements to parse.
+     *
+     * @return a new vector with the elements assigned from the given
+     * strings.
+     *
+     * @throws IllegalArgumentException unless all string elements are
+     * properly formatted.
+     */
+    public static JamVector parse(Collection<String> elements) {
+        int index = 0;
+        JamVector vector = new JamVector(elements.size());
+
+        for (String element : elements)
+            vector.set(index++, Double.parseDouble(element));
+
+        return vector;
+    }
+
     @Override public int length() {
         return impl.length();
     }
