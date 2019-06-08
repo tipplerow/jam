@@ -1,7 +1,6 @@
 
 package jam.data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jam.matrix.JamMatrix;

@@ -3,153 +3,160 @@ package jam.data;
 
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-
-import jam.math.DoubleComparator;
-import jam.vector.JamVector;
 
 /**
- * Represents a numeric vector where elements are accessed by key
- * strings rather than integer indexes.
+ * Represents a numeric vector where elements are accessed by keys
+ * (fixed at the time of creation) in addition to integer indexes.
  *
- * <p>The element keys are fixed at the time of creation, but the
- * element values may change.  As with the {@link java.util.Set}
- * class, the order of the keys is immaterial.
+ * @param K the runtime time of the element keys.
  */
-public final class DataVector {
-    private final JamVector elements;
-    private final VectorIndex index;
-
+public interface DataVector<K> {
     /**
-     * Creates a new data vector with fixed keys and assigns each
-     * element to zero.
-     *
-     * @param keys the element keys.
+     * Special index used to indicate that an element key is not
+     * present in this vector.
      */
-    public DataVector(Set<String> keys) {
-        this(keys, 0.0);
-    }
+    public static final int KEY_MISSING = -1;
 
     /**
-     * Creates a new data vector with fixed keys and assigns each
-     * element to the same value.
+     * Returns a new data vector with dense vector storage.
+     *
+     * @param <K> the runtime type for the row keys.
      *
      * @param keys the element keys.
      *
-     * @param fill the value to assign each element.
+     * @return the new data vector.
+     *
+     * @throws IllegalArgumentException if the key list is empty or
+     * contains duplicates.
      */
-    public DataVector(Set<String> keys, double fill) {
-        this.index = new VectorIndex(keys);
-        this.elements = new JamVector(keys.size(), fill);
+    public static <K> DataVector<K> dense(List<K> keys) {
+        return DenseDataVector.create(keys);
     }
 
     /**
-     * Identifies keys contained in this data vector.
+     * Returns the element index mapped to a given key.
      *
-     * @param key the key to examine.
+     * @param key the element key to examine.
      *
-     * @return {@code true} iff this data vector contains an element
-     * with the specified key.
+     * @return the element index mapped to the specified key, or
+     * {@code KEY_MISSING} if this vector does not contain that
+     * element.
      */
-    public boolean contains(String key) {
-        return index.contains(key);
+    public abstract int indexOf(K key);
+
+    /**
+     * Returns the key for a given element.
+     *
+     * @param index a zero-offset element index.
+     *
+     * @return the key of the specified element.
+     *
+     * @throws IllegalArgumentException unless the element index lies
+     * within this vector.
+     */
+    public abstract K keyAt(int index);
+
+    /**
+     * Returns a read-only list view of the keys in this vector.
+     *
+     * @return a read-only list view of the keys in this vector.
+     */
+    public abstract List<K> keyList();
+
+    /**
+     * Returns a read-only set view of the key in this vector.
+     *
+     * @return a read-only set view of the key in this vector.
+     */
+    public abstract Set<K> keySet();
+
+    /**
+     * Identifies keys contained in this vector.
+     *
+     * @param key the element key to examine.
+     *
+     * @return {@code true} iff this vector contains an element with
+     * the specified key.
+     */
+    public default boolean contains(K key) {
+        return indexOf(key) != KEY_MISSING;
     }
 
     /**
-     * Returns the value indexed by key.
+     * Returns the value of an element indexed by key.
      *
      * @param key the key of the element to return.
      *
      * @return the value indexed by the specified key.
      *
-     * @throws IllegalArgumentException unless this data vector
-     * contains the specified element.
+     * @throws IllegalArgumentException unless this vector contains
+     * the specified element.
      */
-    public double get(String key) {
-        return elements.get(index.indexOf(key));
+    public default double get(K key) {
+        return get(indexOf(key));
     }
 
     /**
-     * Returns the keys for the elements in this data vector.
+     * Returns the value of an element indexed by position.
      *
-     * @return the keys for the elements in this data vector.
+     * @param index the (zero-offset) position of the element.
+     *
+     * @return the value indexed by the specified keys.
+     *
+     * @throws IllegalArgumentException unless the index lies within
+     * this vector.
      */
-    public Set<String> keys() {
-        return new TreeSet<String>(index.keys());
+    public abstract double get(int index);
+
+    /**
+     * Returns an immutable wrapper around this vector.
+     *
+     * @return an immutable wrapper around this vector.
+     */
+    public default DataVector<K> immutable() {
+        return new ImmutableDataVector<K>(this);
     }
 
     /**
-     * Returns the number of elements in this data vector.
+     * Returns the number of elements in this vector.
      *
-     * @return the number of elements in this data vector.
+     * @return the number of elements in this vector.
      */
-    public int length() {
-        return elements.length();
+    public default int length() {
+        return keyList().size();
     }
 
     /**
-     * Assigns a new value to an element indexed by a key.
+     * Assigns a new value to an element indexed by key
+     * (optional operation).
      *
-     * @param key the key of the element to assign.
+     * @param key the key of the element to set.
      *
      * @param value the value to assign.
      *
-     * @throws IllegalArgumentException unless this data vector
+     * @throws IllegalArgumentException unless this vector
      * contains the specified element.
+     *
+     * @throws UnsupportedOperationException if this is an
+     * unmodifiable vector.
      */
-    public void set(String key, double value) {
-        elements.set(index.indexOf(key), value);
+    public default void set(K key, double value) {
+        set(indexOf(key), value);
     }
 
     /**
-     * Ensures that this data vector contains a particular key.
+     * Assigns a new value to an element indexed by position
+     * (optional operation).
      *
-     * @param key the key to validate.
+     * @param index the (zero-offset) position of the element.
      *
-     * @throws IllegalArgumentException unless this data vector
-     * contains the specified key.
+     * @param value the value to assign.
+     *
+     * @throws IllegalArgumentException unless the index lies
+     * within this vector.
+     *
+     * @throws UnsupportedOperationException if this is an
+     * unmodifiable vector.
      */
-    public void validateKey(String key) {
-        index.validateKey(key);
-    }
-
-    @Override public boolean equals(Object that) {
-        return (that instanceof DataVector) && equalsDataVector((DataVector) that);
-    }
-
-    private boolean equalsDataVector(DataVector that) {
-        //
-        // The element ordering may differ, but all key/value pairs
-        // must be identical...
-        //
-        if (this.length() != that.length())
-            return false;
-
-        for (String key : index.keys()) {
-            if (!that.contains(key))
-                return false;
-
-            if (DoubleComparator.DEFAULT.NE(this.get(key), that.get(key)))
-                return false;
-        }
-
-        return true;
-    }
-
-    @Override public int hashCode() {
-        throw new UnsupportedOperationException("Data vectors should not be used as keys.");
-    }
-
-    @Override public String toString() {
-        StringBuilder builder = new StringBuilder();
-
-        for (String key : index.keys())
-            builder.append(formatElement(key));
-
-        return builder.toString();
-    }
-
-    private String formatElement(String key) {
-        return key + " => " + get(key);
-    }
+    public abstract void set(int index, double value);
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import jam.data.DataMatrix;
-import jam.data.DenseDataMatrix;
 import jam.lang.KeyedObject;
 
 import org.junit.*;
@@ -35,8 +34,8 @@ public class DataMatrixTest extends NumericTestBase {
     private static Factor VALUE    = new Factor("VALUE");
 
     private static DataMatrix<Asset, Factor> createMatrix() {
-        return DenseDataMatrix.create(List.of(AMAT, KLAC, LRCX),
-                                      List.of(MOMENTUM, VALUE));
+        return DataMatrix.dense(List.of(AMAT, KLAC, LRCX),
+                                List.of(MOMENTUM, VALUE));
     }
 
     @Test public void testIndexing() {

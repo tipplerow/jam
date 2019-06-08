@@ -21,6 +21,27 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
     public static final int KEY_MISSING = -1;
 
     /**
+     * Returns a new data matrix with dense matrix storage.
+     *
+     * @param <ROWTYPE> the runtime type for the row keys.
+     *
+     * @param <COLTYPE> the runtime type for the column keys.
+     *
+     * @param rowKeys the row keys.
+     *
+     * @param colKeys the column keys.
+     *
+     * @return the new data matrix.
+     *
+     * @throws IllegalArgumentException if either key list is empty or
+     * contains duplicates.
+     */
+    public static <ROWTYPE, COLTYPE> DataMatrix<ROWTYPE, COLTYPE> dense(List<ROWTYPE> rowKeys,
+                                                                        List<COLTYPE> colKeys) {
+        return DenseDataMatrix.create(rowKeys, colKeys);
+    }
+
+    /**
      * Returns the column index mapped to a given column key.
      *
      * @param colKey the column key to examine.
@@ -111,16 +132,15 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
     }
 
     /**
-     * Returns the value of an element indexed by row and column
+     * Returns the value of an element identified by row and column
      * position.
      *
-     * @param rowIndex the (zero-offset) row position of the element
-     * to return.
+     * @param rowIndex the (zero-offset) row position of the element.
      *
      * @param colIndex the (zero-offset) column position of the
-     * element to return.
+     * element.
      *
-     * @return the value indexed by the specified keys.
+     * @return the value at the specified position.
      *
      * @throws IllegalArgumentException unless the row and column
      * indexes lie within this matrix.

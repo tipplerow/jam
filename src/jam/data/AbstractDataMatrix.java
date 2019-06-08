@@ -132,7 +132,7 @@ public abstract class AbstractDataMatrix<ROWTYPE, COLTYPE> implements DataMatrix
         if (this.ncol() != that.ncol())
             return false;
 
-        // Must have identical keys...
+        // Must have identical keys in the same order...
         for (int rowIndex = 0; rowIndex < nrow(); ++rowIndex)
             if (!this.rowKey(rowIndex).equals(that.rowKey(rowIndex)))
                 return false;
@@ -166,6 +166,9 @@ public abstract class AbstractDataMatrix<ROWTYPE, COLTYPE> implements DataMatrix
     }
 
     private String formatElement(int rowIndex, int colIndex) {
-        return "(" + rowKey(rowIndex) + ", " + colKey(rowIndex) + ") => " + get(rowIndex, colIndex) + System.lineSeparator();
+        return String.format("(%s, %s) => %s\n",
+                             rowKey(rowIndex),
+                             colKey(colIndex),
+                             Double.toString(get(rowIndex, colIndex)));
     }
 }
