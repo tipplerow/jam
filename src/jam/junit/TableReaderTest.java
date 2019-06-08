@@ -29,6 +29,8 @@ public class TableReaderTest {
 
     private void runNextTest(String fileName) {
         TableReader reader = TableReader.open(fileName);
+
+        assertEquals(2, reader.ncol());
         assertEquals(List.of("Key", "Value"), reader.columnKeys());
 
         assertEquals(List.of("abc", "0"), reader.next());
@@ -39,6 +41,8 @@ public class TableReaderTest {
 
     private void runIteratorTest(String fileName) {
         TableReader reader = TableReader.open(fileName);
+
+        assertEquals(2, reader.ncol());
         assertEquals(List.of("Key", "Value"), reader.columnKeys());
 
         List<List<String>> lines = new ArrayList<List<String>>();

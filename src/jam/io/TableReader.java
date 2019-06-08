@@ -114,6 +114,15 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
     }
 
     /**
+     * Returns the number of columns in the table.
+     *
+     * @return the number of columns in the table.
+     */
+    public int ncol() {
+        return columnKeys.size();
+    }
+
+    /**
      * Closes the underlying reader.
      */
     @Override public void close() {
