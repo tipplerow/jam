@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.app.JamLogger;
 import jam.io.TableReader;
 import jam.lang.JamException;
 import jam.matrix.JamMatrix;
@@ -48,6 +49,9 @@ public abstract class DenseDataMatrixLoader<R, C> extends DataMatrixLoader<R, C>
         try {
             parseColKeys();
             parseRowData();
+
+            JamLogger.info("DenseDataMatrixLoader: Loaded [%d] rows.", rowKeys.size());
+            JamLogger.info("DenseDataMatrixLoader: Loaded [%d] columns.", colKeys.size());
 
             return new DenseDataMatrix<R, C>(rowKeys, colKeys, JamMatrix.rbind(rowData), false, false);
         }
