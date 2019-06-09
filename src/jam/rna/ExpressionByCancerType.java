@@ -5,7 +5,6 @@ import java.io.File;
 import java.util.List;
 
 import jam.data.DataMatrix;
-import jam.data.DenseDataMatrix;
 import jam.data.DenseDataMatrixLoader;
 import jam.peptide.HugoSymbol;
 import jam.tcga.CancerType;
@@ -24,7 +23,7 @@ public final class ExpressionByCancerType {
      * @return a new {@code DataMatrix} with the specified keys.
      */
     public static DataMatrix<HugoSymbol, CancerType> create(List<HugoSymbol> genes, List<CancerType> types) {
-        return DenseDataMatrix.create(genes, types);
+        return DataMatrix.dense(genes, types);
     }
 
     /**

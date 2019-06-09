@@ -9,7 +9,7 @@ import jam.matrix.JamMatrix;
  * Implements the {@code DataMatrix} interface with dense matrix
  * storage.
  */
-public final class DenseDataMatrix<ROWTYPE, COLTYPE> extends AbstractDataMatrix<ROWTYPE, COLTYPE> {
+public class DenseDataMatrix<ROWTYPE, COLTYPE> extends AbstractDataMatrix<ROWTYPE, COLTYPE> {
     private final JamMatrix elements;
 
     DenseDataMatrix(List<ROWTYPE> rowKeys,

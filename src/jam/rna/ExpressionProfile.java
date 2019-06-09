@@ -16,15 +16,8 @@ public abstract class ExpressionProfile {
      * Name of the system property that specifies the type of the
      * global RNA expression profile.
      */
-    public static final String EXPRESSION_PROFILE_TYPE_PROPERTY =
+    public static final String PROFILE_TYPE_PROPERTY =
         "jam.rna.expressionProfileType";
-
-    /**
-     * Name of the system property that specifies the data file
-     * containing the global RNA expression profile.
-     */
-    public static final String EXPRESSION_PROFILE_FILE_NAME_PROPERTY =
-        "jam.rna.expressionProfileFileName";
 
     /**
      * Returns the global expression profile defined by system
@@ -45,7 +38,10 @@ public abstract class ExpressionProfile {
 
         switch (type) {
         case AGGREGATE:
-            return AggregateProfile.load(resolveProfileFileName());
+            return AggregateProfile.global();
+
+        case CANCER_TYPE:
+            return CancerTypeProfile.global();
 
         default:
             throw JamException.runtime("Unsupported expression profile type: [%s].", type);
@@ -53,11 +49,7 @@ public abstract class ExpressionProfile {
     }
 
     private static ExpressionProfileType resolveProfileType() {
-        return JamProperties.getRequiredEnum(EXPRESSION_PROFILE_TYPE_PROPERTY, ExpressionProfileType.class);
-    }
-
-    private static String resolveProfileFileName() {
-        return JamProperties.getRequired(EXPRESSION_PROFILE_FILE_NAME_PROPERTY);
+        return JamProperties.getRequiredEnum(PROFILE_TYPE_PROPERTY, ExpressionProfileType.class);
     }
 
     /**

@@ -2,6 +2,7 @@
 package jam.junit;
 
 import jam.peptide.HugoSymbol;
+import jam.rna.AggregateProfile;
 import jam.rna.Expression;
 import jam.rna.ExpressionProfile;
 import jam.tcga.TumorBarcode;
@@ -11,8 +12,8 @@ import static org.junit.Assert.*;
 
 public class AggregateProfileTest {
     static {
-        System.setProperty(ExpressionProfile.EXPRESSION_PROFILE_TYPE_PROPERTY, "AGGREGATE");
-        System.setProperty(ExpressionProfile.EXPRESSION_PROFILE_FILE_NAME_PROPERTY, "data/test/RNA_Median.tsv");
+        System.setProperty(ExpressionProfile.PROFILE_TYPE_PROPERTY, "AGGREGATE");
+        System.setProperty(AggregateProfile.PROFILE_FILE_NAME_PROPERTY, "data/test/RNA_Median.tsv");
     }
 
     @Test public void testAll() {
