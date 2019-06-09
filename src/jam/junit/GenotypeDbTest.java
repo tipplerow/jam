@@ -37,8 +37,12 @@ public class GenotypeDbTest {
     private static final PatientID Pat04 = PatientID.instance("Pat04");
     private static final PatientID Pat05 = PatientID.instance("Pat05");
 
+    static {
+        System.setProperty(GenotypeDb.FILE_NAME_PROPERTY, "data/test/genotype1.csv");
+    }
+
     @Test public void test1() {
-        GenotypeDb db = GenotypeDb.load("data/test/genotype1.csv");
+        GenotypeDb db = GenotypeDb.global();
         assertEquals(4, db.size());
 
         assertTrue(db.contains(Pat01));

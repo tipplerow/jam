@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jam.app.JamProperties;
 import jam.app.JamLogger;
 import jam.io.TableReader;
 import jam.lang.JamException;
@@ -32,10 +33,40 @@ import jam.util.RegexUtil;
 public final class GenotypeDb {
     private final Map<PatientID, Genotype> genotypes;
 
+    private static GenotypeDb global = null;
+
     private static final Pattern ALLELE_ALELE_DELIM = RegexUtil.MULTI_WHITE_SPACE;
 
     private GenotypeDb() {
         this.genotypes = new HashMap<PatientID, Genotype>();
+    }
+
+    /**
+     * Name of the system property that specifies the file containing
+     * the global genotype data.
+     */
+    public static final String FILE_NAME_PROPERTY = "jam.hla.genotypeDbFile";
+
+    /**
+     * Returns the global genotype database defined via system
+     * properties.
+     *
+     * @return the global genotype database defined via system
+     * properties.
+     */
+    public static GenotypeDb global() {
+        if (global == null)
+            global = createGlobal();
+
+        return global;
+    }
+
+    private static GenotypeDb createGlobal() {
+        return load(resolveFileName());
+    }
+
+    private static String resolveFileName() {
+        return JamProperties.getRequired(FILE_NAME_PROPERTY);
     }
 
     /**
