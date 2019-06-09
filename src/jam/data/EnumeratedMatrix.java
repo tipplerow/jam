@@ -16,13 +16,13 @@ import jam.util.EnumUtil;
  * (and include all defined enum values), but the element values 
  * may change.
  */
-public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
-                                    COLTYPE extends Enum<COLTYPE>> implements DataMatrix<ROWTYPE, COLTYPE> {
-    private final ROWTYPE[] rowKeys;
-    private final COLTYPE[] colKeys;
+public final class EnumeratedMatrix<R extends Enum<R>,
+                                    C extends Enum<C>> implements DataMatrix<R, C> {
+    private final R[] rowKeys;
+    private final C[] colKeys;
     private final JamMatrix elements;
 
-    private EnumeratedMatrix(Class<ROWTYPE> rowType, Class<COLTYPE> colType, double fill) {
+    private EnumeratedMatrix(Class<R> rowType, Class<C> colType, double fill) {
         this.rowKeys  = EnumUtil.values(rowType);
         this.colKeys  = EnumUtil.values(colType);
         this.elements = new JamMatrix(rowKeys.length, colKeys.length, fill);
@@ -31,9 +31,9 @@ public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
     /**
      * Creates a enumerated matrix and assigns each element to zero.
      *
-     * @param <ROW> the enumerated row type.
+     * @param <R> the enumerated row type.
      *
-     * @param <COL> the enumerated column type.
+     * @param <C> the enumerated column type.
      *
      * @param rowType the enum class to serve as the row keys.
      *
@@ -41,8 +41,8 @@ public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
      *
      * @return the new enumerated matrix.
      */
-    public static <ROW extends Enum<ROW>, COL extends Enum<COL>> 
-        EnumeratedMatrix<ROW, COL> create(Class<ROW> rowType, Class<COL> colType) {
+    public static <R extends Enum<R>, C extends Enum<C>> 
+        EnumeratedMatrix<R, C> create(Class<R> rowType, Class<C> colType) {
         return create(rowType, colType, 0.0);
     }
 
@@ -50,9 +50,9 @@ public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
      * Creates a enumerated matrix and assigns each element to the
      * same value.
      *
-     * @param <ROW> the enumerated row type.
+     * @param <R> the enumerated row type.
      *
-     * @param <COL> the enumerated column type.
+     * @param <C> the enumerated column type.
      *
      * @param rowType the enum class to serve as the row keys.
      *
@@ -62,22 +62,22 @@ public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
      *
      * @return the new enumerated matrix.
      */
-    public static <ROW extends Enum<ROW>, COL extends Enum<COL>> 
-        EnumeratedMatrix<ROW, COL> create(Class<ROW> rowType, Class<COL> colType, double fill) {
-        return new EnumeratedMatrix<ROW, COL>(rowType, colType, fill);
+    public static <R extends Enum<R>, C extends Enum<C>> 
+        EnumeratedMatrix<R, C> create(Class<R> rowType, Class<C> colType, double fill) {
+        return new EnumeratedMatrix<R, C>(rowType, colType, fill);
     }
 
     /**
      * Creates a square enumerated matrix with the same row and colum
      * type and assigns each element to zero.
      *
-     * @param <KEY> the enumerated row and column type.
+     * @param <E> the enumerated row and column type.
      *
      * @param keyType the enum class to serve as the row keys.
      *
      * @return the new enumerated matrix.
      */
-    public static <KEY extends Enum<KEY>> EnumeratedMatrix<KEY, KEY> square(Class<KEY> keyType) {
+    public static <E extends Enum<E>> EnumeratedMatrix<E, E> square(Class<E> keyType) {
         return square(keyType, 0.0);
     }
 
@@ -85,7 +85,7 @@ public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
      * Creates a square enumerated matrix with the same row and colum
      * type and assigns each element to the same value.
      *
-     * @param <KEY> the enumerated row and column type.
+     * @param <E> the enumerated row and column type.
      *
      * @param keyType the enum class to serve as the row keys.
      *
@@ -93,23 +93,23 @@ public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
      *
      * @return the new enumerated matrix.
      */
-    public static <KEY extends Enum<KEY>> EnumeratedMatrix<KEY, KEY> square(Class<KEY> keyType, double fill) {
+    public static <E extends Enum<E>> EnumeratedMatrix<E, E> square(Class<E> keyType, double fill) {
         return create(keyType, keyType, fill);
     }
 
-    @Override public int colIndex(COLTYPE colKey) {
+    @Override public int colIndex(C colKey) {
         return colKey.ordinal();
     }
 
-    @Override public COLTYPE colKey(int colIndex) {
+    @Override public C colKey(int colIndex) {
         return colKeys[colIndex];
     }
 
-    @Override public List<COLTYPE> colKeyList() {
+    @Override public List<C> colKeyList() {
         return List.of(colKeys);
     }
 
-    @Override public Set<COLTYPE> colKeySet() {
+    @Override public Set<C> colKeySet() {
         return Set.of(colKeys);
     }
 
@@ -125,19 +125,19 @@ public final class EnumeratedMatrix<ROWTYPE extends Enum<ROWTYPE>,
         return elements.nrow();
     }
 
-    @Override public int rowIndex(ROWTYPE rowKey) {
+    @Override public int rowIndex(R rowKey) {
         return rowKey.ordinal();
     }
 
-    @Override public ROWTYPE rowKey(int rowIndex) {
+    @Override public R rowKey(int rowIndex) {
         return rowKeys[rowIndex];
     }
 
-    @Override public List<ROWTYPE> rowKeyList() {
+    @Override public List<R> rowKeyList() {
         return List.of(rowKeys);
     }
 
-    @Override public Set<ROWTYPE> rowKeySet() {
+    @Override public Set<R> rowKeySet() {
         return Set.of(rowKeys);
     }
 

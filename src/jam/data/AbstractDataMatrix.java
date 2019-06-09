@@ -16,26 +16,26 @@ import jam.math.DoubleComparator;
  * interface that is independent of the element storage scheme
  * (dense or sparse).
  */
-public abstract class AbstractDataMatrix<ROWTYPE, COLTYPE> implements DataMatrix<ROWTYPE, COLTYPE> {
+public abstract class AbstractDataMatrix<R, C> implements DataMatrix<R, C> {
     /**
      * The fixed row keys in index order.
      */
-    protected final List<ROWTYPE> rowKeyList;
+    protected final List<R> rowKeyList;
 
     /**
      * The fixed column keys in index order.
      */
-    protected final List<COLTYPE> colKeyList;
+    protected final List<C> colKeyList;
 
     /**
      * Mapping from row key to row index.
      */
-    protected final Map<ROWTYPE, Integer> rowKeyMap;
+    protected final Map<R, Integer> rowKeyMap;
 
     /**
      * Mapping from column key to column index.
      */
-    protected final Map<COLTYPE, Integer> colKeyMap;
+    protected final Map<C, Integer> colKeyMap;
 
     /**
      * Creates a new data matrix with fixed row and column keys.
@@ -49,10 +49,10 @@ public abstract class AbstractDataMatrix<ROWTYPE, COLTYPE> implements DataMatrix
      * @throws IllegalArgumentException if either key list is empty or
      * contains duplicates.
      */
-    protected AbstractDataMatrix(List<ROWTYPE> rowKeyList, List<COLTYPE> colKeyList, boolean copy) {
+    protected AbstractDataMatrix(List<R> rowKeyList, List<C> colKeyList, boolean copy) {
         if (copy) {
-            this.rowKeyList = Collections.unmodifiableList(new ArrayList<ROWTYPE>(rowKeyList));
-            this.colKeyList = Collections.unmodifiableList(new ArrayList<COLTYPE>(colKeyList));
+            this.rowKeyList = Collections.unmodifiableList(new ArrayList<R>(rowKeyList));
+            this.colKeyList = Collections.unmodifiableList(new ArrayList<C>(colKeyList));
         }
         else {
             this.rowKeyList = Collections.unmodifiableList(rowKeyList);
@@ -76,7 +76,7 @@ public abstract class AbstractDataMatrix<ROWTYPE, COLTYPE> implements DataMatrix
         return Collections.unmodifiableMap(keyMap);
     }
 
-    @Override public int colIndex(COLTYPE colKey) {
+    @Override public int colIndex(C colKey) {
         Integer index = colKeyMap.get(colKey);
 
         if (index != null)
@@ -85,19 +85,19 @@ public abstract class AbstractDataMatrix<ROWTYPE, COLTYPE> implements DataMatrix
             return KEY_MISSING;
     }
 
-    @Override public COLTYPE colKey(int colIndex) {
+    @Override public C colKey(int colIndex) {
         return colKeyList.get(colIndex);
     }
 
-    @Override public List<COLTYPE> colKeyList() {
+    @Override public List<C> colKeyList() {
         return colKeyList;
     }
 
-    @Override public Set<COLTYPE> colKeySet() {
+    @Override public Set<C> colKeySet() {
         return colKeyMap.keySet();
     }
 
-    @Override public int rowIndex(ROWTYPE rowKey) {
+    @Override public int rowIndex(R rowKey) {
         Integer index = rowKeyMap.get(rowKey);
 
         if (index != null)
@@ -106,15 +106,15 @@ public abstract class AbstractDataMatrix<ROWTYPE, COLTYPE> implements DataMatrix
             return KEY_MISSING;
     }
 
-    @Override public ROWTYPE rowKey(int rowIndex) {
+    @Override public R rowKey(int rowIndex) {
         return rowKeyList.get(rowIndex);
     }
 
-    @Override public List<ROWTYPE> rowKeyList() {
+    @Override public List<R> rowKeyList() {
         return rowKeyList;
     }
 
-    @Override public Set<ROWTYPE> rowKeySet() {
+    @Override public Set<R> rowKeySet() {
         return rowKeyMap.keySet();
     }
 

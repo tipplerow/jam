@@ -9,11 +9,11 @@ import jam.matrix.JamMatrix;
  * Implements the {@code DataMatrix} interface with dense matrix
  * storage.
  */
-public class DenseDataMatrix<ROWTYPE, COLTYPE> extends AbstractDataMatrix<ROWTYPE, COLTYPE> {
+public class DenseDataMatrix<R, C> extends AbstractDataMatrix<R, C> {
     private final JamMatrix elements;
 
-    DenseDataMatrix(List<ROWTYPE> rowKeys,
-                    List<COLTYPE> colKeys,
+    DenseDataMatrix(List<R> rowKeys,
+                    List<C> colKeys,
                     JamMatrix     elements,
                     boolean       copyKeys,
                     boolean       copyElements) {
@@ -41,16 +41,16 @@ public class DenseDataMatrix<ROWTYPE, COLTYPE> extends AbstractDataMatrix<ROWTYP
      * @throws IllegalArgumentException if either key list is empty or
      * contains duplicates.
      */
-    public DenseDataMatrix(List<ROWTYPE> rowKeys, List<COLTYPE> colKeys) {
+    public DenseDataMatrix(List<R> rowKeys, List<C> colKeys) {
         this(rowKeys, colKeys, new JamMatrix(rowKeys.size(), colKeys.size()), true, false);
     }
 
     /**
      * Creates a new data matrix with dense matrix storage.
      *
-     * @param <ROWTYPE> the runtime type for the row keys.
+     * @param <R> the runtime type for the row keys.
      *
-     * @param <COLTYPE> the runtime type for the column keys.
+     * @param <C> the runtime type for the column keys.
      *
      * @param rowKeys the row keys.
      *
@@ -61,14 +61,14 @@ public class DenseDataMatrix<ROWTYPE, COLTYPE> extends AbstractDataMatrix<ROWTYP
      * @throws IllegalArgumentException if either key list is empty or
      * contains duplicates.
      */
-    public static <ROWTYPE, COLTYPE> DenseDataMatrix<ROWTYPE, COLTYPE> create(List<ROWTYPE> rowKeys, List<COLTYPE> colKeys) {
-        return new DenseDataMatrix<ROWTYPE, COLTYPE>(rowKeys, colKeys);
+    public static <R, C> DenseDataMatrix<R, C> create(List<R> rowKeys, List<C> colKeys) {
+        return new DenseDataMatrix<R, C>(rowKeys, colKeys);
     }
 
     /**
      * Creates a new square data matrix with dense matrix storage.
      *
-     * @param <KEYTYPE> the runtime type for the row and column keys.
+     * @param <K> the runtime type for the row and column keys.
      *
      * @param keys the row and column keys.
      *
@@ -77,8 +77,8 @@ public class DenseDataMatrix<ROWTYPE, COLTYPE> extends AbstractDataMatrix<ROWTYP
      * @throws IllegalArgumentException if the key list is empty or
      * contains duplicates.
      */
-    public static <KEYTYPE> DenseDataMatrix<KEYTYPE, KEYTYPE> square(List<KEYTYPE> keys) {
-        return new DenseDataMatrix<KEYTYPE, KEYTYPE>(keys, keys);
+    public static <K> DenseDataMatrix<K, K> square(List<K> keys) {
+        return new DenseDataMatrix<K, K>(keys, keys);
     }
 
     @Override public double get(int rowIndex, int colIndex) {

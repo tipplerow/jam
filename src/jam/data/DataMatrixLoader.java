@@ -6,11 +6,11 @@ import java.io.File;
 /**
  * Reads a data matrix from an input file.
  *
- * @param ROWTYPE the runtime type of the row keys.
+ * @param R the runtime type of the row keys.
  *
- * @param COLTYPE the runtime type of the column keys.
+ * @param C the runtime type of the column keys.
  */
-public abstract class DataMatrixLoader<ROWTYPE, COLTYPE> {
+public abstract class DataMatrixLoader<R, C> {
     /**
      * The file to load.
      */
@@ -42,7 +42,7 @@ public abstract class DataMatrixLoader<ROWTYPE, COLTYPE> {
      * @throws RuntimeException unless the file can be opened and
      * contains a properly formatted data matrix.
      */
-    public abstract DataMatrix<ROWTYPE, COLTYPE> load();
+    public abstract DataMatrix<R, C> load();
 
     /**
      * Converts a string representation into a column key.
@@ -54,7 +54,7 @@ public abstract class DataMatrixLoader<ROWTYPE, COLTYPE> {
      * @throws RuntimeException unless the input string is a valid
      * representation of a column key.
      */
-    public abstract COLTYPE parseColKey(String colKeyStr);
+    public abstract C parseColKey(String colKeyStr);
 
     /**
      * Converts a string representation into a row key.
@@ -66,5 +66,5 @@ public abstract class DataMatrixLoader<ROWTYPE, COLTYPE> {
      * @throws RuntimeException unless the input string is a valid
      * representation of a row key.
      */
-    public abstract ROWTYPE parseRowKey(String rowKeyStr);
+    public abstract R parseRowKey(String rowKeyStr);
 }

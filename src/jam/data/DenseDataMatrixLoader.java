@@ -14,14 +14,14 @@ import jam.vector.JamVector;
  * Loads a data matrix from an input file in <em>dense matrix</em>
  * format.
  *
- * @param ROWTYPE the runtime type of the row keys.
+ * @param R the runtime type of the row keys.
  *
- * @param COLTYPE the runtime type of the column keys.
+ * @param C the runtime type of the column keys.
  */
-public abstract class DenseDataMatrixLoader<ROWTYPE, COLTYPE> extends DataMatrixLoader<ROWTYPE, COLTYPE> {
+public abstract class DenseDataMatrixLoader<R, C> extends DataMatrixLoader<R, C> {
     private TableReader reader;
-    private List<ROWTYPE> rowKeys;
-    private List<COLTYPE> colKeys;
+    private List<R> rowKeys;
+    private List<C> colKeys;
     private List<JamVector> rowData;
 
     /**
@@ -42,14 +42,14 @@ public abstract class DenseDataMatrixLoader<ROWTYPE, COLTYPE> extends DataMatrix
         super(fileName);
     }
 
-    @Override public DenseDataMatrix<ROWTYPE, COLTYPE> load() {
+    @Override public DenseDataMatrix<R, C> load() {
         reader = TableReader.open(file);
 
         try {
             parseColKeys();
             parseRowData();
 
-            return new DenseDataMatrix<ROWTYPE, COLTYPE>(rowKeys, colKeys, JamMatrix.rbind(rowData), false, false);
+            return new DenseDataMatrix<R, C>(rowKeys, colKeys, JamMatrix.rbind(rowData), false, false);
         }
         finally {
             reader.close();
@@ -64,14 +64,14 @@ public abstract class DenseDataMatrixLoader<ROWTYPE, COLTYPE> extends DataMatrix
         if (reader.ncol() < 2)
             throw JamException.runtime("Input file must contain at least two columns.");
 
-        colKeys = new ArrayList<COLTYPE>(reader.ncol() - 1);
+        colKeys = new ArrayList<C>(reader.ncol() - 1);
 
         for (int readerIndex = 1; readerIndex < reader.ncol(); ++readerIndex)
             colKeys.add(parseColKey(reader.columnKeys().get(readerIndex)));
     }
 
     private void parseRowData() {
-        rowKeys = new ArrayList<ROWTYPE>();
+        rowKeys = new ArrayList<R>();
         rowData = new ArrayList<JamVector>();
 
         for (List<String> line : reader)

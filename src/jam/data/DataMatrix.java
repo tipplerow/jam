@@ -9,11 +9,11 @@ import java.util.Set;
  * column keys (fixed at the time of creation) in addition to integer
  * indexes.
  *
- * @param ROWTYPE the runtime type of the row keys.
+ * @param R the runtime type of the row keys.
  *
- * @param COLTYPE the runtime type of the column keys.
+ * @param C the runtime type of the column keys.
  */
-public interface DataMatrix<ROWTYPE, COLTYPE> {
+public interface DataMatrix<R,C> {
     /**
      * Special index used to indicate that a row or column key is not
      * present in this matrix.
@@ -23,9 +23,9 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
     /**
      * Returns a new data matrix with dense matrix storage.
      *
-     * @param <ROWTYPE> the runtime type for the row keys.
+     * @param <R> the runtime type for the row keys.
      *
-     * @param <COLTYPE> the runtime type for the column keys.
+     * @param <C> the runtime type for the column keys.
      *
      * @param rowKeys the row keys.
      *
@@ -36,8 +36,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @throws IllegalArgumentException if either key list is empty or
      * contains duplicates.
      */
-    public static <ROWTYPE, COLTYPE> DataMatrix<ROWTYPE, COLTYPE> dense(List<ROWTYPE> rowKeys,
-                                                                        List<COLTYPE> colKeys) {
+    public static <R,C> DataMatrix<R,C> dense(List<R> rowKeys, List<C> colKeys) {
         return DenseDataMatrix.create(rowKeys, colKeys);
     }
 
@@ -49,7 +48,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @return the column index mapped to the specified column key, or
      * {@code KEY_MISSING} if this matrix does not contain the column.
      */
-    public abstract int colIndex(COLTYPE colKey);
+    public abstract int colIndex(C colKey);
 
     /**
      * Returns the key for a given column.
@@ -61,21 +60,21 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @throws IllegalArgumentException unless the column index lies
      * within this matrix.
      */
-    public abstract COLTYPE colKey(int colIndex);
+    public abstract C colKey(int colIndex);
 
     /**
      * Returns a read-only list view of the columns in this matrix.
      *
      * @return a read-only list view of the columns in this matrix.
      */
-    public abstract List<COLTYPE> colKeyList();
+    public abstract List<C> colKeyList();
 
     /**
      * Returns a read-only set view of the columns in this matrix.
      *
      * @return a read-only set view of the columns in this matrix.
      */
-    public abstract Set<COLTYPE> colKeySet();
+    public abstract Set<C> colKeySet();
 
     /**
      * Identifies keys contained in this matrix.
@@ -87,7 +86,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @return {@code true} iff this matrix contains an element with
      * the specified keys.
      */
-    public default boolean contains(ROWTYPE rowKey, COLTYPE colKey) {
+    public default boolean contains(R rowKey, C colKey) {
         return containsRow(rowKey) && containsCol(colKey);
     }
 
@@ -99,7 +98,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @return {@code true} iff this matrix contains the specified
      * column key.
      */
-    public default boolean containsCol(COLTYPE colKey) {
+    public default boolean containsCol(C colKey) {
         return colIndex(colKey) != KEY_MISSING;
     }
 
@@ -111,7 +110,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @return {@code true} iff this matrix contains the specified row
      * key.
      */
-    public default boolean containsRow(ROWTYPE rowKey) {
+    public default boolean containsRow(R rowKey) {
         return rowIndex(rowKey) != KEY_MISSING;
     }
 
@@ -127,7 +126,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @throws IllegalArgumentException unless this matrix contains
      * the specified element.
      */
-    public default double get(ROWTYPE rowKey, COLTYPE colKey) {
+    public default double get(R rowKey, C colKey) {
         return get(rowIndex(rowKey), colIndex(colKey));
     }
 
@@ -152,8 +151,8 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      *
      * @return an immutable wrapper around this matrix.
      */
-    public default DataMatrix<ROWTYPE, COLTYPE> immutable() {
-        return new ImmutableDataMatrix<ROWTYPE, COLTYPE>(this);
+    public default DataMatrix<R,C> immutable() {
+        return new ImmutableDataMatrix<R,C>(this);
     }
 
     /**
@@ -182,7 +181,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @return the row index mapped to the specified row key, or
      * {@code KEY_MISSING} if this matrix does not contain the row.
      */
-    public abstract int rowIndex(ROWTYPE rowKey);
+    public abstract int rowIndex(R rowKey);
 
     /**
      * Returns the key for a given row.
@@ -194,21 +193,21 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @throws IllegalArgumentException unless the row index lies
      * within this matrix.
      */
-    public abstract ROWTYPE rowKey(int rowIndex);
+    public abstract R rowKey(int rowIndex);
 
     /**
      * Returns a read-only list view of the rows in this matrix.
      *
      * @return a read-only list view of the rows in this matrix.
      */
-    public abstract List<ROWTYPE> rowKeyList();
+    public abstract List<R> rowKeyList();
 
     /**
      * Returns a read-only set view of the rows in this matrix.
      *
      * @return a read-only set view of the rows in this matrix.
      */
-    public abstract Set<ROWTYPE> rowKeySet();
+    public abstract Set<R> rowKeySet();
 
     /**
      * Assigns a new value to an element indexed by row and column
@@ -226,7 +225,7 @@ public interface DataMatrix<ROWTYPE, COLTYPE> {
      * @throws UnsupportedOperationException if this is an
      * unmodifiable matrix.
      */
-    public default void set(ROWTYPE rowKey, COLTYPE colKey, double value) {
+    public default void set(R rowKey, C colKey, double value) {
         set(rowIndex(rowKey), colIndex(colKey), value);
     }
 
