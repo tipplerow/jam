@@ -21,7 +21,6 @@ import jam.util.RegexUtil;
 public final class MissenseReader implements Closeable, Iterable<MissenseRecord>, Iterator<MissenseRecord> {
     private final TableReader reader;
 
-    private final int patientIDColumn;
     private final int tumorBarcodeColumn;
     private final int hugoSymbolColumn;
     private final int transcriptIDColumn;
@@ -30,30 +29,20 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
     private MissenseReader(TableReader reader) {
         this.reader = reader;
 
-        this.patientIDColumn     = findOptionalColumn(PatientID.COLUMN_NAME);
-        this.tumorBarcodeColumn  = findRequiredColumn(TumorBarcode.COLUMN_NAME);
-        this.hugoSymbolColumn    = findRequiredColumn(HugoSymbol.COLUMN_NAME);
-        this.transcriptIDColumn  = findRequiredColumn(EnsemblTranscript.COLUMN_NAME);
-        this.proteinChangeColumn = findRequiredColumn(ProteinChange.COLUMN_NAME);
+        this.tumorBarcodeColumn  = findColumn(TumorBarcode.COLUMN_NAME);
+        this.hugoSymbolColumn    = findColumn(HugoSymbol.COLUMN_NAME);
+        this.transcriptIDColumn  = findColumn(EnsemblTranscript.COLUMN_NAME);
+        this.proteinChangeColumn = findColumn(ProteinChange.COLUMN_NAME);
     }
 
-    private int findOptionalColumn(String columnName) {
+    private int findColumn(String columnName) {
         List<String> columnKeys = reader.columnKeys();
 
         for (int columnIndex = 0; columnIndex < columnKeys.size(); ++columnIndex)
             if (columnKeys.get(columnIndex).equals(columnName))
                 return columnIndex;
 
-        return -1;
-    }
-
-    private int findRequiredColumn(String columnName) {
-        int columnIndex = findOptionalColumn(columnName);
-
-        if (columnIndex < 0)
-            throw JamException.runtime("Column [%s] not found.", columnName);
-        else
-            return columnIndex;
+        throw JamException.runtime("Column [%s] not found.", columnName);
     }
 
     /**
@@ -152,10 +141,8 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
         HugoSymbol        hugoSymbol    = parseHugoSymbol(fields);
         EnsemblTranscript transcriptID  = parseTranscriptID(fields);
         ProteinChange     proteinChange = parseProteinChange(fields);
-        PatientID         patientID     = parsePatientID(fields, tumorBarcode);
 
-        return new MissenseRecord(patientID,
-                                  tumorBarcode,
+        return new MissenseRecord(tumorBarcode,
                                   hugoSymbol,
                                   transcriptID,
                                   proteinChange);
@@ -175,13 +162,6 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
 
     private ProteinChange parseProteinChange(List<String> fields) {
         return ProteinChange.parse(fields.get(proteinChangeColumn));
-    }
-
-    private PatientID parsePatientID(List<String> fields, TumorBarcode tumorBarcode) {
-        if (patientIDColumn < 0)
-            return tumorBarcode.patientID();
-        else
-            return PatientID.instance(fields.get(patientIDColumn));
     }
 
     @Override public Iterator<MissenseRecord> iterator() {

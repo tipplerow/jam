@@ -16,7 +16,7 @@ public final class TumorBarcode extends KeyedObject<String> {
      * The canonical column name for tumor identifiers in the header
      * line of data files to be analyzed by the {@code jam} library.
      */
-    public static final String COLUMN_NAME = "Tumor_Sample_Barcode";
+    public static final String COLUMN_NAME = "Tumor_Barcode";
 
     /**
      * String length of the patient key encoded at the beginning of

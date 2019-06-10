@@ -15,7 +15,6 @@ import jam.peptide.ProteinChange;
  * mutations.
  */
 public final class MissenseRecord {
-    private final PatientID         patientID;
     private final TumorBarcode      tumorBarcode;
     private final HugoSymbol        hugoSymbol;
     private final EnsemblTranscript transcriptID;
@@ -23,8 +22,6 @@ public final class MissenseRecord {
 
     /**
      * Creates a new missense mutation record.
-     *
-     * @param patientID the patient from which the tumor was sampled.
      *
      * @param tumorBarcode the tumor in which the mutation occurred.
      *
@@ -35,12 +32,10 @@ public final class MissenseRecord {
      *
      * @param proteinChange the description of the single-residue change.
      */
-    public MissenseRecord(PatientID         patientID,
-                          TumorBarcode      tumorBarcode,
+    public MissenseRecord(TumorBarcode      tumorBarcode,
                           HugoSymbol        hugoSymbol,
                           EnsemblTranscript transcriptID,
                           ProteinChange     proteinChange) {
-        this.patientID     = patientID;
         this.tumorBarcode  = tumorBarcode;
         this.hugoSymbol    = hugoSymbol;
         this.transcriptID  = transcriptID;
@@ -84,15 +79,6 @@ public final class MissenseRecord {
                                        hugoSymbol, ensemblRecord.getHugoSymbol());
 
         return ensemblRecord.getPeptide().mutate(proteinChange);
-    }
-
-    /**
-     * Returns the patient from which the tumor was sampled.
-     *
-     * @return the patient from which the tumor was sampled.
-     */
-    public PatientID getPatientID() {
-        return patientID;
     }
 
     /**

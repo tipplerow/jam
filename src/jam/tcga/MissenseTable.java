@@ -8,17 +8,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jam.app.JamProperties;
 import jam.peptide.HugoSymbol;
 
 /**
  * Reads missesnse mutations from a file and stores them in memory
  * indexed by tumor barcode and HUGO symbol.
  */
-public final class MissenseDb {
+public final class MissenseTable {
     private final Map<TumorBarcode, Map<HugoSymbol, List<MissenseRecord>>> barcodeMap =
         new HashMap<TumorBarcode, Map<HugoSymbol, List<MissenseRecord>>>();
 
-    private MissenseDb(List<MissenseRecord> recordList) {
+    private static MissenseTable global = null;
+
+    private MissenseTable(List<MissenseRecord> recordList) {
         fillMap(recordList);
         freezeMap();
     }
@@ -65,58 +68,84 @@ public final class MissenseDb {
     }
 
     /**
-     * Populates a database by reading all missense mutation records
-     * from a given file.
-     *
-     * @param file the path to the missense mutation file.
-     *
-     * @return a database containing all missense mutation records in
-     * the given file.
-     *
-     * @throws RuntimeException unless the file can be opened for
-     * reading and contains properly formatted records.
+     * Name of the system property that contains the full path name of
+     * the file containing the global data table.
      */
-    public static MissenseDb load(File file) {
-        return new MissenseDb(MissenseReader.read(file));
+    public static final String TABLE_FILE_PROPERTY = "jam.tcga.missenseMAF";
+
+    /**
+     * Returns the global data table.
+     *
+     * @return the global data table.
+     *
+     * @throws RuntimeException unless the system property with the
+     * name given {@code TABLE_FILE_PROPERTY} contains the name of
+     * a file with a valid table.
+     */
+    public static MissenseTable global() {
+        if (global == null)
+            global = load(resolveFileName());
+
+        return global;
+    }
+
+    private static String resolveFileName() {
+        return JamProperties.getRequired(TABLE_FILE_PROPERTY);
     }
 
     /**
-     * Populates a database by reading all missense mutation records
-     * from a given file.
+     * Populates a table by reading all missense mutation records from
+     * a given file.
      *
-     * @param fileName the path to the missense mutation file.
+     * @param file the path to the missense mutation file.
      *
-     * @return a database containing all missense mutation records in
-     * the given file.
+     * @return a table containing all missense mutation records in the
+     * given file.
      *
      * @throws RuntimeException unless the file can be opened for
      * reading and contains properly formatted records.
      */
-    public static MissenseDb load(String fileName) {
+    public static MissenseTable load(File file) {
+        return new MissenseTable(MissenseReader.read(file));
+    }
+
+    /**
+     * Populates a table by reading all missense mutation records from
+     * a given file.
+     *
+     * @param fileName the path to the missense mutation file.
+     *
+     * @return a table containing all missense mutation records in the
+     * given file.
+     *
+     * @throws RuntimeException unless the file can be opened for
+     * reading and contains properly formatted records.
+     */
+    public static MissenseTable load(String fileName) {
         return load(new File(fileName));
     }
 
     /**
-     * Identifies tumors contained in this mutation database.
+     * Identifies tumors contained in this mutation table.
      *
      * @param barcode the tumor barcode of interest.
      *
-     * @return {@code true} iff this database contains mutations for
-     * the specified tumor.
+     * @return {@code true} iff this table contains mutations for the
+     * specified tumor.
      */
     public boolean contains(TumorBarcode barcode) {
         return barcodeMap.containsKey(barcode);
     }
 
     /**
-     * Identifies tumor-gene pairs contained in this mutation database.
+     * Identifies tumor-gene pairs contained in this mutation table.
      *
      * @param barcode the tumor barcode of interest.
      *
      * @param symbol the gene of interest.
      *
-     * @return {@code true} iff this database contains mutations for
-     * the specified tumor-gene pair.
+     * @return {@code true} iff this table contains mutations for the
+     * specified tumor-gene pair.
      */
     public boolean contains(TumorBarcode barcode, HugoSymbol symbol) {
         return contains(barcode) && barcodeMap.get(barcode).containsKey(symbol) ;
