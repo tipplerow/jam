@@ -12,11 +12,11 @@ import jam.matrix.JamMatrix;
 public class DenseDataMatrix<R, C> extends AbstractDataMatrix<R, C> {
     private final JamMatrix elements;
 
-    DenseDataMatrix(List<R> rowKeys,
-                    List<C> colKeys,
-                    JamMatrix     elements,
-                    boolean       copyKeys,
-                    boolean       copyElements) {
+    DenseDataMatrix(List<R>   rowKeys,
+                    List<C>   colKeys,
+                    JamMatrix elements,
+                    boolean   copyKeys,
+                    boolean   copyElements) {
         super(rowKeys, colKeys, copyKeys);
 
         if (copyElements)

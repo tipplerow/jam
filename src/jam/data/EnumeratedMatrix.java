@@ -16,13 +16,23 @@ import jam.util.EnumUtil;
  * (and include all defined enum values), but the element values 
  * may change.
  */
-public final class EnumeratedMatrix<R extends Enum<R>,
-                                    C extends Enum<C>> implements DataMatrix<R, C> {
+public class EnumeratedMatrix<R extends Enum<R>,
+                              C extends Enum<C>> implements DataMatrix<R, C> {
     private final R[] rowKeys;
     private final C[] colKeys;
     private final JamMatrix elements;
 
-    private EnumeratedMatrix(Class<R> rowType, Class<C> colType, double fill) {
+    /**
+     * Creates a enumerated matrix and assigns each element to the
+     * same value.
+     *
+     * @param rowType the enum class to serve as the row keys.
+     *
+     * @param colType the enum class to serve as the column keys.
+     *
+     * @param fill the value to assign each element.
+     */
+    protected EnumeratedMatrix(Class<R> rowType, Class<C> colType, double fill) {
         this.rowKeys  = EnumUtil.values(rowType);
         this.colKeys  = EnumUtil.values(colType);
         this.elements = new JamMatrix(rowKeys.length, colKeys.length, fill);
