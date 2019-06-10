@@ -106,7 +106,7 @@ public final class PatientCancerTypeTable {
             reader.close();
         }
 
-        JamLogger.info("PatientCancerTypeTable: Loaded [%d] rows.", size());
+        JamLogger.info("PatientCancerTypeTable: Loaded [%d] records.", size());
     }
 
     private void parseColumns(List<String> columns) {

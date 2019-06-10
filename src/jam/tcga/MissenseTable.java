@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.peptide.HugoSymbol;
 
@@ -106,7 +107,10 @@ public final class MissenseTable {
      * reading and contains properly formatted records.
      */
     public static MissenseTable load(File file) {
-        return new MissenseTable(MissenseReader.read(file));
+        List<MissenseRecord> records = MissenseReader.read(file);
+        JamLogger.info("MissenseTable: Loaded [%d] records.", records.size());
+        
+        return new MissenseTable(records);
     }
 
     /**
