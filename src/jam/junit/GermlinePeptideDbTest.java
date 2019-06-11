@@ -38,6 +38,16 @@ public class GermlinePeptideDbTest {
         assertEquals(Peptide.parse("GQDLAAYTTY"), db.get(A1CF).get(1));
         assertEquals(Peptide.parse("LPGMELTPM"),  db.get(A1CF).get(2));
         assertEquals(Peptide.parse("AEYNAPCSK"),  db.get(A2M).get(0));
+
+        assertEquals(6, db.peptideSet().size());
+
+        assertTrue(db.peptideSet().contains(Peptide.parse("AAPPPPVLM")));
+        assertTrue(db.peptideSet().contains(Peptide.parse("GCLGLMVAK")));
+        assertTrue(db.peptideSet().contains(Peptide.parse("CASVDNCRL")));
+        assertTrue(db.peptideSet().contains(Peptide.parse("GQDLAAYTTY")));
+        assertTrue(db.peptideSet().contains(Peptide.parse("LPGMELTPM")));
+        assertTrue(db.peptideSet().contains(Peptide.parse("AEYNAPCSK")));
+        assertFalse(db.peptideSet().contains(Peptide.parse("AAAAAAAAA")));
     }
 
     public static void main(String[] args) {

@@ -2,6 +2,8 @@
 package jam.chop;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +22,9 @@ import jam.peptide.Peptide;
  */
 public final class GermlinePeptideDb {
     private final ImmutableListMultimap<HugoSymbol, Peptide> map;
+
+    // Unique peptides in this database...
+    private Set<Peptide> peptideSet = null;
 
     private static GermlinePeptideDb global = null;
 
@@ -87,7 +92,7 @@ public final class GermlinePeptideDb {
     }
 
     /**
-     * Identifies HUGO symbols contained in this database.
+     * Identifies genes contained in this database.
      *
      * @param symbol the HUGO symbol of interest.
      *
@@ -96,6 +101,28 @@ public final class GermlinePeptideDb {
      */
     public boolean contains(HugoSymbol symbol) {
         return map.containsKey(symbol);
+    }
+
+    /**
+     * Identifies peptides contained in this database.
+     *
+     * @param peptide the peptide of interest.
+     *
+     * @return {@code true} iff this database contains the specified
+     * peptide (derived from one or more genes).
+     */
+    public boolean contains(Peptide peptide) {
+        return peptideSet().contains(peptide);
+    }
+
+    /**
+     * Returns all HUGO symbols contained in this database.
+     *
+     * @return an immutable set containing all HUGO symbols contained
+     * in this database.
+     */
+    public Set<HugoSymbol> geneSet() {
+        return map.keySet();
     }
 
     /**
@@ -112,13 +139,21 @@ public final class GermlinePeptideDb {
     }
 
     /**
-     * Returns all HUGO symbols contained in this database.
+     * Returns all unique self-peptides in this database.
      *
-     * @return an immutable set containing all HUGO symbols contained
-     * in this database.
+     * @return all unique self-peptides in this database in an
+     * unmodifiable set.
      */
-    public Set<HugoSymbol> keySet() {
-        return map.keySet();
+    public Set<Peptide> peptideSet() {
+        if (peptideSet == null)
+            createPeptideSet();
+
+        return peptideSet;
+    }
+
+    private void createPeptideSet() {
+        peptideSet = Collections.unmodifiableSet(new HashSet<Peptide>(map.values()));
+        JamLogger.info("GermlinePeptideDb: Found [%d] unique peptides.", peptideSet.size());
     }
 
     /**
