@@ -43,6 +43,27 @@ public abstract class DenseDataMatrixLoader<R, C> extends DataMatrixLoader<R, C>
         super(fileName);
     }
 
+    /**
+     * Returns a new dense data matrix given the keys and values read
+     * from the input file.
+     *
+     * <p>This default implementation returns an instance of the base
+     * class {@code DenseDataMatrix}, but subclass loaders may return
+     * a specialized subclass.
+     *
+     * @param rowKeys the row keys.
+     *
+     * @param colKeys the column keys.
+     *
+     * @param elements the element values.
+     *
+     * @return a new dense data matrix given the keys and values read
+     * from the input file.
+     */
+    public DenseDataMatrix<R, C> newMatrix(List<R> rowKeys, List<C> colKeys, JamMatrix elements) {
+        return new DenseDataMatrix<R, C>(rowKeys, colKeys, elements, false, false);
+    }
+
     @Override public DenseDataMatrix<R, C> load() {
         reader = TableReader.open(file);
 
@@ -53,7 +74,7 @@ public abstract class DenseDataMatrixLoader<R, C> extends DataMatrixLoader<R, C>
             JamLogger.info("DenseDataMatrixLoader: Loaded [%d] rows.", rowKeys.size());
             JamLogger.info("DenseDataMatrixLoader: Loaded [%d] columns.", colKeys.size());
 
-            return new DenseDataMatrix<R, C>(rowKeys, colKeys, JamMatrix.rbind(rowData), false, false);
+            return newMatrix(rowKeys, colKeys, JamMatrix.rbind(rowData));
         }
         finally {
             reader.close();

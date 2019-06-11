@@ -12,11 +12,59 @@ import jam.matrix.JamMatrix;
 public class DenseDataMatrix<R, C> extends AbstractDataMatrix<R, C> {
     private final JamMatrix elements;
 
-    DenseDataMatrix(List<R>   rowKeys,
-                    List<C>   colKeys,
-                    JamMatrix elements,
-                    boolean   copyKeys,
-                    boolean   copyElements) {
+    /**
+     * Creates a new data matrix with dense matrix storage initialized
+     * to zero.
+     *
+     * @param rowKeys the row keys.
+     *
+     * @param colKeys the column keys.
+     *
+     * @throws IllegalArgumentException if either key list is empty or
+     * contains duplicates.
+     */
+    public DenseDataMatrix(List<R> rowKeys, List<C> colKeys) {
+        this(rowKeys, colKeys, 0.0);
+    }
+
+    /**
+     * Creates a new data matrix with dense matrix storage initialized
+     * to a common value.
+     *
+     * @param rowKeys the row keys.
+     *
+     * @param colKeys the column keys.
+     *
+     * @param fill the value to assign to each element.
+     *
+     * @throws IllegalArgumentException if either key list is empty or
+     * contains duplicates.
+     */
+    public DenseDataMatrix(List<R> rowKeys, List<C> colKeys, double fill) {
+        this(rowKeys, colKeys, new JamMatrix(rowKeys.size(), colKeys.size(), fill), true, false);
+    }
+
+    /**
+     * Creates a new dense data matrix with fixed row and column keys
+     * and mutable (by default) values.
+     *
+     * @param rowKeys the row keys.
+     *
+     * @param colKeys the column keys.
+     *
+     * @param elements the element values.
+     *
+     * @param copyKeys whether or not to create a deep private copy of
+     * the input keys.
+     *
+     * @param copyElements whether or not to create a deep private
+     * copy of the input elements.
+     */
+    public DenseDataMatrix(List<R>   rowKeys,
+                           List<C>   colKeys,
+                           JamMatrix elements,
+                           boolean   copyKeys,
+                           boolean   copyElements) {
         super(rowKeys, colKeys, copyKeys);
 
         if (copyElements)
@@ -29,20 +77,6 @@ public class DenseDataMatrix<R, C> extends AbstractDataMatrix<R, C> {
 
         if (elements.ncol() != colKeys.size())
             throw new IllegalArgumentException("Column dimensions are incompatible.");
-    }
-
-    /**
-     * Creates a new data matrix with dense matrix storage.
-     *
-     * @param rowKeys the row keys.
-     *
-     * @param colKeys the column keys.
-     *
-     * @throws IllegalArgumentException if either key list is empty or
-     * contains duplicates.
-     */
-    public DenseDataMatrix(List<R> rowKeys, List<C> colKeys) {
-        this(rowKeys, colKeys, new JamMatrix(rowKeys.size(), colKeys.size()), true, false);
     }
 
     /**
