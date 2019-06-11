@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableListMultimap;
 
+import jam.app.JamLogger;
 import jam.io.TableReader;
 import jam.lang.JamException;
 
@@ -19,10 +20,6 @@ public final class HugoPeptideTable {
 
     private HugoPeptideTable(ImmutableListMultimap<HugoSymbol, Peptide> map) {
         this.map = map;
-    }
-
-    private HugoPeptideTable(ImmutableListMultimap.Builder<HugoSymbol, Peptide> builder) {
-        this(builder.build());
     }
 
     /**
@@ -122,7 +119,10 @@ public final class HugoPeptideTable {
                 reader.close();
             }
 
-            return new HugoPeptideTable(builder);
+            ImmutableListMultimap<HugoSymbol, Peptide> map = builder.build();
+            JamLogger.info("HugoPeptideTable: Loaded [%d] records.", map.size());
+
+            return new HugoPeptideTable(map);
         }
 
         private void validateColumnKeys() {
