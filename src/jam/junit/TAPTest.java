@@ -48,12 +48,11 @@ public class TAPTest {
 
             IEDB.add(Double.parseDouble(fields.get(1)));
             ours.add(TAP.consensus().score(peptide));
-
-            System.out.println(String.format("%f,%f", Double.parseDouble(fields.get(1)), TAP.consensus().score(peptide)));
         }
 
         reader.close();
-        assertTrue(StatUtil.cor(VectorView.wrap(IEDB), VectorView.wrap(ours)) < -0.75);
+        // IEDB flips the sign...
+        assertTrue(StatUtil.cor(VectorView.wrap(IEDB), VectorView.wrap(ours)) < -0.95);
     }
 
     public static void main(String[] args) {

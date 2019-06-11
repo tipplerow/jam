@@ -8,6 +8,7 @@ import java.util.List;
 import jam.app.JamEnv;
 import jam.app.JamProperties;
 import jam.io.FileUtil;
+import jam.math.DoubleRange;
 import jam.peptide.Peptide;
 import jam.peptide.Residue;
 
@@ -18,21 +19,29 @@ import jam.peptide.Residue;
  * 1741--1749 (2003).
  */
 public final class TAP {
+    private final double alpha;
     private final double threshold;
     private final TAPMatrix matrix;
 
     private static TAP consensus = null;
 
-    private TAP(TAPMatrix matrix, double threshold) {
+    private TAP(TAPMatrix matrix, double alpha, double threshold) {
+        this.alpha = alpha;
         this.matrix = matrix;
         this.threshold = threshold;
     }
 
     /**
+     * Name of the system property that defines the shrinkage factor
+     * for the contribution of N-terminal residues.
+     */
+    public static final String ALPHA_PROPERTY = "jam.tap.alpha";
+
+    /**
      * The optimal shrinkage factor for the contribution of N-terminal
      * residues to the binding score as reported by Peters.
      */
-    public static final double SCORE_ALPHA = 0.2;
+    public static final double ALPHA_DEFAULT = 0.2;
 
     /**
      * Name of the system property that defines the threshold score
@@ -61,12 +70,15 @@ public final class TAP {
     }
 
     private static TAP createConsensus() {
-        return new TAP(TAPMatrix.consensus(), resolveThreshold());
+        return new TAP(TAPMatrix.consensus(), resolveAlpha(), resolveThreshold());
+    }
+
+    private static double resolveAlpha() {
+        return JamProperties.getOptionalDouble(ALPHA_PROPERTY, DoubleRange.FRACTIONAL, ALPHA_DEFAULT);
     }
 
     private static double resolveThreshold() {
-        return JamProperties.getOptionalDouble(THRESHOLD_SCORE_PROPERTY,
-                                               THRESHOLD_SCORE_DEFAULT);
+        return JamProperties.getOptionalDouble(THRESHOLD_SCORE_PROPERTY, THRESHOLD_SCORE_DEFAULT);
     }
 
     /**
@@ -109,18 +121,10 @@ public final class TAP {
         int    cterm = L - 1;
         double score = matrix.get(peptide.at(cterm), TAPPosition.CTerm);
 
-        // Add the alpha-scaled contributions from the first (L - 8)
-        // N-terminal residues...
-        for (int nterm1 = 0; nterm1 < (L - 8); ++nterm1)
-            score += SCORE_ALPHA * matrix.get(peptide.at(nterm1), TAPPosition.NTerm1);
-
-        // Add the raw contributions from the next two residues after
-        // the N-terminal...
-        int nterm2 = L - 8;
-        int nterm3 = L - 7;
-
-        score += matrix.get(peptide.at(nterm2), TAPPosition.NTerm2);
-        score += matrix.get(peptide.at(nterm3), TAPPosition.NTerm3);
+        // Add the alpha-scaled contributions from the N-terminal residues...
+        score += alpha * matrix.get(peptide.at(0), TAPPosition.NTerm1);
+        score += alpha * matrix.get(peptide.at(1), TAPPosition.NTerm2);
+        score += alpha * matrix.get(peptide.at(2), TAPPosition.NTerm3);
 
         return score;
     }
