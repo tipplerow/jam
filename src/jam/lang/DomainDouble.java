@@ -120,6 +120,39 @@ public abstract class DomainDouble implements Formatted {
         return equals(that.value);
     }
 
+    /**
+     * Identifies negative values.
+     *
+     * @return {@code true} iff this value is negative allowing for
+     * the default {@code DoubleComparator} tolerance (is less than
+     * the tolerance).
+     */
+    public boolean isNegative() {
+        return DoubleComparator.DEFAULT.isNegative(value);
+    }
+
+    /**
+     * Identifies positive values.
+     *
+     * @return {@code true} iff this value is positive allowing for
+     * the default {@code DoubleComparator} tolerance (greater than
+     * the tolerance).
+     */
+    public boolean isPositive() {
+        return DoubleComparator.DEFAULT.isPositive(value);
+    }
+
+    /**
+     * Identifies (nearly) zero values.
+     *
+     * @return {@code true} iff this value is equal to zero when
+     * allowing for the default {@code DoubleComparator} tolerance
+     * (is less than the tolerance in absolute value).
+     */
+    public boolean isZero() {
+        return DoubleComparator.DEFAULT.isZero(value);
+    }
+
     @Override public String format() {
         return Double.toString(value);
     }
