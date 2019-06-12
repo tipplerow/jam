@@ -2,6 +2,7 @@
 package jam.junit;
 
 import java.util.Map;
+import java.util.Properties;
 
 import jam.app.JamProperties;
 import jam.math.DoubleRange;
@@ -63,8 +64,12 @@ public class JamPropertiesTest {
 
         // Now reload with a true override flag and check that the
         // property was overwritten...
-        JamProperties.loadFile("conf/jam.properties", true);
+        Properties fileProps = JamProperties.loadFile("conf/jam.properties", true);
         assertEquals(propFileValue, JamProperties.getRequired(propName));
+
+        assertEquals(2, fileProps.size());
+        assertEquals("conf/log4j.xml", fileProps.getProperty("log4j.configurationFile"));
+        assertTrue(fileProps.containsKey("jam.home"));
     }
 
     @Test public void testRequiredPresent() {

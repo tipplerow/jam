@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -484,11 +485,13 @@ public final class JamProperties {
      *
      * @param override whether to override previously assigned values.
      *
+     * @return the properties contained in the file.
+     *
      * @throws RuntimeException unless the properties file can be
      * located and parsed successfully.
      */
-    public static synchronized void loadFile(String fileName, boolean override) {
-        loadFile(new File(fileName), override);
+    public static synchronized Properties loadFile(String fileName, boolean override) {
+        return loadFile(new File(fileName), override);
     }
 
     /**
@@ -511,16 +514,22 @@ public final class JamProperties {
      *
      * @param override whether to override previously assigned values.
      *
+     * @return the properties contained in the files.
+     *
      * @throws RuntimeException unless at least one property file is
      * specified and all property files can be located and parsed
      * successfully.
      */
-    public static synchronized void loadFiles(String[] fileNames, boolean override) {
+    public static synchronized Properties loadFiles(String[] fileNames, boolean override) {
         if (fileNames.length < 1)
             throw new IllegalArgumentException("At least one property file must be specified.");
 
+        Properties properties = new Properties();
+
         for (String fileName : fileNames)
-            loadFile(fileName, override);
+            properties.putAll(loadFile(fileName, override));
+
+        return properties;
     }
 
     /**
@@ -543,35 +552,31 @@ public final class JamProperties {
      *
      * @param override whether to override previously assigned values.
      *
+     * @return the properties contained in the file.
+     *
      * @throws RuntimeException unless the properties file can be
      * located and parsed successfully.
      */
-    public static synchronized void loadFile(File propFile, boolean override) {
+    public static synchronized Properties loadFile(File propFile, boolean override) {
+        Properties properties = new Properties();
         DataReader reader = DataReader.open(propFile, COMMENT_PATTERN);
 
         try {
-            loadFile(reader, override);
+            for (String line : reader) {
+                String[] fields = RegexUtil.split(KEY_VALUE_DELIM, line, 2);
+
+                String propertyName = fields[0];
+                String propertyValue = fields[1];
+
+                setProperty(propertyName, propertyValue, override);
+                properties.setProperty(propertyName, propertyValue);
+            }
         }
         finally {
             reader.close();
         }
-    }
 
-    private static void loadFile(DataReader reader, boolean override) {
-        for (String line : reader)
-            processLine(line, override);
-    }
-
-    private static void processLine(String line, boolean override) {
-        String[] fields = KEY_VALUE_DELIM.split(line);
-
-        if (fields.length != 2)
-            throw JamException.runtime("Invalid property specification: [%s].", line);
-
-        String propertyName  = fields[0].trim();
-        String propertyValue = fields[1].trim();
-
-        setProperty(propertyName, propertyValue, override);
+        return properties;
     }
 
     /**
