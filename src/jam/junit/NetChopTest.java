@@ -33,7 +33,7 @@ public class NetChopTest {
 
     @Test public void testChop() {
         if (NetChop.isInstalled())
-            assertEquals(FRAGMENTS, NetChop.chop(PEPTIDE, 9));
+            assertEquals(FRAGMENTS, NetChop.chop(PEPTIDE, new int[] { 9 }, 0.5));
     }
 
     public static void main(String[] args) {

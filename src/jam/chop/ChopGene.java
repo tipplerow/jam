@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 import jam.app.JamLogger;
-import jam.chop.NetChop;
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
 import jam.ensembl.TranscriptBiotype;
@@ -24,6 +23,7 @@ import jam.peptide.Peptide;
 public final class ChopGene {
     private final LineReader reader;
     private final PrintWriter writer;
+    private final NetChop netchop = new NetChop();
 
     private static final int[] PEPTIDE_LENGTHS = new int[] { 9, 10 };
 
@@ -85,7 +85,7 @@ public final class ChopGene {
         if (!peptide.isNative())
             return Collections.emptyList();
 
-        Collection<Peptide> chopped = NetChop.chop(peptide, PEPTIDE_LENGTHS);
+        Collection<Peptide> chopped = netchop.chop(peptide);
         return Peptide.formatString(chopped);
     }
 

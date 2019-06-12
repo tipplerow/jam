@@ -9,26 +9,22 @@ import jam.app.JamEnv;
 import jam.app.JamProperties;
 import jam.math.DoubleRange;
 import jam.math.IntRange;
+import jam.math.IntUtil;
 import jam.peptide.Peptide;
+import jam.util.RegexUtil;
 
 /**
- * Simulates proteasomal processing of a peptide:  Predicts cleavage
- * sites using {@code netchop} and assembles cleaved fragments having
- * a desired length.
+ * Simulates proteasomal processing of a peptide: Predicts cleavage
+ * sites using {@code netchop} and assembles cleaved fragments with
+ * prescribed lengths.
  */
 public final class NetChop {
-    private final Peptide peptide;
-    private final int[]   lengths;
-    private final double  threshold;
+    private final int[] lengths;
+    private final double threshold;
 
+    private Peptide peptide;
     private List<Double> scores;
     private List<Peptide> fragments;
-
-    private NetChop(Peptide peptide, int[] lengths) {
-        this.peptide   = peptide;
-        this.lengths   = lengths;
-        this.threshold = resolveThreshold();
-    }
 
     /**
      * Name of the environment variable that defines the absolute path
@@ -45,21 +41,57 @@ public final class NetChop {
     public static final String EXECUTABLE_PATH_PROPERTY = "jam.chop.netchop";
 
     /**
-     * Name of the system property that defines the threshold
-     * probability for assigned cleavage sites.
-     */
-    public static final String THRESHOLD_PROBABILITY_PROPERTY = "jam.chop.thresholdProbability";
-
-    /**
      * Default value for the threshold probability for assigned
      * cleavage sites.
      */
     public static final double THRESHOLD_PROBABILITY_DEFAULT = 0.5;
 
-    private static double resolveThreshold() {
-        return JamProperties.getOptionalDouble(THRESHOLD_PROBABILITY_PROPERTY,
-                                               DoubleRange.FRACTIONAL,
-                                               THRESHOLD_PROBABILITY_DEFAULT);
+    /**
+     * Default value for the lengths of the cleaved peptides.
+     */
+    public static final int[] PEPTIDE_LENGTHS_DEFAULT = new int[] { 9, 10 };
+
+    /**
+     * Creates a new {@code netchop} processor with default settings.
+     */
+    public NetChop() {
+        this(PEPTIDE_LENGTHS_DEFAULT, THRESHOLD_PROBABILITY_DEFAULT);
+    }
+
+    /**
+     * Creates a new {@code netchop} processor.
+     *
+     * @param lengths the lengths of the peptide fragments to
+     * produce.
+     *
+     * @param threshold the threshold probability for assigned
+     * cleavage sites.
+     */
+    public NetChop(int[] lengths, double threshold) {
+        this.lengths = lengths;
+        this.threshold = threshold;
+    }
+
+    /**
+     * Simulates proteasomal processing of a peptide.
+     *
+     * <p>Predicts cleavage sites using the assigned threshold
+     * probability and assembles cleaved fragments having the
+     * prescribed lengths.
+     *
+     * @param peptide the peptide to chop.
+     *
+     * @param lengths the lengths of the cleaved peptides to
+     * generate.
+     *
+     * @param threshold the threshold probability for assigned
+     * cleavage sites.
+     *
+     * @return a list containing the cleaved peptide fragments.
+     */
+    public static List<Peptide> chop(Peptide peptide, int[] lengths, double threshold) {
+        NetChop chopper = new NetChop(lengths, threshold);
+        return chopper.chop(peptide);
     }
 
     /**
@@ -106,49 +138,65 @@ public final class NetChop {
     }
 
     /**
-     * Simulates proteasomal processing of a peptide: Predicts
-     * cleavage sites and assembles cleaved fragments having a
-     * desired length.
+     * Simulates proteasomal processing of a peptide.
+     *
+     * <p>Predicts cleavage sites using the assigned threshold
+     * probability and assembles cleaved fragments having the
+     * prescribed lengths.
      *
      * @param peptide the peptide to chop.
      *
-     * @param lengths the fragment lengths.
-     *
-     * @return a set containing the cleaved peptide fragments.
+     * @return a list containing the cleaved peptide fragments.
      */
-    public static List<Peptide> chop(Peptide peptide, int... lengths) {
-        NetChop chopper = new NetChop(peptide, lengths);
-        return chopper.chop();
-    }
+    public List<Peptide> chop(Peptide peptide) {
+        this.peptide = peptide;
 
-    private List<Peptide> chop() {
-        scores = NetChopRunner.chop(peptide);
-        fragments = new ArrayList<Peptide>();
-
-        for (int cterm = 0; cterm < peptide.length(); ++cterm) {
-            //
-            // A cleavage fragment of length "N" is generated with
-            // C-terminus at index "i" iff:
-            //
-            // (1) The residue at index "i" is a cleavage site, and
-            // (2) The residue at index "i - N" is a cleavage site.
-            //
-            if (isCleavageSite(cterm))
-                for (int length : lengths)
-                    if (isCleavageSite(cterm - length))
-                        fragments.add(cleavageFragment(cterm, length));
-        }
+        computeScores();
+        assembleFragments();
 
         return fragments;
     }
 
-    private boolean isCleavageSite(int index) {
-        return (index == -1)
-            || (index == peptide.length() - 1)
-            || (index >= 0 && scores.get(index) >= threshold);
+    private void computeScores() {
+        scores = NetChopRunner.chop(peptide);
     }
 
-    private Peptide cleavageFragment(int cterm, int length) {
-        return peptide.fragment(new IntRange(cterm - length + 1, cterm));
+    private void assembleFragments() {
+        fragments = new ArrayList<Peptide>();
+
+        for (int length : lengths)
+            assembleFragments(length);
+    }
+
+    private void assembleFragments(int fragLen) {
+        //
+        // A cleavage fragment of length "L" is generated with
+        // C-terminus at index "L - 1" iff the residue at index
+        // "L - 1" is a cleavage site.
+        //
+        int cterm = fragLen - 1;
+
+        if (isCleavageSite(cterm))
+            fragments.add(cleavageFragment(cterm, fragLen));
+
+        for (cterm = fragLen; cterm < peptide.length(); ++cterm) {
+            //
+            // A cleavage fragment of length "L" is generated with
+            // C-terminus at index "i" iff:
+            //
+            // (1) The residue at index "i" is a cleavage site, and
+            // (2) The residue at index "i - L" is a cleavage site.
+            //
+            if (isCleavageSite(cterm) && isCleavageSite(cterm - fragLen))
+                fragments.add(cleavageFragment(cterm, fragLen));
+        }
+    }
+
+    private boolean isCleavageSite(int index) {
+        return scores.get(index) >= threshold;
+    }
+
+    private Peptide cleavageFragment(int cterm, int fragLen) {
+        return peptide.fragment(new IntRange(cterm - fragLen + 1, cterm));
     }
 }
