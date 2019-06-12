@@ -1,6 +1,7 @@
 
 package jam.peptide;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,21 @@ public final class PeptideConcentrationProfile {
             concentration = concentration.plus(existing);
 
         map.put(peptide, concentration);
+    }
+
+    /**
+     * Adds peptides to this profile.
+     *
+     * <p>If any peptide is already present in this profile, the
+     * specified concentration is added to its existing concentration.
+     *
+     * @param peptides the peptides of interest.
+     *
+     * @param concentration the uniform concentration of each peptide.
+     */
+    public void add(Collection<Peptide> peptides, Concentration concentration) {
+        for (Peptide peptide : peptides)
+            add(peptide, concentration);
     }
 
     /**
