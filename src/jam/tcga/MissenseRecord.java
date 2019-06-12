@@ -1,6 +1,10 @@
 
 package jam.tcga;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
 import jam.ensembl.EnsemblTranscript;
@@ -43,33 +47,96 @@ public final class MissenseRecord {
     }
 
     /**
-     * Applies the mutation encoded in this record to the peptide
-     * contained in the global Ensembl database.
+     * Aggregates all protein changes in a list of records
+     * describing mutations in the same tumor and gene.
      *
-     * @return the mutated peptide.
+     * @param records the records to aggregate.
      *
-     * @throws RuntimeException unless the global database contains
-     * a transcript matching the one contained in this record and the
-     * mutation is valid given the reference protein structure.
+     * @return a list of all protein changes in the specified records.
+     *
+     * @throws RuntimeException unless all records describe mutations
+     * in the same tumor and transcript.
      */
-    public Peptide apply() {
-        return apply(EnsemblDb.global());
+    public static List<ProteinChange> aggregate(List<MissenseRecord> records) {
+        switch (records.size()) {
+        case 0:
+            return Collections.emptyList();
+
+        case 1:
+            return List.of(records.get(0).getProteinChange());
+
+        default:
+            validateList(records);
+            return aggregateValid(records);
+        }
+    }
+
+    private static void validateList(List<MissenseRecord> records) {
+        TumorBarcode barcode0 = records.get(0).getTumorBarcode();
+        EnsemblTranscript transcript0 = records.get(0).getTranscriptID();
+
+        for (int index = 1; index < records.size(); ++index) {
+            TumorBarcode barcodeI = records.get(index).getTumorBarcode();
+            EnsemblTranscript transcriptI = records.get(index).getTranscriptID();
+
+            if (!barcodeI.equals(barcode0))
+                throw JamException.runtime("Inconsistent tumor barcodes.");
+
+            if (!transcriptI.equals(transcript0))
+                throw JamException.runtime("Inconsistent transcripts.");
+        }
+    }
+
+    private static List<ProteinChange> aggregateValid(List<MissenseRecord> records) {
+        List<ProteinChange> changes = new ArrayList<ProteinChange>(records.size());
+
+        for (MissenseRecord record : records)
+            changes.add(record.getProteinChange());
+
+        return changes;
     }
 
     /**
-     * Applies the mutation encoded in this record to the peptide
-     * contained in a reference database.
+     * Applies the mutations encoded in a list of records to the
+     * germline protein contained in the global Ensembl database.
      *
-     * @param ensemblDb an Ensembl reference database.
+     * @param records the records to apply.
      *
-     * @return the mutated peptide.
+     * @return the mutated protein.
      *
-     * @throws RuntimeException unless the reference database contains
-     * a transcript matching the one contained in this record and the
-     * mutation is valid given the reference protein structure.
+     * @throws RuntimeException unless all records describe mutations
+     * in the same tumor and transcript, the Ensembl database contains
+     * a transcript matching the one contained in the records, and all
+     * mutations are valid given the germline protein structure.
      */
-    public Peptide apply(EnsemblDb ensemblDb) {
-        EnsemblRecord ensemblRecord = ensemblDb.get(transcriptID);
+    public static Peptide apply(List<MissenseRecord> records) {
+        return records.get(0).getGermlineProtein().mutate(aggregate(records));
+    }
+
+    /**
+     * Applies the mutation encoded in this record to the germline
+     * protein structure contained in the global Ensembl database.
+     *
+     * @return the mutated protein.
+     *
+     * @throws RuntimeException unless the Ensembl database contains a
+     * transcript matching this record and the mutation is valid given
+     * the germline protein structure.
+     */
+    public Peptide apply() {
+        return getGermlineProtein().mutate(proteinChange);
+    }
+
+    /**
+     * Returns the germline protein that is altered by this mutation.
+     *
+     * @return the germline protein that is altered by this mutation.
+     *
+     * @throws RuntimeException unless the Ensembl database contains a
+     * transcript matching this record.
+     */
+    public Peptide getGermlineProtein() {
+        EnsemblRecord ensemblRecord = EnsemblDb.global().get(transcriptID);
 
         if (ensemblRecord == null)
             throw JamException.runtime("Unmapped transcript: [%s]", transcriptID);
@@ -78,7 +145,7 @@ public final class MissenseRecord {
             throw JamException.runtime("Mismatched HUGO symbols: [%s vs %s]",
                                        hugoSymbol, ensemblRecord.getHugoSymbol());
 
-        return ensemblRecord.getPeptide().mutate(proteinChange);
+        return ensemblRecord.getPeptide();
     }
 
     /**
