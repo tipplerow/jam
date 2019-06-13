@@ -79,6 +79,8 @@ public final class AgProcDriver {
     private void processGenes() {
         for (String symbol : reader)
             processGene(symbol);
+
+        JamLogger.info("DONE!");
     }
 
     private void processGene(String symbol) {
