@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.util.Set;
+
 import jam.peptide.HugoSymbol;
 import jam.peptide.HugoPeptideTable;
 import jam.peptide.Peptide;
@@ -34,6 +36,16 @@ public class HugoPeptideTableTest {
         assertEquals(Peptide.parse("GQDLAAYTTY"), table.get(A1CF).get(1));
         assertEquals(Peptide.parse("LPGMELTPM"),  table.get(A1CF).get(2));
         assertEquals(Peptide.parse("AEYNAPCSK"),  table.get(A2M).get(0));
+
+        Set<Peptide> peptides = table.collectUniquePeptides();
+        assertEquals(6, peptides.size());
+
+        assertTrue(peptides.contains(Peptide.parse("AAPPPPVLM")));
+        assertTrue(peptides.contains(Peptide.parse("GCLGLMVAK")));
+        assertTrue(peptides.contains(Peptide.parse("CASVDNCRL")));
+        assertTrue(peptides.contains(Peptide.parse("GQDLAAYTTY")));
+        assertTrue(peptides.contains(Peptide.parse("LPGMELTPM")));
+        assertTrue(peptides.contains(Peptide.parse("AEYNAPCSK")));
     }
 
     public static void main(String[] args) {

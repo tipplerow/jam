@@ -2,6 +2,7 @@
 package jam.peptide;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +52,17 @@ public final class HugoPeptideTable {
      */
     public static HugoPeptideTable load(String fileName) {
         return load(new File(fileName));
+    }
+
+    /**
+     * Returns a set containing all unique peptides contained in this
+     * table.
+     *
+     * @return a set containing all unique peptides contained in this
+     * table.
+     */
+    public Set<Peptide> collectUniquePeptides() {
+        return new HashSet<Peptide>(map.values());
     }
 
     /**
