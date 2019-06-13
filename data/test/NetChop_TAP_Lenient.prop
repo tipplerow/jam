@@ -1,0 +1,8 @@
+jam.agpro.cleavageLength = 9, 10
+
+jam.agpro.useNetChop = true
+jam.agpro.useTAP     = true
+
+jam.agpro.netChopThreshold  = 0.5
+jam.agpro.tapAlpha          = 0.2
+jam.agpro.tapScoreThreshold = 1.0
