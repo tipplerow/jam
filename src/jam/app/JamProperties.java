@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -490,7 +489,7 @@ public final class JamProperties {
      * @throws RuntimeException unless the properties file can be
      * located and parsed successfully.
      */
-    public static synchronized Properties loadFile(String fileName, boolean override) {
+    public static synchronized PropertyList loadFile(String fileName, boolean override) {
         return loadFile(new File(fileName), override);
     }
 
@@ -520,14 +519,14 @@ public final class JamProperties {
      * specified and all property files can be located and parsed
      * successfully.
      */
-    public static synchronized Properties loadFiles(String[] fileNames, boolean override) {
+    public static synchronized PropertyList loadFiles(String[] fileNames, boolean override) {
         if (fileNames.length < 1)
             throw new IllegalArgumentException("At least one property file must be specified.");
 
-        Properties properties = new Properties();
+        PropertyList properties = new PropertyList();
 
         for (String fileName : fileNames)
-            properties.putAll(loadFile(fileName, override));
+            properties.append(loadFile(fileName, override));
 
         return properties;
     }
@@ -557,24 +556,72 @@ public final class JamProperties {
      * @throws RuntimeException unless the properties file can be
      * located and parsed successfully.
      */
-    public static synchronized Properties loadFile(File propFile, boolean override) {
-        Properties properties = new Properties();
-        DataReader reader = DataReader.open(propFile, COMMENT_PATTERN);
+    public static synchronized PropertyList loadFile(File propFile, boolean override) {
+        PropertyList properties = parseFile(propFile);
+
+        for (String propertyName : properties.names())
+            setProperty(propertyName, properties.get(propertyName), override);
+
+        return properties;
+    }
+
+    /**
+     * Reads the property names and values from a property file and
+     * returns the mapping <em>but does not set any of those system
+     * properties</em>.
+     *
+     * @param file the file to parse.
+     *
+     * @return the property names and values contained in the file.
+     */
+    public static PropertyList parseFile(File file) {
+        PropertyList properties = new PropertyList();
+        DataReader reader = DataReader.open(file, COMMENT_PATTERN);
 
         try {
             for (String line : reader) {
                 String[] fields = RegexUtil.split(KEY_VALUE_DELIM, line, 2);
 
-                String propertyName = fields[0];
-                String propertyValue = fields[1];
+                String propertyName = fields[0].trim();
+                String propertyValue = fields[1].trim();
 
-                setProperty(propertyName, propertyValue, override);
-                properties.setProperty(propertyName, propertyValue);
+                properties.set(propertyName, propertyValue);
             }
         }
         finally {
             reader.close();
         }
+
+        return properties;
+    }
+
+    /**
+     * Reads the property names and values from a property file and
+     * returns the mapping <em>but does not set any of those system
+     * properties</em>.
+     *
+     * @param fileName the name of the file to parse.
+     *
+     * @return the property names and values contained in the file.
+     */
+    public static PropertyList parseFile(String fileName) {
+        return parseFile(new File(fileName));
+    }
+
+    /**
+     * Reads the property names and values from a sequence of property
+     * files and returns the mapping <em>but does not set any of those
+     * system properties</em>.
+     *
+     * @param fileNames the name of the file to parse.
+     *
+     * @return the property names and values contained in the files.
+     */
+    public static PropertyList parseFiles(String... fileNames) {
+        PropertyList properties = new PropertyList();
+
+        for (String fileName : fileNames)
+            properties.append(parseFile(fileName));
 
         return properties;
     }
