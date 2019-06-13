@@ -47,6 +47,11 @@ public final class NetChop {
     public static final double THRESHOLD_PROBABILITY_DEFAULT = 0.5;
 
     /**
+     * Valid range of threshold probabilities.
+     */
+    public static final DoubleRange THRESHOLD_PROBABILITY_RANGE = DoubleRange.FRACTIONAL;
+
+    /**
      * Default value for the lengths of the cleaved peptides.
      */
     public static final int[] PEPTIDE_LENGTHS_DEFAULT = new int[] { 9, 10 };
@@ -70,6 +75,8 @@ public final class NetChop {
     public NetChop(int[] lengths, double threshold) {
         this.lengths = lengths;
         this.threshold = threshold;
+
+        THRESHOLD_PROBABILITY_RANGE.validate("Threshold probability", threshold);
     }
 
     /**

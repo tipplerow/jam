@@ -29,6 +29,9 @@ public final class TAP {
         this.alpha = alpha;
         this.matrix = matrix;
         this.threshold = threshold;
+
+        ALPHA_RANGE.validate("Alpha factor", alpha);
+        THRESHOLD_SCORE_RANGE.validate("Score threshold", threshold);
     }
 
     /**
@@ -44,18 +47,41 @@ public final class TAP {
     public static final double ALPHA_DEFAULT = 0.2;
 
     /**
+     * Valid range of alpha shrinkage factors.
+     */
+    public static final DoubleRange ALPHA_RANGE = DoubleRange.FRACTIONAL;
+
+    /**
      * Name of the system property that defines the threshold score
-     * for transport: peptides must score BELOW this threshold to be
+     * for transport. Peptides must score BELOW this threshold to be
      * transported.
      */
     public static final String THRESHOLD_SCORE_PROPERTY = "jam.tap.thresholdScore";
 
     /**
-     * Default value for the threshold score for transport: 
-     * Peters reports that 98% of known epitopes fall below this
-     * threshold.
+     * Default value for the threshold score for transport.  Peters
+     * reports that 98% of known epitopes fall below 1.0, while the
+     * value -1.0 provides a reasonable trade-off between the false
+     * positive and false negative rate.
      */
-    public static final double THRESHOLD_SCORE_DEFAULT = 1.0;
+    public static final double THRESHOLD_SCORE_DEFAULT = -1.0;
+
+    /**
+     * Valid range of score thresholds.
+     */
+    public static final DoubleRange THRESHOLD_SCORE_RANGE = DoubleRange.closed(-2.0, 2.0);
+
+    /**
+     * Creates a new TAP scorer.
+     *
+     * @param alpha the alpha shrinkage factor for N-terminal
+     * residues.
+     *
+     * @param threshold the score threshold for transport.
+     */
+    public TAP(double alpha, double threshold) {
+        this(TAPMatrix.consensus(), alpha, threshold);
+    }
 
     /**
      * Returns the consensus TAP scorer.
@@ -74,11 +100,15 @@ public final class TAP {
     }
 
     private static double resolveAlpha() {
-        return JamProperties.getOptionalDouble(ALPHA_PROPERTY, DoubleRange.FRACTIONAL, ALPHA_DEFAULT);
+        return JamProperties.getOptionalDouble(ALPHA_PROPERTY,
+                                               ALPHA_RANGE,
+                                               ALPHA_DEFAULT);
     }
 
     private static double resolveThreshold() {
-        return JamProperties.getOptionalDouble(THRESHOLD_SCORE_PROPERTY, THRESHOLD_SCORE_DEFAULT);
+        return JamProperties.getOptionalDouble(THRESHOLD_SCORE_PROPERTY,
+                                               THRESHOLD_SCORE_RANGE,
+                                               THRESHOLD_SCORE_DEFAULT);
     }
 
     /**
