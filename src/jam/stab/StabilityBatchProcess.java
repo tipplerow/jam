@@ -26,7 +26,7 @@ final class StabilityBatchProcess extends BatchProcess<Peptide, StabilityRecord>
     }
 
     @Override public List<StabilityRecord> runBatch(Collection<Peptide> inputSlice) {
-        return NetStab.run(allele, inputSlice);
+        return NetStabRunner.run(allele, inputSlice);
     }
 }
 
