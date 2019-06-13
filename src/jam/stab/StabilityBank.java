@@ -4,6 +4,7 @@ package jam.stab;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.app.JamLogger;
 import jam.hla.Allele;
 import jam.io.IOUtil;
 import jam.io.LineReader;
@@ -21,7 +22,7 @@ public final class StabilityBank {
     private final List<Allele> alleles = new ArrayList<Allele>();
     private final List<Peptide> peptides = new ArrayList<Peptide>();
 
-    private final static int BATCH_SIZE = 100000;
+    private final static int BATCH_SIZE = 200000;
 
     private StabilityBank(String[] args) {
         validate(args);
@@ -32,7 +33,7 @@ public final class StabilityBank {
 
     private static void validate(String[] args) {
         if (args.length != 2) {
-            System.err.println("Usage: pepmhc.app.StabilityBank ALLELE_FILE PEPTIDE_FILE");
+            System.err.println("Usage: jam.stab.StabilityBank ALLELE_FILE PEPTIDE_FILE");
             System.exit(1);
         }
     }
@@ -41,6 +42,7 @@ public final class StabilityBank {
         loadAlleles();
         loadPeptides();
         processAlleles();
+        JamLogger.info("DONE!");
     }
 
     private void loadAlleles() {
