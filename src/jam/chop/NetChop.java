@@ -3,6 +3,8 @@ package jam.chop;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import jam.app.JamEnv;
@@ -76,6 +78,7 @@ public final class NetChop {
         this.lengths = lengths;
         this.threshold = threshold;
 
+        Arrays.sort(this.lengths);
         THRESHOLD_PROBABILITY_RANGE.validate("Threshold probability", threshold);
     }
 
@@ -156,6 +159,9 @@ public final class NetChop {
      * @return a list containing the cleaved peptide fragments.
      */
     public List<Peptide> chop(Peptide peptide) {
+        if (peptide.length() < lengths[0])
+            return Collections.emptyList();
+
         this.peptide = peptide;
 
         computeScores();
