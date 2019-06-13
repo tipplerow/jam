@@ -4,7 +4,6 @@ package jam.chop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import jam.app.JamEnv;
@@ -159,9 +158,6 @@ public final class NetChop {
      * @return a list containing the cleaved peptide fragments.
      */
     public List<Peptide> chop(Peptide peptide) {
-        if (peptide.length() < lengths[0])
-            return Collections.emptyList();
-
         this.peptide = peptide;
 
         computeScores();
@@ -183,10 +179,15 @@ public final class NetChop {
 
     private void assembleFragments(int fragLen) {
         //
+        // No cleavage fragments unless the peptide is as long as the
+        // fragment length...
+        //
+        if (peptide.length() < fragLen)
+            return;
+        
         // A cleavage fragment of length "L" is generated with
         // C-terminus at index "L - 1" iff the residue at index
         // "L - 1" is a cleavage site.
-        //
         int cterm = fragLen - 1;
 
         if (isCleavageSite(cterm))
@@ -211,5 +212,27 @@ public final class NetChop {
 
     private Peptide cleavageFragment(int cterm, int fragLen) {
         return peptide.fragment(new IntRange(cterm - fragLen + 1, cterm));
+    }
+
+    /**
+     * Returns the lengths of the cleaved peptides returned by this
+     * simulator.
+     *
+     * @return the lengths of the cleaved peptides returned by this
+     * simulator.
+     */
+    public int[] getLengths() {
+        return Arrays.copyOf(lengths, lengths.length);
+    }
+
+    /**
+     * Returns the threshold probability required to assign a cleavage
+     * site.
+     *
+     * @return the threshold probability required to assign a cleavage
+     * site.
+     */
+    public double getThreshold() {
+        return threshold;
     }
 }

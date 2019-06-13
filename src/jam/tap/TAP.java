@@ -64,7 +64,7 @@ public final class TAP {
      * value -1.0 provides a reasonable trade-off between the false
      * positive and false negative rate.
      */
-    public static final double THRESHOLD_SCORE_DEFAULT = -1.0;
+    public static final double THRESHOLD_SCORE_DEFAULT = 1.0;
 
     /**
      * Valid range of score thresholds.
@@ -109,6 +109,35 @@ public final class TAP {
         return JamProperties.getOptionalDouble(THRESHOLD_SCORE_PROPERTY,
                                                THRESHOLD_SCORE_RANGE,
                                                THRESHOLD_SCORE_DEFAULT);
+    }
+
+    /**
+     * Returns the alpha shrinkage factor for N-terminal residues.
+     *
+     * @return the alpha shrinkage factor for N-terminal residues.
+     */
+    public double getAlpha() {
+        return alpha;
+    }
+
+    /**
+     * Returns the score threshold required for successful TAP
+     * transport.
+     *
+     * @return the score threshold required for successful TAP
+     * transport.
+     */
+    public double getThreshold() {
+        return threshold;
+    }
+
+    /**
+     * Returns the underlying scoring matrix.
+     *
+     * @return the underlying scoring matrix.
+     */
+    public TAPMatrix getMatrix() {
+        return matrix;
     }
 
     /**

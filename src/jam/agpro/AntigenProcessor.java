@@ -210,6 +210,42 @@ public final class AntigenProcessor {
     }
 
     /**
+     * Creates a new antigen processor by resolving the properties
+     * defined in a file.
+     *
+     * @param fileName the name of the property file containing the
+     * antigen processor definitition.
+     *
+     * @return a new antigen processor defined by the properties in
+     * the specified file.
+     *
+     * @throws RuntimeException unless the file can be opened for
+     * reading and contains properties that define a valid antigen
+     * processor.
+     */
+    public static AntigenProcessor resolve(String fileName) {
+        return resolve(new File(fileName));
+    }
+
+    /**
+     * Returns the active {@code netchop} predictor.
+     *
+     * @return the active {@code netchop} predictor.
+     */
+    public NetChop getNetChop() {
+        return netChop;
+    }
+
+    /**
+     * Returns the active TAP predictor.
+     *
+     * @return the active TAP predictor.
+     */
+    public TAP getTAP() {
+        return tap;
+    }
+
+    /**
      * Simulates the antigen processing for a single protein.
      *
      * @param protein the protein to process.

@@ -1,7 +1,6 @@
 
 package jam.agpro;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,7 +61,7 @@ public final class AgProcDriver {
             reader = LineReader.open(symbolFile);
             writer = IOUtil.openWriter(antigenFile);
 
-            processor = AntigenProcessor.resolve(new File(configFile));
+            processor = AntigenProcessor.resolve(configFile);
 
             writeHeader();
             processGenes();
