@@ -29,16 +29,24 @@ public final class PeptideConcentrationProfile {
     }
 
     /**
-     * Adds a peptide concentration to this profile.
+     * Adds a positive peptide concentration to this profile.
      *
      * <p>If the peptide is already present in this profile, the
      * specified concentration is added to the existing concentration.
+     *
+     * <p>Concentrations that are equal to zero (within the standard
+     * floating-point tolerance) will <em>not</em> be added, so that
+     * this profile will only contain peptides with a net positive
+     * concentration.
      *
      * @param peptide the peptide of interest.
      *
      * @param concentration the concentration of the peptide.
      */
     public void add(Peptide peptide, Concentration concentration) {
+        if (!concentration.isPositive())
+            return;
+
         Concentration existing = map.get(peptide);
 
         if (existing != null)
@@ -57,7 +65,7 @@ public final class PeptideConcentrationProfile {
      *
      * @param concentration the uniform concentration of each peptide.
      */
-    public void add(Collection<Peptide> peptides, Concentration concentration) {
+    public void addAll(Collection<Peptide> peptides, Concentration concentration) {
         for (Peptide peptide : peptides)
             add(peptide, concentration);
     }

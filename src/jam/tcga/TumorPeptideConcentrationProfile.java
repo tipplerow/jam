@@ -1,6 +1,7 @@
 
 package jam.tcga;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +16,7 @@ import jam.peptide.PeptideConcentrationProfile;
 import jam.rna.ConcentrationModel;
 import jam.rna.Expression;
 import jam.rna.ExpressionProfile;
+import jam.util.SetUtil;
 
 /**
  * Assembles protein concentration profiles for self-peptides and
@@ -23,14 +25,16 @@ import jam.rna.ExpressionProfile;
 public final class TumorPeptideConcentrationProfile {
     private final TumorBarcode barcode;
 
+    private final Set<Peptide> neoPeptides = new HashSet<Peptide>();
+    private final Set<Peptide> selfPeptides = new HashSet<Peptide>();
+
     private final MissenseTable missenseTable = MissenseTable.global();
     private final SelfPeptideDb selfPeptideDb = SelfPeptideDb.global();
     private final AntigenProcessor antigenProcessor = selfPeptideDb.antigenProcessor();
     private final ExpressionProfile expressionProfile = ExpressionProfile.global();
     private final ConcentrationModel concentrationModel = ConcentrationModel.global();
 
-    private final PeptideConcentrationProfile neoConc = PeptideConcentrationProfile.create();
-    private final PeptideConcentrationProfile selfConc = PeptideConcentrationProfile.create();
+    private final PeptideConcentrationProfile concentrationProfile = PeptideConcentrationProfile.create();
 
     private int mutatedGeneCount = 0;
     private int expressedGeneCount = 0;
@@ -66,6 +70,19 @@ public final class TumorPeptideConcentrationProfile {
     }
 
     /**
+     * Returns the concentration of a peptide in the tumor.
+     *
+     * @param peptide the peptide of interest.
+     *
+     * @return the concentration of the specified peptide in this
+     * tumor ({@code Concentration.ZERO} if the specified peptide
+     * is not present in this tumor).
+     */
+    public Concentration getConcentration(Peptide peptide) {
+        return concentrationProfile.lookup(peptide);
+    }
+
+    /**
      * Returns the number of expressed genes in the tumor.
      *
      * @return the number of expressed genes in the tumor.
@@ -93,29 +110,14 @@ public final class TumorPeptideConcentrationProfile {
     }
 
     /**
-     * Returns the concentration of a given neo-peptide in the tumor.
+     * Returns a read-only view of all peptides (neo and self)
+     * presented in the tumor.
      *
-     * @param peptide a neo-peptide of interest.
-     *
-     * @return the concentration of the specified neo-peptide in this
-     * tumor ({@code Concentration.ZERO} if the specified peptide is
-     * not a neo-peptide in the tumor).
+     * @return an unmodifiable set containing every peptide (neo
+     * and self) presented in the tumor.
      */
-    public Concentration getNeoPeptideConcentration(Peptide peptide) {
-        return neoConc.lookup(peptide);
-    }
-
-    /**
-     * Returns the concentration of a given self-peptide in the tumor.
-     *
-     * @param peptide a self-peptide of interest.
-     *
-     * @return the concentration of the specified self-peptide in this
-     * tumor ({@code Concentration.ZERO} if the specified peptide is
-     * not a self-peptide in the tumor).
-     */
-    public Concentration getSelfPeptideConcentration(Peptide peptide) {
-        return selfConc.lookup(peptide);
+    public Set<Peptide> viewPeptides() {
+        return concentrationProfile.viewPeptides();
     }
 
     /**
@@ -126,7 +128,7 @@ public final class TumorPeptideConcentrationProfile {
      * presented in the tumor.
      */
     public Set<Peptide> viewNeoPeptides() {
-        return neoConc.viewPeptides();
+        return Collections.unmodifiableSet(neoPeptides);
     }
 
     /**
@@ -137,7 +139,7 @@ public final class TumorPeptideConcentrationProfile {
      * presented in the tumor.
      */
     public Set<Peptide> viewSelfPeptides() {
-        return selfConc.viewPeptides();
+        return Collections.unmodifiableSet(selfPeptides);
     }
 
     private void process() {
@@ -145,62 +147,81 @@ public final class TumorPeptideConcentrationProfile {
 
         for (HugoSymbol symbol : symbols)
             processGene(symbol);
+
+        if (SetUtil.countShared(neoPeptides, selfPeptides) > 0)
+            throw new IllegalStateException("Overlap between self-peptides and neo-peptides.");
     }
 
     private void processGene(HugoSymbol symbol) {
         Expression expression =
             expressionProfile.lookup(barcode, symbol);
 
-        if (expression == null)
-            return;
+        if (expression != null)
+            processExpressedGene(symbol, expression);
+    }
 
+    private void processExpressedGene(HugoSymbol symbol, Expression expression) {
         Concentration concentration =
             concentrationModel.translate(expression);
 
-        if (!concentration.isPositive())
-            return;
+        if (concentration.isPositive())
+            processTranslatedGene(symbol, concentration);
+    }
 
-        // THIS GENE IS EXPRESSED
+    private void processTranslatedGene(HugoSymbol symbol, Concentration concentration) {
+        //
+        // This gene is expressed and translated in appreciable
+        // amounts...
+        //
         ++expressedGeneCount;
             
         List<MissenseRecord> records =
             missenseTable.lookup(barcode, symbol);
 
-        if (records.isEmpty()) {
-            //
-            // All peptides are self-peptides from the germline
-            // protein...
-            //
-            selfConc.add(selfPeptideDb.lookup(symbol), concentration);
-            return;
-        }
+        if (records.isEmpty())
+            processGermlineGene(symbol, concentration);
+        else
+            processMutatedGene(symbol, concentration, records);
+    }
 
-        // THIS GENE IS MUTATED
+    private void processGermlineGene(HugoSymbol symbol, Concentration concentration) {
+        //
+        // All peptides are self-peptides from the germline
+        // protein...
+        //
+        List<Peptide> genePeptides = selfPeptideDb.lookup(symbol);
+
+        selfPeptides.addAll(genePeptides);
+        concentrationProfile.addAll(genePeptides, concentration);
+    }
+
+    private void processMutatedGene(HugoSymbol symbol,
+                                    Concentration concentration,
+                                    List<MissenseRecord> missenseRecords) {
+        // This gene is mutated...
         ++mutatedGeneCount;
-        totalMutationCount += records.size();
+        totalMutationCount += missenseRecords.size();
 
         // Determine the mutated form of the protein...
-        Peptide mutatedProtein = MissenseRecord.apply(records);
+        Peptide mutatedProtein = MissenseRecord.apply(missenseRecords);
 
         // Run the mutated protein through the antigen processing
         // machinery...
         JamLogger.info("Processing mutated protein from gene [%s]...", symbol.getKey());
         List<Peptide> peptides = antigenProcessor.process(mutatedProtein);
 
+        classifyPeptides(peptides);
+        concentrationProfile.addAll(peptides, concentration);
+    }
+
+    private void classifyPeptides(List<Peptide> peptides) {
+        //
         // Split the fragments into self-peptides and neo-peptides...
-        Set<Peptide> neoPep = new HashSet<Peptide>();
-        Set<Peptide> selfPep = new HashSet<Peptide>();
-
-        for (Peptide peptide : peptides) {
+        //
+        for (Peptide peptide : peptides)
             if (selfPeptideDb.contains(peptide))
-                selfPep.add(peptide);
+                selfPeptides.add(peptide);
             else
-                neoPep.add(peptide);
-        }
-
-        JamLogger.info("Found [%d] self-peptides and [%d] neo-peptides.", selfPep.size(), neoPep.size());
-
-        neoConc.add(neoPep, concentration);
-        selfConc.add(selfPep, concentration);
+                neoPeptides.add(peptide);
     }
 }
