@@ -1,19 +1,12 @@
 
 package jam.nap;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import jam.chem.Concentration;
-import jam.hla.Allele;
 import jam.math.DoubleComparator;
-import jam.peptide.Peptide;
-import jam.stab.NetStab;
-import jam.stab.StabilityCache;
-import jam.stab.StabilityRecord;
-import jam.tcga.PeptideType;
-import jam.tcga.TumorBarcode;
-import jam.tcga.TumorPeptideConcentrationProfile;
+import jam.math.Probability;
 
 /**
  * Encapsulates the components of the neo-antigen presentation score.
@@ -42,7 +35,9 @@ import jam.tcga.TumorPeptideConcentrationProfile;
  * </li>
  * </ol>
  *
- * <p>Each metric score is a fractional value (on the interval {@code [0,1]}).
+ * <p>Each score is a fractional value (on the interval {@code [0,1]}) and
+ * and is reported as a probability that a neo-antigen will be presented on
+ * the cell surface by the HLA allele.
  */
 public final class NAPAlleleScore {
     private final int neoBoundCount;
@@ -54,9 +49,9 @@ public final class NAPAlleleScore {
     private final double neoWtMeanStab;
     private final double selfWtMeanStab;
 
-    private final double bindScore;
-    private final double concScore;
-    private final double stabScore;
+    private final Probability bindScore;
+    private final Probability concScore;
+    private final Probability stabScore;
 
     NAPAlleleScore(int neoBoundCount,
                    int selfBoundCount,
@@ -100,19 +95,19 @@ public final class NAPAlleleScore {
             throw new IllegalArgumentException("Mean self-antigen stability cannot be negative.");
     }
 
-    private double computeBindScore() {
-        return neoBoundCount / (neoBoundCount + selfBoundCount);
+    private Probability computeBindScore() {
+        return Probability.valueOf(neoBoundCount / (neoBoundCount + selfBoundCount));
     }
 
-    private double computeConcScore() {
-        return neoTotalConc / (neoTotalConc + selfTotalConc);
+    private Probability computeConcScore() {
+        return Probability.valueOf(neoTotalConc / (neoTotalConc + selfTotalConc));
     }
 
-    private double computeStabScore() {
+    private Probability computeStabScore() {
         double  neoStab =  neoTotalConc *  neoWtMeanStab;
         double selfStab = selfTotalConc * selfWtMeanStab;
 
-        return neoStab / (neoStab + selfStab);
+        return Probability.valueOf(neoStab / (neoStab + selfStab));
     }
 
     /**
@@ -120,6 +115,42 @@ public final class NAPAlleleScore {
      * be classified as bound to its MHC molecule.
      */
     public static final double RANK_THRESHOLD = 2.0;
+
+    /**
+     * Extracts the binding threshold scores from a collection of
+     * allele scores.
+     *
+     * @param alleleScores the allele scores to extract from.
+     *
+     * @return the binding threshold scores from the input collection.
+     */
+    public static List<Probability> getBindingThresholdScores(Collection<NAPAlleleScore> alleleScores) {
+        return alleleScores.stream().map(x -> x.getBindingThresholdScore()).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the concentration ratio scores from a collection of
+     * allele scores.
+     *
+     * @param alleleScores the allele scores to extract from.
+     *
+     * @return the concentration ratio scores from the input collection.
+     */
+    public static List<Probability> getConcentrationRatioScores(Collection<NAPAlleleScore> alleleScores) {
+        return alleleScores.stream().map(x -> x.getConcentrationRatioScore()).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the stability ratio scores from a collection of allele
+     * scores.
+     *
+     * @param alleleScores the allele scores to extract from.
+     *
+     * @return the stability ratio scores from the input collection.
+     */
+    public static List<Probability> getStabilityRatioScores(Collection<NAPAlleleScore> alleleScores) {
+        return alleleScores.stream().map(x -> x.getStabilityRatioScore()).collect(Collectors.toList());
+    }
 
     /**
      * Returns the number of expressed and translated neo-peptides
@@ -188,7 +219,7 @@ public final class NAPAlleleScore {
      *
      * @return the binding threshold score for the tumor and allele.
      */
-    public double getBindingThresholdScore() {
+    public Probability getBindingThresholdScore() {
         return bindScore;
     }
 
@@ -197,7 +228,7 @@ public final class NAPAlleleScore {
      *
      * @return the concentration ratio score for the tumor and allele.
      */
-    public double getConcentrationRatioScore() {
+    public Probability getConcentrationRatioScore() {
         return concScore;
     }
 
@@ -206,7 +237,7 @@ public final class NAPAlleleScore {
      *
      * @return the stability ratio score for the tumor and allele.
      */
-    public double getStabilityRatioScore() {
+    public Probability getStabilityRatioScore() {
         return stabScore;
     }
 }

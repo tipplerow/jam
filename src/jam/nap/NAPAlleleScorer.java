@@ -7,11 +7,8 @@ import java.util.Set;
 import jam.chem.Concentration;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
-import jam.stab.NetStab;
 import jam.stab.StabilityCache;
 import jam.stab.StabilityRecord;
-import jam.tcga.PeptideType;
-import jam.tcga.TumorBarcode;
 import jam.tcga.TumorPeptideConcentrationProfile;
 
 /**
@@ -20,13 +17,9 @@ import jam.tcga.TumorPeptideConcentrationProfile;
  */
 public final class NAPAlleleScorer {
     private final Allele allele;
-    private final TumorBarcode barcode;
-
-    private Set<Peptide> neoPeptides;
-    private Set<Peptide> selfPeptides;
+    private final TumorPeptideConcentrationProfile profile;
 
     private Map<Peptide, StabilityRecord> stabilityMap;
-    private TumorPeptideConcentrationProfile concentrationProfile;
 
     private int neoBoundCount;
     private int selfBoundCount;
@@ -37,35 +30,29 @@ public final class NAPAlleleScorer {
     private double neoWtMeanStab;
     private double selfWtMeanStab;
 
-    private NAPAlleleScorer(TumorBarcode barcode, Allele allele) {
+    private NAPAlleleScorer(Allele allele, TumorPeptideConcentrationProfile profile) {
         this.allele = allele;
-        this.barcode = barcode;
+        this.profile = profile;
     }
 
     /**
-     * The minimum stability percentile rank required for a peptide to
-     * be classified as bound to its MHC molecule.
-     */
-    public static final double RANK_THRESHOLD = 2.0;
-
-    /**
      * Computes the neo-antigen presentation score (NAP) for a given
-     * tumor and allele.
-     *
-     * @param barcode the tumor to analyze.
+     * allele and tumor protein concentration profile.
      *
      * @param allele the HLA allele presenting the peptides.
      *
+     * @param profile the concentration of expressed and translated
+     * proteins in the tumor under analysis.
+     *
      * @return the neo-antigen presentation score for the specified
-     * tumor and allele.
+     * allele and concentration profile.
      */
-    public static NAPAlleleScore compute(TumorBarcode barcode, Allele allele) {
-        NAPAlleleScorer scorer = new NAPAlleleScorer(barcode, allele);
+    public static NAPAlleleScore compute(Allele allele, TumorPeptideConcentrationProfile profile) {
+        NAPAlleleScorer scorer = new NAPAlleleScorer(allele, profile);
         return scorer.compute();
     }
 
     private NAPAlleleScore compute() {
-        computePeptideConcentration();
         computePeptideMHCStability();
         computeScoreComponents();
 
@@ -74,18 +61,14 @@ public final class NAPAlleleScorer {
                                   neoWtMeanStab, selfWtMeanStab);
     }
 
-    private void computePeptideConcentration() {
-        concentrationProfile = TumorPeptideConcentrationProfile.process(barcode);
-
-        neoPeptides = concentrationProfile.viewNeoPeptides();
-        selfPeptides = concentrationProfile.viewSelfPeptides();
-    }
-
     private void computePeptideMHCStability() {
-        stabilityMap = StabilityRecord.map(StabilityCache.get(allele, concentrationProfile.viewPeptides()));
+        stabilityMap = StabilityRecord.map(StabilityCache.get(allele, profile.viewPeptides()));
     }
 
     private void computeScoreComponents() {
+        Set<Peptide> neoPeptides = profile.viewNeoPeptides();
+        Set<Peptide> selfPeptides = profile.viewSelfPeptides();
+
         neoBoundCount = countBound(neoPeptides);
         selfBoundCount = countBound(selfPeptides);
 
@@ -102,7 +85,7 @@ public final class NAPAlleleScorer {
         for (Peptide peptide : peptides) {
             StabilityRecord record = stabilityMap.get(peptide);
 
-            if (record.getPercentile() >= RANK_THRESHOLD)
+            if (record.getPercentile() >= NAPAlleleScore.RANK_THRESHOLD)
                 ++count;
         }
 
@@ -113,7 +96,7 @@ public final class NAPAlleleScorer {
         double total = 0.0;
 
         for (Peptide peptide : peptides)
-            total += concentrationProfile.getConcentration(peptide).doubleValue();
+            total += profile.getConcentration(peptide).doubleValue();
 
         return total;
     }
@@ -123,7 +106,7 @@ public final class NAPAlleleScorer {
 
         for (Peptide peptide : peptides) {
             StabilityRecord stabRecord    = stabilityMap.get(peptide);
-            Concentration   concentration = concentrationProfile.getConcentration(peptide);
+            Concentration   concentration = profile.getConcentration(peptide);
 
             wtStab += concentration.doubleValue() * stabRecord.getHalfLife();
         }

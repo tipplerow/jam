@@ -1,2 +1,0 @@
-trialIndex,sharedPeptideCount,cortexPrivateCount,medullaPrivateCount,repertoireSize,positiveThreshold,negativeThreshold,positivePassRate,negativePassRate,netSelectionRate,meanAff.FP,meanAff.FN,meanAff.EX,pathogen.coveredFrac,pathogen.reactiveFrac,sharedNeo.coveredFrac,sharedNeo.reactiveFrac,medullaNeo.coveredFrac,medullaNeo.reactiveFrac,elapsedSec
-0,86775,0,76201,1000,31.6,33.2,0.2178,0.3269,0.07119,18.04,23.04,21.28,0.000,0.000,0.000,0.000,0.000,0.000,52

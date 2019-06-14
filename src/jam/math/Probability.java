@@ -2,7 +2,7 @@
 package jam.math;
 
 import java.util.Arrays;
-import java.util.Collection;
+//import java.util.Collection;
 import java.util.Collections;
 
 import jam.lang.DomainDouble;
@@ -109,7 +109,7 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      * @return a new probability equal to the <em>product</em> of the
      * event probabilities.
      */
-    public static Probability allOccur(Collection<Probability> events) {
+    public static Probability allOccur(Iterable<Probability> events) {
         double value = 1.0;
 
         for (Probability event : events)
@@ -153,7 +153,7 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      * @return the joint probability that one or more event in the
      * input set occurs.
      */
-    public static Probability anyOccur(Collection<Probability> events) {
+    public static Probability anyOccur(Iterable<Probability> events) {
         return not(noneOccur(events));
     }
 
@@ -246,7 +246,7 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      *
      * @return {@code true} iff the event probabilities sum to one.
      */
-    public static boolean isNormalized(Collection<Probability> events) {
+    public static boolean isNormalized(Iterable<Probability> events) {
         return DoubleComparator.DEFAULT.EQ(1.0, or(events).doubleValue());
     }
 
@@ -309,7 +309,7 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      * @return the joint probability that no events in the input set
      * occur.
      */
-    public static Probability noneOccur(Collection<Probability> events) {
+    public static Probability noneOccur(Iterable<Probability> events) {
         double value = 1.0;
 
         for (Probability event : events)
@@ -403,7 +403,7 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      * a set of mutually exclusive events (with probabilities totaling
      * 1.0 or less).
      */
-    public static Probability or(Collection<Probability> events) {
+    public static Probability or(Iterable<Probability> events) {
         double value = 0.0;
 
         for (Probability event : events)
@@ -442,7 +442,7 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      * a set of mutually exclusive events (with probabilities totaling
      * 1.0 or less).
      */
-    public static Probability other(Collection<Probability> events) {
+    public static Probability other(Iterable<Probability> events) {
         return not(or(events));
     }
 
