@@ -88,6 +88,37 @@ public final class Probability extends DomainDouble implements Comparable<Probab
     }
 
     /**
+     * Computes the joint probability that all events (in a set of
+     * independent events) occur.
+     *
+     * @param events the event probabilities.
+     *
+     * @return a new probability equal to the <em>product</em> of the
+     * event probabilities.
+     */
+    public static Probability allOccur(Probability... events) {
+        return allOccur(Arrays.asList(events));
+    }
+
+    /**
+     * Computes the joint probability that all events (in a set of
+     * independent events) occur.
+     *
+     * @param events the event probabilities.
+     *
+     * @return a new probability equal to the <em>product</em> of the
+     * event probabilities.
+     */
+    public static Probability allOccur(Collection<Probability> events) {
+        double value = 1.0;
+
+        for (Probability event : events)
+            value *= event.doubleValue();
+
+        return valueOf(value);
+    }
+
+    /**
      * Computes the joint probability of this event <em>and</em>
      * another event occuring independently.
      *
@@ -101,34 +132,29 @@ public final class Probability extends DomainDouble implements Comparable<Probab
     }
 
     /**
-     * Computes the joint probability of a set of events occurring
-     * independently.
+     * Computes the joint probability that one or more event (in a set
+     * of independent events) occurs.
      *
      * @param events the event probabilities.
      *
-     * @return a new probability equal to the <em>product</em> of the
-     * event probabilities.
+     * @return the joint probability that one or more event in the
+     * input set occurs.
      */
-    public static Probability and(Probability... events) {
-        return and(Arrays.asList(events));
+    public static Probability anyOccur(Probability... events) {
+        return anyOccur(Arrays.asList(events));
     }
 
     /**
-     * Computes the joint probability of a set of events occurring
-     * independently.
+     * Computes the joint probability that one or more event (in a set
+     * of independent events) occurs.
      *
      * @param events the event probabilities.
      *
-     * @return a new probability equal to the <em>product</em> of the
-     * event probabilities.
+     * @return the joint probability that one or more event in the
+     * input set occurs.
      */
-    public static Probability and(Collection<Probability> events) {
-        double value = 1.0;
-
-        for (Probability event : events)
-            value *= event.doubleValue();
-
-        return valueOf(value);
+    public static Probability anyOccur(Collection<Probability> events) {
+        return not(noneOccur(events));
     }
 
     /**
@@ -259,6 +285,37 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      */
     public Probability noneOccur(int trialCount) {
         return not(this).allOccur(trialCount);
+    }
+
+    /**
+     * Computes the joint probability that no events (in a set of
+     * independent events) occur.
+     *
+     * @param events the event probabilities.
+     *
+     * @return the joint probability that no events in the input set
+     * occur.
+     */
+    public static Probability noneOccur(Probability... events) {
+        return noneOccur(Arrays.asList(events));
+    }
+
+    /**
+     * Computes the joint probability that no events (in a set of
+     * independent events) occur.
+     *
+     * @param events the event probabilities.
+     *
+     * @return the joint probability that no events in the input set
+     * occur.
+     */
+    public static Probability noneOccur(Collection<Probability> events) {
+        double value = 1.0;
+
+        for (Probability event : events)
+            value *= (1.0 - event.doubleValue());
+
+        return valueOf(value);
     }
 
     /**

@@ -43,6 +43,16 @@ public class ProbabilityTest extends NumericTestBase {
         assertProbability(0.0016, p1.allOccur(4));
     }
 
+    @Test public void testAllOccurStatic() {
+        Probability p1 = Probability.valueOf(0.8);
+        Probability p2 = Probability.valueOf(0.6);
+        Probability p3 = Probability.valueOf(0.5);
+        Probability p4 = Probability.valueOf(0.8 * 0.6 * 0.5);
+
+        assertEquals(p4, Probability.allOccur(p1, p2, p3));
+        assertEquals(p4, Probability.allOccur(p3, p2, p1));
+    }
+
     @Test public void testAndInstance() {
         Probability p1 = Probability.valueOf(0.8);
         Probability p2 = Probability.valueOf(0.6);
@@ -52,14 +62,14 @@ public class ProbabilityTest extends NumericTestBase {
         assertEquals(p3, p2.and(p1));
     }
 
-    @Test public void testAndStatic() {
-        Probability p1 = Probability.valueOf(0.8);
-        Probability p2 = Probability.valueOf(0.6);
-        Probability p3 = Probability.valueOf(0.5);
-        Probability p4 = Probability.valueOf(0.8 * 0.6 * 0.5);
+    @Test public void testAnyOccurStatic() {
+        Probability p1 = Probability.valueOf(0.1);
+        Probability p2 = Probability.valueOf(0.2);
+        Probability p3 = Probability.valueOf(0.4);
+        Probability p4 = Probability.valueOf(1.0 - 0.9 * 0.8 * 0.6);
 
-        assertEquals(p4, Probability.and(p1, p2, p3));
-        assertEquals(p4, Probability.and(p3, p2, p1));
+        assertEquals(p4, Probability.anyOccur(p1, p2, p3));
+        assertEquals(p4, Probability.anyOccur(p3, p2, p1));
     }
 
     @Test public void testDivide() {
@@ -160,6 +170,16 @@ public class ProbabilityTest extends NumericTestBase {
         assertProbability(0.64,   p1.noneOccur(2));
         assertProbability(0.512,  p1.noneOccur(3));
         assertProbability(0.4096, p1.noneOccur(4));
+    }
+
+    @Test public void testNoneOccurStatic() {
+        Probability p1 = Probability.valueOf(0.1);
+        Probability p2 = Probability.valueOf(0.2);
+        Probability p3 = Probability.valueOf(0.4);
+        Probability p4 = Probability.valueOf(0.9 * 0.8 * 0.6);
+
+        assertEquals(p4, Probability.noneOccur(p1, p2, p3));
+        assertEquals(p4, Probability.noneOccur(p3, p2, p1));
     }
 
     @Test public void testNot() {
