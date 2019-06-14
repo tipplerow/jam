@@ -33,6 +33,12 @@
    <antcall target="test"/>
  </target>
 
+ <target name="fresh">
+   <antcall target="clean"/>
+   <antcall target="lib"/>
+   <antcall target="doc"/>
+ </target>
+
  <target name="clean">
    <delete dir="${dir.build}"/>
    <delete dir="${dir.lib}"/>
