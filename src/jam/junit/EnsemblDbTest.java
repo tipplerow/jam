@@ -7,7 +7,7 @@ import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblGene;
 import jam.ensembl.EnsemblProtein;
 import jam.ensembl.EnsemblTranscript;
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 
 import org.junit.*;
 import static org.junit.Assert.*;

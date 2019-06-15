@@ -11,9 +11,9 @@ import com.google.common.collect.ImmutableListMultimap;
 
 import jam.app.JamLogger;
 import jam.app.JamProperties;
+import jam.hugo.HugoSymbol;
 import jam.io.TableReader;
 import jam.lang.JamException;
-import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 /**

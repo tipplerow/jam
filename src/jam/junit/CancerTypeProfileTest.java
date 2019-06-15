@@ -1,7 +1,7 @@
 
 package jam.junit;
 
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 import jam.rna.CancerTypeProfile;
 import jam.rna.Expression;
 import jam.rna.ExpressionProfile;

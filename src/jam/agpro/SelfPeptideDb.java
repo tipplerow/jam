@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import jam.app.JamProperties;
+import jam.hugo.HugoSymbol;
 import jam.peptide.HugoPeptideTable;
-import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 /**

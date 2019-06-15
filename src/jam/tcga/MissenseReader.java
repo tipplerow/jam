@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import jam.ensembl.EnsemblTranscript;
+import jam.hugo.HugoSymbol;
 import jam.io.TableReader;
 import jam.lang.JamException;
-import jam.peptide.HugoSymbol;
 import jam.peptide.ProteinChange;
 import jam.util.RegexUtil;
 

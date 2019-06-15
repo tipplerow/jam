@@ -11,9 +11,9 @@ import jam.app.JamLogger;
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
 import jam.ensembl.TranscriptBiotype;
+import jam.hugo.HugoSymbol;
 import jam.io.IOUtil;
 import jam.io.LineReader;
-import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 /**

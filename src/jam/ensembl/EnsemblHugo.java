@@ -1,7 +1,7 @@
 
 package jam.ensembl;
 
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 
 /**
  * Represents the unique Ensembl HUGO identifier.
@@ -14,36 +14,17 @@ public final class EnsemblHugo extends EnsemblID {
     }
 
     /**
-     * Returns the Ensemble HUGO identifier for a given key string.
-     *
-     * @param key the key string.
-     *
-     * @return the Ensemble HUGO identifier for the given key string.
-     */
-    public static EnsemblHugo instance(String key) {
-        return new EnsemblHugo(key);
-    }
-
-    /**
      * Extracts the HUGO symbol from an Ensembl record header line.
      *
      * @param headerLine the header line from an Ensembl record.
      *
-     * @return the HUGO symbol contained in the given header line.
-     *
-     * @throws RuntimeException unless the header line contains a
-     * properly formatted HUGO symbol.
+     * @return the HUGO symbol contained in the given header line, or
+     * {@code null} if the header line does not contain a HUGO symbol.
      */
-    public static EnsemblHugo parseHeader(String headerLine) {
-        return new EnsemblHugo(parseHeader(headerLine, LABEL_CODE));
-    }
-
-    /**
-     * Returns the HUGO symbol object corresponding to this HUGO key.
-     *
-     * @return the HUGO symbol object corresponding to this HUGO key.
-     */
-    public HugoSymbol hugoSymbol() {
-        return HugoSymbol.instance(getKey());
+    public static HugoSymbol parseHeader(String headerLine) {
+        if (headerContains(headerLine, LABEL_CODE))
+            return HugoSymbol.instance(parseHeader(headerLine, LABEL_CODE));
+        else
+            return null;
     }
 }

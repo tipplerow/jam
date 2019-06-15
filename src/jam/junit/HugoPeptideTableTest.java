@@ -3,7 +3,7 @@ package jam.junit;
 
 import java.util.Set;
 
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 import jam.peptide.HugoPeptideTable;
 import jam.peptide.Peptide;
 

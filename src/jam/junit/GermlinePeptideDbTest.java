@@ -2,7 +2,7 @@
 package jam.junit;
 
 import jam.chop.GermlinePeptideDb;
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 import jam.peptide.Peptide;
 
 import org.junit.*;

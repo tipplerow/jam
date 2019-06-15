@@ -6,7 +6,7 @@ import java.io.File;
 import jam.app.JamProperties;
 import jam.data.DataMatrix;
 import jam.data.DenseDataMatrixLoader;
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 import jam.tcga.CancerType;
 import jam.tcga.PatientCancerTypeTable;
 import jam.tcga.PatientID;

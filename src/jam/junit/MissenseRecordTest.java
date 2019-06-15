@@ -4,7 +4,7 @@ package jam.junit;
 import java.util.List;
 
 import jam.ensembl.EnsemblTranscript;
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 import jam.peptide.Peptide;
 import jam.peptide.ProteinChange;
 import jam.tcga.MissenseRecord;

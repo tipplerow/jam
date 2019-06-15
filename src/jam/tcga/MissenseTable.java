@@ -10,7 +10,7 @@ import java.util.Map;
 
 import jam.app.JamLogger;
 import jam.app.JamProperties;
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 
 /**
  * Reads missesnse mutations from a file and stores them in memory

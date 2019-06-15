@@ -10,7 +10,7 @@ import jam.agpro.AntigenProcessor;
 import jam.agpro.SelfPeptideDb;
 import jam.app.JamLogger;
 import jam.chem.Concentration;
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 import jam.peptide.Peptide;
 import jam.peptide.PeptideConcentrationProfile;
 import jam.rna.ConcentrationModel;

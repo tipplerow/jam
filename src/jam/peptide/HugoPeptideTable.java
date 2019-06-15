@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.common.collect.ImmutableListMultimap;
 
 import jam.app.JamLogger;
+import jam.hugo.HugoSymbol;
 import jam.io.TableReader;
 import jam.lang.JamException;
 

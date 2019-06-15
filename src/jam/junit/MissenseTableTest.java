@@ -4,7 +4,7 @@ package jam.junit;
 import java.util.List;
 import java.util.Map;
 
-import jam.peptide.HugoSymbol;
+import jam.hugo.HugoSymbol;
 import jam.tcga.MissenseRecord;
 import jam.tcga.MissenseTable;
 import jam.tcga.TumorBarcode;

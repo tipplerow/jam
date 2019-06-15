@@ -2,14 +2,17 @@
 package jam.tcga;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import jam.app.JamLogger;
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
 import jam.ensembl.EnsemblTranscript;
+import jam.hugo.HugoMaster;
+import jam.hugo.HugoSymbol;
 import jam.lang.JamException;
-import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 import jam.peptide.ProteinChange;
 
@@ -44,6 +47,15 @@ public final class MissenseRecord {
         this.hugoSymbol    = hugoSymbol;
         this.transcriptID  = transcriptID;
         this.proteinChange = proteinChange;
+        validate();
+    }
+
+    private void validate() {
+        Collection<HugoSymbol> symbols =
+            HugoMaster.global().getHugo(transcriptID);
+
+        if (!symbols.isEmpty() && !symbols.contains(hugoSymbol))
+            JamLogger.warn("Inconsistent HUGO symbol: [%s, %s].", hugoSymbol, transcriptID);
     }
 
     /**
@@ -140,10 +152,6 @@ public final class MissenseRecord {
 
         if (ensemblRecord == null)
             throw JamException.runtime("Unmapped transcript: [%s]", transcriptID);
-
-        if (!ensemblRecord.getHugoSymbol().equals(hugoSymbol))
-            throw JamException.runtime("Mismatched HUGO symbols: [%s vs %s]",
-                                       hugoSymbol, ensemblRecord.getHugoSymbol());
 
         return ensemblRecord.getPeptide();
     }

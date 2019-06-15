@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import jam.app.JamProperties;
+import jam.hugo.HugoSymbol;
 import jam.io.TableReader;
 import jam.lang.JamException;
-import jam.peptide.HugoSymbol;
 import jam.tcga.TumorBarcode;
 import jam.util.MapUtil;
 

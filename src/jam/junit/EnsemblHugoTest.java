@@ -2,6 +2,7 @@
 package jam.junit;
 
 import jam.ensembl.EnsemblHugo;
+import jam.hugo.HugoSymbol;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -13,8 +14,8 @@ public class EnsemblHugoTest {
         + " gene_symbol:BRAF description:B-Raf proto-oncogene, serine/threonine kinase [Source:HGNC Symbol;Acc:HGNC:1097]";
 
     @Test public void testParseHeader() {
-        EnsemblHugo hugoID = EnsemblHugo.parseHeader(HEADER_LINE);
-        assertEquals("BRAF", hugoID.hugoSymbol().getKey());
+        HugoSymbol hugoID = EnsemblHugo.parseHeader(HEADER_LINE);
+        assertEquals("BRAF", hugoID.getKey());
     }
 
     public static void main(String[] args) {

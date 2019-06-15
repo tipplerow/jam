@@ -13,11 +13,12 @@ import com.google.common.collect.Multimap;
 
 import jam.app.JamEnv;
 import jam.app.JamLogger;
+import jam.app.JamProperties;
+import jam.hugo.HugoSymbol;
 import jam.io.IOUtil;
 import jam.fasta.FastaReader;
 import jam.fasta.FastaRecord;
 import jam.lang.JamException;
-import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 /**
@@ -54,9 +55,27 @@ public final class EnsemblDb {
         if (transcriptMap.put(ensemblRecord.getEnsemblTranscript(), ensemblRecord) != null)
             throw JamException.runtime("Duplicate transcript key: [%s]", ensemblRecord.getEnsemblTranscript());
 
-        hugoMap.put(ensemblRecord.getHugoSymbol(), ensemblRecord);
         geneMap.put(ensemblRecord.getEnsemblGene(), ensemblRecord);
+
+        if (ensemblRecord.getHugoSymbol() != null)
+            hugoMap.put(ensemblRecord.getHugoSymbol(), ensemblRecord);
     }
+
+    /**
+     * Name of the environment variable that defines the absolute path
+     * of the Ensembl reference human peptidome file.  If the system
+     * property {@code jam.ensembl.peptidomeFile} is also defined, it
+     * will override the environment variable.
+     */
+    public static final String PEPTIDOME_FILE_ENV = "ENSEMBL_PEPTIDOME_FILE";
+
+    /**
+     * Name of the system property that defines the absolute path of
+     * the Ensembl reference human peptidome file.  If not defined,
+     * the environment variable {@code ENSEMBL_PEPTIDOME_FILE} will
+     * be used by default.
+     */
+    public static final String PEPTIDOME_FILE_PROPERTY = "jam.ensembl.peptidomeFile";
 
     /**
      * Creates a database of Ensembl records from a sequence of FASTA
@@ -115,8 +134,14 @@ public final class EnsemblDb {
     }
 
     private static File resolveGlobalFile() {
-        return new File(JamEnv.getRequired("ENSEMBL_HOME"),
-                        JamEnv.getRequired("ENSEMBL_HUMAN_PEPTIDOME"));
+        return new File(resolveGlobalFileName());
+    }
+
+    private static String resolveGlobalFileName() {
+        if (JamProperties.isSet(PEPTIDOME_FILE_PROPERTY))
+            return JamProperties.getRequired(PEPTIDOME_FILE_PROPERTY);
+        else
+            return JamEnv.getRequired(PEPTIDOME_FILE_ENV);
     }
 
     /**

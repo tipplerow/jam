@@ -2,8 +2,8 @@
 package jam.rna;
 
 import jam.app.JamProperties;
+import jam.hugo.HugoSymbol;
 import jam.lang.JamException;
-import jam.peptide.HugoSymbol;
 import jam.tcga.TumorBarcode;
 
 /**

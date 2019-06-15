@@ -32,6 +32,27 @@ public abstract class EnsemblID extends KeyedObject<String> {
     }
 
     /**
+     * Identifies key labels contained in header lines.
+     *
+     * @param headerLine the header line of an Ensembl record.
+     *
+     * @param labelCode the code used in the Ensemble header text to
+     * indicate the identifier type.
+     *
+     * @return {@code true} iff the header line contains a key with
+     * the given label.
+     */
+    public static boolean headerContains(String headerLine, String labelCode) {
+        String[] fields = RegexUtil.split(HEADER_FIELD_DELIM, headerLine);
+
+        for (String field : fields)
+            if (field.startsWith(labelCode))
+                return true;
+
+        return false;
+    }
+
+    /**
      * Extracts the key string from the header line of an Ensembl
      * record.
      *
