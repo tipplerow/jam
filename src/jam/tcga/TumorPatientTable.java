@@ -2,31 +2,41 @@
 package jam.tcga;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
+
 import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.io.TableReader;
 import jam.lang.JamException;
+import jam.util.MapUtil;
 
 /**
  * Maps tumor barcodes to the sampled patient in the cohort.
+ *
+ * <p>Tumor barcodes must be unique, but mulitple tumors may map
+ * to the same patient.
  *
  * <p><b>File format.</b> The data file must contain a header line
  * (which is ignored) and every other line must contain the barcode
  * and patient key separated by a comma, tab, or pipe character.
  */
 public final class TumorPatientTable {
-    private final Map<TumorBarcode, PatientID> map;
+    private final Map<TumorBarcode, PatientID> tumorMap;
+    private final Multimap<PatientID, TumorBarcode> patientMap;
 
     private static TumorPatientTable global = null;
 
     private TumorPatientTable() {
-        this.map = new HashMap<TumorBarcode, PatientID>();
+        this.tumorMap = new HashMap<TumorBarcode, PatientID>();
+        this.patientMap = TreeMultimap.create();
     }
 
     /**
@@ -115,10 +125,20 @@ public final class TumorPatientTable {
         TumorBarcode barcode   = TumorBarcode.instance(columns.get(0));
         PatientID    patientID = PatientID.instance(columns.get(1));
 
-        if (map.containsKey(barcode))
-            throw JamException.runtime("Duplicate key: [%s]", barcode.getKey());
+        patientMap.put(patientID, barcode);
+        MapUtil.putUnique(tumorMap, barcode, patientID);
+    }
 
-        map.put(barcode, patientID);
+    /**
+     * Identifies patients in this table.
+     *
+     * @param patient the key for the patient of interest.
+     *
+     * @return {@code true} iff this table contains the specified
+     * patient.
+     */
+    public boolean contains(PatientID patient) {
+        return patientMap.containsKey(patient);
     }
 
     /**
@@ -130,7 +150,19 @@ public final class TumorPatientTable {
      * tumor.
      */
     public boolean contains(TumorBarcode barcode) {
-        return map.containsKey(barcode);
+        return tumorMap.containsKey(barcode);
+    }
+
+    /**
+     * Returns the tumors sampled from a given patient.
+     *
+     * @param patient the key for the patient of interest.
+     *
+     * @return the tumors sampled from the specified patient (or an
+     * empty collection if this table does not contain the patient).
+     */
+    public Collection<TumorBarcode> lookup(PatientID patient) {
+        return patientMap.get(patient);
     }
 
     /**
@@ -142,7 +174,7 @@ public final class TumorPatientTable {
      * ({@code null} if the barcode is not in this table).
      */
     public PatientID lookup(TumorBarcode barcode) {
-        return map.get(barcode);
+        return tumorMap.get(barcode);
     }
 
     /**
@@ -170,7 +202,17 @@ public final class TumorPatientTable {
      * @return the number of tumors in this table.
      */
     public int size() {
-        return map.size();
+        return tumorMap.size();
+    }
+
+    /**
+     * Returns a read-only view of the patients in this table.
+     *
+     * @return an unmodifiable set containing all patients in this
+     * table.
+     */
+    public Set<PatientID> viewPatients() {
+        return Collections.unmodifiableSet(patientMap.keySet());
     }
 
     /**
@@ -180,6 +222,6 @@ public final class TumorPatientTable {
      * table.
      */
     public Set<TumorBarcode> viewBarcodes() {
-        return Collections.unmodifiableSet(map.keySet());
+        return Collections.unmodifiableSet(tumorMap.keySet());
     }
 }

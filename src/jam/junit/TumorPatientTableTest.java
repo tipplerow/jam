@@ -26,8 +26,21 @@ public class TumorPatientTableTest {
         TumorPatientTable table = TumorPatientTable.global();
         assertEquals(4, table.size());
 
+        assertTrue(table.contains(AL4602));
         assertTrue(table.contains(AL4602_T1));
+
+        assertFalse(table.contains(PatientID.instance("Missing")));
         assertFalse(table.contains(TumorBarcode.instance("Missing")));
+
+        assertEquals(2, table.lookup(AL4602).size());
+        assertEquals(1, table.lookup(AU5884).size());
+        assertEquals(1, table.lookup(BL3403).size());
+        assertEquals(0, table.lookup(PatientID.instance("Missing")).size());
+
+        assertTrue(table.lookup(AL4602).contains(AL4602_T1));
+        assertTrue(table.lookup(AL4602).contains(AL4602_T2));
+        assertTrue(table.lookup(AU5884).contains(AU5884_T));
+        assertTrue(table.lookup(BL3403).contains(BL3403_T));
 
         assertEquals(AL4602, table.require(AL4602_T1));
         assertEquals(AL4602, table.require(AL4602_T2));
