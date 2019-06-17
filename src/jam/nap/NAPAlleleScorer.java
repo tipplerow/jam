@@ -1,12 +1,14 @@
 
 package jam.nap;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jam.chem.Concentration;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
+import jam.stab.NetStab;
 import jam.stab.StabilityCache;
 import jam.stab.StabilityRecord;
 import jam.tcga.TumorPeptideConcentrationProfile;
@@ -62,7 +64,20 @@ public final class NAPAlleleScorer {
     }
 
     private void computePeptideMHCStability() {
-        stabilityMap = StabilityRecord.map(StabilityCache.get(allele, profile.viewPeptides()));
+        //
+        // Use the stability cache for the self-peptides, but
+        // compute the stability for neo-peptides on the fly...
+        //
+        Set<Peptide> neoPeptides = profile.viewNeoPeptides();
+        Set<Peptide> selfPeptides = profile.viewSelfPeptides();
+
+        List<StabilityRecord> neoRecords = NetStab.run(allele, neoPeptides);
+        List<StabilityRecord> selfRecords = StabilityCache.get(allele, selfPeptides);
+
+        stabilityMap = StabilityRecord.map(selfRecords);
+
+        for (StabilityRecord neoRecord : neoRecords)
+            stabilityMap.put(neoRecord.getPeptide(), neoRecord);
     }
 
     private void computeScoreComponents() {
