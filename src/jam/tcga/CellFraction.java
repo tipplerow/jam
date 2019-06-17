@@ -1,6 +1,7 @@
 
 package jam.tcga;
 
+import jam.chem.Concentration;
 import jam.lang.DomainDouble;
 import jam.math.DoubleRange;
 
@@ -70,5 +71,17 @@ public final class CellFraction extends DomainDouble {
      */
     public static CellFraction valueOf(String s) {
         return valueOf(Double.parseDouble(s));
+    }
+
+    /**
+     * Multiples a protein concentration by this cell fraction.
+     *
+     * @param concentration a protein concentration.
+     *
+     * @return the protein concentration rescaled by this cell
+     * fraction.
+     */
+    public Concentration times(Concentration concentration) {
+        return Concentration.valueOf(concentration.doubleValue() * doubleValue());
     }
 }

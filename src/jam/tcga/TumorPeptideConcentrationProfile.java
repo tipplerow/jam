@@ -189,10 +189,10 @@ public final class TumorPeptideConcentrationProfile {
         // All peptides are self-peptides from the germline
         // protein...
         //
-        List<Peptide> genePeptides = selfPeptideDb.lookup(symbol);
+        List<Peptide> geneSelfPeptides = selfPeptideDb.lookup(symbol);
 
-        selfPeptides.addAll(genePeptides);
-        concentrationProfile.addAll(genePeptides, concentration);
+        selfPeptides.addAll(geneSelfPeptides);
+        concentrationProfile.addAll(geneSelfPeptides, concentration);
     }
 
     private void processMutatedGene(HugoSymbol symbol,
@@ -202,26 +202,35 @@ public final class TumorPeptideConcentrationProfile {
         ++mutatedGeneCount;
         totalMutationCount += missenseRecords.size();
 
-        // Determine the mutated form of the protein...
-        Peptide mutatedProtein = MissenseRecord.apply(missenseRecords);
+        // When multiple mutations are present in the same gene,
+        // self-peptides from the mutated protein should only be
+        // counted once, so we aggregate them in a single set and
+        // then add them with the concentration of the gene.
+        Set<Peptide> geneSelfPeptides = new HashSet<Peptide>();
 
-        // Run the mutated protein through the antigen processing
-        // machinery...
-        JamLogger.info("Processing mutated protein from gene [%s]...", symbol.getKey());
-        List<Peptide> peptides = antigenProcessor.process(mutatedProtein);
+        for (MissenseRecord missenseRecord : missenseRecords) {
+            //
+            // Determine the mutated form of the protein...
+            //
+            Peptide mutatedProtein = missenseRecord.apply();
 
-        classifyPeptides(peptides);
-        concentrationProfile.addAll(peptides, concentration);
-    }
+            // Run the mutated protein through the antigen processing
+            // machinery...
+            JamLogger.info("Processing mutated protein from gene [%s]...", symbol.getKey());
+            List<Peptide> peptides = antigenProcessor.process(mutatedProtein);
 
-    private void classifyPeptides(List<Peptide> peptides) {
-        //
-        // Split the fragments into self-peptides and neo-peptides...
-        //
-        for (Peptide peptide : peptides)
-            if (selfPeptideDb.contains(peptide))
-                selfPeptides.add(peptide);
-            else
-                neoPeptides.add(peptide);
+            for (Peptide peptide : peptides) {
+                if (selfPeptideDb.contains(peptide)) {
+                    geneSelfPeptides.add(peptide);
+                }
+                else {
+                    neoPeptides.add(peptide);
+                    concentrationProfile.add(peptide, missenseRecord.getCellFraction().times(concentration));
+                }
+            }
+        }
+
+        selfPeptides.addAll(geneSelfPeptides);
+        concentrationProfile.addAll(geneSelfPeptides, concentration);
     }
 }
