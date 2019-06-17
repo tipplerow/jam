@@ -25,24 +25,35 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
     private final int hugoSymbolColumn;
     private final int transcriptIDColumn;
     private final int proteinChangeColumn;
+    private final int cellFractionColumn;
 
     private MissenseReader(TableReader reader) {
         this.reader = reader;
 
-        this.tumorBarcodeColumn  = findColumn(TumorBarcode.COLUMN_NAME);
-        this.hugoSymbolColumn    = findColumn(HugoSymbol.COLUMN_NAME);
-        this.transcriptIDColumn  = findColumn(EnsemblTranscript.COLUMN_NAME);
-        this.proteinChangeColumn = findColumn(ProteinChange.COLUMN_NAME);
+        this.tumorBarcodeColumn  = findRequiredColumn(TumorBarcode.COLUMN_NAME);
+        this.hugoSymbolColumn    = findRequiredColumn(HugoSymbol.COLUMN_NAME);
+        this.transcriptIDColumn  = findRequiredColumn(EnsemblTranscript.COLUMN_NAME);
+        this.proteinChangeColumn = findRequiredColumn(ProteinChange.COLUMN_NAME);
+        this.cellFractionColumn  = findOptionalColumn(CellFraction.COLUMN_NAME);
     }
 
-    private int findColumn(String columnName) {
+    private int findOptionalColumn(String columnName) {
         List<String> columnKeys = reader.columnKeys();
 
         for (int columnIndex = 0; columnIndex < columnKeys.size(); ++columnIndex)
             if (columnKeys.get(columnIndex).equals(columnName))
                 return columnIndex;
 
-        throw JamException.runtime("Column [%s] not found.", columnName);
+        return -1;
+    }
+
+    private int findRequiredColumn(String columnName) {
+        int columnIndex = findOptionalColumn(columnName);
+
+        if (columnIndex < 0)
+            throw JamException.runtime("Column [%s] not found.", columnName);
+
+        return columnIndex;
     }
 
     /**
@@ -141,11 +152,13 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
         HugoSymbol        hugoSymbol    = parseHugoSymbol(fields);
         EnsemblTranscript transcriptID  = parseTranscriptID(fields);
         ProteinChange     proteinChange = parseProteinChange(fields);
+        CellFraction      cellFraction  = parseCellFraction(fields);
 
         return new MissenseRecord(tumorBarcode,
                                   hugoSymbol,
                                   transcriptID,
-                                  proteinChange);
+                                  proteinChange,
+                                  cellFraction);
     }
 
     private TumorBarcode parseTumorBarcode(List<String> fields) {
@@ -162,6 +175,13 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
 
     private ProteinChange parseProteinChange(List<String> fields) {
         return ProteinChange.parse(fields.get(proteinChangeColumn));
+    }
+
+    private CellFraction parseCellFraction(List<String> fields) {
+        if (cellFractionColumn < 0)
+            return CellFraction.UNIT;
+        else
+            return CellFraction.valueOf(fields.get(cellFractionColumn));
     }
 
     @Override public Iterator<MissenseRecord> iterator() {

@@ -26,6 +26,7 @@ public final class MissenseRecord {
     private final HugoSymbol        hugoSymbol;
     private final EnsemblTranscript transcriptID;
     private final ProteinChange     proteinChange;
+    private final CellFraction      cellFraction;
 
     /**
      * Creates a new missense mutation record.
@@ -38,15 +39,20 @@ public final class MissenseRecord {
      * transcript.
      *
      * @param proteinChange the description of the single-residue change.
+     *
+     * @param cellFraction the fraction of cancer cells carrying the mutation.
      */
     public MissenseRecord(TumorBarcode      tumorBarcode,
                           HugoSymbol        hugoSymbol,
                           EnsemblTranscript transcriptID,
-                          ProteinChange     proteinChange) {
+                          ProteinChange     proteinChange,
+                          CellFraction      cellFraction) {
         this.tumorBarcode  = tumorBarcode;
         this.hugoSymbol    = hugoSymbol;
         this.transcriptID  = transcriptID;
         this.proteinChange = proteinChange;
+        this.cellFraction  = cellFraction;
+
         validate();
     }
 
@@ -190,5 +196,14 @@ public final class MissenseRecord {
      */
     public ProteinChange getProteinChange() {
         return proteinChange;
+    }
+
+    /**
+     * Returns the fraction of cancer cells carrying this mutation.
+     *
+     * @return the fraction of cancer cells carrying this mutation.
+     */
+    public CellFraction getCellFraction() {
+        return cellFraction;
     }
 }
