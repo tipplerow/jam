@@ -2,6 +2,7 @@
 package jam.nap;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
@@ -23,20 +24,17 @@ import jam.tcga.TumorPatientTable;
  * dataset.
  */
 public final class NAPDriver extends JamApp {
+    private final String patientFile;
+
     private LineReader patientReader;
     private PrintWriter alleleWriter;
     private PrintWriter genotypeWriter;
     private PrintWriter exceptionWriter;
 
-    private NAPDriver(String... propFiles) {
-        super(propFiles);
+    private NAPDriver(String patientFile, String[] propertyFiles) {
+        super(propertyFiles);
+        this.patientFile = patientFile;
     }
-
-    /**
-     * Name of the system property that assigns the full path to the
-     * file containing the patients to process.
-     */ 
-    public static final String PATIENT_COHORT_FILE_PROPERTY = "jam.nap.patientCohort";
 
     /**
      * Name of the system property that assigns the full path to the
@@ -71,7 +69,7 @@ public final class NAPDriver extends JamApp {
     }
 
     private void openIO() {
-        patientReader = LineReader.open(resolvePatientFile());
+        patientReader = LineReader.open(patientFile);
 
         alleleWriter    = IOUtil.openWriter(resolveAlleleFile());
         genotypeWriter  = IOUtil.openWriter(resolveGenotypeFile());
@@ -79,10 +77,6 @@ public final class NAPDriver extends JamApp {
 
         writeAlleleHeader();
         writeGenotypeHeader();
-    }
-
-    private static String resolvePatientFile() {
-        return JamProperties.getRequired(PATIENT_COHORT_FILE_PROPERTY);
     }
 
     private static String resolveAlleleFile() {
@@ -178,8 +172,19 @@ public final class NAPDriver extends JamApp {
         genotypeWriter.flush();
     }
 
-    public static void main(String[] propFiles) {
-        NAPDriver driver = new NAPDriver(propFiles);
+    private static void usage() {
+        System.err.println("Usage: java [JVM_OPTIONS] jam.nap.NAPDriver PATIENT_FILE PROPERTY_FILE1 [PROPERTY_FILE2 ...]");
+        System.exit(1);
+    }
+
+    public static void main(String[] args) {
+        if (args.length < 2)
+            usage();
+
+        String   patientFile   = args[0];
+        String[] propertyFiles = Arrays.copyOfRange(args, 1, args.length);
+
+        NAPDriver driver = new NAPDriver(patientFile, propertyFiles);
         driver.run();
     }
 }
