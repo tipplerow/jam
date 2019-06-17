@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -519,8 +520,8 @@ public final class JamProperties {
      * specified and all property files can be located and parsed
      * successfully.
      */
-    public static synchronized PropertyList loadFiles(String[] fileNames, boolean override) {
-        if (fileNames.length < 1)
+    public static synchronized PropertyList loadFiles(List<String> fileNames, boolean override) {
+        if (fileNames.isEmpty())
             throw new IllegalArgumentException("At least one property file must be specified.");
 
         PropertyList properties = new PropertyList();
@@ -617,7 +618,7 @@ public final class JamProperties {
      *
      * @return the property names and values contained in the files.
      */
-    public static PropertyList parseFiles(String... fileNames) {
+    public static PropertyList parseFiles(Iterable<String> fileNames) {
         PropertyList properties = new PropertyList();
 
         for (String fileName : fileNames)

@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -19,7 +19,8 @@ import jam.lang.JamException;
  * properties and write output files.
  */
 public abstract class JamApp {
-    private final String[] propertyFiles;
+    private final List<String> propertyFiles;
+
     private final int trialIndex;
     private final File reportDir;
     private final Collection<Writer> autoClose = new ArrayList<Writer>();
@@ -55,9 +56,21 @@ public abstract class JamApp {
      * are specfied elsewhere).
      */
     protected JamApp(String... propertyFiles) {
-        this.propertyFiles = Arrays.copyOf(propertyFiles, propertyFiles.length);
+        this(List.of(propertyFiles));
+    }
 
-        if (propertyFiles.length > 0)
+    /**
+     * Creates a new application instance and reads system properties
+     * from a set of property files.
+     *
+     * @param propertyFiles files containing system properties that
+     * define the application parameters (may be empty if properties
+     * are specfied elsewhere).
+     */
+    protected JamApp(List<String> propertyFiles) {
+        this.propertyFiles = new ArrayList<String>(propertyFiles);
+
+        if (!propertyFiles.isEmpty())
             JamProperties.loadFiles(propertyFiles, false);
 
         this.reportDir = resolveReportDir();
@@ -76,10 +89,10 @@ public abstract class JamApp {
         // Parent directory of the first property file or the working
         // directory...
         //
-        if (propertyFiles.length > 0)
-            return FileUtil.getParentName(new File(propertyFiles[0]));
-        else
+        if (propertyFiles.isEmpty())
             return ".";
+        else
+            return FileUtil.getParentName(new File(propertyFiles.get(0)));
     }
 
     private static int resolveTrialIndex() {
