@@ -195,9 +195,9 @@ public final class NAPDriver extends JamApp {
         builder.append(score.getSelfTotalConc());
         builder.append(score.getNeoWtMeanStab());
         builder.append(score.getSelfWtMeanStab());
-        builder.append(score.getBindingThresholdScore());
-        builder.append(score.getConcentrationRatioScore());
-        builder.append(score.getStabilityRatioScore());
+        builder.append(score.getBindingThresholdScore().doubleValue());
+        builder.append(score.getConcentrationRatioScore().doubleValue());
+        builder.append(score.getStabilityRatioScore().doubleValue());
 
         alleleWriter.println(builder.toString());
         alleleWriter.flush();
