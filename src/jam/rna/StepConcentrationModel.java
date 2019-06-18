@@ -6,8 +6,16 @@ import jam.chem.Concentration;
 import jam.lang.JamException;
 
 /**
- * Defines an interface to models that convert RNA expression to
- * protein concentration.
+ * Defines a step-function protein concentration model: the protein 
+ *concentration, {@code C}, is a step function:
+ *
+ * <pre>
+ *     C = 0, FPKM &lt; Fmin,
+ *     C = 1, FPKM &ge; Fmin.
+ * </pre>
+ *
+ * where {@code FPKM} is the RNA transcript expression level and
+ * {@code Fmin} is a threshold expression level.
  */
 public final class StepConcentrationModel extends ConcentrationModel {
     private final Expression threshold;
@@ -18,8 +26,8 @@ public final class StepConcentrationModel extends ConcentrationModel {
     private static final Concentration UNIT_CONC = Concentration.valueOf(1.0);
 
     /**
-     * Name of the system property that specifies the type of the
-     * global protein concentration model.
+     * Name of the system property that specifies the expression
+     * threshold.
      */
     public static final String EXPRESSION_THRESHOLD_PROPERTY =
         "jam.rna.expressionThreshold";

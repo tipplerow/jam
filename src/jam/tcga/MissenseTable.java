@@ -156,6 +156,43 @@ public final class MissenseTable {
     }
 
     /**
+     * Counts the total number of missense mutations in a given tumor.
+     *
+     * @param barcode the tumor barcode of interest.
+     *
+     * @return the total number of missense mutations in the specified
+     * tumor.
+     */
+    public int count(TumorBarcode barcode) {
+        Map<HugoSymbol, List<MissenseRecord>> hugoMap = barcodeMap.get(barcode);
+
+        if (hugoMap == null)
+            return 0;
+
+        int total = 0;
+
+        for (List<MissenseRecord> records : hugoMap.values())
+            total += records.size();
+
+        return total;
+    }
+
+    /**
+     * Counts the number of missense mutations for a given tumor
+     * and gene.
+     *
+     * @param barcode the tumor barcode of interest.
+     *
+     * @param symbol the gene of interest.
+     *
+     * @return the number of missense mutations for the specified
+     * tumor and gene.
+     */
+    public int count(TumorBarcode barcode, HugoSymbol symbol) {
+        return lookup(barcode, symbol).size();
+    }
+
+    /**
      * Returns all missense mutations for a given tumor.
      *
      * @param barcode the tumor barcode of interest.

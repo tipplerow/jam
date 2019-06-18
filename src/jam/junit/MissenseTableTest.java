@@ -45,6 +45,14 @@ public class MissenseTableTest {
         assertFalse(TABLE.contains(barcode3, ASPM));
         assertFalse(TABLE.contains(barcode3, ALMS1));
 
+        assertEquals(6, TABLE.count(barcode1));
+        assertEquals(3, TABLE.count(barcode2));
+        assertEquals(0, TABLE.count(barcode3));
+
+        assertEquals(1, TABLE.count(barcode1, ASPM));
+        assertEquals(3, TABLE.count(barcode1, RNF31));
+        assertEquals(0, TABLE.count(barcode2, RNF31));
+
         Map<HugoSymbol, List<MissenseRecord>> hugoMap = TABLE.lookup(barcode1);
         assertEquals(4, hugoMap.size());
 

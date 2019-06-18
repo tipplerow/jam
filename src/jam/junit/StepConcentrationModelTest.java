@@ -2,7 +2,6 @@
 package jam.junit;
 
 import jam.chem.Concentration;
-import jam.hugo.HugoSymbol;
 import jam.rna.Expression;
 import jam.rna.ConcentrationModel;
 import jam.rna.StepConcentrationModel;
