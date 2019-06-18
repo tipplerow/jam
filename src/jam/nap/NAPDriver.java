@@ -4,12 +4,13 @@ package jam.nap;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import jam.app.JamApp;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
-
+import jam.hla.Allele;
 import jam.hla.Genotype;
 import jam.hla.GenotypeDb;
 import jam.io.IOUtil;
@@ -92,6 +93,23 @@ public final class NAPDriver extends JamApp {
     }
 
     private void writeAlleleHeader() {
+        LineBuilder builder = LineBuilder.csv();
+
+        builder.append("Patient_ID");
+        builder.append("Tumor_Barcode");
+        builder.append("Allele");
+        builder.append("Neo_Bound_Count");
+        builder.append("Self_Bound_Count");
+        builder.append("Neo_Total_Conc");
+        builder.append("Self_Total_Conc");
+        builder.append("Neo_WtMean_Stab");
+        builder.append("Self_WtMean_Stab");
+        builder.append("Binding_Threshold_Score");
+        builder.append("Concentration_Ratio_Score");
+        builder.append("Stability_Ratio_Score");
+
+        alleleWriter.println(builder.toString());
+        alleleWriter.flush();
     }
 
     private void writeGenotypeHeader() {
@@ -99,9 +117,10 @@ public final class NAPDriver extends JamApp {
 
         builder.append("Patient_ID");
         builder.append("Tumor_Barcode");
+        builder.append("Total_Mutation_Count");
         builder.append("Expressed_Gene_Count");
         builder.append("Mutated_Gene_Count");
-        builder.append("Total_Mutation_Count");
+        builder.append("Expressed_Mutation_Count");
         builder.append("Binding_Threshold_Score");
         builder.append("Concentration_Ratio_Score");
         builder.append("Stability_Ratio_Score");
@@ -140,7 +159,8 @@ public final class NAPDriver extends JamApp {
             NAPGenotypeScore genotypeScore =
                 NAPGenotypeScorer.compute(barcode, genotype);
 
-            writeGenotypeScore(patient, barcode, genotype, genotypeScore);
+            writeAlleleScores(patient, barcode, genotypeScore);
+            writeGenotypeScore(patient, barcode, genotypeScore);
         }
         catch (Exception ex) {
             logException(patient, barcode, ex.getMessage());
@@ -156,14 +176,42 @@ public final class NAPDriver extends JamApp {
         JamLogger.error(fullMessage);
     }
 
-    private void writeGenotypeScore(PatientID patient, TumorBarcode barcode, Genotype genotype, NAPGenotypeScore score) {
+    private void writeAlleleScores(PatientID patient, TumorBarcode barcode, NAPGenotypeScore genotypeScore) {
+        Map<Allele, NAPAlleleScore> alleleScores = genotypeScore.viewAlleleScores();
+
+        for (Map.Entry<Allele, NAPAlleleScore> entry : alleleScores.entrySet())
+            writeAlleleScore(patient, barcode, entry.getKey(), entry.getValue());
+    }
+
+    private void writeAlleleScore(PatientID patient, TumorBarcode barcode, Allele allele, NAPAlleleScore score) {
         LineBuilder builder = LineBuilder.csv();
 
         builder.append(patient.getKey());
         builder.append(barcode.getKey());
+        builder.append(allele.shortKey());
+        builder.append(score.getNeoBoundCount());
+        builder.append(score.getSelfBoundCount());
+        builder.append(score.getNeoTotalConc());
+        builder.append(score.getSelfTotalConc());
+        builder.append(score.getNeoWtMeanStab());
+        builder.append(score.getSelfWtMeanStab());
+        builder.append(score.getBindingThresholdScore());
+        builder.append(score.getConcentrationRatioScore());
+        builder.append(score.getStabilityRatioScore());
+
+        alleleWriter.println(builder.toString());
+        alleleWriter.flush();
+    }
+
+    private void writeGenotypeScore(PatientID patient, TumorBarcode barcode, NAPGenotypeScore score) {
+        LineBuilder builder = LineBuilder.csv();
+
+        builder.append(patient.getKey());
+        builder.append(barcode.getKey());
+        builder.append(score.getTotalMutationCount());
         builder.append(score.getExpressedGeneCount());
         builder.append(score.getMutatedGeneCount());
-        builder.append(score.getTotalMutationCount());
+        builder.append(score.getExpressedMutationCount());
         builder.append(score.getBindingThresholdScore().doubleValue());
         builder.append(score.getConcentrationRatioScore().doubleValue());
         builder.append(score.getStabilityRatioScore().doubleValue());

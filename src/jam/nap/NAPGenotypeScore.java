@@ -17,6 +17,7 @@ public final class NAPGenotypeScore {
 
     private final int mutatedGeneCount;
     private final int expressedGeneCount;
+    private final int expressedMutationCount;
     private final int totalMutationCount;
 
     private final Probability bindScore;
@@ -30,6 +31,7 @@ public final class NAPGenotypeScore {
         this.mutatedGeneCount = concProfile.getMutatedGeneCount();
         this.expressedGeneCount = concProfile.getExpressedGeneCount();
         this.totalMutationCount = concProfile.getTotalMutationCount();
+        this.expressedMutationCount = concProfile.getExpressedMutationCount();
 
         this.bindScore = computeBindScore();
         this.concScore = computeConcScore();
@@ -62,14 +64,25 @@ public final class NAPGenotypeScore {
      *
      * @return the number of mutated genes in the tumor.
      */
+    public int getExpressedMutationCount() {
+        return expressedMutationCount;
+    }
+
+    /**
+     * Returns the number of mutated genes in the tumor.
+     *
+     * @return the number of mutated genes in the tumor.
+     */
     public int getMutatedGeneCount() {
         return mutatedGeneCount;
     }
 
     /**
-     * Returns the total number of mutations in the tumor.
+     * Returns the total number of mutations in the tumor
+     * (expressed or not).
      *
-     * @return the total number of mutations in the tumor.
+     * @return the total number of mutations in the tumor
+     * (expressed or not).
      */
     public int getTotalMutationCount() {
         return totalMutationCount;

@@ -38,6 +38,7 @@ public final class TumorPeptideConcentrationProfile {
 
     private int mutatedGeneCount = 0;
     private int expressedGeneCount = 0;
+    private int expressedMutationCount = 0;
     private int totalMutationCount = 0;
 
     private TumorPeptideConcentrationProfile(TumorBarcode barcode) {
@@ -92,6 +93,17 @@ public final class TumorPeptideConcentrationProfile {
     }
 
     /**
+     * Returns the number of mutations on genes that are expressed in
+     * the tumor.
+     *
+     * @return the number of mutations on genes that are expressed in
+     * the tumor.
+     */
+    public int getExpressedMutationCount() {
+        return expressedMutationCount;
+    }
+
+    /**
      * Returns the number of mutated genes in the tumor.
      *
      * @return the number of mutated genes in the tumor.
@@ -101,9 +113,11 @@ public final class TumorPeptideConcentrationProfile {
     }
 
     /**
-     * Returns the total number of mutations in the tumor.
+     * Returns the total number of mutations in the tumor
+     * (expressed or not).
      *
-     * @return the total number of mutations in the tumor.
+     * @return the total number of mutations in the tumor
+     * (expressed or not).
      */
     public int getTotalMutationCount() {
         return totalMutationCount;
@@ -150,6 +164,8 @@ public final class TumorPeptideConcentrationProfile {
 
         if (SetUtil.countShared(neoPeptides, selfPeptides) > 0)
             throw new IllegalStateException("Overlap between self-peptides and neo-peptides.");
+
+        totalMutationCount = missenseTable.count(barcode);
     }
 
     private void processGene(HugoSymbol symbol) {
@@ -200,7 +216,7 @@ public final class TumorPeptideConcentrationProfile {
                                     List<MissenseRecord> missenseRecords) {
         // This gene is mutated...
         ++mutatedGeneCount;
-        totalMutationCount += missenseRecords.size();
+        expressedMutationCount += missenseRecords.size();
 
         // When multiple mutations are present in the same gene,
         // self-peptides from the mutated protein should only be
