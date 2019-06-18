@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jam.math.DoubleComparator;
+import jam.math.DoubleUtil;
 import jam.math.Probability;
 
 /**
@@ -96,7 +97,7 @@ public final class NAPAlleleScore {
     }
 
     private Probability computeBindScore() {
-        return Probability.valueOf(neoBoundCount / (neoBoundCount + selfBoundCount));
+        return Probability.valueOf(DoubleUtil.ratio(neoBoundCount, neoBoundCount + selfBoundCount));
     }
 
     private Probability computeConcScore() {
