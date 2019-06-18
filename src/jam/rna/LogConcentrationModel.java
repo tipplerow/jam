@@ -27,7 +27,7 @@ public final class LogConcentrationModel extends ConcentrationModel {
      * Name of the system property that specifies the alpha scaling
      * factor.
      */
-    public static final String ALPHA_PROPERTY = "jam.rna.log1P.Alpha";
+    public static final String ALPHA_PROPERTY = "jam.rna.log1P.alpha";
 
     /**
      * Name of the system property that specifies the maximum
