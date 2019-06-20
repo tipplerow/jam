@@ -1,0 +1,15 @@
+########################################################################
+# All adjustable model parameters required to compute neo-antigen
+# presentation (NAP) scores.
+#
+# This file defines a log-transformed concentration model...
+########################################################################
+
+jam.rna.concentrationModelType = LOG
+
+jam.rna.log1P.alpha   =  1.0
+jam.rna.log1P.maxConc = 10.0
+
+jam.nap.alleleReportFile    = log_1.0_allele_score.csv
+jam.nap.genotypeReportFile  = log_1.0_genotype_score.csv
+jam.nap.exceptionReportFile = log_1.0_exceptions.txt

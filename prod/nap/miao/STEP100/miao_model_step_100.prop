@@ -1,0 +1,15 @@
+########################################################################
+# All adjustable model parameters required to compute neo-antigen
+# presentation (NAP) scores.
+#
+# This file defines a step-function concentration model with an RNA
+# expression threshold of 100 FPKM.  Any gene with expression above
+# 100 FPKM is translated into a protein with unit concentration.
+########################################################################
+
+jam.rna.concentrationModelType = STEP
+jam.rna.expressionThreshold    = 100.0
+
+jam.nap.alleleReportFile    = step_100_allele_score.csv
+jam.nap.genotypeReportFile  = step_100_genotype_score.csv
+jam.nap.exceptionReportFile = step_100_exceptions.txt

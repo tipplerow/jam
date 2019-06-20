@@ -1,0 +1,3 @@
+[Pat100:MEL-IPI_Pat100-Tumor-SM-53U2D] Mismatch in the native residue.
+[Pat110:MEL-IPI_Pat110-Tumor-SM-4CU6X] Mismatch in the native residue.
+[Pat123:MEL-IPI_Pat123-Tumor-SM-5X2R1] Mismatch in the native residue.
