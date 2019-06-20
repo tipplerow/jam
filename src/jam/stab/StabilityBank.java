@@ -73,10 +73,16 @@ public final class StabilityBank {
         // Just get the results from the stability cache, to enforce
         // calculation on demand, but ignore the returned records...
         //
-        List<List<Peptide>> subLists = ListUtil.split(peptides, BATCH_SIZE);
+        try {
+            List<List<Peptide>> subLists = ListUtil.split(peptides, BATCH_SIZE);
 
-        for (List<Peptide> subList : subLists)
-            StabilityCache.get(allele, subList);
+            for (List<Peptide> subList : subLists)
+                StabilityCache.get(allele, subList);
+        }
+        catch (Exception ex) {
+            JamLogger.error("Stability calculation failed for allele [%s].", allele);
+            JamLogger.error(ex.getMessage());
+        }
     }
 
     public static void main(String[] args) {
