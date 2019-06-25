@@ -100,7 +100,7 @@ public final class NAPAlleleScorer {
         for (Peptide peptide : peptides) {
             StabilityRecord record = stabilityMap.get(peptide);
 
-            if (record.getPercentile() >= NAPAlleleScore.RANK_THRESHOLD)
+            if (record.getHalfLife() >= NAPAlleleScore.HALF_LIFE_THRESHOLD)
                 ++count;
         }
 

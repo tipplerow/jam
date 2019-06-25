@@ -15,8 +15,8 @@ import jam.math.Probability;
  * <p>This class defines three metrics for neo-antigen presentation
  * using the following components:
  * <ul>
- * <li>{@code B_n}: the number of neo-peptides  bound to MHC with stability above the 2% rank threshold.</li>
- * <li>{@code B_s}: the number of self-peptides bound to MHC with stability above the 2% rank threshold.</li>
+ * <li>{@code B_n}: the number of neo-peptides  bound to MHC with stability above a common threshold.</li>
+ * <li>{@code B_s}: the number of self-peptides bound to MHC with stability above a common threshold.</li>
  * <li>{@code C_n}: the total concentration of expressed and translated neo-peptides.</li>
  * <li>{@code C_s}: the total concentration of expressed and translated self-peptides.</li>
  * <li>{@code H_n}: the concentration-weighted mean half-life for dissociation for neo-peptides.</li>
@@ -112,10 +112,10 @@ public final class NAPAlleleScore {
     }
 
     /**
-     * The minimum stability percentile rank required for a peptide to
-     * be classified as bound to its MHC molecule.
+     * The minimum half-life required for a peptide to be classified
+     * as bound to its MHC molecule (in hours).
      */
-    public static final double RANK_THRESHOLD = 2.0;
+    public static final double HALF_LIFE_THRESHOLD = 1.0;
 
     /**
      * Extracts the binding threshold scores from a collection of
