@@ -43,6 +43,9 @@ public abstract class ExpressionProfile {
         case CANCER_TYPE:
             return CancerTypeProfile.global();
 
+        case INDIVIDUAL:
+            return IndividualProfile.global();
+
         default:
             throw JamException.runtime("Unsupported expression profile type: [%s].", type);
         }

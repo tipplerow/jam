@@ -18,7 +18,7 @@ public enum ExpressionProfileType {
     CANCER_TYPE,
 
     /**
-     * Each member of a cohort has a unique expression profile.
+     * Each tumor has a unique expression profile.
      */
     INDIVIDUAL;
 }
