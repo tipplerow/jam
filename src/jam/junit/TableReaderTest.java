@@ -22,6 +22,18 @@ public class TableReaderTest {
         runTest("data/test/table.tsv");
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testMissingIndex() {
+        TableReader reader = TableReader.open("data/test/table.csv");
+
+        try {
+            reader.requireColumn("Not_Found");
+        }
+        finally {
+            reader.close();
+        }
+    }
+
     private void runTest(String fileName) {
         runNextTest(fileName);
         runIteratorTest(fileName);
@@ -33,10 +45,16 @@ public class TableReaderTest {
         assertEquals(2, reader.ncol());
         assertEquals(List.of("Key", "Value"), reader.columnKeys());
 
+        assertEquals( 0, reader.findColumn("Key"));
+        assertEquals( 1, reader.findColumn("Value"));
+        assertEquals(-1, reader.findColumn("Not_Found"));
+
         assertEquals(List.of("abc", "0"), reader.next());
         assertEquals(List.of("def", "1"), reader.next());
         assertEquals(List.of("ghi", "2"), reader.next());
         assertFalse(reader.hasNext());
+
+        reader.close();
     }
 
     private void runIteratorTest(String fileName) {
@@ -54,6 +72,8 @@ public class TableReaderTest {
         assertEquals(List.of("abc", "0"), lines.get(0));
         assertEquals(List.of("def", "1"), lines.get(1));
         assertEquals(List.of("ghi", "2"), lines.get(2));
+
+        reader.close();
     }
 
     public static void main(String[] args) {
