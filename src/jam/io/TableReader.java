@@ -114,6 +114,37 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
     }
 
     /**
+     * Returns the index of the column with a given key.
+     *
+     * @param columnKey the desired column key.
+     *
+     * @return the index of the column with the specified key, or
+     * {@code -1} if the key was not found in the header line.
+     */
+    public int findColumn(String columnKey) {
+        return columnKeys.indexOf(columnKey);
+    }
+
+    /**
+     * Returns the index of the column with a given key.
+     *
+     * @param columnKey the desired column key.
+     *
+     * @return the index of the column with the specified key.
+     *
+     * @throws RuntimeException unless the key is found in the
+     * header line.
+     */
+    public int requireColumn(String columnKey) {
+        int index = findColumn(columnKey);
+
+        if (index < 0)
+            throw JamException.runtime("Missing column [%s].", columnKey);
+        else
+            return index;
+    }
+
+    /**
      * Returns the number of columns in the table.
      *
      * @return the number of columns in the table.

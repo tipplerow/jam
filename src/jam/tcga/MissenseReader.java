@@ -30,30 +30,11 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
     private MissenseReader(TableReader reader) {
         this.reader = reader;
 
-        this.tumorBarcodeColumn  = findRequiredColumn(TumorBarcode.COLUMN_NAME);
-        this.hugoSymbolColumn    = findRequiredColumn(HugoSymbol.COLUMN_NAME);
-        this.transcriptIDColumn  = findRequiredColumn(EnsemblTranscript.COLUMN_NAME);
-        this.proteinChangeColumn = findRequiredColumn(ProteinChange.COLUMN_NAME);
-        this.cellFractionColumn  = findOptionalColumn(CellFraction.COLUMN_NAME);
-    }
-
-    private int findOptionalColumn(String columnName) {
-        List<String> columnKeys = reader.columnKeys();
-
-        for (int columnIndex = 0; columnIndex < columnKeys.size(); ++columnIndex)
-            if (columnKeys.get(columnIndex).equals(columnName))
-                return columnIndex;
-
-        return -1;
-    }
-
-    private int findRequiredColumn(String columnName) {
-        int columnIndex = findOptionalColumn(columnName);
-
-        if (columnIndex < 0)
-            throw JamException.runtime("Column [%s] not found.", columnName);
-
-        return columnIndex;
+        this.tumorBarcodeColumn  = reader.requireColumn(TumorBarcode.COLUMN_NAME);
+        this.hugoSymbolColumn    = reader.requireColumn(HugoSymbol.COLUMN_NAME);
+        this.transcriptIDColumn  = reader.requireColumn(EnsemblTranscript.COLUMN_NAME);
+        this.proteinChangeColumn = reader.requireColumn(ProteinChange.COLUMN_NAME);
+        this.cellFractionColumn  = reader.findColumn(CellFraction.COLUMN_NAME);
     }
 
     /**
