@@ -71,7 +71,7 @@ final class Parser {
     }
 
     private void parseSubType() {
-        if (substr.length() != 2)
+        if (substr.length() < 2 || substr.length() > 3)
             throw JamException.runtime("Invalid allele format [%s].", original);
 
         subType = Integer.parseInt(substr);

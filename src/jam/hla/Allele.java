@@ -31,7 +31,7 @@ public final class Allele implements Comparable<Allele> {
     }
 
     private static void validateType(int type) {
-        if (type < 1 || type > 99)
+        if (type < 1 || type > 199)
             throw new IllegalArgumentException("Invalid allele type.");
     }
 
