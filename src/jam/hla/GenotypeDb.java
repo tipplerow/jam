@@ -4,48 +4,62 @@ package jam.hla;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import jam.app.JamProperties;
-import jam.app.JamLogger;
-import jam.io.TableReader;
 import jam.lang.JamException;
-import jam.tcga.PatientID;
+import jam.tcga.TumorBarcode;
 import jam.util.RegexUtil;
 
 /**
  * Reads genotypes from a file and stores them in memory indexed by
- * patient key.
+ * tumor barcode.
  *
- * <p><b>File format.</b> The standard file format contains a header
- * line followed by comman-separated lines containing a patient key
- * and a genotype code.  The genotype code lists each allele present
- * in the genotype (duplicates will be present for homozygous alleles)
- * separated by white space.
+ * <p><b>File format.</b> The file must contain a header line with
+ * columns labeled {@code Tumor_Barcode} and {@code Genotype}. The
+ * genotype code should list each allele separated by white space
+ * (duplicates may be present for homozygous alleles).
  *
- * <p>Commas are the stanard delimiter used to separate patient keys
- * and genotypes, but tabs and pipe characters ({@code |}) are also
- * permitted.
+ * <p>Commas are the stanard column delimiter, but tabs and pipe
+ * characters ({@code |}) are also permitted.
  */
 public final class GenotypeDb {
-    private final Map<PatientID, Genotype> genotypes;
+    private final Map<TumorBarcode, Genotype> genotypes;
 
     private static GenotypeDb global = null;
-
-    private static final Pattern ALLELE_ALELE_DELIM = RegexUtil.MULTI_WHITE_SPACE;
-
-    private GenotypeDb() {
-        this.genotypes = new HashMap<PatientID, Genotype>();
-    }
 
     /**
      * Name of the system property that specifies the file containing
      * the global genotype data.
      */
     public static final String FILE_NAME_PROPERTY = "jam.hla.genotypeDbFile";
+
+    /**
+     * Delimiter that separates alleles within the genotype column in
+     * a database file.
+     */
+    public static final Pattern ALLELE_ALELE_DELIM = RegexUtil.MULTI_WHITE_SPACE;
+
+    /**
+     * Name of the column containing tumor barcodes.
+     */
+    public static final String BARCODE_COLUMN_NAME = "Tumor_Barcode";
+
+    /**
+     * Name of the column containing the genotypes.
+     */
+    public static final String GENOTYPE_COLUMN_NAME = "Genotype";
+
+    /**
+     * Creates a new genotype database with fixed genotypes.
+     *
+     * @param genotypes the genotypes indexed by tumor barcode.
+     */
+    public GenotypeDb(Map<TumorBarcode, Genotype> genotypes) {
+        this.genotypes = new HashMap<TumorBarcode, Genotype>(genotypes);
+    }
 
     /**
      * Returns the global genotype database defined via system
@@ -70,31 +84,26 @@ public final class GenotypeDb {
     }
 
     /**
-     * Loads patient genotypes from a file in standard format.
+     * Loads tumor genotypes from a file in standard format.
      *
      * @param file the genotype file to read.
      *
-     * @return a genotype database containing the patient genotypes
+     * @return a genotype database containing the tumor genotypes
      * mapped to their unique identifier.
      *
      * @throws RuntimeException unless the file name contains a valid
      * genotype file in standard format.
      */
     public static GenotypeDb load(File file) {
-        GenotypeDb db = new GenotypeDb();
-
-        TableReader reader = openReader(file);
-        db.load(reader);
-
-        return db;
+        return GenotypeDbLoader.load(file);
     }
 
     /**
-     * Loads patient genotypes from a file in standard format.
+     * Loads tumor genotypes from a file in standard format.
      *
      * @param fileName the name of the genotype file to read.
      *
-     * @return a genotype database containing the patient genotypes
+     * @return a genotype database containing the tumor genotypes
      * mapped to their unique identifier.
      *
      * @throws RuntimeException unless the file name contains a valid
@@ -104,78 +113,47 @@ public final class GenotypeDb {
         return load(new File(fileName));
     }
 
-    private static TableReader openReader(File file) {
-        TableReader reader = TableReader.open(file);
-
-        if (reader.columnKeys().size() != 2)
-            throw JamException.runtime("Invalid header in genotype file: [%s].", file);
-
-        return reader;
-    }
-
-    private void load(TableReader reader) {
-        try {
-            for (List<String> columns : reader)
-                parseColumns(columns);
-        }
-        finally {
-            reader.close();
-        }
-
-        JamLogger.info("GenotypeDb: Loaded [%d] genoypes.", size());
-    }
-
-    private void parseColumns(List<String> columns) {
-        assert columns.size() == 2;
-
-        PatientID patientID = PatientID.instance(columns.get(0));
-        Genotype  genotype  = Genotype.parse(columns.get(1), ALLELE_ALELE_DELIM);
-
-        if (genotypes.containsKey(patientID))
-            throw JamException.runtime("Duplicate patient ID: [%s]", patientID.getKey());
-
-        genotypes.put(patientID, genotype);
-    }
-
     /**
-     * Identifies patients with genotypes in this database.
+     * Identifies tumors with genotypes in this database.
      *
-     * @param patientID a patient key of interest.
+     * @param barcode a tumor barcode of interest.
      *
      * @return {@code true} iff this database contains a genotype for
-     * the specified patient.
+     * the specified tumor.
      */
-    public boolean contains(PatientID patientID) {
-        return genotypes.containsKey(patientID);
+    public boolean contains(TumorBarcode barcode) {
+        return genotypes.containsKey(barcode);
     }
 
     /**
-     * Returns the genotype for a given patient.
+     * Returns the genotype for a given tumor.
      *
-     * @param patientID a patient key of interest.
+     * @param barcode a tumor barcode of interest.
      *
-     * @return the genotype for the specified patient, or {@code null}
-     * if the patient is not in this database.
+     * @return the genotype for the specified tumor, or {@code null}
+     * if the tumor is not in this database.
      */
-    public Genotype lookup(PatientID patientID) {
-        return genotypes.get(patientID);
+    public Genotype lookup(TumorBarcode barcode) {
+        return genotypes.get(barcode);
     }
 
     /**
-     * Returns the genotype for a given patient.
+     * Returns the genotype for a given tumor.
      *
-     * @param patientID a patient key of interest.
+     * @param barcode a tumor barcode of interest.
      *
-     * @return the genotype for the specified patient, or {@code null}
-     * if the patient is not in this database.
+     * @return the genotype for the specified tumor.
+     *
+     * @throws RuntimeException unless this database contains the
+     * specified tumor.
      */
-    public Genotype require(PatientID patientID) {
-        Genotype genotype = lookup(patientID);
+    public Genotype require(TumorBarcode barcode) {
+        Genotype genotype = lookup(barcode);
 
         if (genotype != null)
             return genotype;
         else
-            throw JamException.runtime("No genotype for patient [%s].", patientID.getKey());
+            throw JamException.runtime("No genotype for tumor [%s].", barcode.getKey());
     }
 
     /**
@@ -188,12 +166,12 @@ public final class GenotypeDb {
     }
 
     /**
-     * Returns a read-only view of the patients in this database.
+     * Returns a read-only view of the tumors in this database.
      *
-     * @return an unmodifiable set containing all patient keys from
-     * this database.
+     * @return an unmodifiable set containing all tumor barcodes
+     * from this database.
      */
-    public Set<PatientID> viewPatients() {
+    public Set<TumorBarcode> viewBarcodes() {
         return Collections.unmodifiableSet(genotypes.keySet());
     }
 }

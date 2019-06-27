@@ -144,12 +144,12 @@ public final class NAPDriver extends JamApp {
     }
 
     private void processBarcode(PatientID patient, TumorBarcode barcode) {
-        Genotype genotype = GenotypeDb.global().lookup(patient);
+        Genotype genotype = GenotypeDb.global().lookup(barcode);
 
         if (genotype != null)
             processGenotype(patient, barcode, genotype);
         else
-            logException(patient, barcode, "No genotype mapped to patient.");
+            logException(patient, barcode, "No genotype mapped to tumor.");
     }
 
     private void processGenotype(PatientID patient, TumorBarcode barcode, Genotype genotype) {
