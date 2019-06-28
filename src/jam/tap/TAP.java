@@ -152,7 +152,7 @@ public final class TAP {
      * nine or greater.
      */
     public boolean isTransported(Peptide peptide) {
-        return score(peptide) <= threshold;
+        return peptide.isNative() && score(peptide) <= threshold;
     }
 
     /**
