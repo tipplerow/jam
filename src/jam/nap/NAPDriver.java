@@ -26,6 +26,7 @@ import jam.tcga.TumorPatientTable;
  */
 public final class NAPDriver extends JamApp {
     private final String patientFile;
+    private final boolean stopOnError;
 
     private LineReader patientReader;
     private PrintWriter alleleWriter;
@@ -34,7 +35,9 @@ public final class NAPDriver extends JamApp {
 
     private NAPDriver(String patientFile, String[] propertyFiles) {
         super(propertyFiles);
+
         this.patientFile = patientFile;
+        this.stopOnError = resolveStopOnError();
     }
 
     /**
@@ -54,6 +57,14 @@ public final class NAPDriver extends JamApp {
      * exception report.
      */ 
     public static final String EXCEPTION_REPORT_FILE_PROPERTY = "jam.nap.exceptionReportFile";
+
+    /**
+     * Name of the system property that specifies whether to throw an
+     * exception and exit the application if an error occurs while
+     * processing any tumor.  The default is to log the error in the
+     * exception report and continue to the next tumor.
+     */
+    public static final String STOP_ON_ERROR_PROPERTY = "jam.nap.stopOnError";
 
     private void run() {
         openIO();
@@ -90,6 +101,10 @@ public final class NAPDriver extends JamApp {
 
     private static String resolveExceptionFile() {
         return JamProperties.getRequired(EXCEPTION_REPORT_FILE_PROPERTY);
+    }
+
+    private static boolean resolveStopOnError() {
+        return JamProperties.getOptionalBoolean(STOP_ON_ERROR_PROPERTY, false);
     }
 
     private void writeAlleleHeader() {
@@ -164,6 +179,9 @@ public final class NAPDriver extends JamApp {
         }
         catch (Exception ex) {
             logException(patient, barcode, ex.getMessage());
+
+            if (stopOnError)
+                throw ex;
         }
     }
 
