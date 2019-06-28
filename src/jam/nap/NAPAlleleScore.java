@@ -97,7 +97,13 @@ public final class NAPAlleleScore {
     }
 
     private Probability computeBindScore() {
-        return Probability.valueOf(DoubleUtil.ratio(neoBoundCount, neoBoundCount + selfBoundCount));
+        int numer = neoBoundCount;
+        int denom = neoBoundCount + selfBoundCount;
+
+        if (denom > 0)
+            return Probability.valueOf(DoubleUtil.ratio(numer, denom));
+        else
+            return Probability.ZERO;
     }
 
     private Probability computeConcScore() {
