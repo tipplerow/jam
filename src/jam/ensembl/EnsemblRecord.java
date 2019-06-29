@@ -3,7 +3,6 @@ package jam.ensembl;
 
 import java.util.Collection;
 
-import jam.app.JamLogger;
 import jam.fasta.FastaRecord;
 import jam.hugo.HugoMaster;
 import jam.hugo.HugoSymbol;
@@ -57,10 +56,8 @@ public final class EnsemblRecord {
 
         if (symbols.size() == 1)
             return CollectionUtil.peek(symbols);
-        else {
-            JamLogger.warn("Unmapped transcript: [%s].", transcript.getKey());
+        else
             return null;
-        }
     }
 
     public HugoSymbol getHugoSymbol() {
