@@ -107,14 +107,26 @@ public final class NAPAlleleScore {
     }
 
     private Probability computeConcScore() {
-        return Probability.valueOf(neoTotalConc / (neoTotalConc + selfTotalConc));
+        double numer = neoTotalConc;
+        double denom = neoTotalConc + selfTotalConc;
+
+        if (denom > 1.0E-12)
+            return Probability.valueOf(numer / denom);
+        else
+            return Probability.ZERO;
     }
 
     private Probability computeStabScore() {
         double  neoStab =  neoTotalConc *  neoWtMeanStab;
         double selfStab = selfTotalConc * selfWtMeanStab;
 
-        return Probability.valueOf(neoStab / (neoStab + selfStab));
+        double numer = neoStab;
+        double denom = neoStab + selfStab;
+
+        if (denom > 1.0E-12)
+            return Probability.valueOf(numer / denom);
+        else
+            return Probability.ZERO;
     }
 
     /**
