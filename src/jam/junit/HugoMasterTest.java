@@ -45,6 +45,12 @@ public class HugoMasterTest {
         assertTrue(master.getTranscripts(A1CF).contains(EnsemblTranscript.instance("ENST00000282641")));
         assertTrue(master.getTranscripts(A1CF).contains(EnsemblTranscript.instance("ENST00000395495")));
         assertTrue(master.getTranscripts(A2M).contains(EnsemblTranscript.instance("ENST00000543436")));
+
+        assertEquals(A1BG, master.getUniqueHugo(EnsemblGene.instance("ENSG00000121410")));
+        assertEquals(A2M,  master.getUniqueHugo(EnsemblGene.instance("ENSG00000175899")));
+
+        assertEquals(A1BG, master.getUniqueHugo(EnsemblTranscript.instance("ENST00000596924")));
+        assertEquals(A2M,  master.getUniqueHugo(EnsemblTranscript.instance("ENST00000543436")));
     }
 
     public static void main(String[] args) {

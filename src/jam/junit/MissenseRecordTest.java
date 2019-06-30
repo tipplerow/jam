@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 public class MissenseRecordTest {
     @Test public void testApply() {
         TumorBarcode      barcode    = TumorBarcode.instance("tumor");
-        HugoSymbol        symbol     = HugoSymbol.instance("TSEN34");
         EnsemblTranscript transcript = EnsemblTranscript.instance("ENST00000614734");
         CellFraction      CCF        = CellFraction.UNIT;
 
@@ -25,9 +24,9 @@ public class MissenseRecordTest {
         ProteinChange change1 = ProteinChange.parse("R2K");
         ProteinChange change2 = ProteinChange.parse("R3G");
 
-        MissenseRecord record0 = new MissenseRecord(barcode, symbol, transcript, change0, CCF);
-        MissenseRecord record1 = new MissenseRecord(barcode, symbol, transcript, change1, CCF);
-        MissenseRecord record2 = new MissenseRecord(barcode, symbol, transcript, change2, CCF);
+        MissenseRecord record0 = MissenseRecord.create(barcode, transcript, change0, CCF);
+        MissenseRecord record1 = MissenseRecord.create(barcode, transcript, change1, CCF);
+        MissenseRecord record2 = MissenseRecord.create(barcode, transcript, change2, CCF);
 
         Peptide expected =
             Peptide.parse("IKGMLVVEVANGRSLVWGAEAVQALRERLGVGGRTVGALPRGPRQNSRLGLPLLLMPEEA" +
@@ -42,13 +41,14 @@ public class MissenseRecordTest {
 
     @Test public void testGermlineProtein() {
         TumorBarcode      barcode    = TumorBarcode.instance("tumor");
-        HugoSymbol        symbol     = HugoSymbol.instance("TSEN34");
         EnsemblTranscript transcript = EnsemblTranscript.instance("ENST00000614734");
         ProteinChange     change     = ProteinChange.parse("E8I");
         CellFraction      CCF        = CellFraction.UNIT;
 
         MissenseRecord record =
-            new MissenseRecord(barcode, symbol, transcript, change, CCF);
+            MissenseRecord.create(barcode, transcript, change, CCF);
+
+        assertEquals(HugoSymbol.instance("TSEN34"), record.getHugoSymbol());
 
         Peptide expected =
             Peptide.parse("MRRMLVVEVANGRSLVWGAEAVQALRERLGVGGRTVGALPRGPRQNSRLGLPLLLMPEEA" +

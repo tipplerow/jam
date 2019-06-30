@@ -41,10 +41,10 @@ public class MissenseReaderTest extends NumericTestBase {
 
     @Test public void testMiao() {
         List<MissenseRecord> records = MissenseReader.read(MIAO_FILE);
-        assertEquals(9, records.size());
+        assertEquals(8, records.size());
 
         assertRecord(records.get(0), "AC-DFCI_AC_PD1-1-Tumor-SM-9LRI9", "ASPM", "ENST00000367409", "S162F", 0.1);
-        assertRecord(records.get(8), "Y2087_T", "ALMS1", "ENST00000264448", "G3501E", 0.9);
+        assertRecord(records.get(7), "Y2087_T", "TTC39B", "ENST00000512701", "A47S", 0.8);
     }                     
 
     public static void main(String[] args) {

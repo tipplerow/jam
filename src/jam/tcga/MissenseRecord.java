@@ -2,7 +2,6 @@
 package jam.tcga;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,40 +27,57 @@ public final class MissenseRecord {
     private final ProteinChange     proteinChange;
     private final CellFraction      cellFraction;
 
+    private MissenseRecord(TumorBarcode      tumorBarcode,
+                           HugoSymbol        hugoSymbol,
+                           EnsemblTranscript transcriptID,
+                           ProteinChange     proteinChange,
+                           CellFraction      cellFraction) {
+        this.tumorBarcode  = tumorBarcode;
+        this.hugoSymbol    = hugoSymbol;
+        this.transcriptID  = transcriptID;
+        this.proteinChange = proteinChange;
+        this.cellFraction  = cellFraction;
+    }
+
     /**
      * Creates a new missense mutation record.
      *
-     * @param tumorBarcode the tumor in which the mutation occurred.
+     * <p>The HUGO symbol of the mutated protein is derived from the
+     * Ensembl transcript ID using the global HUGO master table.  If
+     * the transcript is not mapped, this method returns {@code null}.
      *
-     * @param hugoSymbol the HUGO symbol of the mutated protein.
+     * @param tumorBarcode the tumor in which the mutation occurred.
      *
      * @param transcriptID the Ensembl identifier for the mutated RNA
      * transcript.
      *
      * @param proteinChange the description of the single-residue change.
      *
-     * @param cellFraction the fraction of cancer cells carrying the mutation.
+     * @param cellFraction the fraction of cancer cells carrying the
+     * mutation.
+     *
+     * @return the corresponding missense record, with the HUGO symbol
+     * derived from the Ensembl transcript, or {@code null} if the
+     * transcript is not mapped in the global HUGO master table.
      */
-    public MissenseRecord(TumorBarcode      tumorBarcode,
-                          HugoSymbol        hugoSymbol,
-                          EnsemblTranscript transcriptID,
-                          ProteinChange     proteinChange,
-                          CellFraction      cellFraction) {
-        this.tumorBarcode  = tumorBarcode;
-        this.hugoSymbol    = hugoSymbol;
-        this.transcriptID  = transcriptID;
-        this.proteinChange = proteinChange;
-        this.cellFraction  = cellFraction;
+    public static MissenseRecord create(TumorBarcode      tumorBarcode,
+                                        EnsemblTranscript transcriptID,
+                                        ProteinChange     proteinChange,
+                                        CellFraction      cellFraction) {
+        HugoSymbol hugoSymbol =
+            HugoMaster.global().getUniqueHugo(transcriptID);
 
-        validate();
-    }
-
-    private void validate() {
-        Collection<HugoSymbol> symbols =
-            HugoMaster.global().getHugo(transcriptID);
-
-        if (!symbols.isEmpty() && !symbols.contains(hugoSymbol))
-            JamLogger.warn("Inconsistent HUGO symbol: [%s, %s].", hugoSymbol, transcriptID);
+        if (hugoSymbol != null) {
+            return new MissenseRecord(tumorBarcode,
+                                      hugoSymbol,
+                                      transcriptID,
+                                      proteinChange,
+                                      cellFraction);
+        }
+        else {
+            JamLogger.warn("Transcript [%s] is not mapped to a HUGO symbol.", transcriptID);
+            return null;
+        }
     }
 
     /**

@@ -16,6 +16,7 @@ import jam.ensembl.EnsemblGene;
 import jam.ensembl.EnsemblTranscript;
 import jam.io.TableReader;
 import jam.lang.JamException;
+import jam.util.CollectionUtil;
 
 /**
  * Maintains mappings between HUGO symbols, genes, and transcripts.
@@ -213,6 +214,38 @@ public final class HugoMaster {
      */
     public Collection<EnsemblTranscript> getTranscripts(HugoSymbol hugo) {
         return Collections.unmodifiableCollection(hugoToTranscriptMap.get(hugo));
+    }
+
+    /**
+     * Returns the single HUGO symbol associated with a given gene.
+     *
+     * @param gene the gene of interest.
+     *
+     * @return the single HUGO symbol mapped to the specified gene, or
+     * {@code null} if there is not a unique mapping.
+     */
+    public HugoSymbol getUniqueHugo(EnsemblGene gene) {
+        return getUnique(geneToHugoMap.get(gene));
+    }
+
+    /**
+     * Returns the single HUGO symbol associated with a given
+     * transcript.
+     *
+     * @param transcript the transcript of interest.
+     *
+     * @return the single HUGO symbol mapped to the specified
+     * transcript, {@code null} if there is no unique mapping.
+     */
+    public HugoSymbol getUniqueHugo(EnsemblTranscript transcript) {
+        return getUnique(transcriptToHugoMap.get(transcript));
+    }
+
+    private static HugoSymbol getUnique(Collection<HugoSymbol> symbols) {
+        if (symbols.size() == 1)
+            return CollectionUtil.peek(symbols);
+        else
+            return null;
     }
 
     /**

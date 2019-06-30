@@ -17,7 +17,6 @@ public class MissenseTableTest {
     private static final TumorBarcode barcode2 = TumorBarcode.instance("Y2087_T");
     private static final TumorBarcode barcode3 = TumorBarcode.instance("NotFound");
 
-    private static final HugoSymbol ALMS1  = HugoSymbol.instance("ALMS1");
     private static final HugoSymbol ASPM   = HugoSymbol.instance("ASPM");
     private static final HugoSymbol PRRC1  = HugoSymbol.instance("PRRC1");
     private static final HugoSymbol RINT1  = HugoSymbol.instance("RINT1");
@@ -37,16 +36,16 @@ public class MissenseTableTest {
         assertFalse(TABLE.contains(barcode3));
 
         assertTrue(TABLE.contains(barcode1, ASPM));
-        assertFalse(TABLE.contains(barcode1, ALMS1));
+        assertFalse(TABLE.contains(barcode1, TTC39B));
 
         assertFalse(TABLE.contains(barcode2, ASPM));
-        assertTrue(TABLE.contains(barcode2, ALMS1));
+        assertTrue(TABLE.contains(barcode2, TTC39B));
 
         assertFalse(TABLE.contains(barcode3, ASPM));
-        assertFalse(TABLE.contains(barcode3, ALMS1));
+        assertFalse(TABLE.contains(barcode3, TTC39B));
 
         assertEquals(6, TABLE.count(barcode1));
-        assertEquals(3, TABLE.count(barcode2));
+        assertEquals(2, TABLE.count(barcode2));
         assertEquals(0, TABLE.count(barcode3));
 
         assertEquals(1, TABLE.count(barcode1, ASPM));
@@ -69,13 +68,11 @@ public class MissenseTableTest {
         assertRecord(hugoMap.get(RXFP3).get(0), barcode1, RXFP3, "ENST00000330120", "D296N");
 
         hugoMap = TABLE.lookup(barcode2);
-        assertEquals(3, hugoMap.size());
+        assertEquals(2, hugoMap.size());
 
-        assertEquals(1, hugoMap.get(ALMS1).size());
         assertEquals(1, hugoMap.get(PRRC1).size());
         assertEquals(1, hugoMap.get(TTC39B).size());
 
-        assertRecord(hugoMap.get(ALMS1).get(0),  barcode2, ALMS1,  "ENST00000264448", "G3501E");
         assertRecord(hugoMap.get(PRRC1).get(0),  barcode2, PRRC1,  "ENST00000442138", "A208P");
         assertRecord(hugoMap.get(TTC39B).get(0), barcode2, TTC39B, "ENST00000512701", "A47S");
 
