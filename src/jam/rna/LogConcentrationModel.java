@@ -10,12 +10,12 @@ import jam.lang.JamException;
  * The protein concentration is equal to:
  *
  * <pre>
- *     C = min[log(1 + alpha * FPKM), Cmax],
+ *     C = min[log(1 + FPKM / alpha), Cmax],
  * </pre>
  *
  * where {@code FPKM} is the RNA transcript expression level,
- * {@code alpha} is a positive scale parameter, {@code Cmax}
- * is the maximum (log-transformed) concentration.
+ * {@code alpha} is a positive scale parameter (in FPKM units),
+ * {@code Cmax} is the maximum (log-transformed) concentration.
  */
 public final class LogConcentrationModel extends ConcentrationModel {
     private final double alpha;
@@ -82,6 +82,6 @@ public final class LogConcentrationModel extends ConcentrationModel {
         if (expression.doubleValue() < THRESHOLD)
             return Concentration.ZERO;
         else
-            return Concentration.valueOf(Math.min(maxConc, Math.log(1.0 + alpha * expression.doubleValue())));
+            return Concentration.valueOf(Math.min(maxConc, Math.log(1.0 + expression.doubleValue() / alpha)));
     }
 }
