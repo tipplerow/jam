@@ -167,7 +167,7 @@ public final class NAPDriver extends JamApp {
     }
 
     private void processGenotype(PatientID patient, TumorBarcode barcode, Genotype genotype) {
-        JamLogger.info("Processing [%s:%s]...", patient.getKey(), barcode.getKey());
+        JamLogger.info("Processing sample [%s:%s]...", patient.getKey(), barcode.getKey());
 
         try {
             NAPGenotypeScore genotypeScore =

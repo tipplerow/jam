@@ -65,10 +65,10 @@ public final class ProteinChange {
         int residueIndex = getResidueIndex();
 
         if (residueIndex >= residues.size())
-            throw new IllegalArgumentException("Mutation position lies outside the peptide.");
+            throw JamException.runtime("Mutation position lies outside the peptide.");
 
         if (!residues.get(residueIndex).equals(getNative()))
-            throw new IllegalArgumentException("Mismatch in the native residue.");
+            throw JamException.runtime("Mismatch in the native residue [%s].", toString());
 
         residues.set(residueIndex, getMutated());
     }
