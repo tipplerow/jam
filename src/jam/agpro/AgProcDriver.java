@@ -97,7 +97,7 @@ public final class AgProcDriver {
 
     private Collection<String> generatePeptides(String symbol) {
         Collection<String> peptides = new TreeSet<String>();
-        Collection<EnsemblRecord> records = EnsemblDb.global().get(HugoSymbol.instance(symbol));
+        Collection<EnsemblRecord> records = EnsemblDb.reference().get(HugoSymbol.instance(symbol));
 
         for (EnsemblRecord record : records)
             peptides.addAll(generatePeptides(record));

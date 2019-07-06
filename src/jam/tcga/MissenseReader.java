@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import jam.ensembl.EnsemblTranscript;
+import jam.hugo.HugoSymbol;
 import jam.io.TableReader;
 import jam.lang.JamException;
 import jam.peptide.ProteinChange;
@@ -21,6 +22,7 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
     private final TableReader reader;
 
     private final int tumorBarcodeColumn;
+    private final int hugoSymbolColumn;
     private final int transcriptIDColumn;
     private final int proteinChangeColumn;
     private final int cellFractionColumn;
@@ -29,6 +31,7 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
         this.reader = reader;
 
         this.tumorBarcodeColumn  = reader.requireColumn(TumorBarcode.COLUMN_NAME);
+        this.hugoSymbolColumn    = reader.findColumn(HugoSymbol.COLUMN_NAME);
         this.transcriptIDColumn  = reader.requireColumn(EnsemblTranscript.COLUMN_NAME);
         this.proteinChangeColumn = reader.requireColumn(ProteinChange.COLUMN_NAME);
         this.cellFractionColumn  = reader.findColumn(CellFraction.COLUMN_NAME);
@@ -127,11 +130,13 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
 
     private MissenseRecord createRecord(List<String> fields) {
         TumorBarcode      tumorBarcode  = parseTumorBarcode(fields);
+        HugoSymbol        hugoSymbol    = parseHugoSymbol(fields);
         EnsemblTranscript transcriptID  = parseTranscriptID(fields);
         ProteinChange     proteinChange = parseProteinChange(fields);
         CellFraction      cellFraction  = parseCellFraction(fields);
 
         return MissenseRecord.create(tumorBarcode,
+                                     hugoSymbol,
                                      transcriptID,
                                      proteinChange,
                                      cellFraction);
@@ -139,6 +144,13 @@ public final class MissenseReader implements Closeable, Iterable<MissenseRecord>
 
     private TumorBarcode parseTumorBarcode(List<String> fields) {
         return TumorBarcode.instance(fields.get(tumorBarcodeColumn));
+    }
+
+    private HugoSymbol parseHugoSymbol(List<String> fields) {
+        if (hugoSymbolColumn < 0)
+            return MissenseRecord.resolveHugoSymbol(parseTranscriptID(fields));
+        else
+            return HugoSymbol.instance(fields.get(hugoSymbolColumn));
     }
 
     private EnsemblTranscript parseTranscriptID(List<String> fields) {

@@ -4,7 +4,6 @@ package jam.ensembl;
 import java.util.Collection;
 
 import jam.fasta.FastaRecord;
-import jam.hugo.HugoMaster;
 import jam.hugo.HugoSymbol;
 import jam.peptide.Peptide;
 import jam.util.CollectionUtil;
@@ -35,29 +34,14 @@ public final class EnsemblRecord {
         String fastaKey = fastaRecord.getKey();
         String headerLine = fastaRecord.getComment();
 
+        HugoSymbol hugoKey = EnsemblHugo.parseHeader(headerLine);
         EnsemblGene geneKey = EnsemblGene.parseHeader(headerLine);
         EnsemblProtein proteinKey = EnsemblProtein.parseKey(fastaKey);
         EnsemblTranscript transcriptKey = EnsemblTranscript.parseHeader(headerLine);
         TranscriptBiotype transcriptBiotype = TranscriptBiotype.parseHeader(headerLine);
 
-        HugoSymbol hugoKey = parseHugoSymbol(headerLine, transcriptKey);
-
         return new EnsemblRecord(fastaRecord.getPeptide(), hugoKey, geneKey,
                                  proteinKey, transcriptKey, transcriptBiotype);
-    }
-
-    private static HugoSymbol parseHugoSymbol(String headerLine, EnsemblTranscript transcript) {
-        HugoSymbol symbol = EnsemblHugo.parseHeader(headerLine);
-
-        if (symbol != null)
-            return symbol;
-
-        Collection<HugoSymbol> symbols = HugoMaster.global().getHugo(transcript);
-
-        if (symbols.size() == 1)
-            return CollectionUtil.peek(symbols);
-        else
-            return null;
     }
 
     public HugoSymbol getHugoSymbol() {

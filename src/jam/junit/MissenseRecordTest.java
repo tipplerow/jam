@@ -15,6 +15,10 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class MissenseRecordTest {
+    static {
+        System.setProperty(MissenseRecord.ASSEMBLY_PROPERTY, "GRCh38");
+    }
+
     @Test public void testApply() {
         TumorBarcode      barcode    = TumorBarcode.instance("tumor");
         EnsemblTranscript transcript = EnsemblTranscript.instance("ENST00000614734");

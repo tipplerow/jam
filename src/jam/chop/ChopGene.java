@@ -68,7 +68,7 @@ public final class ChopGene {
 
     private Collection<String> generatePeptides(String gene) {
         Collection<String> peptides = new TreeSet<String>();
-        Collection<EnsemblRecord> records = EnsemblDb.global().get(HugoSymbol.instance(gene));
+        Collection<EnsemblRecord> records = EnsemblDb.reference().get(HugoSymbol.instance(gene));
 
         for (EnsemblRecord record : records)
             peptides.addAll(generatePeptides(record));

@@ -61,8 +61,7 @@ public final class NAPDriver extends JamApp {
     /**
      * Name of the system property that specifies whether to throw an
      * exception and exit the application if an error occurs while
-     * processing any tumor.  The default is to log the error in the
-     * exception report and continue to the next tumor.
+     * processing any tumor.  The default is {@code true}.
      */
     public static final String STOP_ON_ERROR_PROPERTY = "jam.nap.stopOnError";
 
@@ -104,7 +103,7 @@ public final class NAPDriver extends JamApp {
     }
 
     private static boolean resolveStopOnError() {
-        return JamProperties.getOptionalBoolean(STOP_ON_ERROR_PROPERTY, false);
+        return JamProperties.getOptionalBoolean(STOP_ON_ERROR_PROPERTY, true);
     }
 
     private void writeAlleleHeader() {

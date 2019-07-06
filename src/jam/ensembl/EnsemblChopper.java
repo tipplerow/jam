@@ -48,7 +48,7 @@ public final class EnsemblChopper {
     }
 
     private void processGene(EnsemblGene gene) {
-        Collection<EnsemblRecord> records = EnsemblDb.global().get(gene);
+        Collection<EnsemblRecord> records = EnsemblDb.reference().get(gene);
 
         for (EnsemblRecord record : records)
             processPeptide(record.getPeptide());

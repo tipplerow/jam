@@ -6,10 +6,12 @@ import java.util.Collections;
 import java.util.List;
 
 import jam.app.JamLogger;
+import jam.app.JamProperties;
+import jam.ensembl.EnsemblAssembly;
 import jam.ensembl.EnsemblDb;
+import jam.ensembl.EnsemblGene;
 import jam.ensembl.EnsemblRecord;
 import jam.ensembl.EnsemblTranscript;
-import jam.hugo.HugoMaster;
 import jam.hugo.HugoSymbol;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
@@ -27,6 +29,8 @@ public final class MissenseRecord {
     private final ProteinChange     proteinChange;
     private final CellFraction      cellFraction;
 
+    private static EnsemblAssembly assembly = null;
+
     private MissenseRecord(TumorBarcode      tumorBarcode,
                            HugoSymbol        hugoSymbol,
                            EnsemblTranscript transcriptID,
@@ -40,11 +44,35 @@ public final class MissenseRecord {
     }
 
     /**
+     * Name of the system property that defines the genome assembly
+     * from which the transcripts are derived.
+     */
+    public static final String ASSEMBLY_PROPERTY = "jam.tcga.missenseAssembly";
+
+    /**
+     * Returns the governing Ensembl assembly from which transcripts
+     * are derived.
+     *
+     * @return the governing Ensembl assembly from which transcripts
+     * are derived.
+     */
+    public static EnsemblAssembly assembly() {
+        if (assembly == null)
+            assembly = resolveAssembly();
+
+        return assembly;
+    }
+
+    private static EnsemblAssembly resolveAssembly() {
+        return JamProperties.getRequiredEnum(ASSEMBLY_PROPERTY, EnsemblAssembly.class);
+    }
+
+    /**
      * Creates a new missense mutation record.
      *
-     * <p>The HUGO symbol of the mutated protein is derived from the
-     * Ensembl transcript ID using the global HUGO master table.  If
-     * the transcript is not mapped, this method returns {@code null}.
+     * <p>The HUGO symbol is resolved by mapping the transcript to its
+     * gene in the governing genome assembly, then mapping the gene to
+     * a HUGO symbol using the reference Ensembl database.
      *
      * @param tumorBarcode the tumor in which the mutation occurred.
      *
@@ -56,28 +84,77 @@ public final class MissenseRecord {
      * @param cellFraction the fraction of cancer cells carrying the
      * mutation.
      *
-     * @return the corresponding missense record, with the HUGO symbol
-     * derived from the Ensembl transcript, or {@code null} if the
-     * transcript is not mapped in the global HUGO master table.
+     * @return the corresponding missense record.
      */
     public static MissenseRecord create(TumorBarcode      tumorBarcode,
                                         EnsemblTranscript transcriptID,
                                         ProteinChange     proteinChange,
                                         CellFraction      cellFraction) {
-        HugoSymbol hugoSymbol =
-            HugoMaster.global().getUniqueHugo(transcriptID);
+        return new MissenseRecord(tumorBarcode,
+                                  resolveHugoSymbol(transcriptID),
+                                  transcriptID,
+                                  proteinChange,
+                                  cellFraction);
+    }
 
-        if (hugoSymbol != null) {
-            return new MissenseRecord(tumorBarcode,
-                                      hugoSymbol,
-                                      transcriptID,
-                                      proteinChange,
-                                      cellFraction);
-        }
-        else {
-            JamLogger.warn("Transcript [%s] is not mapped to a HUGO symbol.", transcriptID);
-            return null;
-        }
+    /**
+     * Creates a new missense mutation record.
+     *
+     * @param tumorBarcode the tumor in which the mutation occurred.
+     *
+     * @param hugoSymbol the HUGO symbol for the mutated gene.
+     *
+     * @param transcriptID the Ensembl identifier for the mutated RNA
+     * transcript.
+     *
+     * @param proteinChange the description of the single-residue change.
+     *
+     * @param cellFraction the fraction of cancer cells carrying the
+     * mutation.
+     *
+     * @return the corresponding missense record.
+     */
+    public static MissenseRecord create(TumorBarcode      tumorBarcode,
+                                        HugoSymbol        hugoSymbol,
+                                        EnsemblTranscript transcriptID,
+                                        ProteinChange     proteinChange,
+                                        CellFraction      cellFraction) {
+        return new MissenseRecord(tumorBarcode,
+                                  hugoSymbol,
+                                  transcriptID,
+                                  proteinChange,
+                                  cellFraction);
+    }
+
+    /**
+     * Maps a transcript identifier to a HUGO symbol.
+     *
+     * <p>The HUGO symbol is resolved by mapping the transcript to its
+     * gene in the governing genome assembly, then mapping the gene to
+     * a HUGO symbol using the reference Ensembl database.
+     *
+     * @param transcriptID the transcript to map.
+     *
+     * @return the HUGO symbol for the corresponding gene.
+     */
+    public static HugoSymbol resolveHugoSymbol(EnsemblTranscript transcriptID) {
+        //
+        // Must use the missense assembly to look up the gene
+        // corresponding to the transcript, then the reference
+        // assembly to map the gene to a HUGO symbol...
+        //
+        EnsemblRecord ensemblRecord = assembly().db().get(transcriptID);
+
+        if (ensemblRecord == null)
+            throw JamException.runtime("Transcript [%s] is not in the genome assembly [%s].", transcriptID, assembly());
+
+        EnsemblGene ensemblGene = ensemblRecord.getEnsemblGene();
+        HugoSymbol  hugoSymbol  = EnsemblDb.reference().getHugo(ensemblGene);
+
+        if (hugoSymbol != null)
+            return hugoSymbol;
+        else
+            throw JamException.runtime("Transcript/gene [%s/%s] is not mapped to a HUGO symbol.", transcriptID, ensemblGene);
     }
 
     /**
@@ -132,7 +209,7 @@ public final class MissenseRecord {
 
     /**
      * Applies the mutations encoded in a list of records to the
-     * germline protein contained in the global Ensembl database.
+     * germline protein contained in the governing Ensembl database.
      *
      * @param records the records to apply.
      *
@@ -144,18 +221,19 @@ public final class MissenseRecord {
      * mutations are valid given the germline protein structure.
      */
     public static Peptide apply(List<MissenseRecord> records) {
-        return records.get(0).getGermlineProtein().mutate(aggregate(records));
+        Peptide germlineProtein = records.get(0).getGermlineProtein();
+        return germlineProtein.mutate(aggregate(records));
     }
 
     /**
      * Applies the mutation encoded in this record to the germline
-     * protein structure contained in the global Ensembl database.
+     * protein structure contained in the governing Ensembl database.
      *
      * @return the mutated protein.
      *
-     * @throws RuntimeException unless the Ensembl database contains a
-     * transcript matching this record and the mutation is valid given
-     * the germline protein structure.
+     * @throws RuntimeException unless the governing Ensembl database
+     * contains a transcript matching this record and the mutation is
+     * valid given the germline protein structure.
      */
     public Peptide apply() {
         return getGermlineProtein().mutate(proteinChange);
@@ -166,14 +244,14 @@ public final class MissenseRecord {
      *
      * @return the germline protein that is altered by this mutation.
      *
-     * @throws RuntimeException unless the Ensembl database contains a
-     * transcript matching this record.
+     * @throws RuntimeException unless the governing Ensembl database
+     * contains a transcript matching this record.
      */
     public Peptide getGermlineProtein() {
-        EnsemblRecord ensemblRecord = EnsemblDb.global().get(transcriptID);
+        EnsemblRecord ensemblRecord = assembly().db().get(transcriptID);
 
         if (ensemblRecord == null)
-            throw JamException.runtime("Unmapped transcript: [%s]", transcriptID);
+            throw JamException.runtime("Unmapped transcript: [%s] (assembly [%s])", transcriptID, assembly);
 
         return ensemblRecord.getPeptide();
     }
