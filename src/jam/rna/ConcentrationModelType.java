@@ -6,15 +6,27 @@ package jam.rna;
  */
 public enum ConcentrationModelType {
     /**
+     * The protein concentration is equal to the expression level:
+     *
+     * <pre>
+     *     C = min(FPKM, Cmax),
+     * </pre>
+     *
+     * where {@code FPKM} is the RNA transcript expression level and
+     * {@code Cmax} is the maximum concentration.
+     */
+    LINEAR,
+
+    /**
      * The protein concentration is equal to:
      *
      * <pre>
-     *     C = min[log(1 + alpha * FPKM), Cmax],
+     *     C = min[log(1 + FPKM / alpha), Cmax],
      * </pre>
      *
      * where {@code FPKM} is the RNA transcript expression level,
-     * {@code alpha} is a positive scale parameter, and {@code Cmax}
-     * is the maximum (log-transformed) concentration.
+     * {@code alpha} is a scale parameter (in units of FPKM), and
+     * {@code Cmax} is the maximum (log-transformed) concentration.
      */
     LOG,
 

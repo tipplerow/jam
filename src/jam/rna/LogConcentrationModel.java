@@ -53,11 +53,11 @@ public final class LogConcentrationModel extends ConcentrationModel {
     }
 
     /**
-     * Returns the global step concentration model defined by system
-     * properties.
+     * Returns the global log-transformed concentration model defined
+     * by system properties.
      *
-     * @return the global step concentration model defined by system
-     * properties.
+     * @return the global log-transformed concentration model defined
+     * by system properties.
      */
     public static LogConcentrationModel global() {
         if (global == null)

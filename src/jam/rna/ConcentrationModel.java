@@ -37,6 +37,9 @@ public abstract class ConcentrationModel {
         ConcentrationModelType type = resolveModelType();
 
         switch (type) {
+        case LINEAR:
+            return LinearConcentrationModel.global();
+
         case LOG:
             return LogConcentrationModel.global();
 
