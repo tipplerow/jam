@@ -139,8 +139,9 @@ public final class MapUtil {
     }
 
     /**
-     * Add a mapping to an existing map and requires the key to be
-     * unique (not already present in the map).
+     * Adds a mapping to an existing map and requires the mapping to
+     * be unique (either the map does not yet contain the key or the
+     * value already mapped to the key is equal to the input value).
      *
      * @param <K> the runtime key type.
      *
@@ -152,10 +153,13 @@ public final class MapUtil {
      *
      * @param value the mapping value.
      *
-     * @throws RuntimeException if the map already contains the key.
+     * @throws RuntimeException if the map already contains the key
+     * mapped to a different value.
      */
     public static <K, V> void putUnique(Map<K, V> map, K key, V value) {
-        if (map.put(key, value) != null)
+        V oldValue = map.put(key, value);
+
+        if (oldValue != null && !value.equals(oldValue))
             throw JamException.runtime("Duplicate key: [%s]", key);
     }
 

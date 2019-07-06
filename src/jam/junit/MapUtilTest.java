@@ -50,6 +50,11 @@ public class MapUtilTest {
         assertEquals(2, map.size());
         assertEquals(Integer.valueOf(1), map.get("abc"));
         assertEquals(Integer.valueOf(2), map.get("def"));
+
+        // The same key is allowed if it is mapped to the same
+        // value...
+        MapUtil.putUnique(map, "abc", 1);
+        assertEquals(Integer.valueOf(1), map.get("abc"));
     }
 
     @Test(expected = RuntimeException.class)
