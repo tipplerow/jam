@@ -1,1 +1,0 @@
-[Pat43:MEL-IPI_Pat43-Tumor-SM-4DK24] Mismatch in the native residue.

@@ -3,16 +3,19 @@
 # for the Miao et al. (Nature Genetics, 2018) study.
 ########################################################################
 
-jam.nap.patientCohort           = ${CSB_DATA_VAULT}/Miao/Miao_Patient_List.txt
-jam.hla.genotypeDbFile          = ${CSB_DATA_VAULT}/Miao/Miao_Genotype_Input.csv
-jam.tcga.missenseMAF            = ${CSB_DATA_VAULT}/Miao/Miao_Missense.maf.gz
-jam.tcga.tumorPatientTable      = ${CSB_DATA_VAULT}/Miao/Miao_Tumor_Patient_Map.tsv
-jam.tcga.patientCancerTypeTable = ${CSB_DATA_VAULT}/Miao/Miao_Patient_Cancer_Type_Map.tsv
-
-jam.rna.expressionProfileType       = CANCER_TYPE
-jam.rna.cancerTypeExpressionProfile = ${CSB_DATA_VAULT}/TCGA/CellOrigin/CellOrigin_RNA_Median_By_Cancer_Type.csv 
-
 jam.agpro.selfDbConfigFile  = ${CSB_DATA_VAULT}/Self/DB/NetChop_TAP_Lenient.prop
 jam.agpro.selfDbPeptideFile = ${CSB_DATA_VAULT}/Self/DB/SelfAntigenDb_NetChop_TAP_Lenient.tsv.gz
 
-jam.ensembl.peptidomeFile = ${CSB_DATA_VAULT}/Ensembl/Release96/Homo_sapiens.GRCh37.pep.all.fa.gz
+jam.hla.genotypeDbFile = ${CSB_DATA_VAULT}/Miao/Miao_Tumor_Genotype.csv
+
+jam.nap.stopOnError = false
+
+jam.rna.expressionProfileType       = CANCER_TYPE
+jam.rna.cancerTypeExpressionProfile = ${CSB_DATA_VAULT}/TCGA/CellOrigin/TCGA_RNA_Median_By_Cancer_Type.csv 
+
+jam.tcga.missenseMAF            = ${CSB_DATA_VAULT}/Miao/Miao_Missense.maf.gz
+#jam.tcga.missenseMAF            = /Users/scott/Downloads/Miao_Missense2.maf
+jam.tcga.missenseAssembly       = GRCh37
+jam.tcga.tumorPatientTable      = ${CSB_DATA_VAULT}/Miao/Miao_Tumor_Patient_Map.tsv
+jam.tcga.patientCancerTypeTable = ${CSB_DATA_VAULT}/Miao/Miao_Patient_Cancer_Type_Map.tsv
+

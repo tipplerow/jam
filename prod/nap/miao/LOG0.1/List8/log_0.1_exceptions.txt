@@ -1,2 +1,0 @@
-[SA9755:SA9755_T] row index (-1)
-[SD6494:SD6494_T] Mismatch in the native residue.
