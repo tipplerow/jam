@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class LogConcentrationModelTest {
     static {
         System.setProperty(ConcentrationModel.CONCENTRATION_MODEL_TYPE_PROPERTY, "LOG");
-        System.setProperty(LogConcentrationModel.ALPHA_PROPERTY, "0.5");
+        System.setProperty(LogConcentrationModel.ALPHA_PROPERTY, "2.0");
         System.setProperty(LogConcentrationModel.MAX_CONC_PROPERTY, "10.0");
     }
 
