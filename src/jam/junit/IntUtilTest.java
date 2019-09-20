@@ -35,6 +35,32 @@ public class IntUtilTest extends NumericTestBase {
         assertEquals(3, counts.count(3));
     }
 
+    @Test public void testIsCube() {
+        assertTrue(IntUtil.isCube(-8));
+        assertTrue(IntUtil.isCube(-1));
+        assertTrue(IntUtil.isCube( 0));
+        assertTrue(IntUtil.isCube( 1));
+        assertTrue(IntUtil.isCube( 8));
+        assertTrue(IntUtil.isCube(27));
+        assertTrue(IntUtil.isCube(64));
+
+        assertFalse(IntUtil.isCube(2));
+        assertFalse(IntUtil.isCube(3));
+        assertFalse(IntUtil.isCube(4));
+        assertFalse(IntUtil.isCube(5));
+        assertFalse(IntUtil.isCube(6));
+        assertFalse(IntUtil.isCube(7));
+        assertFalse(IntUtil.isCube(9));
+        assertFalse(IntUtil.isCube(10));
+
+        for (int k = 10; k < 1000; ++k) {
+            assertTrue(IntUtil.isCube(k * k * k));
+
+            assertFalse(IntUtil.isCube(k * k * k + 1));
+            assertFalse(IntUtil.isCube(k * k * k - 1));
+        }
+    }
+
     @Test public void testIsDivisible() {
         assertTrue(IntUtil.isDivisible(10,  1));
         assertTrue(IntUtil.isDivisible(10,  2));
@@ -49,6 +75,30 @@ public class IntUtilTest extends NumericTestBase {
         assertFalse(IntUtil.isDivisible(10,  9));
         assertFalse(IntUtil.isDivisible(10, 11));
         assertFalse(IntUtil.isDivisible(10, 99));
+    }
+
+    @Test public void testIsSquare() {
+        assertFalse(IntUtil.isSquare(-4));
+        assertFalse(IntUtil.isSquare(-1));
+
+        assertTrue(IntUtil.isSquare(0));
+        assertTrue(IntUtil.isSquare(1));
+        assertFalse(IntUtil.isSquare(2));
+        assertFalse(IntUtil.isSquare(3));
+        assertTrue(IntUtil.isSquare(4));
+        assertFalse(IntUtil.isSquare(5));
+        assertFalse(IntUtil.isSquare(6));
+        assertFalse(IntUtil.isSquare(7));
+        assertFalse(IntUtil.isSquare(8));
+        assertTrue(IntUtil.isSquare(9));
+        assertFalse(IntUtil.isSquare(10));
+
+        for (int k = 10; k < 1000; ++k) {
+            assertTrue(IntUtil.isSquare(k * k));
+
+            assertFalse(IntUtil.isSquare(k * k + 1));
+            assertFalse(IntUtil.isSquare(k * k - 1));
+        }
     }
 
     @Test public void testParseIntArray() {

@@ -46,6 +46,18 @@ public final class IntUtil {
     }
 
     /**
+     * Identifies integers that are perfect cubes.
+     *
+     * @param k the integer to examine.
+     *
+     * @return {@code true} iff the input value is a perfect cube.
+     */
+    public static boolean isCube(int k) {
+        int root = (int) Math.round(Math.cbrt(k));
+        return root * root * root == k;
+    }
+
+    /**
      * Determines whether one integer is evenly divisible by another.
      *
      * @param numer the numerator to examine.
@@ -57,6 +69,21 @@ public final class IntUtil {
      */
     public static boolean isDivisible(int numer, int denom) {
         return numer % denom == 0;
+    }
+
+    /**
+     * Identifies integers that are perfect squares.
+     *
+     * @param k the integer to examine.
+     *
+     * @return {@code true} iff the input value is a perfect square.
+     */
+    public static boolean isSquare(int k) {
+        if (k < 0)
+            return false;
+
+        int root = (int) Math.round(Math.sqrt(k));
+        return root * root == k;
     }
 
     /**
