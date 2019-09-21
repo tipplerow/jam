@@ -46,6 +46,26 @@ public final class IntUtil {
     }
 
     /**
+     * Computes the integer cube root of a perfect integer cube.
+     *
+     * @param cube the perfect integer cube.
+     *
+     * @return the integer cube root of the input argument (which must
+     * be a perfect integer cube).
+     *
+     * @throws IllegalArgumentException unless the input arguent is a
+     * perfect integer cube.
+     */
+    public static int cbrt(int cube) {
+        int root = (int) Math.round(Math.cbrt(cube));
+
+        if (root * root * root == cube)
+            return root;
+        else
+            throw new IllegalArgumentException(String.format("Integer [%d] is not a perfect cube.", cube));
+    }
+
+    /**
      * Identifies integers that are perfect cubes.
      *
      * @param k the integer to examine.
@@ -319,6 +339,26 @@ public final class IntUtil {
     public static void shuffle(int[] elements, JamRandom random) {
         for (int k = elements.length - 1; k > 0; k--)
             swap(elements, k, random.nextInt(k));
+    }
+
+    /**
+     * Computes the integer square root of a perfect integer square.
+     *
+     * @param square the perfect integer square.
+     *
+     * @return the integer square root of the input argument (which
+     * must be a perfect integer square).
+     *
+     * @throws IllegalArgumentException unless the input arguent is a
+     * perfect integer square.
+     */
+    public static int sqrt(int square) {
+        int root = (int) Math.round(Math.sqrt(square));
+
+        if (root * root == square)
+            return root;
+        else
+            throw new IllegalArgumentException(String.format("Integer [%d] is not a perfect square.", square));
     }
 
     /**

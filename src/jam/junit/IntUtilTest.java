@@ -19,6 +19,21 @@ import static org.junit.Assert.*;
 public class IntUtilTest extends NumericTestBase {
     private static final double TOLERANCE = 1.0e-12;
 
+    @Test public void testCbrt() {
+        assertEquals(-3, IntUtil.cbrt(-27));
+        assertEquals(-2, IntUtil.cbrt( -8));
+        assertEquals(-1, IntUtil.cbrt( -1));
+        assertEquals( 0, IntUtil.cbrt(  0));
+        assertEquals( 1, IntUtil.cbrt(  1));
+        assertEquals( 2, IntUtil.cbrt(  8));
+        assertEquals( 3, IntUtil.cbrt( 27));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testCbrtInvalid() {
+        IntUtil.cbrt(10);
+    }
+
     @Test public void testCount1() {
         Multiset counts = IntUtil.count(Arrays.asList(1, 2, 3, 2, 3, 3));
 
@@ -136,6 +151,18 @@ public class IntUtilTest extends NumericTestBase {
         assertEquals( 0.0, StatUtil.mean(VectorView.wrap(corr)), 0.002);
         assertEquals(50.0, StatUtil.mean(VectorView.wrap(mean1)), 0.1);
         assertEquals(50.0, StatUtil.mean(VectorView.wrap(mean2)), 0.1);
+    }
+
+    @Test public void testSqrt() {
+        assertEquals(0, IntUtil.sqrt(0));
+        assertEquals(1, IntUtil.sqrt(1));
+        assertEquals(2, IntUtil.sqrt(4));
+        assertEquals(3, IntUtil.sqrt(9));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testSqrtInvalid() {
+        IntUtil.sqrt(10);
     }
 
     @Test public void testToArray() {
