@@ -149,7 +149,7 @@ public class PeptideTest {
         assertEquals(Peptide.parse("MPALNSTF"), mutated);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RuntimeException.class)
     public void testMutateInvalid1() {
         ProteinChange change = ProteinChange.parse("K0A");
 
@@ -157,7 +157,7 @@ public class PeptideTest {
         Peptide mutated = native_.mutate(change);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RuntimeException.class)
     public void testMutateInvalid2() {
         ProteinChange change = ProteinChange.parse("K100A");
 
@@ -165,7 +165,7 @@ public class PeptideTest {
         Peptide mutated = native_.mutate(change);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = RuntimeException.class)
     public void testMutateInvalid3() {
         ProteinChange change = ProteinChange.parse("M3A");
 
