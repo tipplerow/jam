@@ -31,6 +31,9 @@ abstract class MatrixImpl extends MatrixView {
     //
     abstract MatrixImpl add(int row, int col, double value);
 
+    // Computes the inverse of this matrix.
+    abstract MatrixImpl inverse();
+
     // Assigns a value to the element at location [row, col].
     //
     // Returns the implementation, usually this same matrix, but

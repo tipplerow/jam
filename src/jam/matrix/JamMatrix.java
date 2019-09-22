@@ -623,6 +623,18 @@ public final class JamMatrix extends MatrixView {
     }
 
     /**
+     * Computes and returns the inverse of this matrix.
+     *
+     * @return the inverse of this matrix.
+     *
+     * @throws RuntimeException if this matrix does not have an
+     * inverse.
+     */
+    public JamMatrix inverse() {
+        return new JamMatrix(impl.inverse());
+    }
+
+    /**
      * Computes the difference between this matrix and a scalar value
      * and returns the result in a new {@code JamMatrix}; this matrix
      * is unchanged.

@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import jam.math.RandomSequence;
 import jam.matrix.JamMatrix;
 import jam.vector.JamVector;
 import jam.vector.VectorAggregator;
@@ -332,6 +333,26 @@ public class JamMatrixTest extends NumericTestBase {
                                        0.0, 0.0, 1.0);
         JamMatrix m2 = JamMatrix.identity(3);
         assertEquals(m1, m2);
+    }
+
+    @Test public void testInverseDense() {
+        JamMatrix m1 = JamMatrix.random(10, 10, RandomSequence.uniform());
+        JamMatrix m2 = m1.inverse();
+
+        assertEquals(JamMatrix.identity(10), m1.times(m2));
+        assertEquals(JamMatrix.identity(10), m2.times(m1));
+    }
+
+    @Test public void testInverseDiagonal() {
+        JamMatrix m1 = JamMatrix.diagonal(1.0, 2.0, 5.0);
+
+        JamMatrix actual   = m1.inverse();
+        JamMatrix expected = JamMatrix.byrow(3, 3,
+                                             1.0, 0.0, 0.0,
+                                             0.0, 0.5, 0.0,
+                                             0.0, 0.0, 0.2);
+
+        assertEquals(expected, actual);
     }
 
     @Test public void testIsSymmetric() {

@@ -2,6 +2,7 @@
 package jam.matrix;
 
 import jam.app.JamLogger;
+import jam.lang.JamException;
 import jam.math.DoubleComparator;
 import jam.vector.VectorUtil;
 
@@ -35,6 +36,18 @@ final class DiagonalMatrix extends MatrixImpl {
             return diagonal[row];
         else
             return 0.0;
+    }
+
+    @Override public MatrixImpl inverse() {
+        double[] invdiag = new double[diagonal.length];
+
+        for (int index = 0; index < diagonal.length; ++index)
+            if (COMPARATOR.isZero(diagonal[index]))
+                throw JamException.runtime("Zero diagonal element.");
+            else
+                invdiag[index] = 1.0 / diagonal[index];
+
+        return new DiagonalMatrix(invdiag);
     }
 
     @Override public MatrixImpl like(int nrow, int ncol) {

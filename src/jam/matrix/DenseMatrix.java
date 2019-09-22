@@ -2,6 +2,7 @@
 package jam.matrix;
 
 import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.MatrixUtils;
 
 // Package-scope implementation of a dense floating-point matrix.
 //
@@ -31,6 +32,10 @@ final class DenseMatrix extends MatrixImpl {
 
     @Override public double get(int row, int col) {
         return elements.getEntry(row, col);
+    }
+
+    @Override public MatrixImpl inverse() {
+        return new DenseMatrix(MatrixUtils.inverse(elements, 1.0E-12).getData());
     }
 
     @Override public MatrixImpl like(int nrow, int ncol) {
