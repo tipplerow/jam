@@ -9,6 +9,13 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class DoubleUtilTest extends NumericTestBase {
+    @Test public void testConstants() {
+        assertEquals(0.693147, DoubleUtil.LOG2, 1.0E-06);
+        assertEquals(0.866025, DoubleUtil.HALF_SQRT3, 1.0E-06);
+        assertEquals(1.414214, DoubleUtil.SQRT2, 1.0E-06);
+        assertEquals(2.506628, DoubleUtil.SQRT_TWO_PI, 1.0E-06);
+    }
+
     @Test public void testIsDouble() {
         assertTrue(DoubleUtil.isDouble("1.0"));
         assertTrue(DoubleUtil.isDouble("-1.0"));

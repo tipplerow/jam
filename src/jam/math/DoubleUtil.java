@@ -31,6 +31,11 @@ public final class DoubleUtil {
     public static final double EULER = 0.5772156649;
 
     /**
+     * One-half of the square root of three.
+     */
+    public static final double HALF_SQRT3 = 0.5 * Math.sqrt(3.0);
+
+    /**
      * Determines whether a string represents a floating-point value.
      *
      * @param s the string to evaluate.
