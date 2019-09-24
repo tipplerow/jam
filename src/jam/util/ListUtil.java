@@ -138,6 +138,33 @@ public final class ListUtil {
     }
 
     /**
+     * Determines whether a list is sorted by the natural ordering of
+     * its elements.
+     *
+     * @param <V> the element type.
+     *
+     * @param list the list to examine.
+     *
+     * @return {@code true} iff the elements in the input list are in
+     * non-decreasing natural order.
+     */
+    public static <V extends Comparable<? super V>> boolean isSorted(List<V> list) {
+        //
+        // Do this with an iterator rather than "get()" to avoid the
+        // O(n^2) scaling for linked lists...
+        //
+        V prev = null;
+
+        for (V curr : list)
+            if (prev != null && prev.compareTo(curr) > 0)
+                return false;
+            else
+                prev = curr;
+
+        return true;
+    }
+
+    /**
      * Returns the last element from a list.
      *
      * @param <V> the element type.

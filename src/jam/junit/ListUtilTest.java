@@ -62,6 +62,17 @@ public class ListUtilTest {
         assertEquals(List.of("C", "A", "D"), ListUtil.get(List.of("A", "B", "C", "D", "E", "F"), new int[] { 2, 0, 3 }));
     }
 
+    @Test public void testIsSorted() {
+        assertTrue(ListUtil.isSorted(List.of("A")));
+
+        assertTrue(ListUtil.isSorted(List.of("A", "A", "A")));
+        assertTrue(ListUtil.isSorted(List.of("A", "B", "B")));
+        assertTrue(ListUtil.isSorted(List.of("A", "B", "C")));
+
+        assertFalse(ListUtil.isSorted(List.of("C", "B", "C")));
+        assertFalse(ListUtil.isSorted(List.of("C", "C", "A")));
+    }
+
     @Test public void testLast() {
         assertEquals("abc", ListUtil.last(Arrays.asList("abc")));
         assertEquals("ghi", ListUtil.last(Arrays.asList("abc", "def", "ghi")));
