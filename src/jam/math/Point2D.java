@@ -6,7 +6,7 @@ import java.util.Comparator;
 /**
  * Represents an immutable point in a two-dimensional space.
  */
-public final class Point2D {
+public final class Point2D implements Point {
     /** The immutable x-coordinate. */
     public final double x;
 
@@ -58,6 +58,35 @@ public final class Point2D {
      */
     public static Point2D at(double x, double y) {
         return new Point2D(x, y);
+    }
+
+    @Override public double coord(int dim) {
+        switch (dim) {
+        case 0:
+            return x;
+
+        case 1:
+            return y;
+
+        default:
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    @Override public int dimensionality() {
+        return 2;
+    }
+
+    @Override public double x() {
+        return x;
+    }
+
+    @Override public double y() {
+        return y;
+    }
+
+    @Override public double[] toArray() {
+        return new double[] { x, y };
     }
 
     @Override public boolean equals(Object that) {
