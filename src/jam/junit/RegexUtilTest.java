@@ -64,8 +64,8 @@ public class RegexUtilTest extends NumericTestBase {
 
     @Test public void testParseInt() {
         Pattern pattern  = RegexUtil.COMMA;
-        String  string   = "  1,  2,  3  ";
-        int[]   expected = new int[] { 1, 2, 3 };
+        String  string   = "  1,  2,  3, 1E4  ";
+        int[]   expected = new int[] { 1, 2, 3, 10000 };
 
         assertTrue(Arrays.equals(expected, RegexUtil.parseInt(pattern, string)));
     }

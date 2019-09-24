@@ -3,6 +3,8 @@ package jam.util;
 
 import java.util.regex.Pattern;
 
+import jam.math.IntUtil;
+
 /**
  * Defines several common regular expressions and implements standard
  * parsing routines.
@@ -161,7 +163,7 @@ public final class RegexUtil {
         int[] result = new int[fields.length];
 
         for (int index = 0; index < fields.length; index++)
-            result[index] = Integer.parseInt(fields[index]);
+            result[index] = IntUtil.parseInt(fields[index]);
 
         return result;
     }
