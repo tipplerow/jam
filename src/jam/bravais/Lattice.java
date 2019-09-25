@@ -84,6 +84,15 @@ public final class Lattice<T> {
     }
 
     /**
+     * Returns the number of occupants on this lattice.
+     *
+     * @return the number of occupants on this lattice.
+     */
+    public int countOccupants() {
+        return indexMap.size();
+    }
+
+    /**
      * Returns the dimensionality of this lattice.
      *
      * @return the dimensionality of this lattice.
@@ -151,6 +160,15 @@ public final class Lattice<T> {
      */
     public UnitIndex indexOf(T occupant) {
         return indexMap.get(occupant);
+    }
+
+    /**
+     * Identifies empty lattices.
+     *
+     * @return {@code true} iff this lattice contains no occupants.
+     */
+    public boolean isEmpty() {
+        return indexMap.isEmpty();
     }
 
     /**
@@ -278,8 +296,15 @@ public final class Lattice<T> {
      * the cell was unoccupied).
      */
     public T place(T occupant, UnitIndex index) {
+        T prevOcc = imageBiMap.forcePut(imageOf(index), occupant);
+
+        if (prevOcc != null && prevOcc != occupant)
+            indexMap.remove(prevOcc);
+
         indexMap.put(occupant, index);
-        return imageBiMap.forcePut(imageOf(index), occupant);
+        assert indexMap.size() == imageBiMap.size();
+
+        return prevOcc;
     }
 
     /**
