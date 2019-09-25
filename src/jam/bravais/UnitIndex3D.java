@@ -12,6 +12,8 @@ final class UnitIndex3D implements UnitIndex {
         this.k = k;
     }
 
+    static final UnitIndex3D ORIGIN = at(0, 0, 0);
+
     static UnitIndex3D at(int i, int j, int k) {
         return new UnitIndex3D(i, j, k);
     }

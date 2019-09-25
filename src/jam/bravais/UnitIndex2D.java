@@ -10,6 +10,8 @@ final class UnitIndex2D implements UnitIndex {
         this.j = j;
     }
 
+    static final UnitIndex2D ORIGIN = at(0, 0);
+
     static UnitIndex2D at(int i, int j) {
         return new UnitIndex2D(i, j);
     }

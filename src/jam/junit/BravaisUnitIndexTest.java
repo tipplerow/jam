@@ -69,6 +69,12 @@ public class BravaisUnitIndexTest {
         assertEquals(3, UnitIndex.at(3, 5, 2).dimensionality());
     }
 
+    @Test public void testOrigin() {
+        assertEquals(UnitIndex.at(0), UnitIndex.origin(1));
+        assertEquals(UnitIndex.at(0, 0), UnitIndex.origin(2));
+        assertEquals(UnitIndex.at(0, 0, 0), UnitIndex.origin(3));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.BravaisUnitIndexTest");
     }

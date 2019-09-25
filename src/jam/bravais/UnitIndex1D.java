@@ -8,6 +8,8 @@ final class UnitIndex1D implements UnitIndex {
         this.index = index;
     }
 
+    static final UnitIndex1D ORIGIN = at(0);
+
     static UnitIndex1D at(int index) {
         return new UnitIndex1D(index);
     }

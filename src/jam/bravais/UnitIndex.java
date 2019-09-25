@@ -49,6 +49,34 @@ public interface UnitIndex extends Comparable<UnitIndex> {
     }
 
     /**
+     * Returns the unit index at the origin of the coordinate system
+     * with a given dimensionality.
+     *
+     * @param dim the dimensionality of the unit index.
+     *
+     * @return the unit index at the origin of the coordinate system
+     * with the specified dimensionality.
+     *
+     * @throws IllegalArgumentException unless the dimensionality is
+     * in the allowed set {@code (1, 2, 3)}.
+     */
+    public static UnitIndex origin(int dim) {
+        switch (dim) {
+        case 1:
+            return UnitIndex1D.ORIGIN;
+
+        case 2:
+            return UnitIndex2D.ORIGIN;
+
+        case 3:
+            return UnitIndex3D.ORIGIN;
+
+        default:
+            throw new IllegalArgumentException("Invalid dimensionality.");
+        }
+    }
+
+    /**
      * Returns the index coordinate along a given dimension.
      *
      * @param dim the (zero-based) index for the desired dimension.
