@@ -54,6 +54,34 @@ public final class Lattice<T> {
     }
 
     /**
+     * Creates a new lattice with a fixed unit cell and period and
+     * fills the lattice with occupants moving from left-to-right,
+     * bottom-to-top in the order returned by the iterator of the
+     * input collection.
+     *
+     * @param <T> the run-time type of the lattice occupants.
+     *
+     * @param unitCell the unit cell for the lattice.
+     *
+     * @param period the periodic dimensions of the lattice.
+     *
+     * @param occupants the occupants to fill the lattice.
+     *
+     * @return a new lattice with the specified unit cell and period,
+     * filled with the occupants provided.
+     *
+     * @throws IllegalArgumentException unless the unit cell and
+     * lattice period have identical dimensions and the number of
+     * occupants exactly matches the number of distinct sites on
+     * the lattice.
+     */
+    public static <T> Lattice<T> fill(UnitCell unitCell, Period period, Collection<T> occupants) {
+        Lattice<T> lattice = create(unitCell, period);
+        lattice.fill(occupants);
+        return lattice;
+    }
+
+    /**
      * Returns the periodic dimensions of this lattice.
      *
      * @return the periodic dimensions of this lattice.
@@ -115,7 +143,7 @@ public final class Lattice<T> {
             throw new IllegalArgumentException("Occupants do not exactly fill the lattice.");
 
         List<UnitIndex> images = period.enumerate();
-        assert images.size() == occupants.size();
+        assert occupants.size() == images.size();
 
         int imageOrdinal = 0;
 
@@ -358,5 +386,24 @@ public final class Lattice<T> {
         }
         else
             throw new IllegalArgumentException("Missing lattice occupant.");
+    }
+
+    /**
+     * Identifies unoccupied neighbors to a given lattice site.
+     *
+     * @param index the (absolute) index of a lattice site.
+     *
+     * @return a list containing the (absolute) indexes of all
+     * unoccupied nearest neighbors to the specified site.
+     */
+    public List<UnitIndex> unoccupiedNeighbors(UnitIndex index) {
+        List<UnitIndex> neighbors = unitCell().getNeighbors(index);
+        List<UnitIndex> unoccupied = new ArrayList<UnitIndex>(neighbors.size());
+
+        for (UnitIndex neighbor : neighbors)
+            if (!isOccupied(neighbor))
+                unoccupied.add(neighbor);
+
+        return unoccupied;
     }
 }

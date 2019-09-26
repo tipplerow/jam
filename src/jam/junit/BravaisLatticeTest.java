@@ -575,6 +575,34 @@ public class BravaisLatticeTest {
         lattice.fill(occupants);
     }
 
+    @Test public void testUnoccupiedNeighbors() {
+        Lattice<String> lattice = LatticeType.parse("SQUARE; 5, 4");
+
+        lattice.place("A", UnitIndex.at(1, 0));
+        lattice.place("B", UnitIndex.at(2, 0));
+        lattice.place("C", UnitIndex.at(3, 0));
+        lattice.place("D", UnitIndex.at(2, 1));
+        lattice.place("E", UnitIndex.at(3, 2));
+        lattice.place("F", UnitIndex.at(0, 3));
+        lattice.place("G", UnitIndex.at(2, 3));
+
+        assertEquals(List.of(),
+                     lattice.unoccupiedNeighbors(UnitIndex.at(2, 0)));
+
+        assertEquals(List.of(UnitIndex.at(1, 2)),
+                     lattice.unoccupiedNeighbors(UnitIndex.at(2, 2)));
+
+        assertEquals(List.of(UnitIndex.at(-1, 0),
+                             UnitIndex.at( 0, 1)),
+                     lattice.unoccupiedNeighbors(UnitIndex.at(0, 0)));
+
+        assertEquals(List.of(UnitIndex.at(1, 1),
+                             UnitIndex.at(0, 2),
+                             UnitIndex.at(2, 2),
+                             UnitIndex.at(1, 3)),
+                     lattice.unoccupiedNeighbors(UnitIndex.at(1, 2)));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.BravaisLatticeTest");
     }
