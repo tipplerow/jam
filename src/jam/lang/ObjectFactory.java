@@ -65,6 +65,18 @@ public interface ObjectFactory<T> {
     }
 
     /**
+     * Returns an object factory that will generate a sequence of
+     * {@code Integer} objects with values starting at {@code 0} and
+     * increasing by one with each with call to {@code newInstance()}.
+     *
+     * @return an object factory that will generate a sequence of
+     * {@code Integer} objects.
+     */
+    public static ObjectFactory<Integer> forInteger() {
+        return new IntegerFactory();
+    }
+
+    /**
      * Returns an object factory that will always return {@code null}
      * references.
      *
@@ -119,6 +131,16 @@ final class ClassFactory<T> implements ObjectFactory<T> {
 
     @Override public T newInstance() {
         return ObjectUtil.newInstance(theClass);
+    }
+}
+
+final class IntegerFactory implements ObjectFactory<Integer> {
+    private int nextInt = 0;
+
+    IntegerFactory() {}
+
+    @Override public Integer newInstance() {
+        return Integer.valueOf(nextInt++);
     }
 }
 

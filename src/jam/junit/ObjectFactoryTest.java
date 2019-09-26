@@ -26,6 +26,15 @@ public class ObjectFactoryTest {
             assertEquals(0, integer.intValue());
     }
 
+    @Test public void testForInteger() {
+        ObjectFactory<Integer> factory = ObjectFactory.forInteger();
+
+        assertEquals(Integer.valueOf(0), factory.newInstance());
+        assertEquals(Integer.valueOf(1), factory.newInstance());
+        assertEquals(Integer.valueOf(2), factory.newInstance());
+        assertEquals(Integer.valueOf(3), factory.newInstance());
+    }
+
     @Test public void testForString() {
         ObjectFactory<String> stringFactory = ObjectFactory.forClass(String.class);
         assertEquals("", stringFactory.newInstance());
