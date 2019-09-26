@@ -205,6 +205,44 @@ public final class CollectionUtil {
     }
 
     /**
+     * Returns the element at a given position in a collection (as
+     * determined by the iteration order).
+     *
+     * <p>If the input collection is a {@code List}, this method calls
+     * its {@code get(int)} method; he resulting complexity is {@code
+     * O(1)} for random-access lists.  Otherwise, this method iterates
+     * through the first {@code index} elements of the collection,
+     * ignores them, and then returns the next element.  The resulting
+     * complexity is {@code O(n)}, where {@code n} is the size of the
+     * collection.
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param collection the collection to process.
+     *
+     * @param index the index of the element to return.
+     *
+     * @return the element at the specified position in the iteration
+     * order of the input collection.
+     *
+     * @throws IndexOutOfBoundsException unless the index is in range.
+     */
+    public static <V> V get(Collection<V> collection, int index) {
+        if (collection instanceof List)
+            return ((List<V>) collection).get(index);
+
+        if (index < 0 || index >= collection.size())
+            throw new IndexOutOfBoundsException(index);
+
+        Iterator<V> iterator = collection.iterator();
+
+        for (int skip = 0; skip < index; ++skip)
+            iterator.next();
+
+        return iterator.next();
+    }
+
+    /**
      * Peeks at the first item in the collection; the collection is
      * unchanged.
      *

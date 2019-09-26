@@ -163,6 +163,22 @@ public class CollectionUtilTest extends NumericTestBase {
         assertEquals(3, CollectionUtil.countUnique(List.of("abc", "def", "ghi")));
     }
 
+    @Test public void testGet() {
+        Collection<String> strings = new TreeSet<String>();
+
+        strings.add("A");
+        strings.add("B");
+        strings.add("C");
+        strings.add("D");
+        strings.add("E");
+
+        assertEquals("A", CollectionUtil.get(strings, 0));
+        assertEquals("B", CollectionUtil.get(strings, 1));
+        assertEquals("C", CollectionUtil.get(strings, 2));
+        assertEquals("D", CollectionUtil.get(strings, 3));
+        assertEquals("E", CollectionUtil.get(strings, 4));
+    }
+
     @Test public void testPeek() {
         assertNull(CollectionUtil.peek(emptyList));
         assertEquals("abc", CollectionUtil.peek(List.of("abc")));
