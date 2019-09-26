@@ -1,7 +1,6 @@
 
 package jam.bravais;
 
-import jam.math.IntUtil;
 import jam.util.RegexUtil;
 
 public enum LatticeType {
@@ -9,8 +8,11 @@ public enum LatticeType {
      * The two-dimensional lattice with hexagonal unit cells.
      */
     HEXAGONAL {
-        @Override public <T> Lattice<T> create(Period period) {
-            return Lattice.create(HexagonalUnitCell.FUNDAMENTAL, period);
+        @Override public <T> Lattice<T> create(double[] sides, int[] period) {
+            if (sides.length != 1)
+                throw new IllegalArgumentException("Exactly one side length is required.");
+
+            return Lattice.create(new HexagonalUnitCell(sides[0]), Period.box(period));
         }
     },
 
@@ -18,28 +20,31 @@ public enum LatticeType {
      * The two-dimensional lattice with square unit cells.
      */
     SQUARE {
-        @Override public <T> Lattice<T> create(Period period) {
-            return Lattice.create(SquareUnitCell.FUNDAMENTAL, period);
+        @Override public <T> Lattice<T> create(double[] sides, int[] period) {
+            if (sides.length != 1)
+                throw new IllegalArgumentException("Exactly one side length is required.");
+
+            return Lattice.create(new SquareUnitCell(sides[0]), Period.box(period));
         }
     };
 
     /**
-     * Creates a new empty lattice with the fundamental unit cell for
-     * this lattice type and the given period dimensions.
-     *
-     * <p>The fundamental unit cell typically has unit side length.
+     * Creates a new empty lattice the unit cell defined by this type.
      *
      * @param <T> the run-time type of the lattice occupants.
      *
+     * @param sides the lengths of the sides of the unit cell.
+     *
      * @param period the periodic dimensions for the lattice.
      *
-     * @return a new empty lattice with the fundamental unit cell for
-     * this lattice type and the specified period dimensions.
+     * @return a new empty lattice with the unit cell defined by this
+     * type and the side lengths and periodic dimensions specified in
+     * the argument list.
      *
-     * @throws IllegalArgumentException unless the periodic dimensions
-     * are valid.
+     * @throws IllegalArgumentException unless the dimensions of the
+     * unit cell and periodic box are valid for this lattice type.
      */
-    public abstract <T> Lattice<T> create(Period period);
+    public abstract <T> Lattice<T> create(double[] sides, int[] period);
 
     /**
      * Parses a single string that defines a Bravais lattice.
@@ -47,9 +52,11 @@ public enum LatticeType {
      * @param <T> the run-time type of the lattice occupants.
      *
      * @param def the string defining a Bravais lattice, formatted as
-     * {@code TYPE; period1, period2, ...}, where {@code TYPE} is the
-     * enumerated type code and {@code period1, period2, ...} are the
-     * comma-separated periodic dimensions.
+     * {@code TYPE; side1, side2, ...; period1, period2, ...}, where
+     * {@code TYPE} is the enumerated type code, {@code side1, side2,
+     * ...} are the (floating-point) side lengths for the unit cell,
+     * and {@code period1, period2, ...} are the (integer) periodic
+     * dimensions.
      *
      * @return the empty Bravais lattice defined by the input string.
      *
@@ -57,15 +64,16 @@ public enum LatticeType {
      * properly formatted lattice definition.
      */
     public static <T> Lattice<T> parse(String def) {
-        String[] fields = RegexUtil.split(RegexUtil.SEMICOLON, def, 2);
+        String[] fields = RegexUtil.split(RegexUtil.SEMICOLON, def, 3);
 
         String typeField   = fields[0];
-        String periodField = fields[1];
+        String sideField   = fields[1];
+        String periodField = fields[2];
 
-        return valueOf(typeField).create(parsePeriod(periodField));
-    }
+        LatticeType type   = valueOf(typeField);
+        double[]    sides  = RegexUtil.parseDouble(RegexUtil.COMMA, sideField);
+        int[]       period = RegexUtil.parseInt(RegexUtil.COMMA, periodField);
 
-    private static Period parsePeriod(String field) {
-        return Period.box(RegexUtil.parseInt(RegexUtil.COMMA, field));
+        return type.create(sides, period);
     }
 }

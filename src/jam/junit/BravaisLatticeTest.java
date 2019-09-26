@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 public class BravaisLatticeTest {
     @Test public void testBasic() {
-        Lattice<String> lattice = LatticeType.parse("SQUARE; 3, 4");
+        Lattice<String> lattice = LatticeType.parse("SQUARE; 1.0; 3, 4");
 
         assertEquals(2, lattice.period().dimensionality());
         assertEquals(3, lattice.period().period(0));
@@ -495,7 +495,7 @@ public class BravaisLatticeTest {
     }
 
     @Test public void testFill() {
-        Lattice<Integer> lattice = LatticeType.parse("SQUARE; 3, 4");
+        Lattice<Integer> lattice = LatticeType.parse("SQUARE; 1.0; 3, 4");
 
         List<Integer> occupants =
             List.of(Integer.valueOf(0),
@@ -535,7 +535,7 @@ public class BravaisLatticeTest {
 
     @Test(expected = RuntimeException.class)
     public void testFillInvalid1() {
-        Lattice<Integer> lattice = LatticeType.parse("SQUARE; 3, 4");
+        Lattice<Integer> lattice = LatticeType.parse("SQUARE; 1.0; 3, 4");
 
         List<Integer> occupants =
             List.of(Integer.valueOf(0),
@@ -555,7 +555,7 @@ public class BravaisLatticeTest {
 
     @Test(expected = RuntimeException.class)
     public void testFillInvalid2() {
-        Lattice<Integer> lattice = LatticeType.parse("SQUARE; 3, 4");
+        Lattice<Integer> lattice = LatticeType.parse("SQUARE; 1.0; 3, 4");
 
         List<Integer> occupants =
             List.of(Integer.valueOf(0),
@@ -576,7 +576,7 @@ public class BravaisLatticeTest {
     }
 
     @Test public void testUnoccupiedNeighbors() {
-        Lattice<String> lattice = LatticeType.parse("SQUARE; 5, 4");
+        Lattice<String> lattice = LatticeType.parse("SQUARE; 1.0; 5, 4");
 
         lattice.place("A", UnitIndex.at(1, 0));
         lattice.place("B", UnitIndex.at(2, 0));
