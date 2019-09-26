@@ -5,18 +5,47 @@ public enum UnitCellType {
     /**
      * The two-dimensional hexagonal unit cell.
      */
-    HEXAGONAL(HexagonalUnitCell.FUNDAMENTAL),
+    HEXAGONAL {
+        @Override public UnitCell create(double... sides) {
+            if (sides.length == 1)
+                return new HexagonalUnitCell(sides[0]);
+            else
+                throw new IllegalArgumentException("Exactly one side length is required.");
+        }
+
+        @Override public UnitCell fundamental() {
+            return HexagonalUnitCell.FUNDAMENTAL;
+        }
+    },
 
     /**
      * The two-dimensional square unit cell.
      */
-    SQUARE(SquareUnitCell.FUNDAMENTAL);
+    SQUARE {
+        @Override public UnitCell create(double... sides) {
+            if (sides.length == 1)
+                return new SquareUnitCell(sides[0]);
+            else
+                throw new IllegalArgumentException("Exactly one side length is required.");
+        }
 
-    private UnitCell fundamental;
+        @Override public UnitCell fundamental() {
+            return SquareUnitCell.FUNDAMENTAL;
+        }
+    };
 
-    private UnitCellType(UnitCell fundamental) {
-        this.fundamental = fundamental;
-    }
+    /**
+     * Creates a new unit cell of this type.
+     *
+     * @param sides the lengths of the sides of the unit cell.
+     *
+     * @return a new unit cell of this type with the specified side
+     * lengths.
+     *
+     * @throws IllegalArgumentException unless the side lengths are
+     * valid for this lattice type.
+     */
+    public abstract UnitCell create(double... sides);
 
     /**
      * Returns the fundamental unit cell for this type (typically with
@@ -25,7 +54,5 @@ public enum UnitCellType {
      * @return the fundamental unit cell for this type (typically with
      * unit side length).
      */
-    public UnitCell fundamental() {
-        return fundamental;
-    }
+    public abstract UnitCell fundamental();
 }

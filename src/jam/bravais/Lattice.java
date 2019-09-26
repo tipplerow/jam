@@ -10,7 +10,9 @@ import java.util.Map;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import jam.app.JamProperties;
 import jam.math.Point;
+import jam.util.RegexUtil;
 
 /**
  * Tracks occupants on a Bravais lattice with periodic boundaries.
@@ -35,6 +37,62 @@ public final class Lattice<T> {
     }
 
     /**
+     * Name of the system property that defines the global unit cell
+     * type.
+     */
+    public static final String UNIT_CELL_TYPE_PROPERTY = "jam.bravais.unitCellType";
+
+    /**
+     * Name of the system property that defines the lengths of the
+     * sides of the global unit cell.  For unit cells with unequal
+     * side lengths, the property value must be a comma-delimited
+     * string containing the side lengths.
+     */
+    public static final String UNIT_CELL_SIZE_PROPERTY = "jam.bravais.unitCellSize";
+
+    /**
+     * Name of the system property that defines the dimensions of
+     * the global periodic boundaries. The property value must be
+     * a comma-delimited string containing the box lengths.
+     */
+    public static final String PERIODIC_BOX_PROPERTY = "jam.bravais.periodicBox";
+
+    /**
+     * Creates a new empty lattice with a fixed unit cell and period
+     * defined by the global system properties.
+     *
+     * @param <T> the run-time type of the lattice occupants.
+     *
+     * @return a new empty lattice with the unit cell and period
+     * defined by the global system properties.
+     *
+     * @throws RuntimeException unless the system properties required
+     * to define a lattice are property assigned.
+     */
+    public static <T> Lattice<T> create() {
+        return create(resolveUnitCell(), resolvePeriod());
+    }
+
+    private static UnitCell resolveUnitCell() {
+        UnitCellType cellType = resolveUnitCellType();
+        double[]     cellSize = resolveUnitCellSize();
+
+        return cellType.create(cellSize);
+    }
+
+    private static UnitCellType resolveUnitCellType() {
+        return JamProperties.getRequiredEnum(UNIT_CELL_TYPE_PROPERTY, UnitCellType.class);
+    }
+
+    private static double[] resolveUnitCellSize() {
+        return RegexUtil.parseDouble(RegexUtil.COMMA, JamProperties.getRequired(UNIT_CELL_SIZE_PROPERTY));
+    }
+
+    private static Period resolvePeriod() {
+        return Period.box(RegexUtil.parseInt(RegexUtil.COMMA, JamProperties.getRequired(PERIODIC_BOX_PROPERTY)));
+    }
+
+    /**
      * Creates a new empty lattice with a fixed unit cell and period.
      *
      * @param <T> the run-time type of the lattice occupants.
@@ -54,31 +112,37 @@ public final class Lattice<T> {
     }
 
     /**
-     * Creates a new lattice with a fixed unit cell and period and
-     * fills the lattice with occupants moving from left-to-right,
-     * bottom-to-top in the order returned by the iterator of the
-     * input collection.
+     * Parses a single string that defines a Bravais lattice.
      *
      * @param <T> the run-time type of the lattice occupants.
      *
-     * @param unitCell the unit cell for the lattice.
+     * @param def the string defining a Bravais lattice, formatted as
+     * {@code TYPE; side1, side2, ...; period1, period2, ...}, where
+     * {@code TYPE} is the enumerated type code, {@code side1, side2,
+     * ...} are the (floating-point) side lengths for the unit cell,
+     * and {@code period1, period2, ...} are the (integer) periodic
+     * dimensions.
      *
-     * @param period the periodic dimensions of the lattice.
+     * @return the empty Bravais lattice defined by the input string.
      *
-     * @param occupants the occupants to fill the lattice.
-     *
-     * @return a new lattice with the specified unit cell and period,
-     * filled with the occupants provided.
-     *
-     * @throws IllegalArgumentException unless the unit cell and
-     * lattice period have identical dimensions and the number of
-     * occupants exactly matches the number of distinct sites on
-     * the lattice.
+     * @throws IllegalArgumentException unless the input string is a
+     * properly formatted lattice definition.
      */
-    public static <T> Lattice<T> fill(UnitCell unitCell, Period period, Collection<T> occupants) {
-        Lattice<T> lattice = create(unitCell, period);
-        lattice.fill(occupants);
-        return lattice;
+    public static <T> Lattice<T> parse(String def) {
+        String[] fields = RegexUtil.split(RegexUtil.SEMICOLON, def, 3);
+
+        String typeField   = fields[0];
+        String sideField   = fields[1];
+        String periodField = fields[2];
+
+        UnitCellType cellType  = UnitCellType.valueOf(typeField);
+        double[]     cellSides = RegexUtil.parseDouble(RegexUtil.COMMA, sideField);
+        int[]        periodDim = RegexUtil.parseInt(RegexUtil.COMMA, periodField);
+
+        UnitCell unitCell = cellType.create(cellSides);
+        Period   period   = Period.box(periodDim);
+
+        return create(unitCell, period);
     }
 
     /**
@@ -241,6 +305,22 @@ public final class Lattice<T> {
             return unitCell().pointAt(index);
         else
             return null;
+    }
+
+    /**
+     * Returns a map containing the absolute continuous-space
+     * positions of all lattice occupants.
+     *
+     * @return a map containing the absolute continuous-space
+     * positions of all lattice occupants.
+     */
+    public Map<T, Point> mapPoints() {
+        Map<T, Point> pointMap = new HashMap<T, Point>(indexMap.size());
+
+        for (Map.Entry<T, UnitIndex> entry : indexMap.entrySet())
+            pointMap.put(entry.getKey(), unitCell.pointAt(entry.getValue()));
+
+        return pointMap;
     }
 
     /**
