@@ -333,6 +333,42 @@ public final class CollectionUtil {
     }
 
     /**
+     * Selects one element at random from a collection using the
+     * global random number generator.
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param collection the collection to sample from.
+     *
+     * @return the randomly sampled element.
+     *
+     * @throws IllegalArgumentException if collection is empty.
+     */
+    public static <V> V sampleOne(Collection<V> collection) {
+        return sampleOne(collection, JamRandom.global());
+    }
+
+    /**
+     * Selects one element at random from a collection.
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param collection the collection to sample from.
+     *
+     * @param random the random number source.
+     *
+     * @return the randomly sampled element.
+     *
+     * @throws IllegalArgumentException if collection is empty.
+     */
+    public static <V> V sampleOne(Collection<V> collection, JamRandom random) {
+        if (collection.isEmpty())
+            throw new IllegalArgumentException("Empty collection.");
+        else
+            return get(collection, random.nextInt(0, collection.size()));
+    }
+
+    /**
      * Splits a collection into lists of equal length, except for the
      * last list when the original collection cannot be split exactly.
      *

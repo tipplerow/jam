@@ -210,6 +210,21 @@ public class CollectionUtilTest extends NumericTestBase {
             assertEquals(0.20, MultisetUtil.frequency(counts, s), 0.002);
     }
 
+    @Test public void testSampleOne() {
+        Multiset<String> strings = HashMultiset.create();
+        Multiset<String> sampled = HashMultiset.create();
+
+        strings.addAll(List.of("A", "B", "B", "C", "C", "C", "D", "D", "D", "D"));
+
+        for (int trial = 0; trial < 100000; ++trial)
+            sampled.add(CollectionUtil.sampleOne(strings));
+
+        assertEquals(0.1, MultisetUtil.frequency(sampled, "A"), 0.002);
+        assertEquals(0.2, MultisetUtil.frequency(sampled, "B"), 0.002);
+        assertEquals(0.3, MultisetUtil.frequency(sampled, "C"), 0.002);
+        assertEquals(0.4, MultisetUtil.frequency(sampled, "D"), 0.002);
+    }
+
     @Test public void testSplit() {
         Set<String> strings = new TreeSet<String>(List.of("1", "2", "3", "4", "5", "6"));
 
