@@ -264,6 +264,16 @@ public final class Lattice<T> {
     }
 
     /**
+     * Identifies completely full lattices.
+     *
+     * @return {@code true} iff every site in this lattice is
+     * occupied.
+     */
+    public boolean isFull() {
+        return countOccupants() == period.countSites();
+    }
+
+    /**
      * Identifies occupied unit cells.
      *
      * @param point a continuous-space coordinate to examine (given as

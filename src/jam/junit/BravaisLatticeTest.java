@@ -510,7 +510,13 @@ public class BravaisLatticeTest {
                     Integer.valueOf(10),
                     Integer.valueOf(11));
 
+        assertTrue(lattice.isEmpty());
+        assertFalse(lattice.isFull());
+
         lattice.fill(occupants);
+
+        assertFalse(lattice.isEmpty());
+        assertTrue(lattice.isFull());
 
         for (Integer occupant : occupants)
             assertTrue(lattice.contains(occupant));
