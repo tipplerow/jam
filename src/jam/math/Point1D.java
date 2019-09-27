@@ -18,6 +18,11 @@ public final class Point1D implements Point {
     }
 
     /**
+     * The point at the origin.
+     */
+    public static final Point1D ORIGIN = at(0.0);
+
+    /**
      * Returns the one-dimensional point at a fixed location.
      *
      * @param x the x-coordinate.

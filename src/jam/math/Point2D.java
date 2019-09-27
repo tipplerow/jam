@@ -26,6 +26,11 @@ public final class Point2D implements Point {
     }
 
     /**
+     * The point at the origin.
+     */
+    public static final Point2D ORIGIN = at(0.0, 0.0);
+
+    /**
      * A comparator to sort points into ascending order by their
      * x-coordinate.
      */

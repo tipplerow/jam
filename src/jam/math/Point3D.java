@@ -32,6 +32,11 @@ public final class Point3D implements Point {
     }
 
     /**
+     * The point at the origin.
+     */
+    public static final Point3D ORIGIN = at(0.0, 0.0, 0.0);
+
+    /**
      * Returns the three-dimensional point at a fixed location.
      *
      * @param x the x-coordinate.
