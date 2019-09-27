@@ -176,6 +176,22 @@ public final class Lattice<T> {
     }
 
     /**
+     * Identifies occupants on this lattice.
+     *
+     * @param occupants a collection of occupants to examine.
+     *
+     * @return {@code true} iff this lattice contains every occupant
+     * in the specified collection.
+     */
+    public boolean containsAll(Collection<? extends T> occupants) {
+        for (T occupant : occupants)
+            if (!contains(occupant))
+                return false;
+
+        return true;
+    }
+
+    /**
      * Returns the number of occupants on this lattice.
      *
      * @return the number of occupants on this lattice.

@@ -518,6 +518,9 @@ public class BravaisLatticeTest {
         assertFalse(lattice.isEmpty());
         assertTrue(lattice.isFull());
 
+        assertTrue(lattice.containsAll(occupants));
+        assertFalse(lattice.containsAll(List.of(Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(33))));
+
         for (Integer occupant : occupants)
             assertTrue(lattice.contains(occupant));
 
