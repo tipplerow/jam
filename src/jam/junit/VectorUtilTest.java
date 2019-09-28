@@ -30,17 +30,6 @@ public class VectorUtilTest extends NumericTestBase {
         assertDouble( 4, VectorUtil.bracket(array,  3.01));
     }
 
-    @Test public void testCreate() {
-	int length = 10;
-	double fill = 1.234;
-
-	double[] vector = VectorUtil.create(length, fill);
-	assertEquals(length, vector.length);
-
-	for (int k = 0; k < vector.length; k++)
-	    assertEquals(fill, vector[k], TOLERANCE);
-    }
-
     @Test public void testCopy() {
         double[] v1 = VectorUtil.create(10, 1.234);
         double[] v2 = VectorUtil.copy(v1);
@@ -59,6 +48,22 @@ public class VectorUtilTest extends NumericTestBase {
         assertEquals(1.234, v1[1], TOLERANCE);
     }
 
+    @Test public void testCreate() {
+	int length = 10;
+	double fill = 1.234;
+
+	double[] vector = VectorUtil.create(length, fill);
+	assertEquals(length, vector.length);
+
+	for (int k = 0; k < vector.length; k++)
+	    assertEquals(fill, vector[k], TOLERANCE);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testCreateInvalid() {
+	VectorUtil.create(-1, -1.1);
+    }
+
     @Test public void testEquals() {
         double[] x1 = new double[] { 1.0, 2.0, 3.0 };
         double[] x2 = new double[] { 1.0, 2.0, 3.0 };
@@ -72,9 +77,11 @@ public class VectorUtilTest extends NumericTestBase {
         assertFalse(VectorUtil.equals(x1, x5, TOLERANCE));
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testCreateInvalid() {
-	VectorUtil.create(-1, -1.1);
+    @Test public void testNormalize() {
+        double[] values = new double[] { 1.0, -2.0, 5.0 };
+
+        VectorUtil.normalize(values);
+        assertTrue(VectorUtil.equals(new double[] { 0.25, -0.50, 1.25 }, values, TOLERANCE));
     }
 
     @Test public void testSequence() {
@@ -96,6 +103,13 @@ public class VectorUtilTest extends NumericTestBase {
         assertDouble( 0.1,  sequence[1]);
         assertDouble( 1.0,  sequence[2]);
         assertDouble(10.0,  sequence[3]);
+    }
+
+    @Test public void testSum() {
+        assertDouble(0.0, VectorUtil.sum());
+        assertDouble(1.0, VectorUtil.sum(1.0));
+        assertDouble(3.0, VectorUtil.sum(1.0, 2.0));
+        assertDouble(6.0, VectorUtil.sum(new double [] { 1.0, 2.0, 3.0 }));
     }
 
     @Test public void testListToArray() {

@@ -108,6 +108,26 @@ public final class VectorUtil {
     }
 
     /**
+     * Normalizes an array of values: rescales each value by the same
+     * scalar factor to generate a unit sum.
+     *
+     * @param values the values to normalize.
+     *
+     * @throws RuntimeException if the values sum to zero.
+     */
+    public static void normalize(double[] values) {
+        double sum = sum(values);
+
+        if (DoubleComparator.DEFAULT.isZero(sum))
+            throw new IllegalArgumentException("Values sum to zero.");
+
+        double rescale = 1.0 / sum;
+
+        for (int k = 0; k < values.length; ++k)
+            values[k] *= rescale;
+    }
+
+    /**
      * Creates new vector with randomly sampled elements.
      *
      * @param N the length of the vector to create.
@@ -184,6 +204,22 @@ public final class VectorUtil {
 
         for (int k = 0; k < result.length; ++k)
             result[k] = Math.exp(result[k]);
+
+        return result;
+    }
+
+    /**
+     * Computes the sum of an array of values.
+     *
+     * @param values the values to sum.
+     *
+     * @return the sum of the input values.
+     */
+    public static double sum(double... values) {
+        double result = 0.0;
+
+        for (double value : values)
+            result += value;
 
         return result;
     }
