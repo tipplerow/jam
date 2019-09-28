@@ -8,6 +8,9 @@ import jam.vector.JamVector;
  * methods for them.
  */
 public enum RealDistributionType {
+    /**
+     * The Dirac delta distribution.
+     */
     DIRAC_DELTA {
         /**
          * Creates a new Dirac delta distribution.
@@ -27,6 +30,31 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The exponential distribution.
+     */
+    EXPONENTIAL {
+        /**
+         * Creates a new exponential distribution.
+         *
+         * @param param the rate parameter for the distribution.
+         *
+         * @return the new exponential distribution.
+         *
+         * @throws IllegalArgumentException unless the parameter
+         * vector has exactly one element.
+         */
+        @Override public RealDistribution create(double... param) {
+            if (param.length != 1)
+                throw new IllegalArgumentException("Invalid parameter set.");
+
+            return new ExponentialDistribution(param[0]);
+        }
+    },
+
+    /**
+     * The Frechet distribution.
+     */
     FRECHET {
         /**
          * Creates a new Frechet distribution.
@@ -47,6 +75,9 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The generalized extreme value distribution.
+     */
     GEV {
         /**
          * Creates a new generalized extreme value distribution.
@@ -67,6 +98,9 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The Gumbel distribution.
+     */
     GUMBEL {
         /**
          * Creates a new Gumbel distribution.
@@ -87,6 +121,9 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The log-normal distribution.
+     */
     LOG_NORMAL {
         /**
          * Creates a new log-normal distribution.
@@ -107,6 +144,9 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The log-uniform distribution.
+     */
     LOG_UNIFORM {
         /**
          * Creates a new log-uniform distribution.
@@ -127,6 +167,9 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The normal (Gaussian) distribution.
+     */
     NORMAL {
         /**
          * Creates a new normal distribution.
@@ -147,6 +190,9 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The reverse Weibull distribution.
+     */
     REVERSE_WEIBULL {
         /**
          * Creates a new reverse Weibull distribution.
@@ -167,6 +213,9 @@ public enum RealDistributionType {
         }
     },
 
+    /**
+     * The uniform real distribution.
+     */
     UNIFORM {
         /**
          * Creates a new uniform real distribution.
