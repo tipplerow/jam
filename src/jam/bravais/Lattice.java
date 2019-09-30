@@ -332,6 +332,17 @@ public final class Lattice<T> {
     }
 
     /**
+     * Returns a list containing the occupants of this lattice (in no
+     * particular order).
+     *
+     * @return a list containing the occupants of this lattice (in no
+     * particular order).
+     */
+    public List<T> listOccupants() {
+        return new ArrayList<T>(indexMap.keySet());
+    }
+
+    /**
      * Returns the continuous-space position of an occupant on this
      * lattice (in absolute coordinates, not as a periodic image).
      *
