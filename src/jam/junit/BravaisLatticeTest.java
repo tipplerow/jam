@@ -6,6 +6,7 @@ import java.util.List;
 import jam.bravais.Lattice;
 import jam.bravais.Period;
 import jam.bravais.UnitIndex;
+import jam.lang.ObjectFactory;
 import jam.math.Point;
 import jam.vector.VectorView;
 
@@ -493,7 +494,59 @@ public class BravaisLatticeTest {
         assertFalse(lattice.isOccupied(indexD2));
     }
 
-    @Test public void testFill() {
+    @Test public void testFillFactory() {
+        Lattice<Integer> lattice = Lattice.parse("SQUARE; 1.0; 3, 4");
+
+        // Ensure that this previous occupant is removed...
+        Integer int88 = Integer.valueOf(88);
+
+        assertTrue(lattice.isEmpty());
+        assertFalse(lattice.isFull());
+        assertNull(lattice.indexOf(int88));
+        assertFalse(lattice.contains(int88));
+
+        lattice.place(int88, UnitIndex.at(1, 2));
+
+        assertFalse(lattice.isEmpty());
+        assertFalse(lattice.isFull());
+        assertEquals(UnitIndex.at(1, 2), lattice.indexOf(int88));
+        assertTrue(lattice.contains(int88));
+
+        lattice.fill(ObjectFactory.forInteger());
+
+        assertFalse(lattice.isEmpty());
+        assertTrue(lattice.isFull());
+        assertNull(lattice.indexOf(int88));
+        assertFalse(lattice.contains(int88));
+
+        assertEquals(UnitIndex.at(0, 0), lattice.indexOf(Integer.valueOf(0)));
+        assertEquals(UnitIndex.at(1, 0), lattice.indexOf(Integer.valueOf(1)));
+        assertEquals(UnitIndex.at(2, 0), lattice.indexOf(Integer.valueOf(2)));
+        assertEquals(UnitIndex.at(0, 1), lattice.indexOf(Integer.valueOf(3)));
+        assertEquals(UnitIndex.at(1, 1), lattice.indexOf(Integer.valueOf(4)));
+        assertEquals(UnitIndex.at(2, 1), lattice.indexOf(Integer.valueOf(5)));
+        assertEquals(UnitIndex.at(0, 2), lattice.indexOf(Integer.valueOf(6)));
+        assertEquals(UnitIndex.at(1, 2), lattice.indexOf(Integer.valueOf(7)));
+        assertEquals(UnitIndex.at(2, 2), lattice.indexOf(Integer.valueOf(8)));
+        assertEquals(UnitIndex.at(0, 3), lattice.indexOf(Integer.valueOf(9)));
+        assertEquals(UnitIndex.at(1, 3), lattice.indexOf(Integer.valueOf(10)));
+        assertEquals(UnitIndex.at(2, 3), lattice.indexOf(Integer.valueOf(11)));
+
+        assertEquals(Integer.valueOf(0), lattice.occupantAt(UnitIndex.at(0, 0)));
+        assertEquals(Integer.valueOf(1), lattice.occupantAt(UnitIndex.at(1, 0)));
+        assertEquals(Integer.valueOf(2), lattice.occupantAt(UnitIndex.at(2, 0)));
+        assertEquals(Integer.valueOf(3), lattice.occupantAt(UnitIndex.at(0, 1)));
+        assertEquals(Integer.valueOf(4), lattice.occupantAt(UnitIndex.at(1, 1)));
+        assertEquals(Integer.valueOf(5), lattice.occupantAt(UnitIndex.at(2, 1)));
+        assertEquals(Integer.valueOf(6), lattice.occupantAt(UnitIndex.at(0, 2)));
+        assertEquals(Integer.valueOf(7), lattice.occupantAt(UnitIndex.at(1, 2)));
+        assertEquals(Integer.valueOf(8), lattice.occupantAt(UnitIndex.at(2, 2)));
+        assertEquals(Integer.valueOf(9), lattice.occupantAt(UnitIndex.at(0, 3)));
+        assertEquals(Integer.valueOf(10), lattice.occupantAt(UnitIndex.at(1, 3)));
+        assertEquals(Integer.valueOf(11), lattice.occupantAt(UnitIndex.at(2, 3)));
+    }
+
+    @Test public void testFillCollection() {
         Lattice<Integer> lattice = Lattice.parse("SQUARE; 1.0; 3, 4");
 
         List<Integer> occupants =

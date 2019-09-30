@@ -11,6 +11,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import jam.app.JamProperties;
+import jam.lang.ObjectFactory;
 import jam.math.Point;
 import jam.util.RegexUtil;
 
@@ -210,8 +211,23 @@ public final class Lattice<T> {
     }
 
     /**
+     * Fills this lattice moving from left-to-right, bottom-to-top
+     * with occupants created by an object factory.  Any previous
+     * occupants will be removed.
+     *
+     * @param factory the source of new occupants.
+     */
+    public void fill(ObjectFactory<? extends T> factory) {
+        List<UnitIndex> images = period.enumerate();
+
+        for (UnitIndex image : images)
+            place(factory.newInstance(), image);
+    }
+
+    /**
      * Fills this lattice with occupants moving from left-to-right,
      * bottom-to-top in the order returned by the collection iterator.
+     * Any previous occupants will be removed.
      *
      * @param occupants the occupants to add to this lattice.
      *
