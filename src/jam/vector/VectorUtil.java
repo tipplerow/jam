@@ -108,6 +108,23 @@ public final class VectorUtil {
     }
 
     /**
+     * Computes the average of an array of values.
+     *
+     * @param values the values to average.
+     *
+     * @return the average of the input values.
+     *
+     * @throws IllegalArgumentException unless at least one value is
+     * given.
+     */
+    public static double mean(double... values) {
+        if (values.length != 0)
+            return sum(values) / values.length;
+        else
+            throw new IllegalArgumentException("At least one value is required.");
+    }
+
+    /**
      * Normalizes an array of values: rescales each value by the same
      * scalar factor to generate a unit sum.
      *

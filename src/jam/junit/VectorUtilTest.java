@@ -77,6 +77,12 @@ public class VectorUtilTest extends NumericTestBase {
         assertFalse(VectorUtil.equals(x1, x5, TOLERANCE));
     }
 
+    @Test public void testMean() {
+        assertDouble(1.0, VectorUtil.mean(1.0));
+        assertDouble(1.5, VectorUtil.mean(1.0, 2.0));
+        assertDouble(2.5, VectorUtil.mean(new double [] { 1.0, 2.0, 3.0, 4.0 }));
+    }
+
     @Test public void testNormalize() {
         double[] values = new double[] { 1.0, -2.0, 5.0 };
 
