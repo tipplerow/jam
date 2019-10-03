@@ -11,21 +11,11 @@ import jam.lang.Ordinal;
 /**
  * Represents a biologial entity that can propagate itself, e.g., a
  * cell or virus.
- *
- * <p>This class hierarcy is defined in the context of discrete-time
- * simulation: Propagators advance through time in discrete steps; at
- * each step, a propagator may produce offspring, become senescent, or
- * die (e.g., by apoptosis).
  */
 public abstract class Propagator extends Ordinal {
     private final int generation;
     private final Propagator parent;
     private final Propagator founder;
-
-    /**
-     * Possible replication states of a propagator.
-     */
-    public enum State { ACTIVE, SENESCENT, DEAD };
 
     /**
      * Creates all propagators.
@@ -37,24 +27,25 @@ public abstract class Propagator extends Ordinal {
      */
     protected Propagator(long index, Propagator parent) {
         super(index);
-        this.parent = parent;
 
-        if (parent == null) {
-            this.founder    = this;
-            this.generation = 0;
-        }
-        else {
-            this.founder    = parent.founder;
-            this.generation = parent.generation + 1;
-        }
+        this.parent = parent;
+        this.founder = deriveFounder(parent);
+        this.generation = deriveGeneration(parent);
     }
 
-    /**
-     * Returns the current replication state of this propagator.
-     *
-     * @return the current replication state of this propagator.
-     */
-    public abstract State getState();
+    private Propagator deriveFounder(Propagator parent) {
+        if (parent != null)
+            return parent.founder;
+        else
+            return this;
+    }
+
+    private static int deriveGeneration(Propagator parent) {
+        if (parent != null)
+            return parent.generation + 1;
+        else
+            return 0;
+    }
 
     /**
      * Returns the generation index for this propagator, with index
@@ -79,54 +70,27 @@ public abstract class Propagator extends Ordinal {
     }
 
     /**
-     * Returns the parent of this propagator, or {@code null} if this was
-     * a founding propagator.
+     * Returns the parent of this propagator ({@code null} if this is
+     * a founding propagator).
      *
      * <p>Subclasses may override this method and cast the return
      * value to the appropriate class.
      *
-     * @return the parent of this propagator, or {@code null} if this was
-     * a founding propagator.
+     * @return the parent of this propagator ({@code null} if this is
+     * a founding propagator).
      */
     public Propagator getParent() {
         return parent;
     }
 
     /**
-     * Identifies founding propagators.
+     * Identifies founders of new lineages.
      *
-     * @return {@code true} iff this is a founding propagator.
+     * @return {@code true} iff this is propagator founded a new
+     * lineage.
      */
     public final boolean isFounder() {
-        return founder == this;
-    }
-
-    /**
-     * Identifies propagators that are still actively dividing.
-     *
-     * @return {@code true} iff this propagator is still active.
-     */
-    public final boolean isActive() {
-        return getState().equals(State.ACTIVE);
-    }
-
-    /**
-     * Identifies propagators that have entered a senescent state.
-     *
-     * @return {@code true} iff this propagator is in a senescent
-     * state.
-     */
-    public final boolean isSenescent() {
-        return getState().equals(State.SENESCENT);
-    }
-
-    /**
-     * Identifies propagators that have died.
-     *
-     * @return {@code true} iff this propagator has died.
-     */
-    public final boolean isDead() {
-        return getState().equals(State.DEAD);
+        return parent == null;
     }
 
     /**

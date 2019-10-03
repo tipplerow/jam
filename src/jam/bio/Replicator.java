@@ -35,10 +35,6 @@ public class Replicator extends Propagator {
         return new Replicator(this);
     }
 
-    @Override public State getState() {
-        return State.ACTIVE;
-    }
-
     @Override public Replicator getFounder() {
         return (Replicator) super.getFounder();
     }
