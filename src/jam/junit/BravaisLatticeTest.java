@@ -664,6 +664,30 @@ public class BravaisLatticeTest {
                      lattice.unoccupiedNeighbors(UnitIndex.at(1, 2)));
     }
 
+    @Test public void testLinear() {
+        Lattice<String> lattice = Lattice.parse("LINEAR; 2.0; 5");
+
+        lattice.place("A", UnitIndex.at(0));
+        lattice.place("B", UnitIndex.at(1));
+        lattice.place("C", UnitIndex.at(2));
+        lattice.place("D", UnitIndex.at(3));
+        lattice.place("E", UnitIndex.at(4));
+
+        for (int imageIndex = -2; imageIndex <= 2; ++imageIndex) {
+            assertEquals("A", lattice.occupantAt(UnitIndex.at(5 * imageIndex + 0)));
+            assertEquals("B", lattice.occupantAt(UnitIndex.at(5 * imageIndex + 1)));
+            assertEquals("C", lattice.occupantAt(UnitIndex.at(5 * imageIndex + 2)));
+            assertEquals("D", lattice.occupantAt(UnitIndex.at(5 * imageIndex + 3)));
+            assertEquals("E", lattice.occupantAt(UnitIndex.at(5 * imageIndex + 4)));
+        }
+
+        assertEquals(List.of("E", "B"), lattice.neighborsOf("A"));
+        assertEquals(List.of("A", "C"), lattice.neighborsOf("B"));
+        assertEquals(List.of("B", "D"), lattice.neighborsOf("C"));
+        assertEquals(List.of("C", "E"), lattice.neighborsOf("D"));
+        assertEquals(List.of("D", "A"), lattice.neighborsOf("E"));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.BravaisLatticeTest");
     }

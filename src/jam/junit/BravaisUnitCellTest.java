@@ -11,6 +11,20 @@ import static org.junit.Assert.*;
 public class BravaisUnitCellTest {
     private static final double ROOT3 = Math.sqrt(3.0);
 
+    @Test public void testLinear() {
+        UnitCell cell = UnitCell.linear(2.5);
+
+        assertEquals(UnitIndex.at(-1), cell.indexOf(Point.at(-1.26)));
+        assertEquals(UnitIndex.at( 0), cell.indexOf(Point.at(-1.24)));
+        assertEquals(UnitIndex.at( 0), cell.indexOf(Point.at( 0.0)));
+        assertEquals(UnitIndex.at( 0), cell.indexOf(Point.at( 1.24)));
+        assertEquals(UnitIndex.at( 1), cell.indexOf(Point.at( 1.26)));
+
+        assertEquals(Point.at(-2.5), cell.pointAt(UnitIndex.at(-1)));
+        assertEquals(Point.at( 0.0), cell.pointAt(UnitIndex.at( 0)));
+        assertEquals(Point.at( 2.5), cell.pointAt(UnitIndex.at( 1)));
+    }
+
     @Test public void testHexagonal() {
         UnitCell cell = UnitCell.hexagonal(2.0);
 

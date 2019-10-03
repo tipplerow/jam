@@ -3,6 +3,22 @@ package jam.bravais;
 
 public enum UnitCellType {
     /**
+     * The one-dimensional unit cell.
+     */
+    LINEAR {
+        @Override public UnitCell create(double... length) {
+            if (length.length == 1)
+                return LinearUnitCell.create(length[0]);
+            else
+                throw new IllegalArgumentException("Exactly one length is required.");
+        }
+
+        @Override public UnitCell fundamental() {
+            return LinearUnitCell.FUNDAMENTAL;
+        }
+    },
+
+    /**
      * The two-dimensional hexagonal unit cell.
      */
     HEXAGONAL {

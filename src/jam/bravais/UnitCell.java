@@ -11,6 +11,19 @@ import jam.vector.VectorView;
  */
 public interface UnitCell {
     /**
+     * Returns a one-dimensional unit cell with a given length.
+     *
+     * @param length the length of the unit cell.
+     *
+     * @return a one-dimensional unit cell with the specified length.
+     *
+     * @throws IllegalArgumentException unless the length is positive.
+     */
+    public static UnitCell linear(double length) {
+        return LinearUnitCell.create(length);
+    }
+
+    /**
      * Returns a two-dimensional hexagonal unit cell with a given side
      * length.
      *
