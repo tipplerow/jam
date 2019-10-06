@@ -11,31 +11,31 @@ import jam.report.ReportWriter;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-class TestRecord implements ReportRecord {
-    public final String key;
-    public final int value;
-
-    public TestRecord(String key, int value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    public static final String BASE_NAME = "report-writer-test.txt";
-
-    @Override public String getBaseName() {
-        return BASE_NAME;
-    }
-
-    @Override public String getHeaderLine() {
-        return "key,value";
-    }
-
-    @Override public String formatLine() {
-        return String.format("%s,%d", key, value);
-    }
-}
-
 public class ReportWriterTest {
+    private static final class TestRecord implements ReportRecord {
+        public final String key;
+        public final int value;
+
+        private TestRecord(String key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public static final String BASE_NAME = "report-writer-test.txt";
+
+        @Override public String getBaseName() {
+            return BASE_NAME;
+        }
+
+        @Override public String getHeaderLine() {
+            return "key,value";
+        }
+
+        @Override public String formatLine() {
+            return String.format("%s,%d", key, value);
+        }
+    }
+
     @Test public void testWriter() {
         File workDir = new File("__workdir__");
         File rptFile = new File(workDir, TestRecord.BASE_NAME);
