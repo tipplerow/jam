@@ -42,6 +42,31 @@ public final class ReportWriter<R extends ReportRecord> implements Closeable, Fl
     }
 
     /**
+     * Writes records in a specific output directory, overwriting the
+     * previous report file if it exists.
+     *
+     * @param <R> the runtime record type.
+     *
+     * @param reportDir the directory where the report file will be
+     * written (created if necessary).
+     *
+     * @param records the records to write.
+     *
+     * @throws RuntimeException if the report directory does not exist
+     * and cannot be created.
+     */
+    public static <R extends ReportRecord> void write(File reportDir, Collection<R> records) {
+        ReportWriter<R> writer = ReportWriter.create(reportDir);
+
+        try {
+            writer.write(records);
+        }
+        finally {
+            writer.close();
+        }
+    }
+
+    /**
      * Writes records to the report file.
      *
      * @param records the records to write.
