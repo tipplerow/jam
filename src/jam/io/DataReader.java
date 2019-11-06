@@ -3,7 +3,9 @@ package jam.io;
 
 import java.io.Closeable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
@@ -96,6 +98,51 @@ public final class DataReader implements Closeable, Iterable<String> {
      */
     public static DataReader open(String fileName, Pattern comment) {
         return open(new File(fileName), comment);
+    }
+
+    /**
+     * Reads all data lines from a specified file.
+     *
+     * @param file the file to read.
+     *
+     * @param comment the pattern that identifies the start of a
+     * single-line or inline comment.
+     *
+     * @return a list containing all data lines in the file.
+     *
+     * @throws RuntimeException if the file cannot be opened for
+     * reading.
+     */
+    public static List<String> read(File file, Pattern comment) {
+        DataReader reader = open(file, comment);
+        List<String> lines = new ArrayList<String>();
+
+        try {
+            for (String line : reader)
+                lines.add(line);
+        }
+        finally {
+            reader.close();
+        }
+
+        return lines;
+    }
+
+    /**
+     * Reads all data lines from a specified file.
+     *
+     * @param fileName the name of the file to read.
+     *
+     * @param comment the pattern that identifies the start of a
+     * single-line or inline comment.
+     *
+     * @return a list containing all data lines in the file.
+     *
+     * @throws RuntimeException if the file cannot be opened for
+     * reading.
+     */
+    public static List<String> read(String fileName, Pattern comment) {
+        return read(new File(fileName), comment);
     }
 
     /**

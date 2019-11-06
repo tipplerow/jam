@@ -1,7 +1,6 @@
 
 package jam.junit;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,14 +22,7 @@ public class DataReaderTest {
     }
 
     private void assertLines(String fileName, List<String> expected) {
-        List<String> actual = new ArrayList<String>();
-        DataReader reader = DataReader.open(fileName, comment);
-
-        for (String line : reader)
-            actual.add(line);
-
-        reader.close();
-        assertEquals(expected, actual);
+        assertEquals(expected, DataReader.read(fileName, comment));
     }
 
     @Test public void testNext() {
