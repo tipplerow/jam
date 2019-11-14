@@ -53,6 +53,20 @@ public class BravaisUnitCellTest {
         assertEquals(Point.at(5.0, 7.5), cell.pointAt(UnitIndex.at(2, 3)));
     }
 
+    @Test public void testCubic() {
+        UnitCell cell = UnitCell.cubic(2.5);
+
+        assertEquals(UnitIndex.at(1, 2, 3), cell.indexOf(Point.at(3.74, 6.24, 8.74)));
+        assertEquals(UnitIndex.at(2, 2, 3), cell.indexOf(Point.at(3.76, 6.24, 8.74)));
+        assertEquals(UnitIndex.at(2, 3, 3), cell.indexOf(Point.at(3.76, 6.26, 8.74)));
+        assertEquals(UnitIndex.at(2, 3, 4), cell.indexOf(Point.at(3.76, 6.26, 8.76)));
+
+        assertEquals(Point.at( 2.5,  5.0,  7.5), cell.pointAt(UnitIndex.at( 1,  2, 3)));
+        assertEquals(Point.at( 5.0,  5.0,  5.0), cell.pointAt(UnitIndex.at( 2,  2, 2)));
+        assertEquals(Point.at(-2.5, -7.5, 15.0), cell.pointAt(UnitIndex.at(-1, -3, 6)));
+        assertEquals(Point.at(-5.0, -2.5,  0.0), cell.pointAt(UnitIndex.at(-2, -1, 0)));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.BravaisUnitCellTest");
     }
