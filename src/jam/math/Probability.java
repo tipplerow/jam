@@ -2,7 +2,6 @@
 package jam.math;
 
 import java.util.Arrays;
-//import java.util.Collection;
 import java.util.Collections;
 
 import jam.lang.DomainDouble;
