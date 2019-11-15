@@ -1,6 +1,8 @@
 
 package jam.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import jam.math.IntUtil;
@@ -214,6 +216,52 @@ public final class RegexUtil {
             throw new IllegalArgumentException(String.format("Expected [%d] fields but found [%d].", count, fields.length));
 
         return trim(fields);
+    }
+
+    /**
+     * Splits strings into fields defined by a given pattern and
+     * trims leading and trailing white space from each field.
+     *
+     * @param pattern the delimiting pattern.
+     *
+     * @param strings the delimited strings.
+     *
+     * @return a list of arrays containing all delimted fields,
+     * stripped of leading and trailing white space.
+     */
+    public static List<String[]> split(Pattern pattern, List<String> strings) {
+        List<String[]> fields = new ArrayList<String[]>(strings.size());
+
+        for (String string : strings)
+            fields.add(split(pattern, string));
+
+        return fields;
+    }
+
+    /**
+     * Splits strings into a pre-defined number of fields defined by a
+     * given pattern and trims leading and trailing white space from
+     * each field.
+     *
+     * @param pattern the delimiting pattern.
+     *
+     * @param strings the delimited strings.
+     *
+     * @param count the expected number of fields.
+     *
+     * @return a list of arrays containing all delimted fields,
+     * stripped of leading and trailing white space.
+     *
+     * @throws IllegalArgumentException unless the number of fields
+     * matches the expected value for all input strings.
+     */
+    public static List<String[]> split(Pattern pattern, List<String> strings, int count) {
+        List<String[]> fields = new ArrayList<String[]>(strings.size());
+
+        for (String string : strings)
+            fields.add(split(pattern, string, count));
+
+        return fields;
     }
 
     public static String stripComment(Pattern pattern, String string) {
