@@ -19,6 +19,12 @@ public class RegexUtilTest extends NumericTestBase {
 	    assertEquals(expected[k], fields[k]);
     }
 
+    @Test public void testCountFields() {
+        assertEquals(1, RegexUtil.countFields(RegexUtil.COMMA, "abc"));
+        assertEquals(2, RegexUtil.countFields(RegexUtil.COMMA, "a, bc"));
+        assertEquals(3, RegexUtil.countFields(RegexUtil.COMMA, "a, b, c"));
+    }
+
     @Test public void testCloseParen() {
         testSplit(RegexUtil.CLOSE_PAREN, "abc(def)ghi", 2, "abc(def", "ghi");
     }

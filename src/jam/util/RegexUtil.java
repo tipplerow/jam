@@ -75,6 +75,19 @@ public final class RegexUtil {
     public static final Pattern TAB = Pattern.compile("\\t");
 
     /**
+     * Counts the number of fields in a delimited string.
+     *
+     * @param pattern the delimiting pattern.
+     *
+     * @param string the delimited string.
+     *
+     * @return the number of fields in the input string.
+     */
+    public static int countFields(Pattern pattern, String string) {
+        return pattern.split(string).length;
+    }
+
+    /**
      * Parses a delimited string of floating-point values.
      *
      * @param pattern the delimiting pattern.
