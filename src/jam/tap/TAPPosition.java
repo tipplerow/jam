@@ -6,7 +6,7 @@ package jam.tap;
  * predictions.
  *
  * <p>See the consensus scoring matrix in Table 1 of Peters et al.,
- * J. Immunol. 171, 1741--1749 (2003).
+ * <em>J. Immunol.</em> <b>171</b>, 1741-1749 (2003).
  */
 public enum TAPPosition {
     NTerm1,

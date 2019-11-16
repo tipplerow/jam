@@ -15,8 +15,8 @@ import jam.peptide.Residue;
 /**
  * Predicts peptides that will be transported into the endoplasmic
  * reticulum by the transporter associated with antigen processing
- * (TAP) using a method reported by Peters et al., J. Immunol. 171,
- * 1741--1749 (2003).
+ * (TAP).  The method was developed by Peters et al. 
+ * <em>J. Immunol.</em> <b>171</b>, 1741-1749 (2003).
  */
 public final class TAP {
     private final double alpha;
