@@ -34,17 +34,6 @@ public class NetChopTest {
     @Test public void testChop() {
         if (NetChop.isInstalled())
             assertEquals(FRAGMENTS, NetChop.chop(PEPTIDE, new int[] { 9 }, 0.5));
-
-        Peptide pep =
-            Peptide.parse("MALKEGLRAWKRIFWRQILLTLGLLGLFLYGLPKFRHLEALIPMGVCPSATMSQLRDNFT" +
-                          "GALRPWARPEVLTCTPWGAPIIWDGSFDPDVAKQEARQQNLTIGLTIFAVGRYLEKYLER" +
-                          "FLETAEQHFMAGQSVMYYVFTELPGAVPRVALGPGRRLPVERVARERRWQDVSMARMRTL" +
-                          "HAALGGLPGREAHFMFCMDVDQHFSGTFGPEALAESVAQLHSWHYHWPSWLLPFERDAHS" +
-                          "AAAMAWGQGDFYNHAAVFGGSVAALRGLTAHCAGGLDWDRARGLEARWHDESHLNKFFWL" +
-                          "HKPAKVLSPEFCWSPDIGPRAEIRRPRLLWAPKGYRLLRN");
-        List<Peptide> fragments = NetChop.chop(pep, new int[] { 9 }, 0.5);
-        System.out.println(fragments.size());
-        System.out.println(fragments);
     }
 
     public static void main(String[] args) {
