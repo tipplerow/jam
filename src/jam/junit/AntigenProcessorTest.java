@@ -43,8 +43,14 @@ public class AntigenProcessorTest extends NumericTestBase {
             return;
 
         List<Peptide> fragments = processor.process(BEX4);
-        System.out.println(fragments.size());
-        System.out.println(fragments);
+
+        assertEquals(List.of(Peptide.parse("HLGGGEGQK"),
+                             Peptide.parse("AIPNRHIEH"),
+                             Peptide.parse("KRKTREQQM"),
+                             Peptide.parse("QTPEPDNHY"),
+                             Peptide.parse("PNRHIEHNEA"),
+                             Peptide.parse("FQTPEPDNHY")),
+                     fragments);
     }
 
     public static void main(String[] args) {
