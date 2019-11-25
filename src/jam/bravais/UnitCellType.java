@@ -3,6 +3,22 @@ package jam.bravais;
 
 public enum UnitCellType {
     /**
+     * The simple cubic unit cell.
+     */
+    CUBIC {
+        @Override public UnitCell create(double... length) {
+            if (length.length == 1)
+                return new SimpleCubicUnitCell(length[0]);
+            else
+                throw new IllegalArgumentException("Exactly one length is required.");
+        }
+
+        @Override public UnitCell fundamental() {
+            return SimpleCubicUnitCell.FUNDAMENTAL;
+        }
+    },
+
+    /**
      * The one-dimensional unit cell.
      */
     LINEAR {
