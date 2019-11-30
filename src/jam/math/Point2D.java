@@ -1,6 +1,7 @@
 
 package jam.math;
 
+import java.text.DecimalFormat;
 import java.util.Comparator;
 
 /**
@@ -80,6 +81,10 @@ public final class Point2D implements Point {
 
     @Override public int dimensionality() {
         return 2;
+    }
+
+    @Override public String formatCSV(DecimalFormat format) {
+        return format.format(x) + "," + format.format(y);
     }
 
     @Override public double x() {

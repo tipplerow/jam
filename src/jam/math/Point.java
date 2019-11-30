@@ -1,6 +1,8 @@
 
 package jam.math;
 
+import java.text.DecimalFormat;
+
 /**
  * Represents an immutable point in space.
  */
@@ -65,6 +67,54 @@ public interface Point {
      * @return the dimensionality of this point.
      */
     public abstract int dimensionality();
+
+    /**
+     * Returns a comma-separated string containing the coordinates of
+     * this point.
+     *
+     * @param format the decimal formatter for the coordinate values.
+     *
+     * @return a comma-separated string containing the coordinates of
+     * this point.
+     */
+    public abstract String formatCSV(DecimalFormat format);
+
+    /**
+     * Returns a comma-separated header string identifying the
+     * coordinates of this point.
+     *
+     * @return a comma-separated header string identifying the
+     * coordinates of this point.
+     */
+    public default String headerCSV() {
+        return headerCSV(dimensionality());
+    }
+
+    /**
+     * Returns a comma-separated header string identifying the
+     * coordinates of points with a given dimensionality.
+     *
+     * @param dimensionality the dimensionality of the points of
+     * interest.
+     *
+     * @return a comma-separated header string identifying the
+     * coordinates of points with the specified dimensionality.
+     */
+    public static String headerCSV(int dimensionality) {
+        switch (dimensionality) {
+        case 1:
+            return "x";
+
+        case 2:
+            return "x,y";
+
+        case 3:
+            return "x,y,z";
+
+        default:
+            throw new IllegalArgumentException("Unsupported dimensionality.");
+        }
+    }
 
     /**
      * Returns the {@code x}-component of this vector.

@@ -1,6 +1,8 @@
 
 package jam.math;
 
+import java.text.DecimalFormat;
+
 /**
  * Represents an immutable point on a line.
  */
@@ -42,6 +44,10 @@ public final class Point1D implements Point {
 
     @Override public int dimensionality() {
         return 1;
+    }
+
+    @Override public String formatCSV(DecimalFormat format) {
+        return format.format(x);
     }
 
     @Override public double x() {
