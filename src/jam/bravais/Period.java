@@ -50,7 +50,6 @@ public interface Period {
         return new Period3D(N, N, N);
     }
 
-
     /**
      * Creates an arbitrary lattice period.
      *
@@ -71,6 +70,34 @@ public interface Period {
         
         case 3:
             return new Period3D(period[0], period[1], period[2]);
+
+        default:
+            throw new IllegalArgumentException("Invalid period dimensionality.");
+        }
+    }
+
+    /**
+     * Creates an N-dimensional box with sides of equal length.
+     *
+     * @param period the periodic length along each direction.
+     *
+     * @param dim the dimensionality of the box.
+     *
+     * @return a lattice period with the specified dimensions.
+     *
+     * @throws IllegalArgumentException unless the dimensionality lies
+     * between one and three (inclusive).
+     */
+    public static Period boxND(int period, int dim) {
+        switch (dim) {
+        case 1:
+            return linear(period);
+
+        case 2:
+            return square(period);
+
+        case 3:
+            return cubic(period);
 
         default:
             throw new IllegalArgumentException("Invalid period dimensionality.");

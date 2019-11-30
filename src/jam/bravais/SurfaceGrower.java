@@ -1,9 +1,8 @@
 
 package jam.bravais;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
@@ -13,6 +12,7 @@ import com.google.common.collect.Multiset;
 
 import jam.app.JamLogger;
 import jam.app.JamProperties;
+import jam.io.IOUtil;
 import jam.lang.ObjectFactory;
 import jam.math.Point;
 import jam.util.CollectionUtil;
@@ -36,6 +36,14 @@ public final class SurfaceGrower<T> {
         this.factory = factory;
         this.targetSize = targetSize;
     }
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#0.0###");
+
+    /**
+     * Name of the output file containing the coordinates of the grown
+     * object.
+     */
+    public static final String OUTPUT_FILE = "grow.csv";
 
     /**
      * Simulates surface-limited growth on a lattice.
@@ -65,6 +73,40 @@ public final class SurfaceGrower<T> {
 
         SurfaceGrower<T> grower = new SurfaceGrower<T>(lattice, factory, size);
         grower.grow();
+    }
+
+    /**
+     * Simulates one realization of surface-limited growth.
+     *
+     * <p>This method fills the empty lattice by placing the first
+     * occupant at the origin and then adding occupants at randomly
+     * selected <em>expansion</em> sites (sites that are unoccupied
+     * and neighbors to occupied sites).
+     *
+     * @param unitCell the unit cell of the supporting lattice.
+     *
+     * @param size the number of occupants to add.
+     *
+     * @throws IllegalArgumentException unless the size is positive.
+     */
+    public static void run(UnitCell unitCell, int size) {
+        int dim = unitCell.dimensionality();
+        Period period = Period.boxND(10000, dim);
+
+        Lattice<Integer> lattice = Lattice.create(unitCell, period);
+        ObjectFactory<Integer> factory = ObjectFactory.forInteger();
+
+        grow(lattice, factory, size);
+
+        PrintWriter writer = IOUtil.openWriter(OUTPUT_FILE, false);
+        writer.println("cell," + Point.headerCSV(dim));
+
+        Map<Integer, Point> points = new TreeMap<Integer, Point>(lattice.mapPoints());
+
+        for (Map.Entry<Integer, Point> entry : points.entrySet())
+            writer.println(entry.getKey().toString() + "," + entry.getValue().formatCSV(DECIMAL_FORMAT));
+
+        writer.close();
     }
 
     private Lattice<T> grow() {
@@ -109,30 +151,11 @@ public final class SurfaceGrower<T> {
         return CollectionUtil.sampleOne(openSites);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         //
         // Change the parameters as desired to test different lattices
         // and sizes...
         //
-        UnitCell unitCell = HexagonalUnitCell.FUNDAMENTAL;
-        Period   period   = Period.box(10000, 10000);
-
-        Lattice<Integer> lattice = Lattice.create(unitCell, period);
-        ObjectFactory<Integer> factory = ObjectFactory.forInteger();
-
-        grow(lattice, factory, 100000);
-
-        PrintWriter writer = new PrintWriter("grow.csv");
-        writer.println("cell,x,y");
-
-        Map<Integer, Point> points = new TreeMap<Integer, Point>(lattice.mapPoints());
-
-        for (Map.Entry<Integer, Point> entry : points.entrySet())
-            writer.println(String.format("%d, %.1f, %.1f",
-                                         entry.getKey().intValue(),
-                                         entry.getValue().coord(0),
-                                         entry.getValue().coord(1)));
-
-        writer.close();
+        run(SimpleCubicUnitCell.FUNDAMENTAL, 1000000);
     }
 }
