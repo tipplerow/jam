@@ -69,6 +69,26 @@ public interface Point {
     public abstract int dimensionality();
 
     /**
+     * Computes the distance between this point and another.
+     *
+     * @param that the reference point.
+     *
+     * @return the distance between this point and the input point.
+     *
+     * @throws RuntimeException unless this point and the input point
+     * have the same dimensionality.
+     */
+    public default double distance(Point that) {
+        validateDimensionality(that);
+        double dsqr = 0.0;
+
+        for (int dim = 0; dim < dimensionality(); ++dim)
+            dsqr += Math.pow(this.coord(dim) - that.coord(dim), 2);
+
+        return Math.sqrt(dsqr);
+    }
+
+    /**
      * Returns a comma-separated string containing the coordinates of
      * this point.
      *
@@ -114,6 +134,19 @@ public interface Point {
         default:
             throw new IllegalArgumentException("Unsupported dimensionality.");
         }
+    }
+
+    /**
+     * Ensures that this point and another point have the same dimensionality.
+     *
+     * @param that the reference point.
+     *
+     * @throws RuntimeException unless this point and the input point
+     * have the same dimensionality.
+     */
+    public default void validateDimensionality(Point that) {
+        if (this.dimensionality() != that.dimensionality())
+            throw new IllegalArgumentException("Inconsistent dimensionality.");
     }
 
     /**

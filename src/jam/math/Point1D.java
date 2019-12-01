@@ -46,6 +46,14 @@ public final class Point1D implements Point {
         return 1;
     }
 
+    @Override public double distance(Point that) {
+        return distance1D((Point1D) that);
+    }
+
+    private double distance1D(Point1D that) {
+        return Math.abs(this.x - that.x);
+    }
+
     @Override public String formatCSV(DecimalFormat format) {
         return format.format(x);
     }

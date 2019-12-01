@@ -72,6 +72,18 @@ public final class Point3D implements Point {
         return 3;
     }
 
+    @Override public double distance(Point that) {
+        return distance3D((Point3D) that);
+    }
+
+    private double distance3D(Point3D that) {
+        double dx = this.x - that.x;
+        double dy = this.y - that.y;
+        double dz = this.z - that.z;
+
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
     @Override public String formatCSV(DecimalFormat format) {
         return format.format(x) + "," + format.format(y) + "," + format.format(z);
     }

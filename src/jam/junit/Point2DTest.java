@@ -36,6 +36,14 @@ public class Point2DTest extends NumericTestBase {
         assertEquals(pt1, pts[3]);
     }
 
+    @Test public void testDistance() {
+        Point2D pt1 = Point2D.at( 1.0, 2.0);
+        Point2D pt2 = Point2D.at(-2.0, 6.0);
+
+        assertDouble(5.0, pt1.distance(pt2));
+        assertDouble(5.0, pt2.distance(pt1));
+    }
+
     @Test public void testEquals() {
         assertTrue(p1a.equals(p1a));
         assertTrue(p1a.equals(p1b));

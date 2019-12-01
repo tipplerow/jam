@@ -83,6 +83,17 @@ public final class Point2D implements Point {
         return 2;
     }
 
+    @Override public double distance(Point that) {
+        return distance2D((Point2D) that);
+    }
+
+    private double distance2D(Point2D that) {
+        double dx = this.x - that.x;
+        double dy = this.y - that.y;
+
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
     @Override public String formatCSV(DecimalFormat format) {
         return format.format(x) + "," + format.format(y);
     }
