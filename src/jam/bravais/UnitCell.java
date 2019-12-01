@@ -1,9 +1,11 @@
 
 package jam.bravais;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jam.math.Point;
+import jam.util.ListUtil;
 import jam.vector.VectorView;
 
 /**
@@ -68,11 +70,60 @@ public interface UnitCell {
     }
 
     /**
+     * Returns a face-centered cubic (FCC) unit cell with a given side
+     * length.
+     *
+     * @param side the side length of the unit cell.
+     *
+     * @return a face-centered cubic unit cell with the specified side
+     * length.
+     *
+     * @throws IllegalArgumentException unless the side length is positive.
+     */
+    public static UnitCell FCC(double side) {
+        return new FCCUnitCell(side);
+    }
+
+    /**
+     * Returns the number of nearest neighbors for each lattice site.
+     *
+     * @return the number of nearest neighbors for each lattice site.
+     */
+    public default int countNeighbors() {
+        return viewNeighborTranslationVectors().size();
+    }
+
+    /**
      * Returns the dimensionality of this unit cell.
      *
      * @return the dimensionality of this unit cell.
      */
     public abstract int dimensionality();
+
+    /**
+     * Finds the nearest neighbors for a given unit cell location.
+     *
+     * @param index the discrete unit index of a unit cell.
+     *
+     * @return the indexes of the neighboring cells nearest to the
+     * cell at the specified location.
+     */
+    public default List<UnitIndex> getNeighbors(UnitIndex index) {
+        List<UnitIndex> transVecs = viewNeighborTranslationVectors();
+        List<UnitIndex> neighbors = new ArrayList<UnitIndex>(transVecs.size());
+
+        for (UnitIndex transVec : transVecs)
+            neighbors.add(index.plus(transVec));
+
+        return neighbors;
+    }
+
+    /**
+     * Returns the Euclidean distance to each nearest neighbor.
+     *
+     * @return the Euclidean distance to each nearest neighbor.
+     */
+    public abstract double getNeighborDistance();
 
     /**
      * Finds the discrete unit index of the unit cell containing a
@@ -103,16 +154,6 @@ public interface UnitCell {
     public abstract Point pointAt(UnitIndex index);
 
     /**
-     * Finds the nearest neighbors for a given unit cell location.
-     *
-     * @param index the discrete unit index of a unit cell.
-     *
-     * @return the indexes of the neighboring cells nearest to the
-     * cell at the specified location.
-     */
-    public abstract List<UnitIndex> getNeighbors(UnitIndex index);
-
-    /**
      * Selects one neighboring cell at random (with equal probability)
      * from the set of all nearest neighbors.
      *
@@ -121,7 +162,9 @@ public interface UnitCell {
      * @return the index of one neighboring cell selected at random
      * (with equal probability) from the set of all nearest neighbors.
      */
-    public abstract UnitIndex selectNeighbor(UnitIndex index);
+    public default UnitIndex selectNeighbor(UnitIndex index) {
+        return index.plus(ListUtil.select(viewNeighborTranslationVectors()));
+    }
 
     /**
      * Returns a read-only view of the primitive (basis) vectors for
@@ -131,4 +174,13 @@ public interface UnitCell {
      * this unit cell.
      */
     public abstract List<VectorView> viewBasis();
+
+    /**
+     * Returns a read-only view of the translation vectors that define
+     * the nearest neighbors.
+     *
+     * @return a read-only view of the translation vectors that define
+     * the nearest neighbors.
+     */
+    public abstract List<UnitIndex> viewNeighborTranslationVectors();
 }

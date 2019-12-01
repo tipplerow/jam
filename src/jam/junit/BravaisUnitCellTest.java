@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.util.List;
+
 import jam.bravais.UnitCell;
 import jam.bravais.UnitIndex;
 import jam.math.Point;
@@ -23,6 +25,19 @@ public class BravaisUnitCellTest {
         assertEquals(Point.at(-2.5), cell.pointAt(UnitIndex.at(-1)));
         assertEquals(Point.at( 0.0), cell.pointAt(UnitIndex.at( 0)));
         assertEquals(Point.at( 2.5), cell.pointAt(UnitIndex.at( 1)));
+
+        assertEquals(2, cell.countNeighbors());
+        assertEquals(2.5, cell.getNeighborDistance(), 1.0E-12);
+
+        validateNeighbors(cell);
+    }
+
+    private void validateNeighbors(UnitCell cell) {
+        UnitIndex index = UnitIndex.origin(cell.dimensionality());
+        Point     point = cell.pointAt(index);
+
+        for (UnitIndex neighbor : cell.getNeighbors(index))
+            assertEquals(cell.getNeighborDistance(), point.distance(cell.pointAt(neighbor)), 1.0E-12);
     }
 
     @Test public void testHexagonal() {
@@ -37,6 +52,11 @@ public class BravaisUnitCellTest {
         assertEquals(Point.at( 2.0, 2.0 * ROOT3), cell.pointAt(UnitIndex.at(2, 2)));
         assertEquals(Point.at(-1.0, 3.0 * ROOT3), cell.pointAt(UnitIndex.at(1, 3)));
         assertEquals(Point.at( 1.0, 3.0 * ROOT3), cell.pointAt(UnitIndex.at(2, 3)));
+
+        assertEquals(6, cell.countNeighbors());
+        assertEquals(2.0, cell.getNeighborDistance(), 1.0E-12);
+
+        validateNeighbors(cell);
     }
 
     @Test public void testSquare() {
@@ -51,6 +71,11 @@ public class BravaisUnitCellTest {
         assertEquals(Point.at(5.0, 5.0), cell.pointAt(UnitIndex.at(2, 2)));
         assertEquals(Point.at(2.5, 7.5), cell.pointAt(UnitIndex.at(1, 3)));
         assertEquals(Point.at(5.0, 7.5), cell.pointAt(UnitIndex.at(2, 3)));
+
+        assertEquals(4, cell.countNeighbors());
+        assertEquals(2.5, cell.getNeighborDistance(), 1.0E-12);
+
+        validateNeighbors(cell);
     }
 
     @Test public void testCubic() {
@@ -65,6 +90,20 @@ public class BravaisUnitCellTest {
         assertEquals(Point.at( 5.0,  5.0,  5.0), cell.pointAt(UnitIndex.at( 2,  2, 2)));
         assertEquals(Point.at(-2.5, -7.5, 15.0), cell.pointAt(UnitIndex.at(-1, -3, 6)));
         assertEquals(Point.at(-5.0, -2.5,  0.0), cell.pointAt(UnitIndex.at(-2, -1, 0)));
+
+        assertEquals(6, cell.countNeighbors());
+        assertEquals(2.5, cell.getNeighborDistance(), 1.0E-12);
+
+        validateNeighbors(cell);
+    }
+
+    @Test public void testFCC() {
+        UnitCell cell = UnitCell.FCC(2.0);
+
+        assertEquals(12, cell.countNeighbors());
+        assertEquals(Math.sqrt(2.0), cell.getNeighborDistance(), 1.0E-12);
+
+        validateNeighbors(cell);
     }
 
     public static void main(String[] args) {

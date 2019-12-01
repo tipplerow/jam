@@ -3,36 +3,43 @@ package jam.bravais;
 
 import java.util.List;
 
+import jam.math.DoubleUtil;
 import jam.vector.VectorView;
 
 /**
- * Represents a three-dimensional simple cubic unit cell.
+ * Represents a three-dimensional face-centered cubic (FCC) unit cell.
  */
-public final class SimpleCubicUnitCell extends UnitCell3D {
+public final class FCCUnitCell extends UnitCell3D {
     private final double side;
 
     private static final List<UnitIndex> TRANSLATION_VECTORS =
         List.of(UnitIndex3D.at( 0,  0, -1),
+                UnitIndex3D.at( 1,  0, -1),
+                UnitIndex3D.at( 0,  1, -1),
                 UnitIndex3D.at( 0, -1,  0),
+                UnitIndex3D.at( 1, -1,  0),
                 UnitIndex3D.at(-1,  0,  0),
                 UnitIndex3D.at( 1,  0,  0),
+                UnitIndex3D.at(-1,  1,  0),
                 UnitIndex3D.at( 0,  1,  0),
+                UnitIndex3D.at( 0, -1,  1),
+                UnitIndex3D.at(-1,  0,  1),
                 UnitIndex3D.at( 0,  0,  1));
 
     /**
-     * The fundamental simple cubic unit cell with unit side length.
+     * The fundamental FCC unit cell with unit side length.
      */
-    public static final SimpleCubicUnitCell FUNDAMENTAL = new SimpleCubicUnitCell(1.0);
+    public static final FCCUnitCell FUNDAMENTAL = new FCCUnitCell(1.0);
 
     /**
-     * Creates a new simple cubic unit cell with a given side length.
+     * Creates a new FCC unit cell with a given side length.
      *
      * @param side the side length for the unit cell.
      *
      * @throws IllegalArgumentException unless the side length is
      * positive.
      */
-    public SimpleCubicUnitCell(double side) {
+    public FCCUnitCell(double side) {
         super(constructBasis(side));
         this.side = side;
     }
@@ -40,9 +47,9 @@ public final class SimpleCubicUnitCell extends UnitCell3D {
     private static List<VectorView> constructBasis(double side) {
         validateSide(side);
 
-        return List.of(VectorView.wrap(side, 0.0, 0.0),
-                       VectorView.wrap(0.0, side, 0.0),
-                       VectorView.wrap(0.0, 0.0, side));
+        return List.of(VectorView.wrap(0.0,        0.5 * side, 0.5 * side),
+                       VectorView.wrap(0.5 * side, 0.0,        0.5 * side),
+                       VectorView.wrap(0.5 * side, 0.5 * side, 0.0));
     }
 
     /**
@@ -55,7 +62,7 @@ public final class SimpleCubicUnitCell extends UnitCell3D {
     }
 
     @Override public double getNeighborDistance() {
-        return side;
+        return side / DoubleUtil.SQRT2;
     }
 
     @Override public List<UnitIndex> viewNeighborTranslationVectors() {

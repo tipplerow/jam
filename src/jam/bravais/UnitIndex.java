@@ -96,6 +96,29 @@ public interface UnitIndex extends Comparable<UnitIndex> {
     public abstract int dimensionality();
 
     /**
+     * Adds another index to this index and returns the result in a
+     * new index; this index is unchanged.
+     *
+     * @param index the shifting index addend.
+     *
+     * @return the new shifted index.
+     *
+     * @throws RuntimeException unless the dimensionality of the input
+     * argument agrees with this index.
+     */
+    public abstract UnitIndex plus(UnitIndex index);
+
+    /**
+     * Multiplies each coordinate in this index by a scalar factor and
+     * returns the result in a new index; this index is unchanged.
+     *
+     * @param scalar the scalar integer factor.
+     *
+     * @return the new rescaled index.
+     */
+    public abstract UnitIndex times(int scalar);
+
+    /**
      * Returns an array containing the components of this index.
      *
      * @return an array containing the components of this index.

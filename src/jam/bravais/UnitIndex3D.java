@@ -38,6 +38,20 @@ final class UnitIndex3D implements UnitIndex {
         return 3;
     }
 
+    @Override public UnitIndex3D plus(UnitIndex that) {
+        return plus3D((UnitIndex3D) that);
+    }
+
+    private UnitIndex3D plus3D(UnitIndex3D that) {
+        return at(this.i + that.i,
+                  this.j + that.j,
+                  this.k + that.k);
+    }
+
+    @Override public UnitIndex3D times(int scalar) {
+        return at(scalar * i, scalar * j, scalar * k);
+    }
+
     @Override public int[] toArray() {
         return new int[] { i, j, k };
     }

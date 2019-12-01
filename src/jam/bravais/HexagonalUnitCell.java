@@ -3,7 +3,6 @@ package jam.bravais;
 
 import java.util.List;
 
-import jam.math.JamRandom;
 import jam.math.DoubleUtil;
 import jam.vector.VectorView;
 
@@ -12,6 +11,14 @@ import jam.vector.VectorView;
  */
 public final class HexagonalUnitCell extends UnitCell2D {
     private final double side;
+
+    private static final List<UnitIndex> TRANSLATION_VECTORS =
+        List.of(UnitIndex2D.at(-1, -1),
+                UnitIndex2D.at( 0, -1),
+                UnitIndex2D.at(-1,  0),
+                UnitIndex2D.at( 1,  0),
+                UnitIndex2D.at( 0,  1),
+                UnitIndex2D.at( 1,  1));
 
     /**
      * The fundamental hexagonal unit cell with unit side length.
@@ -47,54 +54,11 @@ public final class HexagonalUnitCell extends UnitCell2D {
         return side;
     }
 
-    @Override public List<UnitIndex> getNeighbors(UnitIndex index) {
-        validateDimensionality(index);
-
-        int i = index.coord(0);
-        int j = index.coord(1);
-
-        return List.of(UnitIndex2D.at(i - 1, j - 1),
-                       UnitIndex2D.at(    i, j - 1),
-                       UnitIndex2D.at(i - 1,     j),
-                       UnitIndex2D.at(i + 1,     j),
-                       UnitIndex2D.at(    i, j + 1),
-                       UnitIndex2D.at(i + 1, j + 1));
+    @Override public double getNeighborDistance() {
+        return side;
     }
 
-    @Override public UnitIndex selectNeighbor(UnitIndex index) {
-        //
-        // To maximize efficiency, implement the selection here rather
-        // than construct the complete list of neighbors...
-        //
-        validateDimensionality(index);
-
-        int i = index.coord(0);
-        int j = index.coord(1);
-
-        // Select an integer from the half-open interval [0, 6)...
-        int draw = JamRandom.global().nextInt(0, 6);
-
-        switch (draw) {
-        case 0:
-            return UnitIndex2D.at(i - 1, j - 1);
-
-        case 1:
-            return UnitIndex2D.at(i, j - 1);
-
-        case 2:
-            return UnitIndex2D.at(i - 1, j);
-
-        case 3:
-            return UnitIndex2D.at(i + 1, j);
-
-        case 4:
-            return UnitIndex2D.at(i, j + 1);
-
-        case 5:
-            return UnitIndex2D.at(i + 1, j + 1);
-
-        default:
-            throw new IllegalStateException("Unexpected random integer draw.");
-        }
+    @Override public List<UnitIndex> viewNeighborTranslationVectors() {
+        return TRANSLATION_VECTORS;
     }
 }

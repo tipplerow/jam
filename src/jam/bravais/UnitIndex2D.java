@@ -33,6 +33,19 @@ final class UnitIndex2D implements UnitIndex {
         return 2;
     }
 
+    @Override public UnitIndex2D plus(UnitIndex that) {
+        return plus2D((UnitIndex2D) that);
+    }
+
+    private UnitIndex2D plus2D(UnitIndex2D that) {
+        return at(this.i + that.i,
+                  this.j + that.j);
+    }
+
+    @Override public UnitIndex2D times(int scalar) {
+        return at(scalar * i, scalar * j);
+    }
+
     @Override public int[] toArray() {
         return new int[] { i, j };
     }

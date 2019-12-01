@@ -25,6 +25,18 @@ final class UnitIndex1D implements UnitIndex {
         return 1;
     }
 
+    @Override public UnitIndex1D plus(UnitIndex that) {
+        return plus1D((UnitIndex1D) that);
+    }
+
+    private UnitIndex1D plus1D(UnitIndex1D that) {
+        return at(this.index + that.index);
+    }
+
+    @Override public UnitIndex1D times(int scalar) {
+        return at(scalar * index);
+    }
+
     @Override public int[] toArray() {
         return new int[] { index };
     }
