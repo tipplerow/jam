@@ -97,6 +97,15 @@ public class BravaisUnitCellTest {
         validateNeighbors(cell);
     }
 
+    @Test public void testBCC() {
+        UnitCell cell = UnitCell.BCC(2.0);
+
+        assertEquals(8, cell.countNeighbors());
+        assertEquals(Math.sqrt(3.0), cell.getNeighborDistance(), 1.0E-12);
+
+        validateNeighbors(cell);
+    }
+
     @Test public void testFCC() {
         UnitCell cell = UnitCell.FCC(2.0);
 

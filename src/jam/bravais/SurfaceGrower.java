@@ -156,8 +156,6 @@ public final class SurfaceGrower<T> {
         // Change the parameters as desired to test different lattices
         // and sizes...
         //
-        run(FCCUnitCell.FUNDAMENTAL, 100000);
-        //run(HexagonalUnitCell.FUNDAMENTAL, 100000);
-        //run(SquareUnitCell.FUNDAMENTAL, 100000);
+        run(BCCUnitCell.FUNDAMENTAL, 100000);
     }
 }

@@ -70,6 +70,21 @@ public interface UnitCell {
     }
 
     /**
+     * Returns a body-centered cubic (BCC) unit cell with a given side
+     * length.
+     *
+     * @param side the side length of the unit cell.
+     *
+     * @return a body-centered cubic unit cell with the specified side
+     * length.
+     *
+     * @throws IllegalArgumentException unless the side length is positive.
+     */
+    public static UnitCell BCC(double side) {
+        return new BCCUnitCell(side);
+    }
+
+    /**
      * Returns a face-centered cubic (FCC) unit cell with a given side
      * length.
      *

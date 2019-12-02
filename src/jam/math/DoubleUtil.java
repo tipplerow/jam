@@ -31,6 +31,11 @@ public final class DoubleUtil {
     public static final double EULER = 0.5772156649;
 
     /**
+     * Square root of three.
+     */
+    public static final double SQRT3 = Math.sqrt(3.0);
+
+    /**
      * One-half of the square root of three.
      */
     public static final double HALF_SQRT3 = 0.5 * Math.sqrt(3.0);
