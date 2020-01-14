@@ -3,6 +3,22 @@ package jam.bravais;
 
 public enum UnitCellType {
     /**
+     * The body-centered cubic unit cell.
+     */
+    BCC {
+        @Override public UnitCell create(double... length) {
+            if (length.length == 1)
+                return new BCCUnitCell(length[0]);
+            else
+                throw new IllegalArgumentException("Exactly one length is required.");
+        }
+
+        @Override public UnitCell fundamental() {
+            return BCCUnitCell.FUNDAMENTAL;
+        }
+    },
+
+    /**
      * The simple cubic unit cell.
      */
     CUBIC {
@@ -15,6 +31,22 @@ public enum UnitCellType {
 
         @Override public UnitCell fundamental() {
             return SimpleCubicUnitCell.FUNDAMENTAL;
+        }
+    },
+
+    /**
+     * The face-centered cubic unit cell.
+     */
+    FCC {
+        @Override public UnitCell create(double... length) {
+            if (length.length == 1)
+                return new FCCUnitCell(length[0]);
+            else
+                throw new IllegalArgumentException("Exactly one length is required.");
+        }
+
+        @Override public UnitCell fundamental() {
+            return FCCUnitCell.FUNDAMENTAL;
         }
     },
 
