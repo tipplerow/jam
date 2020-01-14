@@ -1,8 +1,10 @@
 
 package jam.bravais;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import jam.math.DoubleComparator;
 import jam.math.Point;
@@ -79,6 +81,16 @@ public abstract class AbstractUnitCell implements UnitCell {
     public static void validateSide(double side) {
         if (!DoubleComparator.DEFAULT.isPositive(side))
             throw new IllegalArgumentException("Non-positive side length.");
+    }
+
+    @Override public List<UnitIndex> getNeighbors(UnitIndex index) {
+        List<UnitIndex> transVecs = viewNeighborTranslationVectors();
+        List<UnitIndex> neighbors = new ArrayList<UnitIndex>(transVecs.size());
+
+        for (UnitIndex transVec : transVecs)
+            neighbors.add(index.plus(transVec));
+
+        return neighbors;
     }
 
     @Override public List<VectorView> viewBasis() {

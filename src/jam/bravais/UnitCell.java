@@ -1,7 +1,6 @@
 
 package jam.bravais;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jam.math.Point;
@@ -123,15 +122,7 @@ public interface UnitCell {
      * @return the indexes of the neighboring cells nearest to the
      * cell at the specified location.
      */
-    public default List<UnitIndex> getNeighbors(UnitIndex index) {
-        List<UnitIndex> transVecs = viewNeighborTranslationVectors();
-        List<UnitIndex> neighbors = new ArrayList<UnitIndex>(transVecs.size());
-
-        for (UnitIndex transVec : transVecs)
-            neighbors.add(index.plus(transVec));
-
-        return neighbors;
-    }
+    public abstract List<UnitIndex> getNeighbors(UnitIndex index);
 
     /**
      * Returns the Euclidean distance to each nearest neighbor.
