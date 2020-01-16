@@ -27,6 +27,11 @@ public final class HugoPeptideTable {
     /**
      * Loads a table from an input file.
      *
+     * <p>The file must contain two columns separated by a comma, tab,
+     * or pipe delimiter. The first line must be header line (although
+     * the column keys are ignored); all subsequent lines must contain
+     * a Hugo symbol in the first column and a peptide in the second.
+     *
      * @param file the file to load.
      *
      * @return a new table containing the gene-peptide mappings
@@ -42,6 +47,11 @@ public final class HugoPeptideTable {
 
     /**
      * Loads a table from an input file.
+     *
+     * <p>The file must contain two columns separated by a comma, tab,
+     * or pipe delimiter. The first line must be header line (although
+     * the column keys are ignored); all subsequent lines must contain
+     * a Hugo symbol in the first column and a peptide in the second.
      *
      * @param fileName the name of the file to load.
      *
