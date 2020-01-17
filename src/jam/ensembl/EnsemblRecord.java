@@ -67,4 +67,8 @@ public final class EnsemblRecord {
     public TranscriptBiotype getTranscriptBiotype() {
         return transcriptBiotype;
     }
+
+    public boolean isProteinCoding() {
+        return transcriptBiotype.equals(TranscriptBiotype.PROTEIN_CODING);
+    }
 }
