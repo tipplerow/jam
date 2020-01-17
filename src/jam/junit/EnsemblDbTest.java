@@ -15,7 +15,7 @@ public class EnsemblDbTest {
     private static final File ENSEMBL_FILE = new File("data/test/ensembl_test2.fa");
 
     @Test public void testSample() {
-        EnsemblDb db = EnsemblDb.create(ENSEMBL_FILE);
+        EnsemblDb db = EnsemblDb.load(ENSEMBL_FILE);
 
         HugoSymbol BRAF_Hugo = HugoSymbol.instance("BRAF");
         HugoSymbol KRAS_Hugo = HugoSymbol.instance("KRAS");

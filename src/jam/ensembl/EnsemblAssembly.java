@@ -63,6 +63,6 @@ public enum EnsemblAssembly {
     }
 
     private EnsemblDb createDb() {
-        return EnsemblDb.create(JamEnv.getRequired(envName));
+        return EnsemblDb.load(JamEnv.getRequired(envName));
     }
 }

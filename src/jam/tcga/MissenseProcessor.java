@@ -54,7 +54,7 @@ public final class MissenseProcessor {
     }
 
     private void run() {
-        ensemblDb = EnsemblDb.create(ensemblDbFile);
+        ensemblDb = EnsemblDb.load(ensemblDbFile);
         missenseReader = MissenseReader.open(missenseInput);
         fastaWriter = IOUtil.openWriter(proteinOutput);
     }

@@ -116,8 +116,8 @@ public final class EnsemblDb {
      *
      * @throws RuntimeException if any I/O errors occur.
      */
-    public static EnsemblDb create(String fastaFile) {
-        return create(new File(fastaFile));
+    public static EnsemblDb load(String fastaFile) {
+        return load(new File(fastaFile));
     }
 
     /**
@@ -131,7 +131,7 @@ public final class EnsemblDb {
      *
      * @throws RuntimeException if any I/O errors occur.
      */
-    public static EnsemblDb create(File fastaFile) {
+    public static EnsemblDb load(File fastaFile) {
         EnsemblDb database = null;
         FastaReader reader = null;
 
