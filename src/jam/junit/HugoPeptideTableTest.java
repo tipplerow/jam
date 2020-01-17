@@ -4,7 +4,7 @@ package jam.junit;
 import java.util.Set;
 
 import jam.hugo.HugoSymbol;
-import jam.peptide.HugoPeptideTable;
+import jam.hugo.HugoPeptideTable;
 import jam.peptide.Peptide;
 
 import org.junit.*;
