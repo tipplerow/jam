@@ -1,6 +1,10 @@
 #!/bin/sh
 ########################################################################
 # Usage: jam-run.sh PROJECT_HOME [-D<name>=<value> ...] class [ARGUMENTS]
+#
+# Jar files from additional TIPPLEROW projects may be included in the
+# classpath by assigning the TIPPLEROW_CLASSPATH environment variable
+# in the calling script.
 ########################################################################
 
 SCRIPT=`basename $0`
@@ -25,6 +29,11 @@ shift
 AddLib ${JAM_HOME}/jlib
 AddLib ${JAM_HOME}/lib
 AddLib ${PROJECT_HOME}/lib
+
+if [ ! -z "${TIPPLEROW_CLASSPATH}" ]
+then
+    CLASSPATH=${TIPPLEROW_CLASSPATH}:$CLASSPATH
+fi
 
 export CLASSPATH=$CLASSPATH
 LOG4J_CONF=${PROJECT_HOME}/conf/log4j.xml
