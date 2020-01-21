@@ -77,7 +77,7 @@ public final class MAFProperties {
      * barcode.
      */
     public static String resolveTumorBarcodeColumnName() {
-        return JamProperties.getOptional(HUGO_SYMBOL_COLUMN_PROPERTY, TumorBarcode.COLUMN_NAME);
+        return JamProperties.getOptional(TUMOR_BARCODE_COLUMN_PROPERTY, TumorBarcode.COLUMN_NAME);
     }
 
     /**
