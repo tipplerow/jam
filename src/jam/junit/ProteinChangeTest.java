@@ -84,7 +84,7 @@ public class ProteinChangeTest {
     }
 
     @Test public void testParse() {
-        ProteinChange pc = ProteinChange.parse("L123V");
+        ProteinChange pc = ProteinChange.parse("p.L123V");
 
         assertEquals(L, pc.getNative());
         assertEquals(V, pc.getMutated());

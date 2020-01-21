@@ -107,9 +107,10 @@ public final class ProteinChange {
     /**
      * Parses a protein change string in standard format.
      *
-     * <p>The standard format for a protein change from residue {@code X}
-     * to residue {@code Y} at position {@code k} is {@code XkY}, where
-     * {@code X} and {@code Y} are the single-character residue codes.
+     * <p>The standard format for a protein change from residue {@code
+     * X} to residue {@code Y} at position {@code k} is {@code XkY},
+     * where {@code X} and {@code Y} are the single-character residue
+     * codes.  The string may also start with {@code p.}.
      *
      * @param s a protein-change string in standard format.
      *
@@ -118,6 +119,9 @@ public final class ProteinChange {
      * @throws RuntimeException unless the string is properly formatted.
      */
     public static ProteinChange parse(String s) {
+        if (s.startsWith("p."))
+            s = s.substring(2);
+
         char nativeChar = s.charAt(0);
         char mutatedChar = s.charAt(s.length() - 1);
         String positionStr = s.substring(1, s.length() - 1);
