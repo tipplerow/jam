@@ -9,6 +9,7 @@ import jam.hugo.HugoSymbol;
 import jam.io.IOUtil;
 import jam.io.TableReader;
 import jam.peptide.ProteinChange;
+import jam.tcga.CellFraction;
 import jam.tcga.TumorBarcode;
 
 /**
@@ -26,12 +27,14 @@ public final class MissenseParser {
     private int classificationIndex;
     private int variantTypeIndex;
     private int proteinChangeIndex;
+    private int cellFractionIndex;
 
     private List<String> fields;
 
     private HugoSymbol hugoSymbol;
     private VariantType variantType;
     private TumorBarcode tumorBarcode;
+    private CellFraction cellFraction;
     private ProteinChange proteinChange;
     private EnsemblTranscript transcriptID;
     private VariantClassification classification;
@@ -66,6 +69,9 @@ public final class MissenseParser {
             variantTypeIndex    = reader.requireColumn(MAFProperties.resolveVariantTypeColumnName());
             proteinChangeIndex  = reader.requireColumn(MAFProperties.resolveProteinChangeColumnName());
 
+            // The cancer cell fraction may be missing (as in the TCGA data)...
+            cellFractionIndex = reader.findColumn(MAFProperties.resolveCellFractionColumnName());
+
             while (reader.hasNext())
                 processLine();
         }
@@ -79,20 +85,36 @@ public final class MissenseParser {
     private void processLine() {
         List<String> fields = reader.next();
 
-        VariantType variantType = VariantType.valueOf(fields.get(variantTypeIndex));
-        VariantClassification classification = VariantClassification.requireCode(fields.get(classificationIndex));
+        VariantType variantType =
+            VariantType.valueOf(fields.get(variantTypeIndex));
 
         if (!variantType.equals(VariantType.SNP))
             return;
 
+        VariantClassification classification =
+            VariantClassification.requireCode(fields.get(classificationIndex));
+
         if (!classification.equals(VariantClassification.MISSENSE))
             return;
 
+        CellFraction cellFraction =
+            parseCellFraction(fields);
+
+        if (cellFraction.doubleValue() < MAFProperties.resolveCCFThreshold())
+            return;
+        
         HugoSymbol hugoSymbol = HugoSymbol.instance(fields.get(hugoSymbolIndex));
         TumorBarcode tumorBarcode = TumorBarcode.instance(fields.get(tumorBarcodeIndex));
         ProteinChange proteinChange = ProteinChange.parse(fields.get(proteinChangeIndex));
         EnsemblTranscript transcriptID = EnsemblTranscript.instance(fields.get(transcriptIndex));
 
-        records.add(new MissenseRecord(tumorBarcode, transcriptID, hugoSymbol, proteinChange));
+        records.add(new MissenseRecord(tumorBarcode, transcriptID, hugoSymbol, proteinChange, cellFraction));
+    }
+
+    private CellFraction parseCellFraction(List<String> fields) {
+        if (cellFractionIndex < 0)
+            return CellFraction.UNIT;
+        else
+            return CellFraction.valueOf(fields.get(cellFractionIndex));
     }
 }

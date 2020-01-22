@@ -5,6 +5,7 @@ import jam.app.JamProperties;
 import jam.ensembl.EnsemblTranscript;
 import jam.hugo.HugoSymbol;
 import jam.peptide.ProteinChange;
+import jam.tcga.CellFraction;
 import jam.tcga.TumorBarcode;
 
 /**
@@ -50,6 +51,16 @@ public final class MAFProperties {
      * Name of the MAF file column containing the protein change.
      */
     public static final String PROTEIN_CHANGE_COLUMN_PROPERTY = "jam.maf.proteinChangeColumn";
+
+    /**
+     * Name of the MAF file column containing the cancer cell fraction.
+     */
+    public static final String CELL_FRACTION_COLUMN_PROPERTY = "jam.maf.cellFractionColumn";
+
+    /**
+     * Minimum cancer cell fraction required to process a mutation.
+     */
+    public static final String CCF_THRESHOLD_PROPERTY = "jam.maf.ccfThreshold";
 
     /**
      * Returns the name of the input MAF file to process.
@@ -133,5 +144,27 @@ public final class MAFProperties {
      */
     public static String resolveProteinChangeColumnName() {
         return JamProperties.getOptional(PROTEIN_CHANGE_COLUMN_PROPERTY, ProteinChange.COLUMN_NAME);
+    }
+
+    /**
+     * Returns the name of the MAF file column containing the cancer
+     * cell fraction.
+     *
+     * @return the name of the MAF file column containing the cancer
+     * cell fraction.
+     */
+    public static String resolveCellFractionColumnName() {
+        return JamProperties.getOptional(CELL_FRACTION_COLUMN_PROPERTY, CellFraction.COLUMN_NAME);
+    }
+
+    /**
+     * Returns the name of the MAF file column containing the cancer
+     * cell fraction.
+     *
+     * @return the name of the MAF file column containing the cancer
+     * cell fraction.
+     */
+    public static double resolveCCFThreshold() {
+        return JamProperties.getOptionalDouble(CCF_THRESHOLD_PROPERTY, 0.0);
     }
 }

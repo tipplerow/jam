@@ -5,6 +5,7 @@ import jam.ensembl.EnsemblTranscript;
 import jam.hugo.HugoSymbol;
 import jam.peptide.ProteinChange;
 import jam.tcga.TumorBarcode;
+import jam.tcga.CellFraction;
 
 /**
  * Encapsulates information contained in one record from a Mutation
@@ -16,6 +17,7 @@ public final class MissenseRecord {
     private final EnsemblTranscript transcriptID;
     private final HugoSymbol        hugoSymbol;
     private final ProteinChange     proteinChange;
+    private final CellFraction      cellFraction;
 
     /**
      * Creates a new missense mutation record.
@@ -28,15 +30,19 @@ public final class MissenseRecord {
      * @param hugoSymbol the HUGO symbol for the mutated gene.
      *
      * @param proteinChange the description of the single-residue change.
+     *
+     * @param cellFraction the cancer cell fraction of the mutation.
      */
     public MissenseRecord(TumorBarcode      tumorBarcode,
                           EnsemblTranscript transcriptID,
                           HugoSymbol        hugoSymbol,
-                          ProteinChange     proteinChange) {
+                          ProteinChange     proteinChange,
+                          CellFraction      cellFraction) {
         this.tumorBarcode  = tumorBarcode;
         this.transcriptID  = transcriptID;
         this.hugoSymbol    = hugoSymbol;
         this.proteinChange = proteinChange;
+        this.cellFraction  = cellFraction;
     }
 
     /**
@@ -73,5 +79,14 @@ public final class MissenseRecord {
      */
     public TumorBarcode getTumorBarcode() {
         return tumorBarcode;
+    }
+
+    /**
+     * Returns the cancer cell fraction for the mutation.
+     *
+     * @return the cancer cell fraction for the mutation.
+     */
+    public CellFraction getCellFraction() {
+        return cellFraction;
     }
 }
