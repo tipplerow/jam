@@ -5,94 +5,72 @@ import java.util.List;
 import java.util.Map;
 
 import jam.hugo.HugoSymbol;
-import jam.tcga.MissenseRecord;
-import jam.tcga.MissenseTable;
+import jam.maf.MAFProperties;
+import jam.maf.MissenseRecord;
+import jam.maf.MissenseTable;
 import jam.tcga.TumorBarcode;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class MissenseTableTest {
-    private static final TumorBarcode barcode1 = TumorBarcode.instance("AC-DFCI_AC_PD1-1-Tumor-SM-9LRI9");
-    private static final TumorBarcode barcode2 = TumorBarcode.instance("Y2087_T");
-    private static final TumorBarcode barcode3 = TumorBarcode.instance("NotFound");
+    private static final String TCGA_MAF = "data/test/MAF_TCGA_sample200.maf";
 
-    private static final HugoSymbol ASPM   = HugoSymbol.instance("ASPM");
-    private static final HugoSymbol PRRC1  = HugoSymbol.instance("PRRC1");
-    private static final HugoSymbol RINT1  = HugoSymbol.instance("RINT1");
-    private static final HugoSymbol RNF31  = HugoSymbol.instance("RNF31");
-    private static final HugoSymbol RXFP3  = HugoSymbol.instance("RXFP3");
-    private static final HugoSymbol TTC39B = HugoSymbol.instance("TTC39B");
+    private static final TumorBarcode barcode1 = TumorBarcode.instance("TCGA-02-0003-01A-01D-1490-08");
+    private static final TumorBarcode barcode2 = TumorBarcode.instance("TCGA-02-0033-01A-01D-1490-08");
+    private static final TumorBarcode barcode3 = TumorBarcode.instance("TCGA-02-0047-01A-01D-1490-08");
+    private static final TumorBarcode barcode4 = TumorBarcode.instance("TCGA-02-0055-01A-01D-1490-08");
 
-    static {
-        System.setProperty(MissenseTable.TABLE_FILE_PROPERTY, "data/test/Miao_Missense.maf");
-    }
+    private static final HugoSymbol ABR     = HugoSymbol.instance("ABR");
+    private static final HugoSymbol ACADS   = HugoSymbol.instance("ACADS");
+    private static final HugoSymbol ADAMTS2 = HugoSymbol.instance("ADAMTS2");
+    private static final HugoSymbol GPR158  = HugoSymbol.instance("GPR158");
+    private static final HugoSymbol ZNF385D = HugoSymbol.instance("ZNF385D");
+    private static final HugoSymbol ZNF583  = HugoSymbol.instance("ZNF583");
 
-    private static final MissenseTable TABLE = MissenseTable.global();
+    @Test public void testTCGA() {
+        System.setProperty(MAFProperties.TUMOR_BARCODE_COLUMN_PROPERTY,  "Tumor_Sample_Barcode");
+        System.setProperty(MAFProperties.HUGO_SYMBOL_COLUMN_PROPERTY,    "Hugo_Symbol");
+        System.setProperty(MAFProperties.TRANSCRIPT_COLUMN_PROPERTY,     "Transcript_ID");
+        System.setProperty(MAFProperties.CLASSIFICATION_COLUMN_PROPERTY, "Variant_Classification");
+        System.setProperty(MAFProperties.VARIANT_TYPE_COLUMN_PROPERTY,   "Variant_Type");
+        System.setProperty(MAFProperties.PROTEIN_CHANGE_COLUMN_PROPERTY, "HGVSp_Short");
 
-    @Test public void testMiao() {
-        assertTrue(TABLE.contains(barcode1));
-        assertTrue(TABLE.contains(barcode2));
-        assertFalse(TABLE.contains(barcode3));
+        MissenseTable table = MissenseTable.load(TCGA_MAF);
 
-        assertTrue(TABLE.contains(barcode1, ASPM));
-        assertFalse(TABLE.contains(barcode1, TTC39B));
+        assertTrue(table.contains(barcode1));
+        assertTrue(table.contains(barcode2));
+        assertTrue(table.contains(barcode3));
+        assertTrue(table.contains(barcode4));
+        assertFalse(table.contains(TumorBarcode.instance("no such")));
 
-        assertFalse(TABLE.contains(barcode2, ASPM));
-        assertTrue(TABLE.contains(barcode2, TTC39B));
+        assertEquals(44, table.count(barcode1));
+        assertEquals(23, table.count(barcode2));
+        assertEquals(56, table.count(barcode3));
+        assertEquals(8,  table.count(barcode4));
+        assertEquals(0,  table.count(TumorBarcode.instance("no such")));
 
-        assertFalse(TABLE.contains(barcode3, ASPM));
-        assertFalse(TABLE.contains(barcode3, TTC39B));
+        assertTrue(table.contains(barcode1, ZNF583));
+        assertTrue(table.contains(barcode2, ACADS));
+        assertFalse(table.contains(barcode1, ACADS));
+        assertFalse(table.contains(barcode2, ZNF583));
 
-        assertEquals(6, TABLE.count(barcode1));
-        assertEquals(2, TABLE.count(barcode2));
-        assertEquals(0, TABLE.count(barcode3));
+        Map<HugoSymbol, List<MissenseRecord>> hugoMap = table.lookup(barcode3);
 
-        assertEquals(1, TABLE.count(barcode1, ASPM));
-        assertEquals(3, TABLE.count(barcode1, RNF31));
-        assertEquals(0, TABLE.count(barcode2, RNF31));
+        // Not 56 because there are two genes with double mutations...
+        assertEquals(54, hugoMap.size());
 
-        Map<HugoSymbol, List<MissenseRecord>> hugoMap = TABLE.lookup(barcode1);
-        assertEquals(4, hugoMap.size());
+        assertEquals(1, hugoMap.get(ABR).size());
+        assertEquals(2, hugoMap.get(ADAMTS2).size());
+        assertEquals(2, hugoMap.get(GPR158).size());
+        assertEquals(1, hugoMap.get(ZNF385D).size());
 
-        assertEquals(1, hugoMap.get(ASPM).size());
-        assertEquals(1, hugoMap.get(RINT1).size());
-        assertEquals(3, hugoMap.get(RNF31).size());
-        assertEquals(1, hugoMap.get(RXFP3).size());
-
-        assertRecord(hugoMap.get(ASPM).get(0),  barcode1, ASPM,  "ENST00000367409", "S162F");
-        assertRecord(hugoMap.get(RINT1).get(0), barcode1, RINT1, "ENST00000257700", "P3T");
-        assertRecord(hugoMap.get(RNF31).get(0), barcode1, RNF31, "ENST00000324103", "E346K");
-        assertRecord(hugoMap.get(RNF31).get(1), barcode1, RNF31, "ENST00000324103", "E506Q");
-        assertRecord(hugoMap.get(RNF31).get(2), barcode1, RNF31, "ENST00000324103", "E518K");
-        assertRecord(hugoMap.get(RXFP3).get(0), barcode1, RXFP3, "ENST00000330120", "D296N");
-
-        hugoMap = TABLE.lookup(barcode2);
-        assertEquals(2, hugoMap.size());
-
-        assertEquals(1, hugoMap.get(PRRC1).size());
-        assertEquals(1, hugoMap.get(TTC39B).size());
-
-        assertRecord(hugoMap.get(PRRC1).get(0),  barcode2, PRRC1,  "ENST00000442138", "A208P");
-        assertRecord(hugoMap.get(TTC39B).get(0), barcode2, TTC39B, "ENST00000512701", "A47S");
-
-        assertTrue(TABLE.lookup(barcode3).isEmpty());
-
-        List<MissenseRecord> recordList = TABLE.lookup(barcode1, ASPM);
-        assertEquals(1, recordList.size());
-
-        assertRecord(recordList.get(0), barcode1, ASPM, "ENST00000367409", "S162F");
-
-        recordList = TABLE.lookup(barcode1, RNF31);
-        assertEquals(3, recordList.size());
-
-        assertRecord(recordList.get(0), barcode1, RNF31, "ENST00000324103", "E346K");
-        assertRecord(recordList.get(1), barcode1, RNF31, "ENST00000324103", "E506Q");
-        assertRecord(recordList.get(2), barcode1, RNF31, "ENST00000324103", "E518K");
-
-        assertTrue(TABLE.lookup(barcode1, PRRC1).isEmpty());
-        assertTrue(TABLE.lookup(barcode2, RINT1).isEmpty());
-        assertTrue(TABLE.lookup(barcode3, PRRC1).isEmpty());
+        assertRecord(hugoMap.get(ABR).get(0),     barcode3, ABR,     "ENST00000302538", "G532S");
+        assertRecord(hugoMap.get(ADAMTS2).get(0), barcode3, ADAMTS2, "ENST00000251582", "T805M");
+        assertRecord(hugoMap.get(ADAMTS2).get(1), barcode3, ADAMTS2, "ENST00000251582", "D361N");
+        assertRecord(hugoMap.get(GPR158).get(0),  barcode3, GPR158,  "ENST00000376351", "D778Y");
+        assertRecord(hugoMap.get(GPR158).get(1),  barcode3, GPR158,  "ENST00000376351", "G784R");
+        assertRecord(hugoMap.get(ZNF385D).get(0), barcode3, ZNF385D, "ENST00000281523", "R377W");
     }
 
     private void assertRecord(MissenseRecord record,
@@ -104,16 +82,6 @@ public class MissenseTableTest {
         assertEquals(hugoSymbol,    record.getHugoSymbol());
         assertEquals(transcriptID,  record.getTranscriptID().getKey());
         assertEquals(proteinChange, record.getProteinChange().format());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testModifyHugoMap() {
-        TABLE.lookup(barcode1).put(ASPM, List.of());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testModifyRecordList() {
-        TABLE.lookup(barcode1, ASPM).remove(0);
     }
 
     public static void main(String[] args) {
