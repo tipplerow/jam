@@ -45,6 +45,8 @@ public final class EnsemblDb {
     private final Map<EnsemblGene, HugoSymbol> geneHugoMap =
         new HashMap<EnsemblGene, HugoSymbol>();
 
+    private static EnsemblDb reference = null;
+
     private EnsemblDb(Iterable<FastaRecord> records) {
         for (FastaRecord record : records)
             addRecord(record);
@@ -89,6 +91,12 @@ public final class EnsemblDb {
             MapUtil.putUnique(geneHugoMap, gene, hugo);
         }
     }
+
+    /**
+     * System property that specifies the name of the data file
+     * containing the reference human proteome.
+     */
+    public static final String REFERENCE_FILE_PROPERTY = "jam.ensembl.referenceFile";
 
     /**
      * Creates a database of Ensembl records from a sequence of FASTA
@@ -153,7 +161,14 @@ public final class EnsemblDb {
      * @return the reference human proteome.
      */
     public static EnsemblDb reference() {
-        return EnsemblAssembly.reference().db();
+        if (reference == null)
+            reference = load(resolveReferenceFile());
+
+        return reference;
+    }
+
+    private static String resolveReferenceFile() {
+        return JamProperties.getRequired(REFERENCE_FILE_PROPERTY);
     }
 
     /**
