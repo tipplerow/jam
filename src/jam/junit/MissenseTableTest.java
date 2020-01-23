@@ -1,9 +1,6 @@
 
 package jam.junit;
 
-import java.util.List;
-import java.util.Map;
-
 import jam.hugo.HugoSymbol;
 import jam.maf.MAFProperties;
 import jam.maf.MissenseRecord;
@@ -61,22 +58,23 @@ public class MissenseTableTest {
         assertFalse(table.contains(barcode1, ACADS));
         assertFalse(table.contains(barcode2, ZNF583));
 
-        Map<HugoSymbol, List<MissenseRecord>> hugoMap = table.lookup(barcode3);
-
         // Not 56 because there are two genes with double mutations...
-        assertEquals(54, hugoMap.size());
+        assertEquals(54, table.viewSymbols(barcode3).size());
 
-        assertEquals(1, hugoMap.get(ABR).size());
-        assertEquals(2, hugoMap.get(ADAMTS2).size());
-        assertEquals(2, hugoMap.get(GPR158).size());
-        assertEquals(1, hugoMap.get(ZNF385D).size());
+        assertEquals(1, table.lookup(barcode3, ABR).size());
+        assertEquals(2, table.lookup(barcode3, ADAMTS2).size());
+        assertEquals(2, table.lookup(barcode3, GPR158).size());
+        assertEquals(1, table.lookup(barcode3, ZNF385D).size());
 
-        assertRecord(hugoMap.get(ABR).get(0),     barcode3, ABR,     "ENST00000302538", "G532S");
-        assertRecord(hugoMap.get(ADAMTS2).get(0), barcode3, ADAMTS2, "ENST00000251582", "T805M");
-        assertRecord(hugoMap.get(ADAMTS2).get(1), barcode3, ADAMTS2, "ENST00000251582", "D361N");
-        assertRecord(hugoMap.get(GPR158).get(0),  barcode3, GPR158,  "ENST00000376351", "D778Y");
-        assertRecord(hugoMap.get(GPR158).get(1),  barcode3, GPR158,  "ENST00000376351", "G784R");
-        assertRecord(hugoMap.get(ZNF385D).get(0), barcode3, ZNF385D, "ENST00000281523", "R377W");
+        assertEquals(0, table.lookup(barcode2, ZNF385D).size());
+        assertEquals(0, table.lookup(barcode3, ACADS).size());
+
+        assertRecord(table.lookup(barcode3, ABR).get(0),     barcode3, ABR,     "ENST00000302538", "G532S");
+        assertRecord(table.lookup(barcode3, ADAMTS2).get(0), barcode3, ADAMTS2, "ENST00000251582", "T805M");
+        assertRecord(table.lookup(barcode3, ADAMTS2).get(1), barcode3, ADAMTS2, "ENST00000251582", "D361N");
+        assertRecord(table.lookup(barcode3, GPR158).get(0),  barcode3, GPR158,  "ENST00000376351", "D778Y");
+        assertRecord(table.lookup(barcode3, GPR158).get(1),  barcode3, GPR158,  "ENST00000376351", "G784R");
+        assertRecord(table.lookup(barcode3, ZNF385D).get(0), barcode3, ZNF385D, "ENST00000281523", "R377W");
     }
 
     private void assertRecord(MissenseRecord record,

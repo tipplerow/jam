@@ -183,24 +183,6 @@ public final class MissenseTable {
     }
 
     /**
-     * Returns all missense mutations for a given tumor.
-     *
-     * @param barcode the tumor barcode of interest.
-     *
-     * @return an immutable map containing all missense mutations for
-     * the specified tumor (or an empty map if there are no matching
-     * mutations).
-     */
-    public Map<HugoSymbol, List<MissenseRecord>> lookup(TumorBarcode barcode) {
-        HugoMap hugoMap = barcodeMap.get(barcode);
-
-        if (hugoMap != null)
-            return Collections.unmodifiableMap(hugoMap);
-        else
-            return Collections.emptyMap();
-    }
-
-    /**
      * Returns all missense mutations for a given tumor and gene.
      *
      * @param barcode the tumor barcode of interest.
@@ -212,12 +194,17 @@ public final class MissenseTable {
      * matching mutations).
      */
     public List<MissenseRecord> lookup(TumorBarcode barcode, HugoSymbol symbol) {
-        List<MissenseRecord> recordList = lookup(barcode).get(symbol);
+        HugoMap hugoMap = barcodeMap.get(barcode);
 
-        if (recordList != null)
-            return Collections.unmodifiableList(recordList);
-        else
+        if (hugoMap == null)
             return Collections.emptyList();
+
+        List<MissenseRecord> recordList = hugoMap.get(symbol);
+
+        if (recordList == null)
+            return Collections.emptyList();
+
+        return Collections.unmodifiableList(recordList);
     }
 
     /**
@@ -227,5 +214,22 @@ public final class MissenseTable {
      */
     public Collection<TumorBarcode> viewBarcodes() {
         return Collections.unmodifiableCollection(barcodeMap.keySet());
+    }
+
+    /**
+     * Returns a read-only view of all mutated genes for a given tumor.
+     *
+     * @param barcode the tumor barcode of interest.
+     *
+     * @return a read-only view of all mutated genes for the specified
+     * tumor.
+     */
+    public Collection<HugoSymbol> viewSymbols(TumorBarcode barcode) {
+        HugoMap hugoMap = barcodeMap.get(barcode);
+
+        if (hugoMap != null)
+            return Collections.unmodifiableCollection(hugoMap.keySet());
+        else
+            return Collections.emptySet();
     }
 }
