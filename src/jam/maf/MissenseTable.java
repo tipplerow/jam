@@ -4,30 +4,26 @@ package jam.maf;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import jam.app.JamLogger;
 import jam.ensembl.EnsemblTranscript;
 import jam.hugo.HugoSymbol;
 import jam.lang.JamException;
 import jam.tcga.TumorBarcode;
+import jam.util.PairKeyTable;
 
 /**
  * Indexes missesnse mutations by tumor barcode and HUGO symbol.
  */
 public final class MissenseTable {
     //
-    // Derive class-specific containers to avoid messy generics syntax
-    // (three angle brackets!?!)...
+    // Class-specific containers...
     //
     private static final class RecordList extends ArrayList<MissenseRecord> {}
-    private static final class HugoMap    extends HashMap<HugoSymbol, RecordList> {}
-    private static final class BarcodeMap extends HashMap<TumorBarcode, HugoMap> {}
 
     // All mutations indexed by barcode (outer) and symbol (inner)...
-    private final BarcodeMap barcodeMap = new BarcodeMap();
+    private final PairKeyTable<TumorBarcode, HugoSymbol, RecordList> table = PairKeyTable.hash();
 
     private MissenseTable(Collection<MissenseRecord> records) {
         fillMap(records);
@@ -62,26 +58,14 @@ public final class MissenseTable {
     }
 
     private RecordList recordList(TumorBarcode barcode, HugoSymbol symbol) {
-        HugoMap    hugoMap    = hugoMap(barcode);
-        RecordList recordList = hugoMap.get(symbol);
+        RecordList recordList = table.get(barcode, symbol);
 
         if (recordList == null) {
             recordList = new RecordList();
-            hugoMap.put(symbol, recordList);
+            table.put(barcode, symbol, recordList);
         }
 
         return recordList;
-    }
-
-    private HugoMap hugoMap(TumorBarcode barcode) {
-        HugoMap hugoMap = barcodeMap.get(barcode);
-
-        if (hugoMap == null) {
-            hugoMap = new HugoMap();
-            barcodeMap.put(barcode, hugoMap);
-        }
-
-        return hugoMap;
     }
 
     /**
@@ -120,18 +104,6 @@ public final class MissenseTable {
     }
 
     /**
-     * Identifies tumors contained in this mutation table.
-     *
-     * @param barcode the tumor barcode of interest.
-     *
-     * @return {@code true} iff this table contains mutations for the
-     * specified tumor.
-     */
-    public boolean contains(TumorBarcode barcode) {
-        return barcodeMap.containsKey(barcode);
-    }
-
-    /**
      * Identifies tumor-gene pairs contained in this mutation table.
      *
      * @param barcode the tumor barcode of interest.
@@ -142,7 +114,7 @@ public final class MissenseTable {
      * specified tumor-gene pair.
      */
     public boolean contains(TumorBarcode barcode, HugoSymbol symbol) {
-        return contains(barcode) && barcodeMap.get(barcode).containsKey(symbol) ;
+        return table.contains(barcode, symbol);
     }
 
     /**
@@ -154,15 +126,10 @@ public final class MissenseTable {
      * tumor.
      */
     public int count(TumorBarcode barcode) {
-        HugoMap hugoMap = barcodeMap.get(barcode);
-
-        if (hugoMap == null)
-            return 0;
-
         int total = 0;
 
-        for (RecordList records : hugoMap.values())
-            total += records.size();
+        for (HugoSymbol symbol : table.innerKeySet(barcode))
+            total += count(barcode, symbol);
 
         return total;
     }
@@ -194,17 +161,12 @@ public final class MissenseTable {
      * matching mutations).
      */
     public List<MissenseRecord> lookup(TumorBarcode barcode, HugoSymbol symbol) {
-        HugoMap hugoMap = barcodeMap.get(barcode);
+        RecordList recordList = table.get(barcode, symbol);
 
-        if (hugoMap == null)
+        if (recordList != null)
+            return Collections.unmodifiableList(recordList);
+        else
             return Collections.emptyList();
-
-        List<MissenseRecord> recordList = hugoMap.get(symbol);
-
-        if (recordList == null)
-            return Collections.emptyList();
-
-        return Collections.unmodifiableList(recordList);
     }
 
     /**
@@ -213,7 +175,7 @@ public final class MissenseTable {
      * @return a read-only view of all tumor barcodes in this table.
      */
     public Collection<TumorBarcode> viewBarcodes() {
-        return Collections.unmodifiableCollection(barcodeMap.keySet());
+        return Collections.unmodifiableCollection(table.outerKeySet());
     }
 
     /**
@@ -225,11 +187,6 @@ public final class MissenseTable {
      * tumor.
      */
     public Collection<HugoSymbol> viewSymbols(TumorBarcode barcode) {
-        HugoMap hugoMap = barcodeMap.get(barcode);
-
-        if (hugoMap != null)
-            return Collections.unmodifiableCollection(hugoMap.keySet());
-        else
-            return Collections.emptySet();
+        return Collections.unmodifiableCollection(table.innerKeySet(barcode));
     }
 }

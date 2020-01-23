@@ -35,12 +35,6 @@ public class MissenseTableTest {
 
         MissenseTable table = MissenseTable.load(TCGA_MAF);
 
-        assertTrue(table.contains(barcode1));
-        assertTrue(table.contains(barcode2));
-        assertTrue(table.contains(barcode3));
-        assertTrue(table.contains(barcode4));
-        assertFalse(table.contains(TumorBarcode.instance("no such")));
-
         assertTrue(table.viewBarcodes().contains(barcode1));
         assertTrue(table.viewBarcodes().contains(barcode2));
         assertTrue(table.viewBarcodes().contains(barcode3));
