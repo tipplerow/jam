@@ -219,4 +219,13 @@ public final class MissenseTable {
         else
             return Collections.emptyList();
     }
+
+    /**
+     * Returns a read-only view of all tumor barcodes in this table.
+     *
+     * @return a read-only view of all tumor barcodes in this table.
+     */
+    public Collection<TumorBarcode> viewBarcodes() {
+        return Collections.unmodifiableCollection(barcodeMap.keySet());
+    }
 }

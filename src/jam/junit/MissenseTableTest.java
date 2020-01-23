@@ -44,6 +44,12 @@ public class MissenseTableTest {
         assertTrue(table.contains(barcode4));
         assertFalse(table.contains(TumorBarcode.instance("no such")));
 
+        assertTrue(table.viewBarcodes().contains(barcode1));
+        assertTrue(table.viewBarcodes().contains(barcode2));
+        assertTrue(table.viewBarcodes().contains(barcode3));
+        assertTrue(table.viewBarcodes().contains(barcode4));
+        assertFalse(table.viewBarcodes().contains(TumorBarcode.instance("no such")));
+
         assertEquals(44, table.count(barcode1));
         assertEquals(23, table.count(barcode2));
         assertEquals(56, table.count(barcode3));
