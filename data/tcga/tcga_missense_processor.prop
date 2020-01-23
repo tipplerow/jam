@@ -1,0 +1,11 @@
+########################################################################
+# Property file for applications using the jam.maf.MissenseProcessor
+# and TCGA MAF files in their standard format.
+########################################################################
+
+jam.maf.tumorBarcodeColumn   = Tumor_Sample_Barcode
+jam.maf.hugoSymbolColumn     = Hugo_Symbol
+jam.maf.transcriptColumn     = Transcript_ID
+jam.maf.classificationColumn = Variant_Classification
+jam.maf.variantTypeColumn    = Variant_Type
+jam.maf.proteinChangeColumn  = HGVSp_Short
