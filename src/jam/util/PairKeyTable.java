@@ -26,6 +26,12 @@ public final class PairKeyTable<K1, K2, V> {
      * Creates a new empty table using {@code HashMap}s for the
      * underlying storage.
      *
+     * @param <K1> runtime type for the outer keys.
+     *
+     * @param <K2> runtime type for the inner keys.
+     *
+     * @param <V> runtime type for the values.
+     *
      * @return a new empty table using {@code HashMap}s for the
      * underlying storage.
      */
@@ -46,6 +52,12 @@ public final class PairKeyTable<K1, K2, V> {
     /**
      * Creates a new empty table using {@code TreeMap}s for the
      * underlying storage.
+     *
+     * @param <K1> runtime type for the outer keys.
+     *
+     * @param <K2> runtime type for the inner keys.
+     *
+     * @param <V> runtime type for the values.
      *
      * @return a new empty table using {@code TreeMap}s for the
      * underlying storage.
