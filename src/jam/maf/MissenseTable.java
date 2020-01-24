@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import jam.app.JamLogger;
 import jam.ensembl.EnsemblTranscript;
@@ -94,7 +95,7 @@ public final class MissenseTable {
      * @param records the records to be indexed in the table.
      *
      * @return a table containing all missense mutation records in
-     * the given file.
+     * the given collection.
      *
      * @throws RuntimeException unless all Ensembl transcripts are
      * identical for records with the same tumor sample and gene.
@@ -174,8 +175,8 @@ public final class MissenseTable {
      *
      * @return a read-only view of all tumor barcodes in this table.
      */
-    public Collection<TumorBarcode> viewBarcodes() {
-        return Collections.unmodifiableCollection(table.outerKeySet());
+    public Set<TumorBarcode> viewBarcodes() {
+        return table.viewOuterKeys();
     }
 
     /**
@@ -186,7 +187,7 @@ public final class MissenseTable {
      * @return a read-only view of all mutated genes for the specified
      * tumor.
      */
-    public Collection<HugoSymbol> viewSymbols(TumorBarcode barcode) {
-        return Collections.unmodifiableCollection(table.innerKeySet(barcode));
+    public Set<HugoSymbol> viewSymbols(TumorBarcode barcode) {
+        return table.viewInnerKeys(barcode);
     }
 }

@@ -1,6 +1,9 @@
 
 package jam.maf;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jam.fasta.FastaRecord;
 import jam.hugo.HugoSymbol;
 import jam.lang.JamException;
@@ -25,10 +28,22 @@ public final class MAFFastaRecord {
     private final CellFraction cellFraction;
     private final Peptide      peptide;
 
-    private MAFFastaRecord(TumorBarcode tumorBarcode,
-                           HugoSymbol   hugoSymbol,
-                           CellFraction cellFraction,
-                           Peptide      peptide) {
+    /**
+     * Creates a new FASTA record from the individual attributes.
+     *
+     * @param tumorBarcode the tumor barcode for the record.
+     *
+     * @param hugoSymbol the HUGO symbol of the mutated gene.
+     *
+     * @param cellFraction the cancer cell fraction for the mutated
+     * peptide.
+     *
+     * @param peptide the mutated amino acid sequence.
+     */
+    public MAFFastaRecord(TumorBarcode tumorBarcode,
+                          HugoSymbol   hugoSymbol,
+                          CellFraction cellFraction,
+                          Peptide      peptide) {
         this.tumorBarcode = tumorBarcode;
         this.hugoSymbol   = hugoSymbol;
         this.cellFraction = cellFraction;
@@ -89,6 +104,29 @@ public final class MAFFastaRecord {
 
     private static CellFraction parseCellFraction(FastaRecord record) {
         return CellFraction.valueOf(parseField(getCommentField(record, 1), CellFraction.COLUMN_NAME));
+    }
+
+    /**
+     * Returns a {@code FastaRecord} with the key and comment fields
+     * formatted to encode the mutation attributes of this record.
+     *
+     * @return a {@code FastaRecord} with the key and comment fields
+     * formatted to encode the mutation attributes of this record.
+     */
+    public FastaRecord format() {
+        return new FastaRecord(formatKey(), formatComment(), peptide);
+    }
+
+    private String formatKey() {
+        return String.format("%s:%s", TumorBarcode.COLUMN_NAME, tumorBarcode.getKey());
+    }
+
+    private String formatComment() {
+        return String.format("%s:%s %s:%.2f",
+                             HugoSymbol.COLUMN_NAME,
+                             hugoSymbol.getKey(),
+                             CellFraction.COLUMN_NAME,
+                             cellFraction.doubleValue());
     }
 
     /**
