@@ -1,11 +1,13 @@
 
 package jam.util;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 import jam.lang.ObjectFactory;
 
@@ -105,6 +107,23 @@ public final class PairKeyTable<K1, K2, V> {
     }
 
     /**
+     * Fills this table with records according to a user-defined
+     * indexing scheme.
+     *
+     * @param values the records to add to this table.
+     *
+     * @param outerKey a function that extracts the outer key from
+     * each record.
+     *
+     * @param innerKey a function that extracts the inner key from
+     * each record.
+     */
+    public void fill(Collection<V> values, Function<V, K1> outerKey, Function<V, K2> innerKey) {
+        for (V value : values)
+            put(outerKey.apply(value), innerKey.apply(value), value);
+    }
+
+    /**
      * Returns the value indexed by a pair of keys.
      *
      * @param key1 the first (outer) key.
@@ -193,6 +212,31 @@ public final class PairKeyTable<K1, K2, V> {
             return innerMap.remove(key2);
         else
             return null;
+    }
+
+    /**
+     * Returns a read-only {@code Set} view of the inner keys in this
+     * table for a given outer key.
+     *
+     * @param key1 the outer key.
+     *
+     * @return a read-only {@code Set} view of the inner keys that
+     * share the given outer key (or an empty set if this table does
+     * not contain the outer key).
+     */
+    public Set<K2> viewInnerKeys(K1 key1) {
+        return Collections.unmodifiableSet(innerKeySet(key1));
+    }
+
+    /**
+     * Returns a read-only {@code Set} view of the outer keys in this
+     * table.
+     *
+     * @return a read-only {@code Set} view of the outer keys in this
+     * table.
+     */
+    public Set<K1> viewOuterKeys() {
+        return Collections.unmodifiableSet(outerKeySet());
     }
 
     @Override public String toString() {
