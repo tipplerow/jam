@@ -4,10 +4,12 @@ package jam.maf;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.app.JamLogger;
 import jam.ensembl.EnsemblTranscript;
 import jam.hugo.HugoSymbol;
 import jam.io.IOUtil;
 import jam.io.TableReader;
+import jam.lang.JamException;
 import jam.peptide.ProteinChange;
 import jam.tcga.CellFraction;
 import jam.tcga.TumorBarcode;
@@ -24,20 +26,8 @@ public final class MissenseParser {
     private int tumorBarcodeIndex;
     private int hugoSymbolIndex;
     private int transcriptIndex;
-    private int classificationIndex;
-    private int variantTypeIndex;
     private int proteinChangeIndex;
     private int cellFractionIndex;
-
-    private List<String> fields;
-
-    private HugoSymbol hugoSymbol;
-    private VariantType variantType;
-    private TumorBarcode tumorBarcode;
-    private CellFraction cellFraction;
-    private ProteinChange proteinChange;
-    private EnsemblTranscript transcriptID;
-    private VariantClassification classification;
 
     private MissenseParser(String mafFile) {
         this.mafFile = mafFile;
@@ -62,12 +52,10 @@ public final class MissenseParser {
         reader = TableReader.open(mafFile);
 
         try {
-            tumorBarcodeIndex   = reader.requireColumn(MAFProperties.resolveTumorBarcodeColumnName());
-            hugoSymbolIndex     = reader.requireColumn(MAFProperties.resolveHugoSymbolColumnName());
-            transcriptIndex     = reader.requireColumn(MAFProperties.resolveTranscriptColumnName());
-            classificationIndex = reader.requireColumn(MAFProperties.resolveClassificationColumnName());
-            variantTypeIndex    = reader.requireColumn(MAFProperties.resolveVariantTypeColumnName());
-            proteinChangeIndex  = reader.requireColumn(MAFProperties.resolveProteinChangeColumnName());
+            tumorBarcodeIndex  = reader.requireColumn(MAFProperties.resolveTumorBarcodeColumnName());
+            hugoSymbolIndex    = reader.requireColumn(MAFProperties.resolveHugoSymbolColumnName());
+            transcriptIndex    = reader.requireColumn(MAFProperties.resolveTranscriptColumnName());
+            proteinChangeIndex = reader.requireColumn(MAFProperties.resolveProteinChangeColumnName());
 
             // The cancer cell fraction may be missing (as in the TCGA data)...
             cellFractionIndex = reader.findColumn(MAFProperties.resolveCellFractionColumnName());
@@ -85,18 +73,15 @@ public final class MissenseParser {
     private void processLine() {
         List<String> fields = reader.next();
 
-        VariantType variantType =
-            VariantType.valueOf(fields.get(variantTypeIndex));
+        try {
+            processLine(fields);
+        }
+        catch (Exception ex) {
+            logException(fields, ex);
+        }
+    }
 
-        if (!variantType.equals(VariantType.SNP))
-            return;
-
-        VariantClassification classification =
-            VariantClassification.requireCode(fields.get(classificationIndex));
-
-        if (!classification.equals(VariantClassification.MISSENSE))
-            return;
-
+    private void processLine(List<String> fields) {
         CellFraction cellFraction =
             parseCellFraction(fields);
 
@@ -116,5 +101,24 @@ public final class MissenseParser {
             return CellFraction.UNIT;
         else
             return CellFraction.valueOf(fields.get(cellFractionIndex));
+    }
+
+    private void logException(List<String> fields, Exception ex1) {
+        try {
+            String tumorBarcode  = fields.get(tumorBarcodeIndex);
+            String hugoSymbol    = fields.get(hugoSymbolIndex);
+            String transcriptID  = fields.get(transcriptIndex);
+            String proteinChange = fields.get(proteinChangeIndex);
+
+            String message =
+                String.format("Invalid annotation: [%s; %s; %s; %s]",
+                              tumorBarcode, hugoSymbol, transcriptID, proteinChange);
+
+            JamException.log(message, ex1);
+            JamLogger.warn(message);
+        }
+        catch (Exception ex2) {
+            JamLogger.warn("Exception logging failed: [%s; %s].", ex1, ex2);
+        }
     }
 }

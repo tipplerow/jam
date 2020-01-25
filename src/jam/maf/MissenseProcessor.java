@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import jam.app.JamApp;
+import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
@@ -29,6 +30,9 @@ public final class MissenseProcessor extends JamApp {
 
     private MissenseTable table;
     private PrintWriter writer;
+
+    private int barcodeCount;
+    private int barcodeIndex;
 
     private final EnsemblDb ensemblDb = EnsemblDb.reference();
 
@@ -58,6 +62,9 @@ public final class MissenseProcessor extends JamApp {
         table = MissenseTable.load(mafFile);
         writer = openWriter(fastaFile);
 
+        barcodeIndex = 0;
+        barcodeCount = table.viewBarcodes().size();
+
         try {
             for (TumorBarcode barcode : table.viewBarcodes())
                 processBarcode(barcode);
@@ -68,15 +75,29 @@ public final class MissenseProcessor extends JamApp {
     }
 
     private void processBarcode(TumorBarcode barcode) {
+        ++barcodeIndex;
+        JamLogger.info("Processing barcode [%d of %d] [%s]...",
+                       barcodeIndex, barcodeCount, barcode.getKey());
+
         for (HugoSymbol symbol : table.viewSymbols(barcode))
             processSymbol(barcode, symbol);
     }
 
     private void processSymbol(TumorBarcode barcode, HugoSymbol symbol) {
-        FastaRecord fastaRecord = createFastaRecord(barcode, symbol);
+        try {
+            FastaRecord fastaRecord = createFastaRecord(barcode, symbol);
 
-        writer.println(fastaRecord.format());
-        writer.flush();
+            writer.println(fastaRecord.format());
+            writer.flush();
+        }
+        catch (Exception ex) {
+            String message =
+                String.format("Error creating FASTA record [%s:%s]: %s",
+                              barcode.getKey(), symbol.getKey(), ex.getMessage());
+
+            JamLogger.warn(message);
+            JamException.log(message);
+        }
     }
 
     private FastaRecord createFastaRecord(TumorBarcode barcode, HugoSymbol symbol) {

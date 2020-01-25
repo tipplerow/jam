@@ -43,19 +43,25 @@ public final class MissenseTable {
     }
 
     private static void addRecord(MissenseRecord record, RecordList recordList) {
-        validateRecord(record, recordList);
-        recordList.add(record);
+        if (validateRecord(record, recordList))
+            recordList.add(record);
     }
 
-    private static void validateRecord(MissenseRecord record, RecordList recordList) {
+    private static boolean validateRecord(MissenseRecord record, RecordList recordList) {
         //
         // Ensure that all mutations for the same tumor sample and
         // gene are annoted with reference to the RNA transcript...
         //
-        if (!recordList.isEmpty() && !record.getTranscriptID().equals(recordList.get(0).getTranscriptID()))
-            throw JamException.runtime("Inconsistent Ensembl transcripts for [%s:%s].",
+        if (recordList.isEmpty())
+            return true;
+
+        if (record.getTranscriptID().equals(recordList.get(0).getTranscriptID()))
+            return true;
+
+        JamException.log(String.format("Inconsistent Ensembl transcripts for [%s:%s].",
                                        record.getTumorBarcode().getKey(),
-                                       record.getHugoSymbol().getKey());
+                                       record.getHugoSymbol().getKey()));
+        return false;
     }
 
     private RecordList recordList(TumorBarcode barcode, HugoSymbol symbol) {

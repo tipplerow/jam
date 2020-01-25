@@ -16,7 +16,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class MissenseProcessorTest {
-    private static final String MAF_FILE   = "data/test/MAF_TCGA_sample200.maf";
+    private static final String MAF_FILE   = "data/test/TCGA_Missense.maf";
     private static final String PROP_FILE  = "data/tcga/tcga_missense_processor.prop";
     private static final String FASTA_FILE = "MissenseProcessorTest.fa";
 
@@ -31,25 +31,12 @@ public class MissenseProcessorTest {
         File fastaFile = new File("data/tcga", FASTA_FILE);
         MAFFastaTable table = MAFFastaTable.load(fastaFile.getAbsolutePath());
 
-        assertEquals(Set.of(TumorBarcode.instance("TCGA-02-0003-01A-01D-1490-08"),
-                            TumorBarcode.instance("TCGA-02-0033-01A-01D-1490-08"),
-                            TumorBarcode.instance("TCGA-02-0047-01A-01D-1490-08"),
-                            TumorBarcode.instance("TCGA-02-0055-01A-01D-1490-08")),
+        assertEquals(Set.of(TumorBarcode.instance("TCGA-02-0003-01A"),
+                            TumorBarcode.instance("TCGA-02-0033-01A"),
+                            TumorBarcode.instance("TCGA-02-0047-01A")),
                      table.viewBarcodes());
 
-        assertEquals(Set.of(HugoSymbol.instance("ARMC3"),
-                            HugoSymbol.instance("C10orf10"),
-                            HugoSymbol.instance("MYO3A"),
-                            HugoSymbol.instance("PHRF1"),
-                            HugoSymbol.instance("PICALM"),
-                            HugoSymbol.instance("PTEN"),
-                            HugoSymbol.instance("UBC"),
-                            HugoSymbol.instance("ZNF248")),
-                     table.viewSymbols(TumorBarcode.instance("TCGA-02-0055-01A-01D-1490-08")));
-
-        assertRecord(table, "TCGA-02-0055-01A-01D-1490-08", "ARMC3",   "MGKKIKKEVE", "SREADLYRFI");
-        assertRecord(table, "TCGA-02-0033-01A-01D-1490-08", "SLC22A9", "MAFQDLLGHA", "EDPRVEVTQF");
-
+        assertRecord(table, "TCGA-02-0033-01A", "SLC22A9", "MAFQDLLGHA", "EDPRVEVTQF");
         fastaFile.delete();
     }
 
