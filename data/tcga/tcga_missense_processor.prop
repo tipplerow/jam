@@ -1,14 +1,12 @@
 ########################################################################
 # Property file for applications using the jam.maf.MissenseProcessor
-# and TCGA MAF files in their standard format.
+# and the post-processed TCGA MAF files in their standard format.
 ########################################################################
 
-jam.maf.tumorBarcodeColumn   = Tumor_Sample_Barcode
-jam.maf.hugoSymbolColumn     = Hugo_Symbol
-jam.maf.transcriptColumn     = Transcript_ID
-jam.maf.classificationColumn = Variant_Classification
-jam.maf.variantTypeColumn    = Variant_Type
-jam.maf.proteinChangeColumn  = HGVSp_Short
+jam.maf.tumorBarcodeColumn  = Tumor_Barcode
+jam.maf.hugoSymbolColumn    = Hugo_Symbol
+jam.maf.transcriptColumn    = Transcript_ID
+jam.maf.proteinChangeColumn = Protein_Change
 
 jam.ensembl.referenceFile = ${CSB_DATA_VAULT}/Ensembl/Release96/Homo_sapiens.GRCh37.pep.all.fa.gz
 
