@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jam.hugo.HugoSymbol;
@@ -11,41 +12,46 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class HugoPeptideTableTest {
-    private static HugoSymbol A1BG = HugoSymbol.instance("A1BG");
-    private static HugoSymbol A1CF = HugoSymbol.instance("A1CF");
-    private static HugoSymbol A2M  = HugoSymbol.instance("A2M");
-    private static HugoSymbol ALD1 = HugoSymbol.instance("ALD1");
+    private static final String PEPTIDE_FILE = "data/test/hugo_peptide_table.tsv";
 
-    @Test public void testLoad() {
-        HugoPeptideTable table = HugoPeptideTable.load("data/test/hugo_peptide_table.tsv");
-        assertEquals(6, table.size());
+    private static final HugoSymbol A1BG  = HugoSymbol.instance("A1BG");
+    private static final HugoSymbol XXXX  = HugoSymbol.instance("XXXX");
+    private static final HugoSymbol ZZEF1 = HugoSymbol.instance("ZZEF1");
 
+    private static final Peptide AAPPPPVLM  = Peptide.parse("AAPPPPVLM");
+    private static final Peptide AAPPPPVLMH = Peptide.parse("AAPPPPVLMH");
+    private static final Peptide ADSANYSCV  = Peptide.parse("ADSANYSCV");
+    private static final Peptide YWSLLTSLV  = Peptide.parse("YWSLLTSLV");
+    private static final Peptide VVVVVVVVV  = Peptide.parse("VVVVVVVVV");
+
+    private static final HugoPeptideTable table = HugoPeptideTable.load(PEPTIDE_FILE);
+
+    @Test public void testContainsPeptide() {
+        assertTrue(table.contains(AAPPPPVLM));
+        assertTrue(table.contains(AAPPPPVLMH));
+        assertTrue(table.contains(ADSANYSCV));
+        assertTrue(table.contains(YWSLLTSLV));
+        assertFalse(table.contains(VVVVVVVVV));
+    }
+
+    @Test public void testContainsSymbol() {
         assertTrue(table.contains(A1BG));
-        assertTrue(table.contains(A1CF));
-        assertTrue(table.contains(A2M));
-        assertFalse(table.contains(ALD1));
+        assertTrue(table.contains(ZZEF1));
+        assertFalse(table.contains(XXXX));
+    }
 
-        assertEquals(2, table.get(A1BG).size());
-        assertEquals(3, table.get(A1CF).size());
-        assertEquals(1, table.get(A2M).size());
-        assertEquals(0, table.get(ALD1).size());
+    @Test public void getGet() {
+        assertTrue(table.get(XXXX).isEmpty());
+        assertEquals(Set.of(ADSANYSCV, YWSLLTSLV), new HashSet<Peptide>(table.get(ZZEF1)));
+        assertEquals(Set.of(AAPPPPVLM, AAPPPPVLMH, ADSANYSCV), new HashSet<Peptide>(table.get(A1BG)));
+    }
 
-        assertEquals(Peptide.parse("AAPPPPVLM"),  table.get(A1BG).get(0));
-        assertEquals(Peptide.parse("GCLGLMVAK"),  table.get(A1BG).get(1));
-        assertEquals(Peptide.parse("CASVDNCRL"),  table.get(A1CF).get(0));
-        assertEquals(Peptide.parse("GQDLAAYTTY"), table.get(A1CF).get(1));
-        assertEquals(Peptide.parse("LPGMELTPM"),  table.get(A1CF).get(2));
-        assertEquals(Peptide.parse("AEYNAPCSK"),  table.get(A2M).get(0));
+    @Test public void testViewPeptides() {
+        assertEquals(Set.of(AAPPPPVLM, AAPPPPVLMH, ADSANYSCV, YWSLLTSLV), table.viewPeptides());
+    }
 
-        Set<Peptide> peptides = table.collectUniquePeptides();
-        assertEquals(6, peptides.size());
-
-        assertTrue(peptides.contains(Peptide.parse("AAPPPPVLM")));
-        assertTrue(peptides.contains(Peptide.parse("GCLGLMVAK")));
-        assertTrue(peptides.contains(Peptide.parse("CASVDNCRL")));
-        assertTrue(peptides.contains(Peptide.parse("GQDLAAYTTY")));
-        assertTrue(peptides.contains(Peptide.parse("LPGMELTPM")));
-        assertTrue(peptides.contains(Peptide.parse("AEYNAPCSK")));
+    @Test public void testViewSymbols() {
+        assertEquals(Set.of(A1BG, ZZEF1), table.viewSymbols());
     }
 
     public static void main(String[] args) {
