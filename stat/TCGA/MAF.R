@@ -4,7 +4,7 @@ MAF.loadRaw <- function() {
 }
 
 MAF.rawFile <- function() {
-    gzfile(file.path(CellOrigin.homeDir(), "raw", "mc3.v0.2.8.PUBLIC.maf.gz"))
+    gzfile(file.path(TCGA.homeDir(), "CellOrigin", "raw", "mc3.v0.2.8.PUBLIC.maf.gz"))
 }
 
 ## ---------------------------------------------------------------------
@@ -54,7 +54,7 @@ MAF.buildMissense <- function(mafRaw = NULL) {
         sprintf("%s%d%s", changeFrom, missenseFrame$Protein_position, changeTo)
 
     missenseFrame$Tumor_Barcode <-
-        CellOrigin.truncateBarcode(missenseFrame$Tumor_Sample_Barcode)
+        TCGA.truncateBarcode(missenseFrame$Tumor_Sample_Barcode)
 
     missenseFrame <-
         missenseFrame[,c("Tumor_Barcode",
@@ -80,7 +80,7 @@ MAF.loadMissense <- function() {
 }
 
 MAF.missenseMAFFile <- function() {
-    gzfile(file.path(CellOrigin.homeDir(), "TCGA_Missense.maf.gz"))
+    gzfile(file.path(TCGA.homeDir(), "CellOrigin", "TCGA_Missense.maf.gz"))
 }
 
 MAF.writeMissense <- function(missenseFrame = NULL) {
