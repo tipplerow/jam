@@ -15,7 +15,7 @@ import jam.lang.JamException;
  */
 public final class SQLUtil {
     /**
-     * Opens a new database connection.
+     * Opens a new {@code sqlite} database connection.
      *
      * @param url the URL for the database.
      *
@@ -23,7 +23,7 @@ public final class SQLUtil {
      *
      * @throws RuntimeException unless the connection can be opened.
      */
-    public static Connection open(String url) {
+    public static Connection sqlite(String url) {
         try {
             Class.forName("org.sqlite.JDBC");
             return DriverManager.getConnection(url);
@@ -57,6 +57,9 @@ public final class SQLUtil {
      * @param columnName the name of the integer column.
      *
      * @param value the integer value to count.
+     *
+     * @return the number of rows containing the specified integer
+     * value.
      */
     public static int count(Connection connection, String tableName, String columnName, int value) {
         String queryString =
@@ -75,6 +78,9 @@ public final class SQLUtil {
      * @param columnName the name of the string column.
      *
      * @param value the string value to count.
+     *
+     * @return the number of rows containing the specified string
+     * value.
      */
     public static int count(Connection connection, String tableName, String columnName, String value) {
         String queryString =
@@ -143,8 +149,6 @@ public final class SQLUtil {
      * @param connection an open database connection.
      *
      * @param update the update string.
-     *
-     * @return the result set returned by the database.
      *
      * @throws RuntimeException if any errors occur.
      */
