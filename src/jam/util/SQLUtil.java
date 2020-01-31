@@ -23,12 +23,21 @@ public final class SQLUtil {
      *
      * @throws RuntimeException unless the connection can be opened.
      */
-    public static Connection sqlite(String url) {
+    public static Connection sqlite(String dbFile) {
         try {
             Class.forName("org.sqlite.JDBC");
+            return getConnection("jdbc:sqlite:" + dbFile);
+        }
+        catch (ClassNotFoundException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    private static Connection getConnection(String url) {
+        try {
             return DriverManager.getConnection(url);
         }
-        catch (Exception ex) {
+        catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
     }
