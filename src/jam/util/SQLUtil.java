@@ -48,6 +48,20 @@ public final class SQLUtil {
     }
 
     /**
+     * Closes a result set.
+     *
+     * @param resultSet the result set to close.
+     */
+    public static void close(ResultSet resultSet) {
+        try {
+            resultSet.close();
+        }
+        catch (SQLException ex) {
+            JamLogger.info("Failed to close result set: [%s].", ex.getMessage());
+        }
+    }
+
+    /**
      * Counts the number of rows that contain a given integer value.
      *
      * @param connection an open database connection.
