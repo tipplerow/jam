@@ -17,7 +17,7 @@ public final class SQLUtil {
     /**
      * Opens a new {@code sqlite} database connection.
      *
-     * @param url the URL for the database.
+     * @param dbFile the path name for the database file.
      *
      * @return an open database connection for the specified URL.
      *
