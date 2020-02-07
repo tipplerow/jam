@@ -108,6 +108,17 @@ public final class FastaReader implements Closeable, Iterable<FastaRecord>, Iter
     }
 
     /**
+     * Identifies header lines in FASTA files.
+     *
+     * @param line a line from a FASTA file.
+     *
+     * @return {@code true} iff the specified line is a header line.
+     */
+    public static boolean isHeaderLine(String line) {
+        return line.startsWith(FastaRecord.HEADER_MARKER);
+    }
+
+    /**
      * Closes this reader.
      */
     @Override public void close() {
@@ -159,10 +170,6 @@ public final class FastaReader implements Closeable, Iterable<FastaRecord>, Iter
         }
 
         return peptideLines;
-    }
-
-    private static boolean isHeaderLine(String line) {
-        return line.startsWith(FastaRecord.HEADER_MARKER);
     }
 
     private static FastaRecord createRecord(String headerLine, List<String> peptideLines) {
