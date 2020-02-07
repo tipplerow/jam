@@ -121,8 +121,6 @@ ImmuneLandscape.buildPatientGenotype <- function(hlaRaw = NULL) {
     if (is.null(hlaRaw))
         hlaRaw <- ImmuneLandscape.loadHLARaw()
 
-    source(file.path(ImmuneLandscape.dataVault(), "TCGA", "CellOrigin", "CellOrigin.R"))
-
     ## Remove missing alleles...
     hlaRaw <- subset(hlaRaw, nchar(A1) >= 7)
     hlaRaw <- subset(hlaRaw, nchar(A2) >= 7)
@@ -134,25 +132,47 @@ ImmuneLandscape.buildPatientGenotype <- function(hlaRaw = NULL) {
     ## Remove mal-formed identifiers...
     hlaRaw <- subset(hlaRaw, nchar(aliquot_id) == 28)
 
-    ## Place alleles in canonical order...
-    A1 <- ifelse(hlaRaw$A1 < hlaRaw$A2, hlaRaw$A1, hlaRaw$A2)
-    A2 <- ifelse(hlaRaw$A1 > hlaRaw$A2, hlaRaw$A1, hlaRaw$A2)
+    ## Extract identifiers...
+    hlaRaw$Patient_ID    <- substr(hlaRaw$aliquot_id, 1, 12)
+    hlaRaw$Tumor_Barcode <- substr(hlaRaw$aliquot_id, 1, 16)
 
-    B1 <- ifelse(hlaRaw$B1 < hlaRaw$B2, hlaRaw$B1, hlaRaw$B2)
-    B2 <- ifelse(hlaRaw$B1 > hlaRaw$B2, hlaRaw$B1, hlaRaw$B2)
+    shortKey <- function(hlaCode) {
+        gsub(":", "", gsub("\\*", "", hlaCode))
+    }
 
-    C1 <- ifelse(hlaRaw$C1 < hlaRaw$C2, hlaRaw$C1, hlaRaw$C2)
-    C2 <- ifelse(hlaRaw$C1 > hlaRaw$C2, hlaRaw$C1, hlaRaw$C2)
+    processBarcode <- function(slice) {
+        A1 <- shortKey(slice$A1)
+        A2 <- shortKey(slice$A2)
 
-    Patient_ID <- substr(hlaRaw$aliquot_id, 1, 12)
-    Genotype   <- paste(A1, A2, B1, B2, C1, C2, sep = " ")
+        B1 <- shortKey(slice$B1)
+        B2 <- shortKey(slice$B2)
 
-    patientFrame <-
-        data.frame(Patient_ID = Patient_ID,
-                   Genotype   = Genotype)
+        C1 <- shortKey(slice$C1)
+        C2 <- shortKey(slice$C2)
 
-    patientFrame <-
-        patientFrame[order(patientFrame$Patient_ID),]
+        genotype <- c(A1, A2, B1, B2, C1, C2)
+        genotype <- sort(genotype)
+        genotype <- genotype[!duplicated(genotype)]
+        genotype <- paste(genotype, sep = " ", collapse = " ")
+
+        genoFrame <- data.frame(Patient_ID    = slice$Patient_ID,
+                                Tumor_Barcode = slice$Tumor_Barcode,
+                                Genotype      = genotype)
+    }
+
+    barcodeFrame <- do.call(rbind, by(hlaRaw, hlaRaw$Tumor_Barcode, processBarcode))
+    rownames(barcodeFrame) <- NULL
+
+    processPatient <- function(slice) {
+        if (length(unique(slice$Genotype)) == 1)
+            return(data.frame(Patient_ID = slice$Patient_ID[1],
+                              Genotype   = slice$Genotype[1]))
+        else
+            return(NULL)
+    }
+
+    patientFrame <- do.call(rbind, by(barcodeFrame, barcodeFrame$Patient_ID, processPatient))
+    rownames(patientFrame) <- NULL
 
     patientFrame
 }
