@@ -5,6 +5,9 @@ package jam.nucleic;
  * Enumerates the nucleotides contained in DNA and RNA.
  */
 public enum Nucleotide {
+    /**
+     * Adenine.
+     */
     A("Adenine", Family.PURINE, true, true) {
         @Override public Nucleotide getPartner() {
             return T;
@@ -15,6 +18,9 @@ public enum Nucleotide {
         }
     },
 
+    /**
+     * Thymine.
+     */
     T("Thymine", Family.PYRIMIDINE, true, false) {
         @Override public Nucleotide getPartner() {
             return A;
@@ -25,6 +31,9 @@ public enum Nucleotide {
         }
     },
 
+    /**
+     * Guanine.
+     */
     G("Guanine", Family.PURINE, true, true) {
         @Override public Nucleotide getPartner() {
             return C;
@@ -35,6 +44,9 @@ public enum Nucleotide {
         }
     },
 
+    /**
+     * Cytosine.
+     */
     C("Cytosine", Family.PYRIMIDINE, true, true) {
         @Override public Nucleotide getPartner() {
             return G;
@@ -45,6 +57,9 @@ public enum Nucleotide {
         }
     },
 
+    /**
+     * Uracil.
+     */
     U("Uracil", Family.PYRIMIDINE, false, true) {
         @Override public Nucleotide getPartner() {
             return A;
@@ -52,6 +67,19 @@ public enum Nucleotide {
 
         @Override public Nucleotide transcribe() {
             throw new UnsupportedOperationException("Cannot transcribe uracil.");
+        }
+    },
+
+    /**
+     * Any of the possible nucleotides.
+     */
+    N("Any", null, true, false) {
+        @Override public Nucleotide getPartner() {
+            return this;
+        }
+
+        @Override public Nucleotide transcribe() {
+            return this;
         }
     };
 
