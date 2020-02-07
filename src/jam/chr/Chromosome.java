@@ -1,6 +1,11 @@
 
 package jam.chr;
 
+import java.io.File;
+
+import jam.ensembl.EnsemblAssembly;
+import jam.nucleic.DNA;
+
 /**
  * Enumerates all human chromosomes.
  */
@@ -34,10 +39,28 @@ public enum Chromosome {
     private final Length length;
     private final Length centromere;
 
+    // Created on demand...
+    private DNA dna = null;
+
     private Chromosome(String code, int length_kb, int centromere_kb) {
         this.code = code;
         this.length = Length.kilo(length_kb);
         this.centromere = Length.kilo(centromere_kb);
+    }
+
+    /**
+     * Returns the file containing the Ensembl nucleotide sequence for
+     * this chromosome.
+     *
+     * @return the file containing the Ensembl nucleotide sequence for
+     * this chromosome.
+     */
+    public File ensemblFile() {
+        return new File(EnsemblAssembly.releaseDir(), ensemblBaseName());
+    }
+
+    private String ensemblBaseName() {
+        return String.format("Homo_sapiens.%s.dna.chromosome.%s.fa.gz", EnsemblAssembly.reference().name(), code);
     }
 
     /**
@@ -47,6 +70,18 @@ public enum Chromosome {
      */
     public String code() {
         return code;
+    }
+
+    /**
+     * Returns the reference DNA sequence for this chromosome.
+     *
+     * @return the reference DNA sequence for this chromosome.
+     */
+    public DNA dna() {
+        if (dna == null)
+            dna = DNA.load(ensemblFile());
+
+        return dna;
     }
 
     /**
