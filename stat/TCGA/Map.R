@@ -94,3 +94,17 @@ Map.writeBarcodeByCancerType <- function(format = "Tumor_Barcode_%s.txt") {
     for (type in types)
         writeLines(typeMap[which(typeMap$Cancer_Type == type), "Tumor_Barcode"], sprintf(format, type))
 }
+
+## ---------------------------------------------------------------------
+
+Map.writePatientByCancerType <- function(format = "Patient_ID_%s.txt") {
+    typeMap <- Map.buildTumorCancerTypeMap()
+
+    typeMap$Patient_ID <- substr(typeMap$Tumor_Barcode, 1, 12)
+    typeMap <- typeMap[!duplicated(typeMap$Patient_ID),]
+
+    types <- sort(unique(typeMap$Cancer_Type))
+
+    for (type in types)
+        writeLines(typeMap[which(typeMap$Cancer_Type == type), "Patient_ID"], sprintf(format, type))
+}
