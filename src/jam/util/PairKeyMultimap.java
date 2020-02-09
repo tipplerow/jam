@@ -211,6 +211,20 @@ public final class PairKeyMultimap<K1, K2, V> {
     }
 
     /**
+     * Returns the number of entries in this table.
+     *
+     * @return the number of entries in this table.
+     */
+    public int size() {
+        int size = 0;
+
+        for (K1 key1 : outerKeySet())
+            size += outerMap.get(key1).size();
+
+        return size;
+    }
+
+    /**
      * Returns a read-only {@code Set} view of the inner keys in this
      * map for a given outer key.
      *

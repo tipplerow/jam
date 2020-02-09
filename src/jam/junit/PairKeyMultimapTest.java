@@ -35,6 +35,7 @@ public final class PairKeyMultimapTest {
         testContains();
         testGet();
         testKeySets();
+        testSize();
         testRemove();
     }
 
@@ -83,11 +84,17 @@ public final class PairKeyMultimapTest {
 
     private void testRemove() {
         assertTrue(table.contains("ghi", 5));
+        assertEquals(9, table.size());
 
         table.remove("ghi", 5);
         
         assertFalse(table.contains("ghi", 5));
         assertValues(List.of(), table.get("ghi", 5));
+        assertEquals(6, table.size());
+    }
+
+    private void testSize() {
+        assertEquals(9, table.size());
     }
 
     public static void main(String[] args) {
