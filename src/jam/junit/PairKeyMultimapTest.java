@@ -2,24 +2,26 @@
 package jam.junit;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
-import jam.util.PairKeyTable;
+import jam.util.PairKeyMultimap;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public final class PairKeyTableTest {
-    private PairKeyTable<String, Integer, String> table;
+public final class PairKeyMultimapTest {
+    private PairKeyMultimap<String, Integer, String> table;
 
     @Test public void testHash() {
-        table = PairKeyTable.hash();
+        table = PairKeyMultimap.hash();
         runTest();
     }
 
     @Test public void testTree() {
-        table = PairKeyTable.tree();
+        table = PairKeyMultimap.tree();
         runTest();
 
         // Check ordering of keys...
@@ -37,12 +39,15 @@ public final class PairKeyTableTest {
     }
 
     private void fillTable() {
-        table.put("abc",  1, "abc.1");
+        table.put("abc",  1, "abc.1.A");
+        table.put("abc",  1, "abc.1.B");
         table.put("abc", -2, "abc.2");
         table.put("def",  2, "def.2");
         table.put("def", -3, "def.3");
         table.put("def",  4, "def.4");
-        table.put("ghi",  5, "ghi.5");
+        table.put("ghi",  5, "ghi.5.A");
+        table.put("ghi",  5, "ghi.5.B");
+        table.put("ghi",  5, "ghi.5.C");
     }
 
     private void testContains() {
@@ -54,11 +59,18 @@ public final class PairKeyTableTest {
     }
 
     private void testGet() {
-        assertEquals("abc.1", table.get("abc", 1));
-        assertNull(table.get("abc", 2));
+        assertValues(List.of("abc.1.A", "abc.1.B"), table.get("abc", 1));
+        assertTrue(table.get("abc", 2).isEmpty());
 
-        assertEquals("def.2", table.get("def", 2));
-        assertNull(table.get("def", 1));
+        assertValues(List.of("def.2"), table.get("def", 2));
+        assertTrue(table.get("def", 1).isEmpty());
+
+        assertValues(List.of("ghi.5.A", "ghi.5.B", "ghi.5.C"), table.get("ghi", 5));
+        assertTrue(table.get("ghi", 2).isEmpty());
+    }
+
+    private void assertValues(List<String> expected, Collection<String> actual) {
+        assertEquals(new TreeSet<String>(expected), new TreeSet<String>(actual));
     }
 
     private void testKeySets() {
@@ -71,16 +83,15 @@ public final class PairKeyTableTest {
 
     private void testRemove() {
         assertTrue(table.contains("ghi", 5));
-        assertEquals("ghi.5", table.get("ghi", 5));
-        assertEquals("ghi.5", table.remove("ghi", 5));
 
+        table.remove("ghi", 5);
+        
         assertFalse(table.contains("ghi", 5));
-        assertNull(table.get("ghi", 5));
-        assertNull("ghi.5", table.remove("ghi", 5));
+        assertValues(List.of(), table.get("ghi", 5));
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.junit.PairKeyTableTest");
+        org.junit.runner.JUnitCore.main("jam.junit.PairKeyMultimapTest");
     }
 }
 
