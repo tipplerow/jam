@@ -98,6 +98,18 @@ public final class PairKeyMultimap<K1, K2, V> {
      *
      * @param key1 the first (outer) key.
      *
+     * @return {@code true} iff this map contains the specified outer
+     * key.
+     */
+    public boolean contains(K1 key1) {
+        return outerMap.containsKey(key1);
+    }
+
+    /**
+     * Identifies keys contained in this map.
+     *
+     * @param key1 the first (outer) key.
+     *
      * @param key2 the second (inner) key.
      *
      * @return {@code true} iff this map contains a value indexed
