@@ -75,7 +75,7 @@ public final class LogConcentrationModel extends ConcentrationModel {
     }
 
     private static double resolveAlphaFactor() {
-        return JamProperties.getRequiredDouble(ALPHA_PROPERTY);
+        return JamProperties.getOptionalDouble(ALPHA_PROPERTY, ALPHA_DEFAULT);
     }
 
     @Override protected double translate(double expression) {
