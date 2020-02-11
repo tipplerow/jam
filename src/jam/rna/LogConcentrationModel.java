@@ -18,10 +18,28 @@ import jam.lang.JamException;
  * {@code Cmax} is the maximum (log-transformed) concentration.
  */
 public final class LogConcentrationModel extends ConcentrationModel {
-    private final double alpha;
-    private final double maxConc;
+    private final double alphaFactor;
 
     private static LogConcentrationModel global = null;
+
+    /**
+     * Creates a new log-transformed concentration model with fixed
+     * parameters.
+     *
+     * @param exprThreshold the minimum RNA expression level required
+     * for positive peptide concentration.
+     *
+     * @param maxExpression the maximum RNA expression level passed to
+     * the concentration model.
+     *
+     * @param alphaFactor the alpha scaling parameter.
+     */
+    public LogConcentrationModel(double exprThreshold,
+                                 double maxExpression,
+                                 double alphaFactor) {
+        super(exprThreshold, maxExpression);
+        this.alphaFactor = alphaFactor;
+    }
 
     /**
      * Name of the system property that specifies the alpha scaling
@@ -30,27 +48,15 @@ public final class LogConcentrationModel extends ConcentrationModel {
     public static final String ALPHA_PROPERTY = "jam.rna.log1P.alpha";
 
     /**
-     * Name of the system property that specifies the maximum
-     * log-transformed concentration.
+     * Default value for the alpha scaling factor.
      */
-    public static final String MAX_CONC_PROPERTY = "jam.rna.log1P.maxConc";
+    public static final double ALPHA_DEFAULT = 1.0;
 
     /**
-     * Expression threshold below which concentration is always zero.
+     * The log-transformed concentration model with default parameters.
      */
-    public static final double THRESHOLD = 0.13;
-
-    /**
-     * Creates a new concentration model with fixed parameters.
-     *
-     * @param alpha the alpha scaling parameter.
-     *
-     * @param maxConc the maximum log-transformed concentration.
-     */
-    public LogConcentrationModel(double alpha, double maxConc) {
-        this.alpha = alpha;
-        this.maxConc = maxConc;
-    }
+    public static final LogConcentrationModel DEFAULT =
+        new LogConcentrationModel(EXPR_THRESHOLD_DEFAULT, MAX_EXPRESSION_DEFAULT, ALPHA_DEFAULT);
 
     /**
      * Returns the global log-transformed concentration model defined
@@ -61,27 +67,21 @@ public final class LogConcentrationModel extends ConcentrationModel {
      */
     public static LogConcentrationModel global() {
         if (global == null)
-            global = createGlobal();
+            global = new LogConcentrationModel(resolveExprThreshold(),
+                                               resolveMaxExpression(),
+                                               resolveAlphaFactor());
 
         return global;
     }
 
-    private static LogConcentrationModel createGlobal() {
-        return new LogConcentrationModel(resolveAlpha(), resolveMaxConc());
-    }
-
-    private static double resolveAlpha() {
+    private static double resolveAlphaFactor() {
         return JamProperties.getRequiredDouble(ALPHA_PROPERTY);
     }
 
-    private static double resolveMaxConc() {
-        return JamProperties.getRequiredDouble(MAX_CONC_PROPERTY);
-    }
-
-    @Override public Concentration translate(Expression expression) {
-        if (expression.doubleValue() < THRESHOLD)
-            return Concentration.ZERO;
-        else
-            return Concentration.valueOf(Math.min(maxConc, Math.log(1.0 + expression.doubleValue() / alpha)));
+    @Override protected double translate(double expression) {
+        //
+        // The expression has already been filtered... 
+        //
+        return Math.log(1.0 + expression / alphaFactor);
     }
 }

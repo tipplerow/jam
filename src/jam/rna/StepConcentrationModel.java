@@ -18,56 +18,43 @@ import jam.lang.JamException;
  * {@code Fmin} is a threshold expression level.
  */
 public final class StepConcentrationModel extends ConcentrationModel {
-    private final Expression threshold;
-
     private static StepConcentrationModel global = null;
 
-    private static final Concentration ZERO_CONC = Concentration.ZERO;
-    private static final Concentration UNIT_CONC = Concentration.valueOf(1.0);
-
     /**
-     * Name of the system property that specifies the expression
-     * threshold.
-     */
-    public static final String EXPRESSION_THRESHOLD_PROPERTY =
-        "jam.rna.expressionThreshold";
-
-    /**
-     * Creates a new step concentration model with a fixed expression
+     * Creates a new step-function concentration model with a fixed
      * threshold.
      *
-     * @param threshold the expression threshold.
+     * @param exprThreshold the minimum RNA expression level required
+     * for positive peptide concentration.
      */
-    public StepConcentrationModel(Expression threshold) {
-        this.threshold = threshold;
+    public StepConcentrationModel(double exprThreshold) {
+        super(exprThreshold, 1.0);
     }
 
     /**
-     * Returns the global step concentration model defined by system
-     * properties.
+     * The step-function concentration model with default parameters.
+     */
+    public static final StepConcentrationModel DEFAULT =
+        new StepConcentrationModel(EXPR_THRESHOLD_DEFAULT);
+
+    /**
+     * Returns the global step-function concentration model defined by
+     * system properties.
      *
-     * @return the global step concentration model defined by system
-     * properties.
+     * @return the global step-function concentration model defined by
+     * system properties.
      */
     public static StepConcentrationModel global() {
         if (global == null)
-            global = createGlobal();
+            global = new StepConcentrationModel(resolveExprThreshold());
 
         return global;
     }
 
-    private static StepConcentrationModel createGlobal() {
-        return new StepConcentrationModel(resolveThreshold());
-    }
-
-    private static Expression resolveThreshold() {
-        return Expression.valueOf(JamProperties.getRequiredDouble(EXPRESSION_THRESHOLD_PROPERTY));
-    }
-
-    @Override public Concentration translate(Expression expression) {
-        if (expression.doubleValue() < threshold.doubleValue())
-            return ZERO_CONC;
-        else
-            return UNIT_CONC;
+    @Override protected double translate(double expression) {
+        //
+        // Expressions below the threshold have already been removed...
+        //
+        return 1.0;
     }
 }

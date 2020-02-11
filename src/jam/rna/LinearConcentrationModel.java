@@ -17,29 +17,26 @@ import jam.lang.JamException;
  * {@code Cmax} is the maximum concentration.
  */
 public final class LinearConcentrationModel extends ConcentrationModel {
-    private final double maxConc;
-
     private static LinearConcentrationModel global = null;
 
     /**
-     * Name of the system property that specifies the maximum
-     * concentration.
-     */
-    public static final String MAX_CONC_PROPERTY = "jam.rna.linear.maxConc";
-
-    /**
-     * Expression threshold below which concentration is always zero.
-     */
-    public static final double THRESHOLD = 0.01;
-
-    /**
-     * Creates a new concentration model with fixed parameters.
+     * Creates a new linear concentration model with fixed parameters.
      *
-     * @param maxConc the maximum concentration.
+     * @param exprThreshold the minimum RNA expression level required
+     * for positive peptide concentration.
+     *
+     * @param maxExpression the maximum RNA expression level passed to
+     * the concentration model.
      */
-    public LinearConcentrationModel(double maxConc) {
-        this.maxConc = maxConc;
+    public LinearConcentrationModel(double exprThreshold, double maxExpression) {
+        super(exprThreshold, maxExpression);
     }
+
+    /**
+     * The linear concentration model with default parameters.
+     */
+    public static LinearConcentrationModel DEFAULT =
+        new LinearConcentrationModel(EXPR_THRESHOLD_DEFAULT, MAX_EXPRESSION_DEFAULT);
 
     /**
      * Returns the global linear concentration model defined by system
@@ -50,23 +47,15 @@ public final class LinearConcentrationModel extends ConcentrationModel {
      */
     public static LinearConcentrationModel global() {
         if (global == null)
-            global = createGlobal();
+            global = new LinearConcentrationModel(resolveExprThreshold(), resolveMaxExpression());
 
         return global;
     }
 
-    private static LinearConcentrationModel createGlobal() {
-        return new LinearConcentrationModel(resolveMaxConc());
-    }
-
-    private static double resolveMaxConc() {
-        return JamProperties.getRequiredDouble(MAX_CONC_PROPERTY);
-    }
-
-    @Override public Concentration translate(Expression expression) {
-        if (expression.doubleValue() < THRESHOLD)
-            return Concentration.ZERO;
-        else
-            return Concentration.valueOf(Math.min(expression.doubleValue(), maxConc));
+    @Override protected double translate(double expression) {
+        //
+        // The expression has already been filtered...
+        //
+        return expression;
     }
 }
