@@ -2,6 +2,7 @@
 package jam.rna;
 
 import java.io.File;
+import java.util.List;
 
 import jam.data.DataMatrix;
 import jam.data.DenseDataMatrixLoader;
@@ -133,5 +134,23 @@ public final class TumorExpressionMatrix {
             return Expression.valueOf(expression.get(barcode, symbol));
         else
             return null;
+    }
+
+    /**
+     * Returns a read-only view of the barcodes in this matrix.
+     *
+     * @return a read-only view of the barcodes in this matrix.
+     */
+    public List<TumorBarcode> viewBarcodes() {
+        return expression.rowKeyList();
+    }
+
+    /**
+     * Returns a read-only view of the HUGO symbols in this matrix.
+     *
+     * @return a read-only view of the HUGO symbols in this matrix.
+     */
+    public List<HugoSymbol> viewSymbols() {
+        return expression.colKeyList();
     }
 }

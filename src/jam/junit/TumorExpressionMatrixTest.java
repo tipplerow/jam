@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.util.List;
+
 import jam.hugo.HugoSymbol;
 import jam.rna.Expression;
 import jam.rna.TumorExpressionMatrix;
@@ -47,6 +49,9 @@ public class TumorExpressionMatrixTest extends NumericTestBase {
         assertNull(matrix.get(tumor1, bad_gene));
         assertNull(matrix.get(bad_tumor, gene1));
         assertNull(matrix.get(bad_tumor, bad_gene));
+
+        assertEquals(List.of(tumor1, tumor2, tumor3), matrix.viewBarcodes());
+        assertEquals(List.of(gene1, gene2, gene3, gene4, gene5), matrix.viewSymbols());
     }
 
     private void assertExpression(double expected, Expression actual) {
