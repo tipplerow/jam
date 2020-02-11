@@ -13,6 +13,8 @@ public abstract class ConcentrationModel {
     private final double exprThreshold;
     private final double maxExpression;
 
+    private static ConcentrationModel global = null;
+
     /**
      * Creates a new concentration model with given expression bounds.
      *
@@ -54,6 +56,27 @@ public abstract class ConcentrationModel {
      * Default value for the maximum RNA expression.
      */
     public static final double MAX_EXPRESSION_DEFAULT = 1.0E+05;
+
+    /**
+     * Returns the global concentration model defined through system
+     * properties.
+     *
+     * @return the global concentration model defined through system
+     * properties.
+     */
+    public static ConcentrationModel global() {
+        if (global == null)
+            global = createGlobal();
+
+        return global;
+    }
+
+    private static ConcentrationModel createGlobal() {
+        ConcentrationModelType modelType =
+            JamProperties.getRequiredEnum(CONC_MODEL_TYPE_PROPERTY, ConcentrationModelType.class);
+
+        return modelType.globalModel();
+    }
 
     /**
      * Returns the minimum RNA expression required for positive
