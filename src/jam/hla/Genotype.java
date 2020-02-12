@@ -3,7 +3,10 @@ package jam.hla;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -24,8 +27,27 @@ import jam.util.CollectionUtil;
  * Represents the complete HLA genotype for a single MHC class.
  */
 public final class Genotype extends AbstractImmutableMultiset<Allele> implements Comparable<Genotype> {
+    private final Map<Locus, List<Allele>> locusMap =
+        new EnumMap<Locus, List<Allele>>(Locus.class);
+
     private Genotype(ImmutableSortedMultiset<Allele> alleles) {
         super(alleles);
+        fillLocusMap();
+    }
+
+    private void fillLocusMap() {
+        for (Locus locus : Locus.values())
+            locusMap.put(locus, new ArrayList<Allele>(2));
+
+        for (Allele allele : this)
+            mapAllele(allele);
+    }
+
+    private void mapAllele(Allele allele) {
+        List<Allele> alleleList = locusMap.get(allele.getLocus());
+
+        if (!alleleList.contains(allele))
+            alleleList.add(allele);
     }
 
     /**
@@ -209,6 +231,19 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
      */
     public Set<Allele> copyUniqueAlleles() {
         return new TreeSet<Allele>(elementSet());
+    }
+
+    /**
+     * Returns a read-only view of the <em>unique</em> alleles for a
+     * given locus.
+     *
+     * @param locus the HLA locus of interest.
+     *
+     * @return a read-only view of the unique alleles for the
+     * specified locus.
+     */
+    public List<Allele> viewAlleles(Locus locus) {
+        return Collections.unmodifiableList(locusMap.get(locus));
     }
 
     /**

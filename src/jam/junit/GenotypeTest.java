@@ -1,10 +1,12 @@
 
 package jam.junit;
 
+import java.util.List;
 import java.util.Set;
 
 import jam.hla.Allele;
 import jam.hla.Genotype;
+import jam.hla.Locus;
 import jam.util.RegexUtil;
 
 import org.junit.*;
@@ -125,6 +127,20 @@ public class GenotypeTest {
         assertFalse(homoA2.isHeterozygous());
         assertFalse(homoB1.isHeterozygous());
         assertFalse(hetero.isHomozygous());
+    }
+
+    @Test public void testLocus() {
+        assertEquals(List.of(A2),     homoA2.viewAlleles(Locus.A));
+        assertEquals(List.of(B1, B2), homoA2.viewAlleles(Locus.B));
+        assertEquals(List.of(C1, C2), homoA2.viewAlleles(Locus.C));
+
+        assertEquals(List.of(A1, A2), homoB1.viewAlleles(Locus.A));
+        assertEquals(List.of(B1),     homoB1.viewAlleles(Locus.B));
+        assertEquals(List.of(C1, C2), homoB1.viewAlleles(Locus.C));
+
+        assertEquals(List.of(A1, A2), hetero.viewAlleles(Locus.A));
+        assertEquals(List.of(B1, B2), hetero.viewAlleles(Locus.B));
+        assertEquals(List.of(C1, C2), hetero.viewAlleles(Locus.C));
     }
 
     @Test public void testParse() {

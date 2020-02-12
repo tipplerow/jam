@@ -1,18 +1,31 @@
 
 package jam.hla;
 
+import jam.hugo.HugoSymbol;
+
 /**
  * Enumerates the HLA allele locus.
  */
 public enum Locus {
-    A(MHCClass.I),
-    B(MHCClass.I),
-    C(MHCClass.I);
+    A(MHCClass.I, HugoSymbol.instance("HLA-A")),
+    B(MHCClass.I, HugoSymbol.instance("HLA-B")),
+    C(MHCClass.I, HugoSymbol.instance("HLA-C"));
 
     private final MHCClass mhcClass;
+    private final HugoSymbol hugoSymbol;
 
-    private Locus(MHCClass mhcClass) {
+    private Locus(MHCClass mhcClass, HugoSymbol hugoSymbol) {
         this.mhcClass = mhcClass;
+        this.hugoSymbol = hugoSymbol;
+    }
+
+    /**
+     * Returns the HUGO symbol of the encoding gene.
+     *
+     * @return the HUGO symbol of the encoding gene.
+     */
+    public HugoSymbol getHugoSymbol() {
+        return hugoSymbol;
     }
 
     /**
