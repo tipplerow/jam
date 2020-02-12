@@ -127,6 +127,18 @@ public class GenotypeTest {
         assertFalse(homoA2.isHeterozygous());
         assertFalse(homoB1.isHeterozygous());
         assertFalse(hetero.isHomozygous());
+
+        assertTrue(homoA2.isHomozygous(Locus.A));
+        assertFalse(homoA2.isHomozygous(Locus.B));
+        assertFalse(homoA2.isHomozygous(Locus.C));
+
+        assertTrue(homoB1.isHomozygous(Locus.B));
+        assertFalse(homoB1.isHomozygous(Locus.A));
+        assertFalse(homoB1.isHomozygous(Locus.C));
+
+        assertFalse(hetero.isHomozygous(Locus.A));
+        assertFalse(hetero.isHomozygous(Locus.B));
+        assertFalse(hetero.isHomozygous(Locus.C));
     }
 
     @Test public void testLocus() {

@@ -115,6 +115,72 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
     }
 
     /**
+     * Returns the first unique allele at the A locus.
+     *
+     * @return the first unique allele at the A locus.
+     */
+    public Allele A1() {
+        return getLocus(Locus.A, 0);
+    }
+
+    /**
+     * Returns the second unique allele at the A locus.
+     *
+     * @return the second unique allele at the A locus ({@code null}
+     * if this genotype is homozygous at the A locus).
+     */
+    public Allele A2() {
+        return getLocus(Locus.A, 1);
+    }
+
+    /**
+     * Returns the first unique allele at the B locus.
+     *
+     * @return the first unique allele at the B locus.
+     */
+    public Allele B1() {
+        return getLocus(Locus.B, 0);
+    }
+
+    /**
+     * Returns the second unique allele at the B locus.
+     *
+     * @return the second unique allele at the B locus ({@code null}
+     * if this genotype is homozygous at the B locus).
+     */
+    public Allele B2() {
+        return getLocus(Locus.B, 1);
+    }
+
+    /**
+     * Returns the first unique allele at the C locus.
+     *
+     * @return the first unique allele at the C locus.
+     */
+    public Allele C1() {
+        return getLocus(Locus.C, 0);
+    }
+
+    /**
+     * Returns the second unique allele at the C locus.
+     *
+     * @return the second unique allele at the C locus ({@code null}
+     * if this genotype is homozygous at the C locus).
+     */
+    public Allele C2() {
+        return getLocus(Locus.C, 1);
+    }
+
+    private Allele getLocus(Locus locus, int index) {
+        List<Allele> alleleList = locusMap.get(locus);
+
+        if (index < alleleList.size())
+            return alleleList.get(index);
+        else
+            return null;
+    }
+
+    /**
      * Returns the number of unique alleles in this genotype.
      *
      * @return the number of unique alleles in this genotype.
@@ -222,6 +288,18 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
                 return true;
 
         return false;
+    }
+
+    /**
+     * Identifies homozygosity at a given HLA locus.
+     *
+     * @param locus the locus of interest.
+     *
+     * @return {@code true} iff this genotype contains fewer than two
+     * unique alleles at the specified locus.
+     */
+    public boolean isHomozygous(Locus locus) {
+        return locusMap.get(locus).size() < 2;
     }
 
     /**
