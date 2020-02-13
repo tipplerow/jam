@@ -9,7 +9,7 @@ RNA.loadRaw <- function() {
 }
 
 RNA.rawFile <- function() {
-    gzfile(file.path(CellOrigin.homeDir(), "raw", "EBPlusPlusAdjustPANCAN_IlluminaHiSeq_RNASeqV2-v2.geneExp.tsv.gz"))
+    gzfile(file.path(TCGA.homeDir(), "CellOrigin", "raw", "EBPlusPlusAdjustPANCAN_IlluminaHiSeq_RNASeqV2-v2.geneExp.tsv.gz"))
 }
 
 ## ---------------------------------------------------------------------
@@ -115,7 +115,7 @@ RNA.loadRData <- function() {
 }
 
 RNA.RDataFile <- function() {
-    file.path(CellOrigin.homeDir(), "TCGA_RNA.RData")
+    file.path(TCGA.homeDir(), "CellOrigin", "TCGA_RNA.RData")
 }
 
 RNA.CSVFile <- function() {
