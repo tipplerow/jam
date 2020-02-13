@@ -190,6 +190,17 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
     }
 
     /**
+     * Returns the number of unique alleles at a given HLA locus.
+     *
+     * @param locus the HLA locus of interest.
+     *
+     * @return the number of unique alleles at the specified locus.
+     */
+    public int countUniqueAlleles(Locus locus) {
+        return locusMap.get(locus).size();
+    }
+
+    /**
      * Removes one or more alleles from this genotype to simulate a
      * loss-of-heterozygosity event.
      *

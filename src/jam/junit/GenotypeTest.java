@@ -52,6 +52,24 @@ public class GenotypeTest {
         assertTrue(g3.compareTo(g4) < 0);
     }
 
+    @Test public void testCountUnique() {
+        assertEquals(5, homoA2.countUniqueAlleles());
+        assertEquals(5, homoB1.countUniqueAlleles());
+        assertEquals(6, hetero.countUniqueAlleles());
+
+        assertEquals(1, homoA2.countUniqueAlleles(Locus.A));
+        assertEquals(2, homoA2.countUniqueAlleles(Locus.B));
+        assertEquals(2, homoA2.countUniqueAlleles(Locus.C));
+
+        assertEquals(2, homoB1.countUniqueAlleles(Locus.A));
+        assertEquals(1, homoB1.countUniqueAlleles(Locus.B));
+        assertEquals(2, homoB1.countUniqueAlleles(Locus.C));
+
+        assertEquals(2, hetero.countUniqueAlleles(Locus.A));
+        assertEquals(2, hetero.countUniqueAlleles(Locus.B));
+        assertEquals(2, hetero.countUniqueAlleles(Locus.C));
+    }
+
     @Test public void testDelete() {
         assertEquals(Genotype.instance(A1, A2, B1, C1, C2), hetero.delete(B2));
         assertTrue(hetero.contains(B2));
