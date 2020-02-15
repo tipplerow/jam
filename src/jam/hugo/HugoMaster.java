@@ -2,10 +2,12 @@
 package jam.hugo;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -13,53 +15,16 @@ import com.google.common.collect.Multimap;
 import jam.app.JamEnv;
 import jam.app.JamProperties;
 import jam.ensembl.EnsemblGene;
-import jam.ensembl.EnsemblTranscript;
-import jam.io.TableReader;
 import jam.lang.JamException;
-import jam.util.CollectionUtil;
 
 /**
- * Maintains mappings between HUGO symbols, genes, and transcripts.
+ * Maintains mappings between HUGO symbols and Ensembl genes.
  */
 public final class HugoMaster {
-    private final Multimap<HugoSymbol, EnsemblGene> hugoToGeneMap = HashMultimap.create();
-    private final Multimap<EnsemblGene, HugoSymbol> geneToHugoMap = HashMultimap.create();
-
-    private final Multimap<HugoSymbol, EnsemblTranscript> hugoToTranscriptMap = HashMultimap.create();
-    private final Multimap<EnsemblTranscript, HugoSymbol> transcriptToHugoMap = HashMultimap.create();
+    private final Map<HugoSymbol, HugoRecord> records;
+    private final Multimap<HugoSymbol, HugoSymbol> aliases;
 
     private static HugoMaster global = null;
-
-    private HugoMaster(TableReader reader) {
-        validateHeader(reader);
-
-        for (List<String> line : reader)
-            processLine(line);
-
-        reader.close();
-    }
-
-    private static void validateHeader(TableReader reader) {
-        List<String> expected =
-            List.of(HugoSymbol.COLUMN_NAME,
-                    EnsemblGene.COLUMN_NAME,
-                    EnsemblTranscript.COLUMN_NAME);
-
-        if (!reader.columnKeys().equals(expected))
-            throw JamException.runtime("Invalid header line.");
-    }
-
-    private void processLine(List<String> line) {
-        HugoSymbol        hugo       = HugoSymbol.instance(line.get(0));
-        EnsemblGene       gene       = EnsemblGene.instance(line.get(1));
-        EnsemblTranscript transcript = EnsemblTranscript.instance(line.get(2));
-
-        hugoToGeneMap.put(hugo, gene);
-        geneToHugoMap.put(gene, hugo);
-
-        hugoToTranscriptMap.put(hugo, transcript);
-        transcriptToHugoMap.put(transcript, hugo);
-    }
 
     /**
      * Name of the environment variable that defines the absolute path
@@ -76,6 +41,58 @@ public final class HugoMaster {
      * by default.
      */
     public static final String MASTER_FILE_PROPERTY = "jam.hugo.masterFile";
+
+    /**
+     * Creates a new HUGO master from a collection of records.
+     *
+     * @param collection the individual HUGO records.
+     *
+     * @throws RuntimeException unless all HUGO symbols are unique.
+     */
+    public HugoMaster(Collection<HugoRecord> collection) {
+        this.aliases = HashMultimap.create();
+        this.records = new HashMap<HugoSymbol, HugoRecord>(collection.size());
+
+        addRecords(collection);
+        addAliases(collection);
+    }
+
+    private void addRecords(Collection<HugoRecord> collection) {
+        for (HugoRecord record : collection)
+            addRecord(record);
+    }
+
+    private void addRecord(HugoRecord record) {
+        addUnique(record.getHugoSymbol(), record);
+
+        for (HugoSymbol alias : record.viewAliases())
+            addUnique(alias, record);
+    }
+
+    private void addUnique(HugoSymbol key, HugoRecord record) {
+        if (records.containsKey(key))
+            throw JamException.runtime("Duplicate HUGO symbol: [%s].", key.getKey());
+        else
+            records.put(key, record);
+    }
+
+    private void addAliases(Collection<HugoRecord> collection) {
+        for (HugoRecord record : collection)
+            if (record.hasAliases())
+                addAliases(record);
+    }
+
+    private void addAliases(HugoRecord record) {
+        List<HugoSymbol> symbols = new ArrayList<HugoSymbol>();
+
+        symbols.add(record.getHugoSymbol());
+        symbols.addAll(record.viewAliases());
+
+        for (int j = 0; j < symbols.size(); ++j)
+            for (int k = 0; k < symbols.size(); ++k)
+                if (j != k)
+                    aliases.put(symbols.get(j), symbols.get(k));
+    }
 
     /**
      * Returns the global master table defined by system properties or
@@ -108,7 +125,7 @@ public final class HugoMaster {
      * @throws RuntimeException if any I/O errors occur.
      */
     public static HugoMaster load(File masterFile) {
-        return new HugoMaster(TableReader.open(masterFile));
+        return new HugoMaster(HugoLoader.load(masterFile));
     }
 
     /**
@@ -121,162 +138,62 @@ public final class HugoMaster {
      * @throws RuntimeException if any I/O errors occur.
      */
     public static HugoMaster load(String masterFileName) {
-        return new HugoMaster(TableReader.open(masterFileName));
+        return load(new File(masterFileName));
     }
 
     /**
-     * Identifies genes in this master table.
+     * Identifies HUGO symbols contained in this table.
      *
-     * @param gene a gene of interest.
+     * @param symbol a HUGO symbol of interest.
      *
-     * @return {@code true} iff this master table contains the
-     * specified gene.
-     */
-    public boolean contains(EnsemblGene gene) {
-        return geneToHugoMap.containsKey(gene);
-    }
-
-    /**
-     * Identifies transcripts in this master table.
-     *
-     * @param transcript a transcript of interest.
-     *
-     * @return {@code true} iff this master table contains the
-     * specified transcript.
-     */
-    public boolean contains(EnsemblTranscript transcript) {
-        return transcriptToHugoMap.containsKey(transcript);
-    }
-
-    /**
-     * Identifies HUGO symbols in this master table.
-     *
-     * @param hugo a HUGO symbol of interest.
-     *
-     * @return {@code true} iff this master table contains the
-     * specified HUGO symbol.
-     */
-    public boolean contains(HugoSymbol hugo) {
-        return hugoToGeneMap.containsKey(hugo);
-    }
-
-    /**
-     * Returns a read-only view of the HUGO symbols associated with
-     * a given gene.
-     *
-     * @param gene the gene of interest.
-     *
-     * @return a read-only collection containing the HUGO symbols
-     * mapped to the specified gene (an empty collection if this
-     * master table does not contain the gene).
-     */
-    public Collection<HugoSymbol> getHugo(EnsemblGene gene) {
-        return Collections.unmodifiableCollection(geneToHugoMap.get(gene));
-    }
-
-    /**
-     * Returns a read-only view of the HUGO symbols associated with
-     * a given transcript.
-     *
-     * @param transcript the transcript of interest.
-     *
-     * @return a read-only collection containing the HUGO symbols
-     * mapped to the specified transcript (an empty collection if
-     * this master table does not contain the transcript).
-     */
-    public Collection<HugoSymbol> getHugo(EnsemblTranscript transcript) {
-        return Collections.unmodifiableCollection(transcriptToHugoMap.get(transcript));
-    }
-
-    /**
-     * Returns a read-only view of the genes mapped to a given HUGO
+     * @return {@code true} iff this table contains the specified HUGO
      * symbol.
-     *
-     * @param hugo the HUGO symbol of interest.
-     *
-     * @return a read-only collection containing the genes mapped
-     * to the specified HUGO symbol (an empty collection if this
-     * master table does not contain the symbol).
      */
-    public Collection<EnsemblGene> getGenes(HugoSymbol hugo) {
-        return Collections.unmodifiableCollection(hugoToGeneMap.get(hugo));
+    public boolean contains(HugoSymbol symbol) {
+        return records.containsKey(symbol);
     }
 
     /**
-     * Returns a read-only view of the transcripts mapped to a given
+     * Returns the known aliases for a given HUGO symbol.
+     *
+     * @param symbol a HUGO symbol of interest.
+     *
+     * @return a read-only view of the aliases for the specified
+     * symbol (an empty collection if this table does not contain
+     * the symbol or if it has no aliases).
+     */
+    public Collection<HugoSymbol> getAliases(HugoSymbol symbol) {
+        return Collections.unmodifiableCollection(aliases.get(symbol));
+    }
+
+    /**
+     * Returns the Ensembl gene identifier corresponding to a given
      * HUGO symbol.
      *
-     * @param hugo the HUGO symbol of interest.
+     * @param symbol a HUGO symbol of interest.
      *
-     * @return a read-only collection containing the transcripts
-     * mapped to the specified HUGO symbol (an empty collection if
-     * this master table does not contain the symbol).
+     * @return the Ensembl gene identifier corresponding to the
+     * specified symbol (or {@code null} if this table does not
+     * contain the symbol).
      */
-    public Collection<EnsemblTranscript> getTranscripts(HugoSymbol hugo) {
-        return Collections.unmodifiableCollection(hugoToTranscriptMap.get(hugo));
-    }
+    public EnsemblGene getGene(HugoSymbol symbol) {
+        HugoRecord record = lookup(symbol);
 
-    /**
-     * Returns the single HUGO symbol associated with a given gene.
-     *
-     * @param gene the gene of interest.
-     *
-     * @return the single HUGO symbol mapped to the specified gene, or
-     * {@code null} if there is not a unique mapping.
-     */
-    public HugoSymbol getUniqueHugo(EnsemblGene gene) {
-        return getUnique(geneToHugoMap.get(gene));
-    }
-
-    /**
-     * Returns the single HUGO symbol associated with a given
-     * transcript.
-     *
-     * @param transcript the transcript of interest.
-     *
-     * @return the single HUGO symbol mapped to the specified
-     * transcript, {@code null} if there is no unique mapping.
-     */
-    public HugoSymbol getUniqueHugo(EnsemblTranscript transcript) {
-        return getUnique(transcriptToHugoMap.get(transcript));
-    }
-
-    private static HugoSymbol getUnique(Collection<HugoSymbol> symbols) {
-        if (symbols.size() == 1)
-            return CollectionUtil.peek(symbols);
+        if (record != null)
+            return record.getEnsemblGene();
         else
             return null;
     }
 
     /**
-     * Returns a read-only view of the genes in this master table.
+     * Returns the record for a given HUGO symbol.
      *
-     * @return a read-only set containing the genes in this master
-     * table.
-     */
-    public Set<EnsemblGene> geneSet() {
-        return Collections.unmodifiableSet(geneToHugoMap.keySet());
-    }
-
-    /**
-     * Returns a read-only view of the HUGO symbols in this master
-     * table.
+     * @param symbol a HUGO symbol of interest.
      *
-     * @return a read-only set containing the HUGO symbols in this
-     * master table.
+     * @return the record corresponding to the specified symbol
+     * ({@code null} if there is no matching record).
      */
-    public Set<HugoSymbol> hugoSet() {
-        return Collections.unmodifiableSet(hugoToGeneMap.keySet());
-    }
-
-    /**
-     * Returns a read-only view of the transcripts in this master
-     * table.
-     *
-     * @return a read-only set containing the transcripts in this
-     * master table.
-     */
-    public Set<EnsemblTranscript> transcriptSet() {
-        return Collections.unmodifiableSet(transcriptToHugoMap.keySet());
+    public HugoRecord lookup(HugoSymbol symbol) {
+        return records.get(symbol);
     }
 }
