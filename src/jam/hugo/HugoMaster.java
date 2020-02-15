@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 
 import jam.app.JamEnv;
 import jam.app.JamProperties;
@@ -51,22 +55,19 @@ public final class HugoMaster {
      */
     public HugoMaster(Collection<HugoRecord> collection) {
         this.aliases = HashMultimap.create();
-        this.records = new HashMap<HugoSymbol, HugoRecord>(collection.size());
+        this.records = new HashMap<HugoSymbol, HugoRecord>();
 
-        addRecords(collection);
+        addPrimary(collection);
         addAliases(collection);
     }
 
-    private void addRecords(Collection<HugoRecord> collection) {
+    private void addPrimary(Collection<HugoRecord> collection) {
         for (HugoRecord record : collection)
-            addRecord(record);
+            addPrimary(record);
     }
 
-    private void addRecord(HugoRecord record) {
+    private void addPrimary(HugoRecord record) {
         addUnique(record.getHugoSymbol(), record);
-
-        for (HugoSymbol alias : record.viewAliases())
-            addUnique(alias, record);
     }
 
     private void addUnique(HugoSymbol key, HugoRecord record) {
@@ -77,16 +78,42 @@ public final class HugoMaster {
     }
 
     private void addAliases(Collection<HugoRecord> collection) {
+        //
+        // Some aliases in the master file refer to multiple primary
+        // symbols, so they must be eliminated...
+        //
+        Set<HugoSymbol> aliasUnique = filterAliases(collection);
+
         for (HugoRecord record : collection)
             if (record.hasAliases())
-                addAliases(record);
+                addAliases(record, aliasUnique);
     }
 
-    private void addAliases(HugoRecord record) {
-        List<HugoSymbol> symbols = new ArrayList<HugoSymbol>();
+    private Set<HugoSymbol> filterAliases(Collection<HugoRecord> collection) {
+        Set<HugoSymbol> aliasUnique = new HashSet<HugoSymbol>();
+        Multiset<HugoSymbol> aliasMulti = HashMultiset.create();
 
+        for (HugoRecord record : collection)
+            aliasMulti.addAll(record.viewAliases());
+
+        for (HugoSymbol symbol : aliasMulti.elementSet())
+            if (aliasMulti.count(symbol) == 1)
+                aliasUnique.add(symbol);
+
+        return aliasUnique;
+    }
+
+    private void addAliases(HugoRecord record, Set<HugoSymbol> aliasUnique) {
+        for (HugoSymbol alias : record.viewAliases())
+            if (aliasUnique.contains(alias))
+                records.put(alias, record);
+
+        List<HugoSymbol> symbols = new ArrayList<HugoSymbol>();
         symbols.add(record.getHugoSymbol());
-        symbols.addAll(record.viewAliases());
+
+        for (HugoSymbol alias : record.viewAliases())
+            if (aliasUnique.contains(alias))
+                symbols.add(alias);
 
         for (int j = 0; j < symbols.size(); ++j)
             for (int k = 0; k < symbols.size(); ++k)
