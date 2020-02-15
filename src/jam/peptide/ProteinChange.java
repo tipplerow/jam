@@ -182,6 +182,42 @@ public final class ProteinChange {
     public int getResidueIndex() {
         return position - 1;
     }
+
+    /**
+     * Identifies native peptides having a sequence consistent with
+     * a collection of protein changes.
+     *
+     * @param peptide a peptide to examine.
+     *
+     * @param changes the protein changes to test.
+     *
+     * @return {@code true} iff the residue at the mutation position
+     * in the specified peptide matches the native residue in this
+     * protein change.
+     */
+    public static boolean isNative(Peptide peptide, Collection<ProteinChange> changes) {
+        for (ProteinChange change : changes)
+            if (!change.isNative(peptide))
+                return false;
+
+        return true;
+    }
+
+    /**
+     * Identifies native peptides having a sequence consistent with
+     * this protein change.
+     *
+     * @param peptide a peptide to examine.
+     *
+     * @return {@code true} iff the residue at the mutation position
+     * in the specified peptide matches the native residue in this
+     * protein change.
+     */
+    public boolean isNative(Peptide peptide) {
+        int residueIndex = getResidueIndex();
+
+        return residueIndex < peptide.length() && peptide.at(residueIndex).equals(native_);
+    }
          
     @Override public boolean equals(Object obj) {
         return (obj instanceof ProteinChange) && equalsProteinChange((ProteinChange) obj);
