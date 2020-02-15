@@ -1,11 +1,14 @@
 
 package jam.maf;
 
+import java.util.List;
+
 import jam.ensembl.EnsemblTranscript;
 import jam.hugo.HugoSymbol;
 import jam.peptide.ProteinChange;
 import jam.tcga.TumorBarcode;
 import jam.tcga.CellFraction;
+import jam.util.ListUtil;
 
 /**
  * Encapsulates information contained in one record from a Mutation
@@ -43,6 +46,21 @@ public final class MissenseRecord {
         this.hugoSymbol    = hugoSymbol;
         this.proteinChange = proteinChange;
         this.cellFraction  = cellFraction;
+    }
+
+    /**
+     * Filters a list of missense records and retains only those with
+     * cell fractions above a threshold.
+     *
+     * @param records the records to filter.
+     *
+     * @param ccfThreshold the cancer cell fraction threshold.
+     *
+     * @return a list containing only records with cell fractions
+     * above the specified threshold.
+     */
+    public static List<MissenseRecord> filterCellFraction(List<MissenseRecord> records, CellFraction ccfThreshold) {
+        return ListUtil.filter(records, record -> record.getCellFraction().above(ccfThreshold));
     }
 
     /**

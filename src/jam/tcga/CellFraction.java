@@ -74,6 +74,30 @@ public final class CellFraction extends DomainDouble {
     }
 
     /**
+     * Compares this cell fraction to a threshold value.
+     *
+     * @param threshold a threshold cell fraction.
+     *
+     * @return {@code true} iff this cell fraction exceeds the
+     * threshold.
+     */
+    public boolean above(CellFraction threshold) {
+        return this.doubleValue() > threshold.doubleValue();
+    }
+
+    /**
+     * Compares this cell fraction to a threshold value.
+     *
+     * @param threshold a threshold cell fraction.
+     *
+     * @return {@code true} iff this cell fraction falls below the
+     * threshold.
+     */
+    public boolean below(CellFraction threshold) {
+        return this.doubleValue() < threshold.doubleValue();
+    }
+
+    /**
      * Multiples a protein concentration by this cell fraction.
      *
      * @param concentration a protein concentration.
