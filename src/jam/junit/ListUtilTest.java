@@ -53,6 +53,13 @@ public class ListUtilTest {
         assertTrue(list2 instanceof LinkedList);
     }
 
+    @Test public void testFilter() {
+        List<String> original = List.of("a", "ab", "abc", "abcd", "abcde");
+        List<String> filtered = ListUtil.filter(original, s -> s.startsWith("abc"));
+
+        assertEquals(List.of("abc", "abcd", "abcde"), filtered);
+    }
+
     @Test public void testFirst() {
         assertEquals("abc", ListUtil.first(Arrays.asList("abc")));
         assertEquals("abc", ListUtil.first(Arrays.asList("abc", "def", "ghi")));

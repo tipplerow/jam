@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import jam.lang.ObjectFactory;
 import jam.math.IntUtil;
@@ -93,6 +95,23 @@ public final class ListUtil {
      */
     @SafeVarargs public static <V> List<V> cat(List<V>... lists) {
         return cat(Arrays.asList(lists));
+    }
+
+    /**
+     * Removes elements of a list that do not pass a filter predicate.
+     *
+     * @param <V> the runtime element type.
+     *
+     * @param list the list to be filtered.
+     *
+     * @param predicate the predicate filter to apply to each element
+     * in the list.
+     *
+     * @return a list containing only elements for which the predicate
+     * evaluates to {@code true}.
+     */
+    public static <V> List<V> filter(List<V> list, Predicate<? super V> predicate) {
+        return list.stream().filter(predicate).collect(Collectors.toList());
     }
 
     /**
