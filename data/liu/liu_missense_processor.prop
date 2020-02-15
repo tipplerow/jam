@@ -1,0 +1,17 @@
+########################################################################
+# Property file for applications using the jam.maf.MissenseProcessor
+# and the post-processed MAF files from Liu et al. in their standard
+# format.
+########################################################################
+
+jam.maf.tumorBarcodeColumn  = Tumor_Barcode
+jam.maf.hugoSymbolColumn    = Hugo_Symbol
+jam.maf.transcriptColumn    = Transcript_ID
+jam.maf.proteinChangeColumn = Protein_Change
+jam.maf.cellFractionColumn  = CCF
+
+# Ignore subclonal mutations...
+jam.maf.ccfThreshold = 0.75
+
+jam.ensembl.referenceFile = ${CSB_DATA_VAULT}/Ensembl/Release99/Homo_sapiens.GRCh38.pep.all.fa.gz
+
