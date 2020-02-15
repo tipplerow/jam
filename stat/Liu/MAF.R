@@ -1,8 +1,4 @@
 
-MAF.defaultCCF <- 0.5
-
-## ---------------------------------------------------------------------
-
 MAF.loadRaw <- function() {
     read.table(MAF.rawFile(), header = TRUE, sep = "\t", quote = "")
 }
@@ -44,9 +40,12 @@ MAF.buildMissense <- function(mafRaw = NULL) {
     missenseFrame <-
         missenseFrame[order(missenseFrame$Tumor_Barcode, missenseFrame$Hugo_Symbol),]
 
+    JamLog.info("%d of %d missing CCF...", sum(is.na(missenseFrame$CCF)), nrow(missenseFrame))
+    JamLog.info("Median CCF: [%.2f]...", median(missenseFrame$CCF, na.rm = TRUE))
+
     ## Replace missing CCFs...
     missenseFrame$CCF <-
-        Filter.replaceNA(missenseFrame$CCF, MAF.defaultCCF)
+        Filter.replaceNA(missenseFrame$CCF, median(missenseFrame$CCF, na.rm = TRUE))
 
     rownames(missenseFrame) <- NULL
     missenseFrame
