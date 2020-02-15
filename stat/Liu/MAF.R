@@ -1,4 +1,7 @@
 
+MAF.defaultCCF <- 0.5
+
+## ---------------------------------------------------------------------
 
 MAF.loadRaw <- function() {
     read.table(MAF.rawFile(), header = TRUE, sep = "\t", quote = "")
@@ -40,6 +43,10 @@ MAF.buildMissense <- function(mafRaw = NULL) {
 
     missenseFrame <-
         missenseFrame[order(missenseFrame$Tumor_Barcode, missenseFrame$Hugo_Symbol),]
+
+    ## Replace missing CCFs...
+    missenseFrame$CCF <-
+        Filter.replaceNA(missenseFrame$CCF, MAF.defaultCCF)
 
     rownames(missenseFrame) <- NULL
     missenseFrame
