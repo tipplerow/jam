@@ -32,7 +32,7 @@ public final class HugoMaster {
      * {@code jam.hugo.masterFile} is also defined, it will override
      * the environment variable.
      */
-    public static final String MASTER_FILE_ENV = "HUGO_MASTER_FILE";
+    public static final String MASTER_FILE_ENV = "JAM_HUGO_MASTER_FILE";
 
     /**
      * Name of the system property that defines the absolute path
