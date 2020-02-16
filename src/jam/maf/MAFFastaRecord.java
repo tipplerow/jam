@@ -107,26 +107,12 @@ public final class MAFFastaRecord {
     }
 
     /**
-     * Returns a {@code FastaRecord} with the key and comment fields
-     * formatted to encode the mutation attributes of this record.
+     * Formats this record for output to a FASTA file.
      *
-     * @return a {@code FastaRecord} with the key and comment fields
-     * formatted to encode the mutation attributes of this record.
+     * @return this record formatted as a single string.
      */
-    public FastaRecord format() {
-        return new FastaRecord(formatKey(), formatComment(), peptide);
-    }
-
-    private String formatKey() {
-        return String.format("%s:%s", TumorBarcode.COLUMN_NAME, tumorBarcode.getKey());
-    }
-
-    private String formatComment() {
-        return String.format("%s:%s %s:%.2f",
-                             HugoSymbol.COLUMN_NAME,
-                             hugoSymbol.getKey(),
-                             CellFraction.COLUMN_NAME,
-                             cellFraction.doubleValue());
+    public String format() {
+        return toFastaRecord().format();
     }
 
     /**
@@ -163,5 +149,32 @@ public final class MAFFastaRecord {
      */
     public Peptide getPeptide() {
         return peptide;
+    }
+
+    /**
+     * Returns a {@code FastaRecord} with the key and comment fields
+     * formatted to encode the mutation attributes of this record.
+     *
+     * @return a {@code FastaRecord} with the key and comment fields
+     * formatted to encode the mutation attributes of this record.
+     */
+    public FastaRecord toFastaRecord() {
+        return new FastaRecord(formatKey(), formatComment(), peptide);
+    }
+
+    private String formatKey() {
+        return String.format("%s:%s", TumorBarcode.COLUMN_NAME, tumorBarcode.getKey());
+    }
+
+    private String formatComment() {
+        return String.format("%s:%s %s:%.2f",
+                             HugoSymbol.COLUMN_NAME,
+                             hugoSymbol.getKey(),
+                             CellFraction.COLUMN_NAME,
+                             cellFraction.doubleValue());
+    }
+
+    @Override public String toString() {
+        return format();
     }
 }

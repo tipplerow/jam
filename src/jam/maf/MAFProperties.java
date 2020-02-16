@@ -164,7 +164,7 @@ public final class MAFProperties {
      * @return the name of the MAF file column containing the cancer
      * cell fraction.
      */
-    public static double resolveCCFThreshold() {
-        return JamProperties.getOptionalDouble(CCF_THRESHOLD_PROPERTY, 0.0);
+    public static CellFraction resolveCCFThreshold() {
+        return CellFraction.valueOf(JamProperties.getOptionalDouble(CCF_THRESHOLD_PROPERTY, 0.0));
     }
 }

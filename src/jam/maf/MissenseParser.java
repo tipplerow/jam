@@ -54,8 +54,10 @@ public final class MissenseParser {
         try {
             tumorBarcodeIndex  = reader.requireColumn(MAFProperties.resolveTumorBarcodeColumnName());
             hugoSymbolIndex    = reader.requireColumn(MAFProperties.resolveHugoSymbolColumnName());
-            transcriptIndex    = reader.requireColumn(MAFProperties.resolveTranscriptColumnName());
             proteinChangeIndex = reader.requireColumn(MAFProperties.resolveProteinChangeColumnName());
+
+            // The transcript may be missing (as in the Liu et al. data)...
+            transcriptIndex = reader.findColumn(MAFProperties.resolveTranscriptColumnName());
 
             // The cancer cell fraction may be missing (as in the TCGA data)...
             cellFractionIndex = reader.findColumn(MAFProperties.resolveCellFractionColumnName());
@@ -82,16 +84,12 @@ public final class MissenseParser {
     }
 
     private void processLine(List<String> fields) {
-        CellFraction cellFraction =
-            parseCellFraction(fields);
-
-        if (cellFraction.doubleValue() < MAFProperties.resolveCCFThreshold())
-            return;
-        
         HugoSymbol hugoSymbol = HugoSymbol.instance(fields.get(hugoSymbolIndex));
         TumorBarcode tumorBarcode = TumorBarcode.instance(fields.get(tumorBarcodeIndex));
         ProteinChange proteinChange = ProteinChange.parse(fields.get(proteinChangeIndex));
-        EnsemblTranscript transcriptID = EnsemblTranscript.instance(fields.get(transcriptIndex));
+
+        CellFraction cellFraction = parseCellFraction(fields);
+        EnsemblTranscript transcriptID = parseTranscriptID(fields);
 
         records.add(new MissenseRecord(tumorBarcode, transcriptID, hugoSymbol, proteinChange, cellFraction));
     }
@@ -101,6 +99,13 @@ public final class MissenseParser {
             return CellFraction.UNIT;
         else
             return CellFraction.valueOf(fields.get(cellFractionIndex));
+    }
+
+    private EnsemblTranscript parseTranscriptID(List<String> fields) {
+        if (transcriptIndex < 0)
+            return null;
+        else
+            return EnsemblTranscript.instance(fields.get(transcriptIndex));
     }
 
     private void logException(List<String> fields, Exception ex1) {

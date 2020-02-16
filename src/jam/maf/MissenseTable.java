@@ -55,6 +55,9 @@ public final class MissenseTable {
         if (recordList.isEmpty())
             return true;
 
+        if (record.getTranscriptID() == null)
+            return true;
+
         if (record.getTranscriptID().equals(recordList.get(0).getTranscriptID()))
             return true;
 

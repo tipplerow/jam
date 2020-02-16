@@ -2,17 +2,20 @@
 package jam.maf;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import jam.app.JamApp;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.ensembl.EnsemblDb;
+import jam.ensembl.EnsemblGene;
 import jam.ensembl.EnsemblRecord;
 import jam.ensembl.EnsemblTranscript;
-import jam.fasta.FastaRecord;
+import jam.hugo.HugoMaster;
 import jam.hugo.HugoSymbol;
-import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
 import jam.peptide.ProteinChange;
@@ -27,20 +30,21 @@ import jam.util.ListUtil;
 public final class MissenseProcessor extends JamApp {
     private final String mafFile;
     private final String fastaFile;
+    private final CellFraction ccfThreshold;
 
     private MissenseTable table;
     private PrintWriter writer;
-
-    private int barcodeCount;
-    private int barcodeIndex;
+    private List<TumorBarcode> barcodes;
 
     private final EnsemblDb ensemblDb = EnsemblDb.reference();
+    private final HugoMaster hugoMaster = HugoMaster.global();
 
     private MissenseProcessor(String... propFiles) {
         super(propFiles);
 
         this.mafFile = MAFProperties.resolveMAFFile();
         this.fastaFile = MAFProperties.resolveFastaFile();
+        this.ccfThreshold = MAFProperties.resolveCCFThreshold();
     }
 
     /**
@@ -62,33 +66,41 @@ public final class MissenseProcessor extends JamApp {
         table = MissenseTable.load(mafFile);
         writer = openWriter(fastaFile);
 
-        barcodeIndex = 0;
-        barcodeCount = table.viewBarcodes().size();
+        sortBarcodes();
+        writeRuntimeEnv("JAM_");
+        writeRuntimeProperties("jam.");
 
         try {
-            for (TumorBarcode barcode : table.viewBarcodes())
-                processBarcode(barcode);
+            for (int index = 0; index < barcodes.size(); ++index)
+                processBarcode(index);
         }
         finally {
-            IOUtil.close(writer);
+            writer.close();
         }
     }
 
-    private void processBarcode(TumorBarcode barcode) {
-        ++barcodeIndex;
-        JamLogger.info("Processing barcode [%d of %d] [%s]...",
-                       barcodeIndex, barcodeCount, barcode.getKey());
-
-        for (HugoSymbol symbol : table.viewSymbols(barcode))
-            processSymbol(barcode, symbol);
+    private void sortBarcodes() {
+        barcodes = new ArrayList<TumorBarcode>(table.viewBarcodes());
+        Collections.sort(barcodes);
     }
 
-    private void processSymbol(TumorBarcode barcode, HugoSymbol symbol) {
-        try {
-            FastaRecord fastaRecord = createFastaRecord(barcode, symbol);
+    private void processBarcode(int index) {
+        TumorBarcode barcode = barcodes.get(index);
 
-            writer.println(fastaRecord.format());
-            writer.flush();
+        JamLogger.info("Processing barcode [%d of %d] [%s]...",
+                       index + 1, barcodes.size(), barcode.getKey());
+
+        for (HugoSymbol symbol : table.viewSymbols(barcode))
+            processTumorGene(barcode, symbol);
+    }
+
+    private void processTumorGene(TumorBarcode barcode, HugoSymbol symbol) {
+        try {
+            List<MissenseRecord> missenseRecords = table.lookup(barcode, symbol);
+            missenseRecords = MissenseRecord.filterCellFraction(missenseRecords, ccfThreshold);
+
+            if (!missenseRecords.isEmpty())
+                processTumorGene(barcode, symbol, missenseRecords);
         }
         catch (Exception ex) {
             String message =
@@ -100,21 +112,28 @@ public final class MissenseProcessor extends JamApp {
         }
     }
 
-    private FastaRecord createFastaRecord(TumorBarcode barcode, HugoSymbol symbol) {
-        List<MissenseRecord> records = table.lookup(barcode, symbol);
-
-        Peptide germline = getGermlinePeptide(records);
-        Peptide mutated  = germline.mutate(getProteinChanges(records));
+    private void processTumorGene(TumorBarcode barcode, HugoSymbol symbol, List<MissenseRecord> missenseRecords) {
+        Peptide germline = getGermlinePeptide(missenseRecords);
+        Peptide mutated  = germline.mutate(getProteinChanges(missenseRecords));
 
         MAFFastaRecord fastaRecord =
             new MAFFastaRecord(barcode, symbol, CellFraction.UNIT, mutated);
 
-        return fastaRecord.format();
+        writer.println(fastaRecord.format());
+        writer.flush();
     }
 
-    private Peptide getGermlinePeptide(List<MissenseRecord> records) {
-        EnsemblTranscript transcriptID  = records.get(0).getTranscriptID();
-        EnsemblRecord     ensemblRecord = ensemblDb.get(transcriptID);
+    private Peptide getGermlinePeptide(List<MissenseRecord> missenseRecords) {
+        EnsemblTranscript transcriptID = missenseRecords.get(0).getTranscriptID();
+
+        if (transcriptID != null)
+            return getGermlinePeptide(transcriptID);
+        else
+            return matchNativePeptide(missenseRecords);
+    }
+
+    private Peptide getGermlinePeptide(EnsemblTranscript transcriptID) {
+        EnsemblRecord ensemblRecord = ensemblDb.get(transcriptID);
 
         if (ensemblRecord != null)
             return ensemblRecord.getPeptide();
@@ -122,8 +141,45 @@ public final class MissenseProcessor extends JamApp {
             throw JamException.runtime("Unmapped transcript: [%s].", transcriptID.getKey());
     }
 
-    private List<ProteinChange> getProteinChanges(List<MissenseRecord> records) {
-        return ListUtil.apply(records, x -> x.getProteinChange());
+    private Peptide matchNativePeptide(List<MissenseRecord> missenseRecords) {
+        //
+        // Okay, no transcript identifier, so we use the first peptide
+        // with a sequence that is consistent with the protein changes...
+        //
+        HugoSymbol hugoSymbol = missenseRecords.get(0).getHugoSymbol();
+
+        List<EnsemblRecord> ensemblRecords = getEnsemblRecords(hugoSymbol);
+        List<ProteinChange> proteinChanges = getProteinChanges(missenseRecords);
+
+        for (EnsemblRecord ensemblRecord : ensemblRecords) {
+            Peptide peptide = ensemblRecord.getPeptide();
+
+            if (ProteinChange.isNative(peptide, proteinChanges))
+                return peptide;
+        }
+
+        throw JamException.runtime("No consistent native Ensembl records: [%s].", hugoSymbol.getKey());
+    }
+
+    private List<EnsemblRecord> getEnsemblRecords(HugoSymbol hugoSymbol) {
+        //
+        // Two ways to match HUGO symbols with Ensembl records:
+        // through the HUGO master table and through the Ensembl
+        // database itself...
+        //
+        List<EnsemblRecord> ensemblRecords = new ArrayList<EnsemblRecord>();
+
+        ensemblRecords.addAll(ensemblDb.get(hugoSymbol));
+        ensemblRecords.addAll(ensemblDb.get(hugoMaster.get(hugoSymbol)));
+
+        if (ensemblRecords.isEmpty())
+            throw JamException.runtime("No matching Ensembl records: [%s].", hugoSymbol.getKey());
+
+        return ensemblRecords;
+    }
+
+    private List<ProteinChange> getProteinChanges(List<MissenseRecord> missenseRecords) {
+        return ListUtil.apply(missenseRecords, x -> x.getProteinChange());
     }
 
     public static void main(String[] args) {
