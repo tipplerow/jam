@@ -13,5 +13,5 @@ jam.maf.cellFractionColumn  = CCF
 # Ignore subclonal mutations...
 jam.maf.ccfThreshold = 0.75
 
-jam.ensembl.referenceFile = ${CSB_DATA_VAULT}/Ensembl/Release99/Homo_sapiens.GRCh38.pep.all.fa.gz
-
+jam.ensembl.primaryFile   = ${CSB_DATA_VAULT}/Ensembl/Release96/Homo_sapiens.GRCh37.pep.all.fa.gz
+jam.ensembl.secondaryFile = ${CSB_DATA_VAULT}/Ensembl/Release99/Homo_sapiens.GRCh38.pep.all.fa.gz
