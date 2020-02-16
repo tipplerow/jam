@@ -38,13 +38,8 @@ public final class ListUtil {
      * @return a list whose kth element is the result of applying the
      * input function to the kth element of the source.
      */
-    public static <T, R> List<R> apply(Collection<T> source, Function<T, R> function) {
-        List<R> result = new ArrayList<R>(source.size());
-
-        for (T t : source)
-            result.add(function.apply(t));
-
-        return result;
+    public static <T, R> List<R> apply(Collection<T> source, Function<? super T, ? extends R> function) {
+        return source.stream().map(function).collect(Collectors.toList());
     }
 
     /**

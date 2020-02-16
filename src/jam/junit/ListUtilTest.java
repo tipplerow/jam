@@ -2,7 +2,6 @@
 package jam.junit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -22,9 +21,9 @@ public class ListUtilTest {
     private final JamRandom random = JamRandom.global(20150413);
 
     @Test public void testApply() {
-        List<String> strings = Arrays.asList("Ohio", "Vermont", "New Jersey");
+        List<String> strings = List.of("Ohio", "Vermont", "New Jersey");
 
-        List<Integer> expected = Arrays.asList(4, 7, 10);
+        List<Integer> expected = List.of(4, 7, 10);
         List<Integer> actual   = ListUtil.apply(strings, s -> s.length());
 
         assertEquals(expected, actual);
@@ -33,13 +32,13 @@ public class ListUtilTest {
     @Test public void testCat() {
         assertEquals(0, ListUtil.cat().size());
 
-        List<String> list1 = Arrays.asList("A", "B", "C");
-        List<String> list2 = Arrays.asList("D");
-        List<String> list3 = Arrays.asList("E", "F");
+        List<String> list1 = List.of("A", "B", "C");
+        List<String> list2 = List.of("D");
+        List<String> list3 = List.of("E", "F");
 
-        assertEquals(Arrays.asList("A", "B", "C"), ListUtil.cat(list1));
-        assertEquals(Arrays.asList("A", "B", "C", "D"), ListUtil.cat(list1, list2));
-        assertEquals(Arrays.asList("A", "B", "C", "D", "E", "F"), ListUtil.cat(list1, list2, list3));
+        assertEquals(List.of("A", "B", "C"), ListUtil.cat(list1));
+        assertEquals(List.of("A", "B", "C", "D"), ListUtil.cat(list1, list2));
+        assertEquals(List.of("A", "B", "C", "D", "E", "F"), ListUtil.cat(list1, list2, list3));
     }
 
     @Test public void testFactories() {
@@ -61,8 +60,8 @@ public class ListUtilTest {
     }
 
     @Test public void testFirst() {
-        assertEquals("abc", ListUtil.first(Arrays.asList("abc")));
-        assertEquals("abc", ListUtil.first(Arrays.asList("abc", "def", "ghi")));
+        assertEquals("abc", ListUtil.first(List.of("abc")));
+        assertEquals("abc", ListUtil.first(List.of("abc", "def", "ghi")));
     }
 
     @Test public void testGet() {
@@ -81,8 +80,8 @@ public class ListUtilTest {
     }
 
     @Test public void testLast() {
-        assertEquals("abc", ListUtil.last(Arrays.asList("abc")));
-        assertEquals("ghi", ListUtil.last(Arrays.asList("abc", "def", "ghi")));
+        assertEquals("abc", ListUtil.last(List.of("abc")));
+        assertEquals("ghi", ListUtil.last(List.of("abc", "def", "ghi")));
     }
 
     @Test public void testNewArrayListIterator() {
@@ -180,18 +179,18 @@ public class ListUtilTest {
     }
 
     @Test public void testTranspose() {
-        List<String> row1 = Arrays.asList("A", "B");
-        List<String> row2 = Arrays.asList("C", "D", "E", "F");
-        List<String> row3 = Arrays.asList("G");
+        List<String> row1 = List.of("A", "B");
+        List<String> row2 = List.of("C", "D", "E", "F");
+        List<String> row3 = List.of("G");
 
-        List<List<String>> original = Arrays.asList(row1, row2, row3);
+        List<List<String>> original = List.of(row1, row2, row3);
         List<List<String>> transpose = ListUtil.transpose(original);
 
         assertEquals(4, transpose.size());
-        assertEquals(Arrays.asList("A", "C", "G"), transpose.get(0));
-        assertEquals(Arrays.asList("B", "D"),      transpose.get(1));
-        assertEquals(Arrays.asList("E"),           transpose.get(2));
-        assertEquals(Arrays.asList("F"),           transpose.get(3));
+        assertEquals(List.of("A", "C", "G"), transpose.get(0));
+        assertEquals(List.of("B", "D"),      transpose.get(1));
+        assertEquals(List.of("E"),           transpose.get(2));
+        assertEquals(List.of("F"),           transpose.get(3));
     }
 
     @Test public void testView() {
@@ -200,7 +199,7 @@ public class ListUtilTest {
         coll.add("def");
         coll.add("ghi");
 
-        assertEquals(Arrays.asList("abc", "def", "ghi"), ListUtil.view(coll));
+        assertEquals(List.of("abc", "def", "ghi"), ListUtil.view(coll));
     }
 
     @Test(expected = RuntimeException.class)
