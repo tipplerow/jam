@@ -1,8 +1,6 @@
 
 package jam.junit;
 
-import java.io.File;
-
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblGene;
 import jam.ensembl.EnsemblTranscript;
@@ -12,7 +10,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class EnsemblDbTest {
-    private static final File ENSEMBL_FILE = new File("data/test/ensembl_test2.fa");
+    private static final String ENSEMBL_FILE = "data/test/ensembl_test2.fa";
 
     @Test public void testSample() {
         EnsemblDb db = EnsemblDb.load(ENSEMBL_FILE);
