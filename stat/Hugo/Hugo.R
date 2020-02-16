@@ -19,11 +19,35 @@ Hugo.rawFile <- function() {
 
 ## ---------------------------------------------------------------------
 
-Hugo.buildMaster <- function(rawFrame = NULL) {
+Hugo.buildBackup <- function(mafRaw = NULL) {
+    if (is.null(mafRaw)) {
+        jamr.loadDir(file.path(Sys.getenv("JAM_HOME"), "stat", "TCGA"))
+        mafRaw <- MAF.loadRaw()
+    }
+
+    backupFrame <-
+        data.frame(Hugo_Symbol  = mafRaw$Hugo_Symbol,
+                   Ensembl_Gene = mafRaw$Gene)
+
+    backupFrame <-
+        backupFrame[!duplicated(backupFrame[,c("Hugo_Symbol", "Ensembl_Gene")]),]
+
+    backupFrame <-
+        backupFrame[order(backupFrame$Hugo_Symbol),]
+
+    backupFrame
+}
+
+## ---------------------------------------------------------------------
+
+Hugo.buildMaster <- function(rawFrame = NULL, backupFrame = NULL) {
     if (is.null(rawFrame))
         master <- Hugo.loadRaw()
     else
         master <- rawFrame
+
+    if (is.null(backupFrame))
+        backupFrame <- Hugo.buildBackup()
 
     colnames(master) <-
         c("HGNC", "Hugo_Symbol", "Name", "Aliases", "Ensembl_Gene")
@@ -35,8 +59,12 @@ Hugo.buildMaster <- function(rawFrame = NULL) {
     removeRows <- c(withdrawn, antisenseRNA, missingEnsembl)
 
     master <- master[-removeRows,]
-    master <- master[,-1]
-    master <- master[order(master$Hugo_Symbol),]
+    master <- master[,c("Hugo_Symbol", "Ensembl_Gene")]
+    master <- rbind(master, backupFrame)
+    master <- master[order(master$Hugo_Symbol, master$Ensembl_Gene),]
+    master <- master[!duplicated(master[,c("Hugo_Symbol", "Ensembl_Gene")]),]
+
+    rownames(master) <- NULL
     master
 }
 
