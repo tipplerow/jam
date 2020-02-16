@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
+import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
@@ -28,6 +29,8 @@ public final class FastaReader implements Closeable, Iterable<FastaRecord>, Iter
     private String nextHeaderLine;
 
     private FastaReader(File file) {
+        JamLogger.info("Reading [%s]...", file);
+
         this.file = file;
         this.reader = IOUtil.openReader(file);
 
