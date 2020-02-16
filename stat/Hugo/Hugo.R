@@ -26,11 +26,11 @@ Hugo.buildBackup <- function(mafRaw = NULL) {
     }
 
     backupFrame <-
-        data.frame(Hugo_Symbol  = mafRaw$Hugo_Symbol,
-                   Ensembl_Gene = mafRaw$Gene)
+        data.frame(Hugo_Symbol = mafRaw$Hugo_Symbol,
+                   Gene_ID     = mafRaw$Gene)
 
     backupFrame <-
-        backupFrame[!duplicated(backupFrame[,c("Hugo_Symbol", "Ensembl_Gene")]),]
+        backupFrame[!duplicated(backupFrame[,c("Hugo_Symbol", "Gene_ID")]),]
 
     backupFrame <-
         backupFrame[order(backupFrame$Hugo_Symbol),]
@@ -50,19 +50,19 @@ Hugo.buildMaster <- function(rawFrame = NULL, backupFrame = NULL) {
         backupFrame <- Hugo.buildBackup()
 
     colnames(master) <-
-        c("HGNC", "Hugo_Symbol", "Name", "Aliases", "Ensembl_Gene")
+        c("HGNC", "Hugo_Symbol", "Name", "Aliases", "Gene_ID")
 
     withdrawn      <- grep("symbol withdrawn", master$Name)
     antisenseRNA   <- grep("antisense RNA", master$Name)
-    missingEnsembl <- which(is.na(master$Ensembl_Gene) | nchar(master$Ensembl_Gene) == 0)
+    missingEnsembl <- which(is.na(master$Gene_ID) | nchar(master$Gene_ID) == 0)
 
     removeRows <- c(withdrawn, antisenseRNA, missingEnsembl)
 
     master <- master[-removeRows,]
-    master <- master[,c("Hugo_Symbol", "Ensembl_Gene")]
+    master <- master[,c("Hugo_Symbol", "Gene_ID")]
     master <- rbind(master, backupFrame)
-    master <- master[order(master$Hugo_Symbol, master$Ensembl_Gene),]
-    master <- master[!duplicated(master[,c("Hugo_Symbol", "Ensembl_Gene")]),]
+    master <- master[order(master$Hugo_Symbol, master$Gene_ID),]
+    master <- master[!duplicated(master[,c("Hugo_Symbol", "Gene_ID")]),]
 
     rownames(master) <- NULL
     master
