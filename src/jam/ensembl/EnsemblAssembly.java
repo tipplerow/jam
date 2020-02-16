@@ -10,8 +10,8 @@ import jam.app.JamProperties;
  * Enumerates published Ensembl genome assemblies.
  */
 public enum EnsemblAssembly {
-    GRCh37("ENSEMBL_GRCH37"),
-    GRCh38("ENSEMBL_GRCH38");
+    GRCh37("JAM_ENSEMBL_GRCH37"),
+    GRCh38("JAM_ENSEMBL_GRCH38");
 
     private final String    envName;
     private       EnsemblDb ensemblDb = null;
@@ -27,7 +27,7 @@ public enum EnsemblAssembly {
      * assembly used to create a mapping from Ensembl transcript
      * identifiers to Ensembl gene identifiers to HUGO gene symbols.
      */
-    public static final String REFERENCE_ASSEMBLY_ENV = "ENSEMBL_ASSEMBLY";
+    public static final String REFERENCE_ASSEMBLY_ENV = "JAM_ENSEMBL_ASSEMBLY";
 
     /**
      * Name of the system property that specifies the reference
@@ -48,7 +48,7 @@ public enum EnsemblAssembly {
      * Environment variable that specifies the directory containing
      * the active Ensembl release.
      */
-    public static final String ENSEMBL_RELEASE_ENV = "ENSEMBL_RELEASE_DIR";
+    public static final String ENSEMBL_RELEASE_ENV = "JAM_ENSEMBL_RELEASE_DIR";
 
     /**
      * Returns the reference assembly used to create a mapping from
