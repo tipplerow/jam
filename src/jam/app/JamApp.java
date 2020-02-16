@@ -42,6 +42,12 @@ public abstract class JamApp {
     public static final String TRIAL_INDEX_PROPERTY = "jam.app.trialIndex";
 
     /**
+     * Name of the output file containing all relevant environment
+     * variables that were defined at the time of execution.
+     */
+    public static final String RUNTIME_ENVIRONMENT_FILE_NAME = "runtime.env";
+
+    /**
      * Name of the output file containing all relevant system
      * properties that were defined at the time of execution.
      */
@@ -181,6 +187,17 @@ public abstract class JamApp {
     }
 
     /**
+     * Writes the relevant runtime environment variables to the file
+     * name specified by {@code RUNTIME_ENVIRONMENT_FILE_NAME}.
+     *
+     * @param prefixes environment variables will be omitted unless
+     * their name begins with one of the prefixes.
+     */
+    public void writeRuntimeEnv(String... prefixes) {
+        writeRuntime(RUNTIME_ENVIRONMENT_FILE_NAME, JamEnv.filter(prefixes));
+    }
+
+    /**
      * Writes the relevant runtime properties to the file name
      * specified by {@code RUNTIME_PROPERTY_FILE_NAME}.
      *
@@ -188,10 +205,13 @@ public abstract class JamApp {
      * begins with one of the prefixes.
      */
     public void writeRuntimeProperties(String... prefixes) {
-        PrintWriter writer = openWriter(RUNTIME_PROPERTY_FILE_NAME);
-        Map<String, String> properties = JamProperties.filter(prefixes);
+        writeRuntime(RUNTIME_PROPERTY_FILE_NAME, JamProperties.filter(prefixes));
+    }
 
-        for (Map.Entry<String, String> entry : properties.entrySet())
+    private void writeRuntime(String fileName, Map<String, String> runtime) {
+        PrintWriter writer = openWriter(fileName);
+
+        for (Map.Entry<String, String> entry : runtime.entrySet())
             writer.println(entry.getKey() + " = " + entry.getValue());
 
         writer.flush();

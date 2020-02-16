@@ -1,6 +1,10 @@
 
 package jam.app;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +21,38 @@ public final class JamEnv {
 
     private static final Pattern SYSTEM_ENV_PATTERN =
         Pattern.compile(Pattern.quote(OPEN_DELIM) + "(\\w+)" + Pattern.quote(CLOSE_DELIM));
+
+    /**
+     * Returns a read-only view of a subset of environment variables,
+     * with the keys arranged in alphabetical order.
+     *
+     * @param prefixes environment variables will be omitted unless
+     * their name begins with one of the prefixes.
+     *
+     * @return a read-only view of a subset of environment variables,
+     * with the keys arranged in alphabetical order.
+     */
+    public static Map<String, String> filter(String... prefixes) {
+        Map<String, String> env = new TreeMap<String, String>(System.getenv());
+        Iterator<String> nameIterator = env.keySet().iterator();
+
+        while (nameIterator.hasNext()) {
+            String name = nameIterator.next();
+
+            if (!startsWith(name, prefixes))
+                nameIterator.remove();
+        }
+
+        return Collections.unmodifiableMap(env);
+    }
+
+    private static boolean startsWith(String name, String... prefixes) {
+        for (String prefix : prefixes)
+            if (name.startsWith(prefix))
+                return true;
+
+        return false;
+    }
 
     /**
      * Returns a required environment variable.
