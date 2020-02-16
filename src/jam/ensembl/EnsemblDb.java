@@ -2,9 +2,11 @@
 package jam.ensembl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -250,6 +252,25 @@ public final class EnsemblDb {
      */
     public Collection<EnsemblRecord> get(EnsemblGene gene) {
         return Collections.unmodifiableCollection(geneRecordMap.get(gene));
+    }
+
+    /**
+     * Returns a read-only view of the records mapped to a collection
+     * of genes.
+     *
+     * @param genes the genes of interest.
+     *
+     * @return a read-only collection containing the records mapped to
+     * the specified genes (an empty collection if none of the genes
+     * are mapped).
+     */
+    public Collection<EnsemblRecord> get(Collection<EnsemblGene> genes) {
+        List<EnsemblRecord> records = new ArrayList<EnsemblRecord>();
+
+        for (EnsemblGene gene : genes)
+            records.addAll(get(gene));
+
+        return records;
     }
 
     /**
