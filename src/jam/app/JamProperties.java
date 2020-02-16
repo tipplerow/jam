@@ -655,6 +655,40 @@ public final class JamProperties {
     }
 
     /**
+     * Resolves a system property or environment variable with an
+     * optional default value.
+     *
+     * <p>If the system property with the specified name is set, this
+     * method returns that property.  Otherwise, if the environment
+     * variable with the specified name is set, this method returns
+     * that variable.  Otherwise, if the default value is not null,
+     * this method returns the default value.  Otherwise, this method
+     * throws an exception.
+     *
+     * @param propertyName the name of the system property to resolve.
+     *
+     * @param envName the name of the environment variable to resolve.
+     *
+     * @param defaultValue the default value to assign if neither the
+     * system property nor the environment variable has been set.
+     *
+     * @return the first non-missing value among the specified system
+     * property, environment variable, and default value.
+     */
+    public static String resolve(String propertyName, String envName, String defaultValue) {
+        if (isSet(propertyName))
+            return getRequired(propertyName);
+
+        if (JamEnv.isSet(envName))
+            return JamEnv.getRequired(envName);
+
+        if (defaultValue != null)
+            return defaultValue;
+
+        throw JamException.runtime("Missing system property [%s] and environment variable [%s].", propertyName, envName);
+    }
+
+    /**
      * Assigns a system property.
      *
      * <p>Previously assigned values will be overwritten.
