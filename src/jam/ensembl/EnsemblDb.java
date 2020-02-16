@@ -17,7 +17,6 @@ import jam.app.JamEnv;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.hugo.HugoSymbol;
-import jam.io.IOUtil;
 import jam.fasta.FastaReader;
 import jam.fasta.FastaRecord;
 import jam.lang.JamException;
@@ -28,33 +27,106 @@ import jam.util.MapUtil;
  * Manages the human genome data from Ensembl.
  */
 public final class EnsemblDb {
-    //
-    // Protein and transcript keys map uniquely to peptide
-    // structures...
-    //
-    private final Map<EnsemblProtein, EnsemblRecord> proteinRecordMap =
-        new HashMap<EnsemblProtein, EnsemblRecord>();
-
-    private final Map<EnsemblTranscript, EnsemblRecord> transcriptRecordMap =
-        new HashMap<EnsemblTranscript, EnsemblRecord>();
+    // Protein and transcript keys map uniquely to peptide structures...
+    private final Map<EnsemblProtein, EnsemblRecord> proteinRecordMap;
+    private final Map<EnsemblTranscript, EnsemblRecord> transcriptRecordMap;
 
     // ...while gene identifiers may map to multiple peptide structures.
-    private final Multimap<HugoSymbol, EnsemblRecord> hugoRecordMap = HashMultimap.create();
-    private final Multimap<EnsemblGene, EnsemblRecord> geneRecordMap = HashMultimap.create();
+    private final Multimap<HugoSymbol, EnsemblRecord> hugoRecordMap;
+    private final Multimap<EnsemblGene, EnsemblRecord> geneRecordMap;
 
-    // The reference Ensembl database defines the global mapping from
-    // gene to HUGO symbol...
-    private final Map<EnsemblGene, HugoSymbol> geneHugoMap =
-        new HashMap<EnsemblGene, HugoSymbol>();
+    // The GRCh38 reference Ensembl database defines a mapping from gene to HUGO symbol...
+    private final Map<EnsemblGene, HugoSymbol> geneHugoMap;
 
     private static EnsemblDb reference = null;
 
-    private EnsemblDb(Iterable<FastaRecord> records) {
-        for (FastaRecord record : records)
-            addRecord(record);
+    private EnsemblDb() {
+        this.proteinRecordMap = new HashMap<EnsemblProtein, EnsemblRecord>();
+        this.transcriptRecordMap = new HashMap<EnsemblTranscript, EnsemblRecord>();
+
+        this.hugoRecordMap = HashMultimap.create();
+        this.geneRecordMap = HashMultimap.create();
+
+        this.geneHugoMap = new HashMap<EnsemblGene, HugoSymbol>();
     }
 
-    private void addRecord(FastaRecord fastaRecord) {
+    /**
+     * Environment variable that defines the absolute path name for
+     * the primary Ensembl proteome file.  If the system property
+     * {@code jam.ensembl.primaryFile} is also defined, it will
+     * override the environment variable.
+     */
+    public static final String PRIMARY_FILE_ENV = "JAM_ENSEMBL_PRIMARY";
+
+    /**
+     * System property that defines the absolute path name for the
+     * primary Ensembl proteome file. If not defined, the environment
+     * variable {@code PRIMARY_FILE_ENV} will be used by default.
+     */
+    public static final String PRIMARY_FILE_PROPERTY = "jam.ensembl.primaryFile";
+
+    /**
+     * Environment variable that defines the absolute path name for
+     * the secondary Ensembl proteome file.  If the system property
+     * {@code jam.ensembl.secondaryFile} is also defined, it will
+     * override the environment variable.
+     */
+    public static final String SECONDARY_FILE_ENV = "JAM_ENSEMBL_SECONDARY";
+
+    /**
+     * System property that defines the absolute path name for the
+     * secondary Ensembl proteome file. If not defined, the environment
+     * variable {@code SECONDARY_FILE_ENV} will be used by default.
+     */
+    public static final String SECONDARY_FILE_PROPERTY = "jam.ensembl.secondaryFile";
+
+    /**
+     * Creates a database of Ensembl records from FASTA files.
+     *
+     * <p>The first file is the <em>primary</em> file: all protein and
+     * transcript identifiers in this file must be unique.  Subsequent
+     * files are <em>secondary</em> files: they may contain duplicate
+     * protein or transcript identifiers, but those records will be
+     * ignored.
+     *
+     * @param fastaFiles files containing the underlying FASTA
+     * records.
+     *
+     * @return the database of Ensembl records.
+     *
+     * @throws RuntimeException if any I/O errors occur.
+     */
+    public static EnsemblDb load(String... fastaFiles) {
+        if (fastaFiles.length < 1)
+            throw new IllegalArgumentException("At least one FASTA file is required.");
+
+        EnsemblDb database = new EnsemblDb();
+        database.loadPrimary(fastaFiles[0]);
+
+        for (int index = 1; index < fastaFiles.length; ++index)
+            database.loadSecondary(fastaFiles[index]);
+
+        return database;
+    }
+
+    private void loadPrimary(String fastaFile) {
+        try (FastaReader reader = FastaReader.open(fastaFile)) {
+            addPrimaryRecords(reader);
+        }
+    }
+
+    private void loadSecondary(String fastaFile) {
+        try (FastaReader reader = FastaReader.open(fastaFile)) {
+            addSecondaryRecords(reader);
+        }
+    }
+
+    private void addPrimaryRecords(Iterable<FastaRecord> records) {
+        for (FastaRecord record : records)
+            addPrimaryRecord(record);
+    }
+
+    private void addPrimaryRecord(FastaRecord fastaRecord) {
         EnsemblRecord ensemblRecord = EnsemblRecord.parse(fastaRecord);
 
         mapProtein(ensemblRecord);
@@ -94,67 +166,24 @@ public final class EnsemblDb {
         }
     }
 
-    /**
-     * System property that specifies the name of the data file
-     * containing the reference human proteome.
-     */
-    public static final String REFERENCE_FILE_PROPERTY = "jam.ensembl.referenceFile";
-
-    /**
-     * Creates a database of Ensembl records from a sequence of FASTA
-     * records.
-     *
-     * @param fastaRecords the underlying FASTA records.
-     *
-     * @return the database of Ensembl records.
-     *
-     * @throws RuntimeException if the records contain any duplicate
-     * protein or transcript keys.
-     */
-    public static EnsemblDb create(Iterable<FastaRecord> fastaRecords) {
-        return new EnsemblDb(fastaRecords);
+    private void addSecondaryRecords(Iterable<FastaRecord> records) {
+        for (FastaRecord record : records)
+            addSecondaryRecord(record);
     }
 
-    /**
-     * Creates a database of Ensembl records from the FASTA records
-     * contained in a file.
-     *
-     * @param fastaFile the name of the file containing the underlying
-     * FASTA records.
-     *
-     * @return the database of Ensembl records.
-     *
-     * @throws RuntimeException if any I/O errors occur.
-     */
-    public static EnsemblDb load(String fastaFile) {
-        return load(new File(fastaFile));
+    private void addSecondaryRecord(FastaRecord fastaRecord) {
+        EnsemblRecord ensemblRecord = EnsemblRecord.parse(fastaRecord);
+
+        if (isUniqueProtein(ensemblRecord) && isUniqueTranscript(ensemblRecord))
+            addPrimaryRecord(fastaRecord);
     }
 
-    /**
-     * Creates a database of Ensembl records from the FASTA records
-     * contained in a file.
-     *
-     * @param fastaFile the file containing the underlying FASTA
-     * records.
-     *
-     * @return the database of Ensembl records.
-     *
-     * @throws RuntimeException if any I/O errors occur.
-     */
-    public static EnsemblDb load(File fastaFile) {
-        EnsemblDb database = null;
-        FastaReader reader = null;
+    private boolean isUniqueProtein(EnsemblRecord ensemblRecord) {
+        return !proteinRecordMap.containsKey(ensemblRecord.getEnsemblProtein());
+    }
 
-        try {
-            JamLogger.info("Reading [%s]...", fastaFile);
-            reader = FastaReader.open(fastaFile);
-            database = new EnsemblDb(reader);
-        }
-        finally {
-            IOUtil.close(reader);
-        }
-
-        return database;
+    private boolean isUniqueTranscript(EnsemblRecord ensemblRecord) {
+        return !transcriptRecordMap.containsKey(ensemblRecord.getEnsemblTranscript());
     }
 
     /**
@@ -164,13 +193,19 @@ public final class EnsemblDb {
      */
     public static EnsemblDb reference() {
         if (reference == null)
-            reference = load(resolveReferenceFile());
+            reference = loadReference();
 
         return reference;
     }
 
-    private static String resolveReferenceFile() {
-        return JamProperties.getRequired(REFERENCE_FILE_PROPERTY);
+    private static EnsemblDb loadReference() {
+        String primaryFile = JamProperties.resolve(PRIMARY_FILE_PROPERTY, PRIMARY_FILE_ENV, null);
+        String secondaryFile = JamProperties.resolve(SECONDARY_FILE_PROPERTY, SECONDARY_FILE_ENV, "");
+
+        if (secondaryFile.isEmpty())
+            return load(primaryFile);
+        else
+            return load(primaryFile, secondaryFile);
     }
 
     /**
