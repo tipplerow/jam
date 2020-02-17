@@ -32,7 +32,7 @@ HLA.buildGenotype <- function() {
 }
 
 HLA.genotypeFile <- function() {
-    file.path(Liu.homeDir(), "Liu_Genotype.csv")
+    file.path(Liu.homeDir(), "Liu_Patient_Genotype.csv")
 }
 
 HLA.loadGenotype <- function() {
