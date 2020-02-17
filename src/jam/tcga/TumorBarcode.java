@@ -1,7 +1,12 @@
 
 package jam.tcga;
 
-import jam.lang.JamException;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import jam.app.JamLogger;
+import jam.io.LineReader;
 import jam.lang.KeyedObject;
 
 /**
@@ -33,6 +38,38 @@ public final class TumorBarcode extends KeyedObject<String> {
      */
     public static TumorBarcode instance(String key) {
         return new TumorBarcode(key);
+    }
+
+    /**
+     * Reads tumor barcodes from a flat file (no header, one barcode
+     * per line).
+     *
+     * @param fileName the name of the file to load.
+     *
+     * @return a list containing the barcodes from the specified file.
+     */
+    public static List<TumorBarcode> load(String fileName) {
+        return load(new File(fileName));
+    }
+
+    /**
+     * Reads tumor barcodes from a flat file (no header, one barcode
+     * per line).
+     *
+     * @param file the file to load.
+     *
+     * @return a list containing the barcodes from the specified file.
+     */
+    public static List<TumorBarcode> load(File file) {
+        List<TumorBarcode> barcodes = new ArrayList<TumorBarcode>();
+
+        try (LineReader reader = LineReader.open(file)) {
+            for (String line : reader)
+                barcodes.add(TumorBarcode.instance(line));
+        }
+
+        JamLogger.info("Loaded [%d] barcodes...", barcodes.size());
+        return barcodes;
     }
 
     /**
