@@ -187,6 +187,15 @@ public abstract class JamApp {
     }
 
     /**
+     * Writes the relevant runtime environment variables and system
+     * properties to their respective report files.
+     */
+    public void reportRuntime() {
+        writeRuntimeEnv("JAM_");
+        writeRuntimeProperties("jam.");
+    }
+
+    /**
      * Writes the relevant runtime environment variables to the file
      * name specified by {@code RUNTIME_ENVIRONMENT_FILE_NAME}.
      *
