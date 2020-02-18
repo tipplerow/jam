@@ -13,12 +13,16 @@ import jam.tcga.TumorBarcode;
  * Encapsulates RNA expression levels for the HLA class I genes.
  */
 public final class ExpressionClassI {
-    private final double total;
+    private final Expression total;
     private final Map<Locus, Expression> expr;
 
-    private ExpressionClassI(Map<Locus, Expression> expr, double total) {
+    private ExpressionClassI(Map<Locus, Expression> expr) {
         this.expr = expr;
-        this.total = total;
+        this.total = computeTotal();
+    }
+
+    private Expression computeTotal() {
+        return get(Locus.A).plus(get(Locus.B)).plus(get(Locus.C));
     }
 
     /**
@@ -40,10 +44,7 @@ public final class ExpressionClassI {
         expr.put(Locus.B, exprB);
         expr.put(Locus.C, exprC);
 
-        double total =
-            exprA.doubleValue() + exprB.doubleValue() + exprC.doubleValue();
-
-        return new ExpressionClassI(expr, total);
+        return new ExpressionClassI(expr);
     }
 
     /**
@@ -142,6 +143,15 @@ public final class ExpressionClassI {
         Locus locus = allele.getLocus();
         int   count = genotype.countUniqueAlleles(locus);
 
-        return expr.get(locus).doubleValue() / total / count;
+        return expr.get(locus).doubleValue() / total.doubleValue() / count;
+    }
+
+    /**
+     * Returns the total expression across the three HLA alleles.
+     *
+     * @return the total expression across the three HLA alleles.
+     */
+    public Expression total() {
+        return total;
     }
 }

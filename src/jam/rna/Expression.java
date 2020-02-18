@@ -60,4 +60,16 @@ public final class Expression extends DomainDouble {
     public static Expression valueOf(String s) {
         return valueOf(Double.parseDouble(s));
     }
+
+    /**
+     * Returns the sum of this expression and another; this expression
+     * is unchanged.
+     *
+     * @param expr the expression to add to this.
+     *
+     * @return the sum of this expression and the input expression.
+     */
+    public Expression plus(Expression expr) {
+        return valueOf(this.doubleValue() + expr.doubleValue());
+    }
 }

@@ -105,6 +105,10 @@ public class ExpressionClassITest extends NumericTestBase {
         assertDouble(0.10, expr.normalize(C2, hetero));
     }
 
+    @Test public void testTotal() {
+        assertEquals(Expression.valueOf(100000.0), expr.total());
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.ExpressionClassITest");
     }
