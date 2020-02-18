@@ -101,6 +101,15 @@ public class PeptideTest {
         assertTrue(p1.hashCode() == p2.hashCode());
         assertTrue(p1.hashCode() != p3.hashCode());
         assertTrue(p1.hashCode() != p4.hashCode());
+
+        Peptide p5 = Peptide.parse("QVSRDQVLD");
+        Peptide p6 = Peptide.parse("QVSRDQVLD");
+        Peptide p7 = Peptide.parse("QVSREQYLE");
+        Peptide p8 = Peptide.parse("QVSREQYLE");
+
+        assertTrue(p5.hashCode() == p6.hashCode());
+        assertTrue(p7.hashCode() == p8.hashCode());
+        assertTrue(p5.hashCode() != p7.hashCode());
     }
 
     @Test(expected = IllegalArgumentException.class)
