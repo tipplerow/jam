@@ -18,6 +18,7 @@ public class PeptideConcentrationProfileTest {
         assertFalse(profile.contains(p1));
         assertFalse(profile.contains(p2));
 
+        assertEquals(0, profile.countPeptides());
         assertEquals(Concentration.ZERO, profile.lookup(p1));
         assertEquals(Concentration.ZERO, profile.lookup(p2));
 
@@ -26,6 +27,7 @@ public class PeptideConcentrationProfileTest {
         assertTrue(profile.contains(p1));
         assertFalse(profile.contains(p2));
 
+        assertEquals(1, profile.countPeptides());
         assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
         assertEquals(Concentration.ZERO, profile.lookup(p2));
 
@@ -34,6 +36,7 @@ public class PeptideConcentrationProfileTest {
         assertTrue(profile.contains(p1));
         assertTrue(profile.contains(p2));
 
+        assertEquals(2, profile.countPeptides());
         assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
         assertEquals(Concentration.valueOf(2.0), profile.lookup(p2));
 
@@ -42,6 +45,7 @@ public class PeptideConcentrationProfileTest {
         assertTrue(profile.contains(p1));
         assertTrue(profile.contains(p2));
 
+        assertEquals(2, profile.countPeptides());
         assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
         assertEquals(Concentration.valueOf(5.0), profile.lookup(p2));
     }

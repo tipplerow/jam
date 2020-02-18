@@ -83,6 +83,15 @@ public final class PeptideConcentrationProfile {
     }
 
     /**
+     * Returns the number of peptides in this concentration profile.
+     *
+     * @return the number of peptides in this concentration profile.
+     */
+    public int countPeptides() {
+        return map.size();
+    }
+
+    /**
      * Returns the concentration of a given peptide.
      *
      * @param peptide the peptide of interest.
