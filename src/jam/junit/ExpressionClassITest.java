@@ -41,19 +41,50 @@ public class ExpressionClassITest extends NumericTestBase {
     private static final double exprB = 50000.0;
     private static final double exprC = 20000.0;
 
-    @Test public void testExpression() {
-        ExpressionClassI expr = createExpression();
+    private final ExpressionClassI expr;
 
+    public ExpressionClassITest() {
+        this.expr = createExpression();
+    }
+
+    private ExpressionClassI createExpression() {
+        List<TumorBarcode> barcodes = List.of(tumor1);
+        List<HugoSymbol>   symbols  = List.of(hlaA, hlaB, hlaC);
+        
+        DataMatrix<TumorBarcode, HugoSymbol> dataMatrix =
+            DenseDataMatrix.create(barcodes, symbols);
+
+        dataMatrix.set(tumor1, hlaA, exprA);
+        dataMatrix.set(tumor1, hlaB, exprB);
+        dataMatrix.set(tumor1, hlaC, exprC);
+
+        TumorExpressionMatrix exprMatrix = new TumorExpressionMatrix(dataMatrix);
+        return ExpressionClassI.create(tumor1, exprMatrix);
+    }
+
+    @Test public void testExpression() {
         assertEquals(Expression.valueOf(exprA), expr.get(Locus.A));
         assertEquals(Expression.valueOf(exprB), expr.get(Locus.B));
         assertEquals(Expression.valueOf(exprC), expr.get(Locus.C));
     }
 
-    @Test public void testNormalize() {
-        ExpressionClassI expr = createExpression();
+    @Test public void testDiversity() {
+        assertDouble(0.95625, expr.diversity(homoA2));
+        assertDouble(0.85625, expr.diversity(homoB1));
+        assertDouble(0.97200, expr.diversity(hetero));
+    }
 
+    @Test public void testHerfindahl() {
+        assertDouble(0.235, expr.herfindahl(homoA2));
+        assertDouble(0.315, expr.herfindahl(homoB1));
+        assertDouble(0.190, expr.herfindahl(hetero));
+    }
+
+    @Test public void testNormalize() {
+        //
         // Alleles at a homozygous locus get the full gene expression;
         // at heterozygous loci, the expression is split evenly...
+        //
         assertDouble(0.30, expr.normalize(A2, homoA2));
         assertDouble(0.25, expr.normalize(B1, homoA2));
         assertDouble(0.25, expr.normalize(B2, homoA2));
@@ -72,21 +103,6 @@ public class ExpressionClassITest extends NumericTestBase {
         assertDouble(0.25, expr.normalize(B2, hetero));
         assertDouble(0.10, expr.normalize(C1, hetero));
         assertDouble(0.10, expr.normalize(C2, hetero));
-    }
-
-    private ExpressionClassI createExpression() {
-        List<TumorBarcode> barcodes = List.of(tumor1);
-        List<HugoSymbol>   symbols  = List.of(hlaA, hlaB, hlaC);
-        
-        DataMatrix<TumorBarcode, HugoSymbol> dataMatrix =
-            DenseDataMatrix.create(barcodes, symbols);
-
-        dataMatrix.set(tumor1, hlaA, exprA);
-        dataMatrix.set(tumor1, hlaB, exprB);
-        dataMatrix.set(tumor1, hlaC, exprC);
-
-        TumorExpressionMatrix exprMatrix = new TumorExpressionMatrix(dataMatrix);
-        return ExpressionClassI.create(tumor1, exprMatrix);
     }
 
     public static void main(String[] args) {

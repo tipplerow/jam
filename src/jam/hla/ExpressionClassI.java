@@ -4,6 +4,7 @@ package jam.hla;
 import java.util.EnumMap;
 import java.util.Map;
 
+import jam.math.DoubleUtil;
 import jam.rna.Expression;
 import jam.rna.TumorExpressionMatrix;
 import jam.tcga.TumorBarcode;
@@ -70,6 +71,52 @@ public final class ExpressionClassI {
      */
     public Expression get(Locus locus) {
         return expr.get(locus);
+    }
+
+    /**
+     * Computes a diversity index for the HLA expression in a given
+     * genotype.
+     *
+     * <p>The diversity index is a measure of how HLA expression is
+     * distributed among the alleles in a genotype. It takes values
+     * in the range {@code [0, 1]}, where 0 indicates that all HLA
+     * expression is concentrated in a single allele and 1 indicates
+     * that expression is equal for all alleles.
+     *
+     * @param genotype the genotype of interest.
+     *
+     * @return the diversity index for the HLA expression of the
+     * specified genotype.
+     */
+    public double diversity(Genotype genotype) {
+        int N = genotype.countUniqueAlleles();
+
+        return (1.0 - herfindahl(genotype)) / (1.0 - 1.0 / N);
+    }
+
+    /**
+     * Computes the Herfindahl index of the HLA expression for a
+     * given genotype.
+     *
+     * <p>The Herfindahl index is a measure of how concentrated the
+     * HLA expression is among the alleles in a genotype.  It takes
+     * values in the range {@code [1/N, 1]}, where {@code N} is the
+     * number of unique alleles, with {@code 1/N} corresponding to
+     * equal expression among all alleles and {@code 1} indicating
+     * that all expression is concentrated in a single allele.
+     *
+     * @param genotype the genotype of interest.
+     *
+     * @return the Herfindahl index of the HLA expression for the
+     * specified genotype.
+     */
+    public double herfindahl(Genotype genotype) {
+        double result = 0.0;
+
+        for (Allele allele : genotype.viewUniqueAlleles())
+            result += DoubleUtil.square(normalize(allele, genotype));
+
+        return result;
     }
 
     /**
