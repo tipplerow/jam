@@ -331,7 +331,7 @@ public final class Genotype extends AbstractImmutableMultiset<Allele> implements
      * @return a read-only view of the unique alleles for the
      * specified locus.
      */
-    public List<Allele> viewAlleles(Locus locus) {
+    public List<Allele> viewUniqueAlleles(Locus locus) {
         return Collections.unmodifiableList(locusMap.get(locus));
     }
 

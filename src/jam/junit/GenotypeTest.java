@@ -182,17 +182,17 @@ public class GenotypeTest {
         assertEquals(C1, hetero.C1());
         assertEquals(C2, hetero.C2());
         
-        assertEquals(List.of(A2),     homoA2.viewAlleles(Locus.A));
-        assertEquals(List.of(B1, B2), homoA2.viewAlleles(Locus.B));
-        assertEquals(List.of(C1, C2), homoA2.viewAlleles(Locus.C));
+        assertEquals(List.of(A2),     homoA2.viewUniqueAlleles(Locus.A));
+        assertEquals(List.of(B1, B2), homoA2.viewUniqueAlleles(Locus.B));
+        assertEquals(List.of(C1, C2), homoA2.viewUniqueAlleles(Locus.C));
 
-        assertEquals(List.of(A1, A2), homoB1.viewAlleles(Locus.A));
-        assertEquals(List.of(B1),     homoB1.viewAlleles(Locus.B));
-        assertEquals(List.of(C1, C2), homoB1.viewAlleles(Locus.C));
+        assertEquals(List.of(A1, A2), homoB1.viewUniqueAlleles(Locus.A));
+        assertEquals(List.of(B1),     homoB1.viewUniqueAlleles(Locus.B));
+        assertEquals(List.of(C1, C2), homoB1.viewUniqueAlleles(Locus.C));
 
-        assertEquals(List.of(A1, A2), hetero.viewAlleles(Locus.A));
-        assertEquals(List.of(B1, B2), hetero.viewAlleles(Locus.B));
-        assertEquals(List.of(C1, C2), hetero.viewAlleles(Locus.C));
+        assertEquals(List.of(A1, A2), hetero.viewUniqueAlleles(Locus.A));
+        assertEquals(List.of(B1, B2), hetero.viewUniqueAlleles(Locus.B));
+        assertEquals(List.of(C1, C2), hetero.viewUniqueAlleles(Locus.C));
     }
 
     @Test public void testParse() {
