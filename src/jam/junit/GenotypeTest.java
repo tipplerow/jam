@@ -160,6 +160,28 @@ public class GenotypeTest {
     }
 
     @Test public void testLocus() {
+        assertNull(homoA2.A2());
+        assertNull(homoB1.B2());
+
+        assertEquals(A2, homoA2.A1());
+        assertEquals(B1, homoA2.B1());
+        assertEquals(B2, homoA2.B2());
+        assertEquals(C1, homoA2.C1());
+        assertEquals(C2, homoA2.C2());
+        
+        assertEquals(A1, homoB1.A1());
+        assertEquals(A2, homoB1.A2());
+        assertEquals(B1, homoB1.B1());
+        assertEquals(C1, homoB1.C1());
+        assertEquals(C2, homoB1.C2());
+        
+        assertEquals(A1, hetero.A1());
+        assertEquals(A2, hetero.A2());
+        assertEquals(B1, hetero.B1());
+        assertEquals(B2, hetero.B2());
+        assertEquals(C1, hetero.C1());
+        assertEquals(C2, hetero.C2());
+        
         assertEquals(List.of(A2),     homoA2.viewAlleles(Locus.A));
         assertEquals(List.of(B1, B2), homoA2.viewAlleles(Locus.B));
         assertEquals(List.of(C1, C2), homoA2.viewAlleles(Locus.C));
