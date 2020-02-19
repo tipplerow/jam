@@ -203,7 +203,7 @@ public abstract class JamApp {
      * their name begins with one of the prefixes.
      */
     public void writeRuntimeEnv(String... prefixes) {
-        writeRuntime(RUNTIME_ENVIRONMENT_FILE_NAME, JamEnv.filter(prefixes));
+        writeRuntime(RUNTIME_ENVIRONMENT_FILE_NAME, JamEnv.filter(prefixes), "=");
     }
 
     /**
@@ -214,14 +214,14 @@ public abstract class JamApp {
      * begins with one of the prefixes.
      */
     public void writeRuntimeProperties(String... prefixes) {
-        writeRuntime(RUNTIME_PROPERTY_FILE_NAME, JamProperties.filter(prefixes));
+        writeRuntime(RUNTIME_PROPERTY_FILE_NAME, JamProperties.filter(prefixes), " = ");
     }
 
-    private void writeRuntime(String fileName, Map<String, String> runtime) {
+    private void writeRuntime(String fileName, Map<String, String> runtime, String separator) {
         PrintWriter writer = openWriter(fileName);
 
         for (Map.Entry<String, String> entry : runtime.entrySet())
-            writer.println(entry.getKey() + " = " + entry.getValue());
+            writer.println(entry.getKey() + separator + entry.getValue());
 
         writer.flush();
         writer.close();
