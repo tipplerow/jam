@@ -118,10 +118,11 @@ public abstract class JamApp {
     }
 
     /**
-     * Registers a writer to be closed by the {@code close()} method.
+     * Registers a writer to be closed by the {@code autoClose()}
+     * method.
      *
-     * <p>Report writers opened by the {@code openWriter()} method are
-     * automatically registered.
+     * <p>Report writers opened by the {@code openWriter()} method
+     * are automatically registered.
      *
      * @param writer the report writer to the closed.
      */
@@ -166,7 +167,7 @@ public abstract class JamApp {
      *
      * <p>This class maintains a map of all print writers created by
      * this method (indexed by base name) and will close all writers
-     * when the {@code close()} method is called.
+     * when the {@code autoClose()} method is called.
      *
      * @param baseName the base name for the report file.
      *
