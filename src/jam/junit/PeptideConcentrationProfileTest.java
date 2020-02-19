@@ -48,6 +48,8 @@ public class PeptideConcentrationProfileTest {
         assertEquals(2, profile.countPeptides());
         assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
         assertEquals(Concentration.valueOf(5.0), profile.lookup(p2));
+
+        System.out.println(profile.list());
     }
 
     public static void main(String[] args) {

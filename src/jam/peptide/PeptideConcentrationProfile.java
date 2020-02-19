@@ -1,9 +1,11 @@
 
 package jam.peptide;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,8 +15,8 @@ import jam.chem.Concentration;
  * Maps peptides to cellular concentrations.
  */
 public final class PeptideConcentrationProfile {
-    private final Map<Peptide, Concentration> map =
-        new HashMap<Peptide, Concentration>();
+    private final Map<Peptide, PeptideConcentration> map =
+        new HashMap<Peptide, PeptideConcentration>();
 
     private PeptideConcentrationProfile() {
     }
@@ -47,12 +49,16 @@ public final class PeptideConcentrationProfile {
         if (!concentration.isPositive())
             return;
 
-        Concentration existing = map.get(peptide);
+        PeptideConcentration existing = map.get(peptide);
 
-        if (existing != null)
-            concentration = concentration.plus(existing);
+        if (existing == null)
+            put(new PeptideConcentration(peptide, concentration));
+        else
+            put(existing.plus(concentration));
+    }
 
-        map.put(peptide, concentration);
+    private void put(PeptideConcentration record) {
+        map.put(record.getPeptide(), record);
     }
 
     /**
@@ -92,6 +98,17 @@ public final class PeptideConcentrationProfile {
     }
 
     /**
+     * Returns a list containing the peptide concentration records in
+     * this profile.
+     *
+     * @return a list containing the peptide concentration records in
+     * this profile.
+     */
+    public List<PeptideConcentration> list() {
+        return new ArrayList<PeptideConcentration>(map.values());
+    }
+
+    /**
      * Returns the concentration of a given peptide.
      *
      * @param peptide the peptide of interest.
@@ -101,10 +118,10 @@ public final class PeptideConcentrationProfile {
      * peptide.
      */
     public Concentration lookup(Peptide peptide) {
-        Concentration result = map.get(peptide);
+        PeptideConcentration record = map.get(peptide);
 
-        if (result != null)
-            return result;
+        if (record != null)
+            return record.getConcentration();
         else
             return Concentration.ZERO;
     }
