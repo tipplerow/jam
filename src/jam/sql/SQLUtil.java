@@ -1,5 +1,5 @@
 
-package jam.util;
+package jam.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
