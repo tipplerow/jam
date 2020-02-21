@@ -49,7 +49,8 @@ public final class SQLUtil {
      */
     public static void close(Connection connection) {
         try {
-            connection.close();
+            if (!connection.isClosed())
+                connection.close();
         }
         catch (SQLException ex) {
             JamLogger.info("Failed to close database connection: [%s].", ex.getMessage());
@@ -63,7 +64,23 @@ public final class SQLUtil {
      */
     public static void close(ResultSet resultSet) {
         try {
-            resultSet.close();
+            if (!resultSet.isClosed())
+                resultSet.close();
+        }
+        catch (SQLException ex) {
+            JamLogger.info("Failed to close result set: [%s].", ex.getMessage());
+        }
+    }
+
+    /**
+     * Closes a statement.
+     *
+     * @param statement the statement to close.
+     */
+    public static void close(Statement statement) {
+        try {
+            if (!statement.isClosed())
+                statement.close();
         }
         catch (SQLException ex) {
             JamLogger.info("Failed to close result set: [%s].", ex.getMessage());
@@ -182,6 +199,38 @@ public final class SQLUtil {
 
             statement.executeUpdate(update);
             statement.close();
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    /**
+     * Closes a result set and the connection and statement that
+     * created it.
+     *
+     * @param resultSet the resultSet to close.
+     */
+    public static void release(ResultSet resultSet) {
+        try {
+            close(resultSet);
+            close(resultSet.getStatement());
+            close(resultSet.getStatement().getConnection());
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    /**
+     * Closes a statement and the connection that created it.
+     *
+     * @param statement the statement to close.
+     */
+    public static void release(Statement statement) {
+        try {
+            close(statement);
+            close(statement.getConnection());
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);

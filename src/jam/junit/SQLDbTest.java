@@ -12,7 +12,15 @@ import static org.junit.Assert.*;
 public class SQLDbTest {
     public static final String FILE_NAME = "data/test/sql_db_test.db";
 
-    @After public void tearDown() {
+    @Before public void tearDown() {
+        deleteDbFile();
+    }
+
+    @AfterClass public static void tearDownClass() {
+        deleteDbFile();
+    }
+
+    private static void deleteDbFile() {
         File dbFile = new File(FILE_NAME);
 
         if (dbFile.exists())

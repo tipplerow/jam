@@ -15,13 +15,8 @@ import jam.lang.JamException;
  * <p><b>Exception handling.</b> All public methods in this class catch
  * {@code SQLException}s and re-throw them as {@code RuntimeException}s.
  */
-public abstract class SQLDb implements AutoCloseable {
+public abstract class SQLDb {
     private boolean verbose = false;
-
-    // Private resources to remain open for the lifetime of this
-    // database instance...
-    private Connection pvtConnection = null;
-    private Statement  pvtStatement  = null;
 
     /**
      * Creates a new SQL database manager.
@@ -39,29 +34,6 @@ public abstract class SQLDb implements AutoCloseable {
             Class.forName(driverClass);
         }
         catch (ClassNotFoundException ex) {
-            throw JamException.runtime(ex);
-        }
-    }
-
-    private Connection privateConnection() {
-        if (pvtConnection == null)
-            pvtConnection = openConnection(false);
-
-        return pvtConnection;
-    }
-
-    private Statement privateStatement() {
-        if (pvtStatement == null)
-            pvtStatement = createStatement(privateConnection());
-
-        return pvtStatement;
-    }
-
-    private static Statement createStatement(Connection connection) {
-        try {
-            return connection.createStatement();
-        }
-        catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
     }
@@ -95,7 +67,7 @@ public abstract class SQLDb implements AutoCloseable {
      * @throws RuntimeException if the pending transactions cannot be
      * committed.
      */
-    public void commit(Connection connection) {
+    public static void commit(Connection connection) {
         try {
             if (!connection.getAutoCommit())
                 connection.commit();
@@ -115,7 +87,7 @@ public abstract class SQLDb implements AutoCloseable {
      * @throws RuntimeException if the table cannot be created.
      */
     public void createTable(String tableName, String tableSchema) {
-        executeUpdate(createTableUpdate(tableName, tableSchema), true);
+        executeUpdate(createTableUpdate(tableName, tableSchema));
     }
 
     private static String createTableUpdate(String tableName, String tableSchema) {
@@ -123,8 +95,11 @@ public abstract class SQLDb implements AutoCloseable {
     }
 
     /**
-     * Executes a query using the private connection maintained by
-     * this database.
+     * Executes a query using a new database connection.
+     *
+     * <p>The new connection, statement, and result set should be
+     * closed after the query result has been processed by calling
+     * {@code queryResult.close()}.
      *
      * @param queryStr the SQL query to execute.
      *
@@ -132,12 +107,14 @@ public abstract class SQLDb implements AutoCloseable {
      *
      * @throws RuntimeException if the query cannot be executed.
      */
-    public synchronized ResultSet executeQuery(String queryStr) {
-        return executeQuery(privateStatement(), queryStr);
+    public QueryResult executeQuery(String queryStr) {
+        return QueryResult.create(openConnection(), queryStr, true);
     }
 
     /**
-     * Executes a query using an open statement.
+     * Executes a query using an existing open statement.
+     *
+     * <p>The result set should be closed after it has been processed.
      *
      * @param statement an open statement.
      *
@@ -159,19 +136,22 @@ public abstract class SQLDb implements AutoCloseable {
     }
 
     /**
-     * Executes an update command using the private connection
-     * maintained by this database.
+     * Executes and commits an atomic update command using a new
+     * database connection (which is closed before returning).
      *
      * @param updateStr the SQL update to execute.
-     *
-     * @param commit whether to commit the update.
      *
      * @return the SQL result code.
      *
      * @throws RuntimeException if the update cannot be executed.
      */
-    public synchronized int executeUpdate(String updateStr, boolean commit) {
-        return executeUpdate(privateStatement(), updateStr, commit);
+    public int executeUpdate(String updateStr) {
+        try (Connection connection = openConnection()) {
+            return executeUpdate(connection.createStatement(), updateStr, true);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
     }
 
     /**
@@ -263,11 +243,8 @@ public abstract class SQLDb implements AutoCloseable {
     public boolean tableExists(String tableName) {
         String queryStr = countTableNamesQuery(tableName);
 
-        try (ResultSet resultSet = executeQuery(queryStr)) {
-            return tableExists(resultSet);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
+        try (QueryResult queryResult = executeQuery(queryStr)) {
+            return tableExists(queryResult.getResultSet());
         }
     }
 
@@ -292,14 +269,5 @@ public abstract class SQLDb implements AutoCloseable {
     private void logUpdate(String message) {
         if (verbose)
             JamLogger.info(message);
-    }
-
-    /**
-     * Closes the private connection and statement maintained by this
-     * database (and commits any pending transactions).
-     */
-    @Override public void close() {
-        commit(pvtConnection);
-        SQLUtil.close(pvtConnection);
     }
 }
