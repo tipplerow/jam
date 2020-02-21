@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jam.util.MapUtil;
+import jam.util.SetUtil;
 
 /**
  * Maintains a persistent database table and computes and stores new
@@ -88,7 +89,7 @@ public abstract class SQLStore<K, V> {
 
         // Identify keys from the input collection that are not
         // present in the table...
-        Set<K> missingKeys = flagMissing(tableRecords.keySet(), keys);
+        Set<K> missingKeys = SetUtil.missing(tableRecords.keySet(), keys);
 
         if (!missingKeys.isEmpty()) {
             // Compute records for each missing key...
@@ -100,16 +101,6 @@ public abstract class SQLStore<K, V> {
         }
 
         return MapUtil.get(tableRecords, keys);
-    }
-
-    private Set<K> flagMissing(Set<K> tableKeys, Collection<K> requestedKeys) {
-        Set<K> missingKeys = new HashSet<K>();
-
-        for (K key : requestedKeys)
-            if (!tableKeys.contains(key))
-                missingKeys.add(key);
-
-        return missingKeys;
     }
 
     private void addRecords(Collection<V> records, Map<K, V> map) {
