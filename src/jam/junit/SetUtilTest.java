@@ -170,6 +170,15 @@ public class SetUtilTest {
         assertEquals(4, set3.size());
     }
 
+    @Test public void testMissing() {
+        Set<String> present = Set.of("A", "B", "C", "D");
+
+        assertEquals(Set.of(), SetUtil.missing(present, Set.of()));
+        assertEquals(Set.of(), SetUtil.missing(present, Set.of("A", "B", "C", "D")));
+        assertEquals(Set.of("E", "F"), SetUtil.missing(present, Set.of("E", "F")));
+        assertEquals(Set.of("E", "F"), SetUtil.missing(present, Set.of("C", "D", "E", "F")));
+    }
+
     @Test public void testNewHashSetFunction() {
         Set<String> strings = Set.of("A", "BC", "DEF");
         Set<Integer> lengths = SetUtil.newHashSet(strings, x -> Integer.valueOf(x.length()));

@@ -225,6 +225,29 @@ public final class SetUtil {
     }
 
     /**
+     * Finds objects that are missing from (not contained in) an
+     * existing set.
+     *
+     * @param <K> the element type.
+     *
+     * @param present the set of existing objects (they are present).
+     *
+     * @param requested the objects that are requested to be present.
+     *
+     * @return a new set containing all requested objects that are not
+     * present in the set.
+     */
+    public static <K> Set<K> missing(Set<K> present, Collection<K> requested) {
+        Set<K> missing = new HashSet<K>();
+
+        for (K key : requested)
+            if (!present.contains(key))
+                missing.add(key);
+
+        return missing;
+    }
+
+    /**
      * Creates a hash set with initial elements.
      *
      * @param <E> the element type.
