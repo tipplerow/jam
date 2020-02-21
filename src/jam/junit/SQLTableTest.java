@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 
 public class SQLTableTest {
     private static final TestRecord rec1 = new TestRecord("key1", 1.0, 11);
-    private static final TestRecord rec2 = new TestRecord("key2", 2.0, 22);
+    private static final TestRecord rec2 = new TestRecord("key2", Double.NaN, 22);
     private static final TestRecord rec3 = new TestRecord("key3", 3.0, 33);
 
     private static final String FILE_NAME = "data/test/sql_table_test.db";
@@ -80,6 +80,10 @@ public class SQLTableTest {
                 && DoubleComparator.DEFAULT.equals(this.foo, that.foo)
                 && this.bar == that.bar;
         }
+
+        @Override public String toString() {
+            return String.format("TestRecord(%s, %f, %d)", key, foo, bar);
+        }
     }
 
     private static final class TestTable extends SQLTable<String, TestRecord> {
@@ -97,7 +101,7 @@ public class SQLTableTest {
 
         @Override public TestRecord getRow(ResultSet resultSet) throws SQLException {
             String key = resultSet.getString(1);
-            double foo = resultSet.getDouble(2);
+            double foo = getDouble(resultSet,2);
             int    bar = resultSet.getInt(3);
 
             return new TestRecord(key, foo, bar);

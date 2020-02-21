@@ -100,6 +100,51 @@ public abstract class SQLTable<K, V> {
     public abstract void prepareInsertStatement(PreparedStatement statement, V record) throws SQLException;
 
     /**
+     * Retrieves a {@code double} value from a result set, converting
+     * database {@code NULL} values to {@code Double.NaN} (instead of
+     * {@code 0.0} like the default behavior of {@code SQLite}).
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnIndex the column index (the first is 1, second is 2, ...).
+     *
+     * @return the {@code double} value in the specified column of the
+     * result set.
+     *
+     * @throws SQLException if the column index is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    protected static double getDouble(ResultSet resultSet, int columnIndex) throws SQLException {
+        return getDouble(resultSet.getObject(columnIndex));
+    }
+
+    /**
+     * Retrieves a {@code double} value from a result set, converting
+     * database {@code NULL} values to {@code Double.NaN} (instead of
+     * {@code 0.0}).
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnLabel the column label.
+     *
+     * @return the {@code double} value in the specified column of the
+     * result set.
+     *
+     * @throws SQLException if the column label is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    protected static double getDouble(ResultSet resultSet, String columnLabel) throws SQLException {
+        return getDouble(resultSet.getObject(columnLabel));
+    }
+
+    private static double getDouble(Object obj) {
+        if (obj != null)
+            return ((Double) obj).doubleValue();
+        else
+            return Double.NaN;
+    }
+
+    /**
      * Loads all rows in the database table.
      *
      * @return all rows contained in the database table.
