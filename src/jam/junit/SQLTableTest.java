@@ -48,10 +48,15 @@ public class SQLTableTest {
         TestTable table = new TestTable(DB);
 
         assertFalse(table.exists());
+        assertFalse(table.contains(key1));
+        assertNull(table.fetch(key1));
         assertTrue(table.load().isEmpty());
 
         table.store(List.of(rec1, rec2));
+
         assertTrue(table.exists());
+        assertTrue(table.contains(key1));
+        assertEquals(rec1, table.fetch(key1));
 
         Map<String, TestRecord> map = table.load();
 

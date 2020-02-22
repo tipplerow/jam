@@ -170,6 +170,38 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
+     * Checks for the existence of a record key.
+     *
+     * @param key the key of interest.
+     *
+     * @return {@code true} iff this table contains a record with the
+     * specfied key.
+     */
+    public boolean contains(K key) {
+        if (!exists())
+            return false;
+
+        try (Connection connection = db.openConnection()) {
+            return contains(connection.prepareStatement(formatCountWhereStatement()), key);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    private String formatCountWhereStatement() {
+        return String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", getTableName(), getKeyName());
+    }
+
+    private boolean contains(PreparedStatement statement, K key) throws SQLException {
+        prepareSelectStatement(statement, key);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            return db.getCount(resultSet) > 0;
+        }
+    }
+
+    /**
      * Creates this table in the database unless it already exists.
      *
      * @throws RuntimeException if the table cannot be created.
@@ -196,6 +228,9 @@ public abstract class SQLTable<K, V> {
      * there is no matching key in this table.
      */
     public V fetch(K key) {
+        if (!exists())
+            return null;
+
         try (Connection connection = db.openConnection()) {
             return fetch(connection.prepareStatement(formatSelectWhereStatement()), key);
         }
@@ -229,6 +264,9 @@ public abstract class SQLTable<K, V> {
      * the corresponding elements will be {@code null}.
      */
     public List<V> fetch(Collection<K> keys) {
+        if (!exists())
+            return new ArrayList<V>();
+
         List<V> records = new ArrayList<V>(keys.size());
 
         try (Connection connection = db.openConnection()) {
