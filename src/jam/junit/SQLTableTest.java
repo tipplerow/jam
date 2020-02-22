@@ -18,9 +18,13 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class SQLTableTest {
-    private static final TestRecord rec1 = new TestRecord("key1", 1.0, 11);
-    private static final TestRecord rec2 = new TestRecord("key2", Double.NaN, 22);
-    private static final TestRecord rec3 = new TestRecord("key3", 3.0, 33);
+    private static final String key1 = "key1";
+    private static final String key2 = "key2";
+    private static final String key3 = "key3";
+
+    private static final TestRecord rec1 = new TestRecord(key1, 1.0, 11);
+    private static final TestRecord rec2 = new TestRecord(key2, Double.NaN, 22);
+    private static final TestRecord rec3 = new TestRecord(key3, 3.0, 33);
 
     private static final String FILE_NAME = "data/test/sql_table_test.db";
     private static final SQLDb DB = SQLiteDb.instance(FILE_NAME);
@@ -43,17 +47,21 @@ public class SQLTableTest {
     @Test public void testLoadStore() {
         TestTable table = new TestTable(DB);
 
-        assertFalse(DB.tableExists(table.getTableName()));
+        assertFalse(table.exists());
         assertTrue(table.load().isEmpty());
 
         table.store(List.of(rec1, rec2));
-        assertTrue(DB.tableExists(table.getTableName()));
+        assertTrue(table.exists());
 
         Map<String, TestRecord> map = table.load();
 
         assertEquals(2, map.size());
-        assertEquals(rec1, map.get("key1"));
-        assertEquals(rec2, map.get("key2"));
+        assertEquals(rec1, map.get(key1));
+        assertEquals(rec2, map.get(key2));
+
+        assertEquals(rec1, table.fetch(key1));
+        assertEquals(rec2, table.fetch(key2));
+        assertEquals(List.of(rec2, rec1), table.fetch(List.of(key2, key1)));
     }
 
     public static void main(String[] args) {

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +41,8 @@ public abstract class SQLTable<K, V> {
 
     /**
      * Returns the names of the table columns (ordered from left to right).
+     *
+     * <p>The key must be in the first (left-most) column.
      *
      * @return the names of the table columns (ordered from left to right).
      */
@@ -100,6 +103,28 @@ public abstract class SQLTable<K, V> {
     public abstract void prepareInsertStatement(PreparedStatement statement, V record) throws SQLException;
 
     /**
+     * Assigns the record key to a prepared {@code SELECT WHERE} statement.
+     *
+     * <p>The prepared statement is created by the following SQL text:
+     * {@code SELECT * FROM table WHERE key = ?}, where {@code table}
+     * is the name of this table and {@code key} is the name of the
+     * key column.
+     *
+     * <p>This default implementation assumes that the table key is a
+     * SQL string and that it is stored as {@code key.toString()}.
+     *
+     * @param statement a prepared statement that has been created
+     * using the SQL text above.
+     *
+     * @param key the key of the record to be fetched.
+     *
+     * @throws SQLException if the assignment fails.
+     */
+    public void prepareSelectStatement(PreparedStatement statement, K key) throws SQLException {
+        statement.setString(1, key.toString());
+    }
+
+    /**
      * Retrieves a {@code double} value from a result set, converting
      * database {@code NULL} values to {@code Double.NaN} (instead of
      * {@code 0.0} like the default behavior of {@code SQLite}).
@@ -145,6 +170,92 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
+     * Creates this table in the database unless it already exists.
+     *
+     * @throws RuntimeException if the table cannot be created.
+     */
+    public synchronized void create() {
+        db.createTable(getTableName(), getTableSchema());
+    }
+
+    /**
+     * Determines whether this table exists in the database.
+     *
+     * @return {@code true} iff this table exists in the database.
+     */
+    public synchronized boolean exists() {
+        return db.tableExists(getTableName());
+    }
+
+    /**
+     * Retrieves a record by its key.
+     *
+     * @param key the key of interest.
+     *
+     * @return the record with the specified key, or {@code null} if
+     * there is no matching key in this table.
+     */
+    public V fetch(K key) {
+        try (Connection connection = db.openConnection()) {
+            return fetch(connection.prepareStatement(formatSelectWhereStatement()), key);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    private String formatSelectWhereStatement() {
+        return String.format("SELECT * FROM %s WHERE %s = ?", getTableName(), getKeyName());
+    }
+
+    private V fetch(PreparedStatement statement, K key) throws SQLException {
+        prepareSelectStatement(statement, key);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next())
+                return getRow(resultSet);
+            else
+                return null;
+        }
+    }
+
+    /**
+     * Retrieve record by their keys.
+     *
+     * @param keys the keys of interest.
+     *
+     * @return a list of records with the specified keys, in the order
+     * returned by the collection iterator.  If any keys are not found,
+     * the corresponding elements will be {@code null}.
+     */
+    public List<V> fetch(Collection<K> keys) {
+        List<V> records = new ArrayList<V>(keys.size());
+
+        try (Connection connection = db.openConnection()) {
+            PreparedStatement statement = connection.prepareStatement(formatSelectWhereStatement());
+
+            for (K key : keys)
+                records.add(fetch(statement, key));
+
+            statement.close();
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+
+        return records;
+    }
+
+    /**
+     * Returns the name of the key column.
+     *
+     * @return the name of the key column.
+     */
+    public String getKeyName() {
+        return getColumnNames().get(0);
+    }
+
+    /**
      * Loads all rows in the database table.
      *
      * @return all rows contained in the database table.
@@ -152,7 +263,7 @@ public abstract class SQLTable<K, V> {
      * @throws RuntimeException if any errors occur.
      */
     public synchronized Map<K, V> load() {
-        if (!db.tableExists(getTableName()))
+        if (!exists())
             return new HashMap<K, V>();
 
         try (Connection connection = db.openConnection(false)) {
@@ -202,8 +313,10 @@ public abstract class SQLTable<K, V> {
      * if any SQL errors occur.
      */
     public synchronized void store(Collection<V> records) {
-        if (!db.tableExists(getTableName()))
-            db.createTable(getTableName(), getTableSchema());
+        if (!exists()) {
+            JamLogger.info("Creating table [%s]...", getTableName());
+            create();
+        }
 
         JamLogger.info("Adding [%s] records to table [%s]...", records.size(), getTableName());
 
