@@ -153,7 +153,7 @@ public abstract class SQLTable<K, V> {
      */
     public synchronized Map<K, V> load() {
         if (!db.tableExists(getTableName()))
-            return Collections.emptyMap();
+            return new HashMap<K, V>();
 
         try (Connection connection = db.openConnection(false)) {
             return load(connection.createStatement());
@@ -205,7 +205,7 @@ public abstract class SQLTable<K, V> {
         if (!db.tableExists(getTableName()))
             db.createTable(getTableName(), getTableSchema());
 
-        JamLogger.info("Adding [%s] records to [%s]...", records.size(), getTableName());
+        JamLogger.info("Adding [%s] records to table [%s]...", records.size(), getTableName());
 
         try (Connection connection = db.openConnection(false)) {
             storeRecords(connection, records);
@@ -214,7 +214,7 @@ public abstract class SQLTable<K, V> {
             throw JamException.runtime(ex);
         }
 
-        JamLogger.info("Added [%s] records to [%s].", records.size(), getTableName());
+        JamLogger.info("Added [%s] records to table [%s].", records.size(), getTableName());
     }
 
     private void storeRecords(Connection connection, Collection<V> records) throws SQLException {
