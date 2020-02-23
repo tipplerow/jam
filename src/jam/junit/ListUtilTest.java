@@ -144,7 +144,7 @@ public class ListUtilTest {
     }
 
     @Test public void testSplit() {
-        List<String> list = List.of("A", "B", "C", "D", "E");
+        List<String> list = new ArrayList<String>(List.of("A", "B", "C", "D", "E"));
         List<List<String>> subLists = ListUtil.split(list, 1);
 
         assertEquals(5, subLists.size());
@@ -176,6 +176,12 @@ public class ListUtilTest {
 
         assertEquals(1, subLists.size());
         assertEquals(List.of("A", "B", "C", "D", "E"), subLists.get(0));
+
+        // The sublists are backed by the original list, so modifying
+        // a sublist also modifies the original...
+        subLists = ListUtil.split(list, 2);
+        subLists.get(0).remove(1);
+        assertEquals(List.of("A", "C", "D", "E"), list);
     }
 
     @Test public void testTranspose() {

@@ -39,7 +39,7 @@ public final class ListUtil {
      * input function to the kth element of the source.
      */
     public static <T, R> List<R> apply(Collection<T> source, Function<? super T, ? extends R> function) {
-        return source.stream().map(function).collect(Collectors.toList());
+        return StreamUtil.apply(source.stream(), function);
     }
 
     /**
@@ -347,6 +347,10 @@ public final class ListUtil {
     /**
      * Splits a list into sublists of equal length, except for the
      * last sublist when the original list cannot be split exactly.
+     *
+     * <p>The returned sublists are backed by the original list,
+     * so changes to a sublist are reflected in the original and
+     * vice-versa.
      *
      * @param <V> the element type.
      *
