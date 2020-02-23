@@ -100,28 +100,24 @@ public abstract class SQLTable<K, V> {
      * @throws SQLException if any of the individual field assignments
      * fail.
      */
-    public abstract void prepareInsertStatement(PreparedStatement statement, V record) throws SQLException;
+    public abstract void prepareInsert(PreparedStatement statement, V record) throws SQLException;
 
     /**
-     * Assigns the record key to a prepared {@code SELECT WHERE} statement.
+     * Assigns the record key to a prepared statement.
      *
-     * <p>The prepared statement is created by the following SQL text:
-     * {@code SELECT * FROM table WHERE key = ?}, where {@code table}
-     * is the name of this table and {@code key} is the name of the
-     * key column.
+     * <p>This default implementation assumes that the key is stored
+     * in the database as {@code key.toString()}.
      *
-     * <p>This default implementation assumes that the table key is a
-     * SQL string and that it is stored as {@code key.toString()}.
+     * @param statement an open prepared statement.
      *
-     * @param statement a prepared statement that has been created
-     * using the SQL text above.
+     * @param index the parameter index of the key in the statement.
      *
-     * @param key the key of the record to be fetched.
+     * @param key the key of the record to assign.
      *
      * @throws SQLException if the assignment fails.
      */
-    public void prepareSelectStatement(PreparedStatement statement, K key) throws SQLException {
-        statement.setString(1, key.toString());
+    public void prepareKey(PreparedStatement statement, int index, K key) throws SQLException {
+        statement.setString(index, key.toString());
     }
 
     /**
@@ -182,22 +178,10 @@ public abstract class SQLTable<K, V> {
             return false;
 
         try (Connection connection = db.openConnection()) {
-            return contains(connection.prepareStatement(formatCountWhereStatement()), key);
+            return contains(connection, key);
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);
-        }
-    }
-
-    private String formatCountWhereStatement() {
-        return String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", getTableName(), getKeyName());
-    }
-
-    private boolean contains(PreparedStatement statement, K key) throws SQLException {
-        prepareSelectStatement(statement, key);
-
-        try (ResultSet resultSet = statement.executeQuery()) {
-            return db.getCount(resultSet) > 0;
         }
     }
 
@@ -231,31 +215,11 @@ public abstract class SQLTable<K, V> {
         if (!exists())
             return null;
 
-        try (Connection connection = db.openConnection()) {
-            return fetch(connection.prepareStatement(formatSelectWhereStatement()), key);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-    }
-
-    private String formatSelectWhereStatement() {
-        return String.format("SELECT * FROM %s WHERE %s = ?", getTableName(), getKeyName());
-    }
-
-    private V fetch(PreparedStatement statement, K key) throws SQLException {
-        prepareSelectStatement(statement, key);
-
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next())
-                return getRow(resultSet);
-            else
-                return null;
-        }
+        return fetch(List.of(key)).get(0);
     }
 
     /**
-     * Retrieve record by their keys.
+     * Retrieves records by their keys.
      *
      * @param keys the keys of interest.
      *
@@ -267,21 +231,12 @@ public abstract class SQLTable<K, V> {
         if (!exists())
             return new ArrayList<V>();
 
-        List<V> records = new ArrayList<V>(keys.size());
-
         try (Connection connection = db.openConnection()) {
-            PreparedStatement statement = connection.prepareStatement(formatSelectWhereStatement());
-
-            for (K key : keys)
-                records.add(fetch(statement, key));
-
-            statement.close();
+            return fetch(connection, keys);
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
-
-        return records;
     }
 
     /**
@@ -300,45 +255,60 @@ public abstract class SQLTable<K, V> {
      *
      * @throws RuntimeException if any errors occur.
      */
-    public synchronized Map<K, V> load() {
-        if (!exists())
-            return new HashMap<K, V>();
-
-        try (Connection connection = db.openConnection(false)) {
-            return load(connection.createStatement());
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-    }
-
-    private Map<K, V> load(Statement statement) {
-        try (ResultSet resultSet = db.executeQuery(statement, selectAllQuery())) {
-            return load(resultSet);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-    }
-
-    private String selectAllQuery() {
-        return String.format("SELECT %s FROM %s", String.join(", ", getColumnNames()), getTableName());
-    }
-
-    private Map<K, V> load(ResultSet resultSet) {
-        Map<K, V> records = new HashMap<K, V>();
+    public Map<K, V> load() {
+        Map<K, V> records = null;
+        JamLogger.info("Loading table [%s]...", getTableName());
 
         try {
-            while (resultSet.next()) {
-                V record = getRow(resultSet);
-                records.put(getKey(record), record);
-            }
+            records = loadSync();
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
 
+        JamLogger.info("Loaded [%d] records from table [%s]...", records.size(), getTableName());
         return records;
+    }
+
+    /**
+     * Removes a record from this table (if it is present); a no-op if
+     * the key is not present.
+     *
+     * @param key the key of the record to remove.
+     */
+    public void remove(K key) {
+        remove(List.of(key));
+    }
+
+    /**
+     * Removes records from this table.
+     *
+     * @param keys the keys of the records to remove.
+     */
+    public void remove(Collection<K> keys) {
+        JamLogger.info("Removing [%d] records from table [%s]...", keys.size(), getTableName());
+
+        try {
+            removeSync(keys);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+
+        JamLogger.info("Removed [%d] records from table [%s].", keys.size(), getTableName());
+    }
+
+    /**
+     * Stores a new unique record in the database table.
+     *
+     * @param record the record to store, which must have a unique
+     * primary keys
+     *
+     * @throws RuntimeException if the records has a duplicate key or
+     * if any SQL errors occur.
+     */
+    public void store(V record) {
+        store(List.of(record));
     }
 
     /**
@@ -350,30 +320,196 @@ public abstract class SQLTable<K, V> {
      * @throws RuntimeException if any records have duplicate keys or
      * if any SQL errors occur.
      */
-    public synchronized void store(Collection<V> records) {
+    public void store(Collection<V> records) {
+        JamLogger.info("Adding [%d] records to table [%s]...", records.size(), getTableName());
+
+        try {
+            storeSync(records);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+
+        JamLogger.info("Added [%d] records to table [%s].", records.size(), getTableName());
+    }
+
+    // -----------------------------------------------------------------
+
+    private boolean contains(Connection connection, K key) throws SQLException {
+        String queryString = formatContainsQuery();
+
+        try (PreparedStatement statement = connection.prepareStatement(queryString)) {
+            return contains(statement, key);
+        }
+    }
+
+    private String formatContainsQuery() {
+        return String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", getTableName(), getKeyName());
+    }
+
+    private boolean contains(PreparedStatement statement, K key) throws SQLException {
+        prepareKey(statement, 1, key);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            return contains(resultSet);
+        }
+    }
+
+    private boolean contains(ResultSet resultSet) {
+        return db.getCount(resultSet) > 0;
+    }
+
+    // -----------------------------------------------------------------
+
+    private List<V> fetch(Connection connection, Collection<K> keys) throws SQLException {
+        String queryString = formatFetchQuery();
+
+        try (PreparedStatement statement = connection.prepareStatement(queryString)) {
+            return fetch(statement, keys);
+        }
+    }
+
+    private String formatFetchQuery() {
+        return String.format("SELECT * FROM %s WHERE %s = ?", getTableName(), getKeyName());
+    }
+
+    private List<V> fetch(PreparedStatement statement, Collection<K> keys) throws SQLException {
+        List<V> records = new ArrayList<V>(keys.size());
+
+        for (K key : keys)
+            records.add(fetch(statement, key));
+
+        return records;
+    }
+
+    private V fetch(PreparedStatement statement, K key) throws SQLException {
+        prepareKey(statement, 1, key);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            return fetch(resultSet);
+        }
+    }
+
+    private V fetch(ResultSet resultSet) throws SQLException {
+        if (resultSet.next())
+            return getRow(resultSet);
+        else
+            return null;
+    }
+
+    // -----------------------------------------------------------------
+
+    private synchronized Map<K, V> loadSync() throws SQLException {
+        if (!exists())
+            return new HashMap<K, V>();
+
+        try (Connection connection = db.openConnection(false)) {
+            return load(connection.createStatement());
+        }
+    }
+
+    private Map<K, V> load(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            return load(statement);
+        }
+    }
+
+    private Map<K, V> load(Statement statement) throws SQLException {
+        String queryString = formatLoadQuery();
+
+        try (ResultSet resultSet = db.executeQuery(statement, queryString)) {
+            return load(resultSet);
+        }
+    }
+
+    private String formatLoadQuery() {
+        return String.format("SELECT %s FROM %s", String.join(", ", getColumnNames()), getTableName());
+    }
+
+    private Map<K, V> load(ResultSet resultSet) throws SQLException {
+        Map<K, V> records = new HashMap<K, V>();
+
+        while (resultSet.next()) {
+            V record = getRow(resultSet);
+            records.put(getKey(record), record);
+        }
+
+        return records;
+    }
+
+    // -----------------------------------------------------------------
+
+    private synchronized void removeSync(Collection<K> keys) throws SQLException {
+        if (!exists())
+            return;
+
+        try (Connection connection = db.openConnection(false)) {
+            remove(connection, keys);
+        }
+    }
+
+    private void remove(Connection connection, Collection<K> keys) throws SQLException {
+        String updateString = formatDeleteStatement();
+
+        try (PreparedStatement statement = connection.prepareStatement(updateString)) {
+            remove(statement, keys);
+        }
+    }
+
+    private String formatDeleteStatement() {
+        return String.format("DELETE FROM %s WHERE %s = ?", getTableName(), getKeyName());
+    }
+
+    private void remove(PreparedStatement statement, Collection<K> keys) throws SQLException {
+        Connection connection = statement.getConnection();
+
+        try {
+            for (K key : keys)
+                remove(statement, key);
+
+            connection.commit();
+        }
+        catch (SQLException ex) {
+            rollback(connection);
+            throw ex;
+        }
+    }
+
+    private void remove(PreparedStatement statement, K key) throws SQLException {
+        prepareKey(statement, 1, key);
+        statement.executeUpdate();
+    }
+
+    private void rollback(Connection connection) throws SQLException {
+        JamLogger.warn("Failed to update database table!");
+
+        try {
+            connection.rollback();
+        }
+        catch (SQLException ex) {
+            JamLogger.warn("Failed to rollback update transaction!");
+            JamLogger.warn(ex);
+        }
+    }
+
+    // -----------------------------------------------------------------
+
+    private synchronized void storeSync(Collection<V> records) throws SQLException {
         if (!exists()) {
             JamLogger.info("Creating table [%s]...", getTableName());
             create();
         }
 
-        JamLogger.info("Adding [%s] records to table [%s]...", records.size(), getTableName());
-
         try (Connection connection = db.openConnection(false)) {
-            storeRecords(connection, records);
+            store(connection, records);
         }
-        catch (Exception ex) {
-            throw JamException.runtime(ex);
-        }
-
-        JamLogger.info("Added [%s] records to table [%s].", records.size(), getTableName());
     }
 
-    private void storeRecords(Connection connection, Collection<V> records) throws SQLException {
-        String insertCommand = formatInsertCommand();
-        JamLogger.info(insertCommand);
+    private void store(Connection connection, Collection<V> records) throws SQLException {
+        String updateString = formatInsertCommand();
 
-        try (PreparedStatement statement = connection.prepareStatement(insertCommand)) {
-            storeRecords(statement, records);
+        try (PreparedStatement statement = connection.prepareStatement(updateString)) {
+            store(statement, records);
         }
     }
 
@@ -391,12 +527,12 @@ public abstract class SQLTable<K, V> {
         return builder.toString();
     }
 
-    private void storeRecords(PreparedStatement statement, Collection<V> records) throws SQLException {
+    private void store(PreparedStatement statement, Collection<V> records) throws SQLException {
         Connection connection = statement.getConnection();
 
         try {
             for (V record : records)
-                storeRecord(statement, record);
+                store(statement, record);
 
             connection.commit();
         }
@@ -406,20 +542,8 @@ public abstract class SQLTable<K, V> {
         }
     }
 
-    private void storeRecord(PreparedStatement statement, V record) throws SQLException {
-        prepareInsertStatement(statement, record);
+    private void store(PreparedStatement statement, V record) throws SQLException {
+        prepareInsert(statement, record);
         statement.executeUpdate();
-    }
-
-    private void rollback(Connection connection) throws SQLException {
-        JamLogger.warn("Failed to update database table!");
-
-        try {
-            connection.rollback();
-        }
-        catch (SQLException ex) {
-            JamLogger.warn("Failed to rollback update transaction!");
-            JamLogger.warn(ex);
-        }
     }
 }

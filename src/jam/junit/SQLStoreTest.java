@@ -118,7 +118,7 @@ public class SQLStoreTest {
             return "key string PRIMARY KEY, value int";
         }
 
-        @Override public void prepareInsertStatement(PreparedStatement statement, TestRecord record) throws SQLException {
+        @Override public void prepareInsert(PreparedStatement statement, TestRecord record) throws SQLException {
             statement.setString(1, record.key);
             statement.setInt(2, record.value);
         }

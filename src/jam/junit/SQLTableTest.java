@@ -67,6 +67,16 @@ public class SQLTableTest {
         assertEquals(rec1, table.fetch(key1));
         assertEquals(rec2, table.fetch(key2));
         assertEquals(List.of(rec2, rec1), table.fetch(List.of(key2, key1)));
+
+        table.remove(key1);
+
+        assertTrue(table.exists());
+        assertFalse(table.contains(key1));
+        assertNull(table.fetch(key1));
+
+        table.store(rec3);
+        assertTrue(table.contains(key3));
+        assertEquals(List.of(rec2, rec3), table.fetch(List.of(key2, key3)));
     }
 
     public static void main(String[] args) {
@@ -128,7 +138,7 @@ public class SQLTableTest {
             return "key string PRIMARY KEY, foo double, bar int";
         }
 
-        @Override public void prepareInsertStatement(PreparedStatement statement, TestRecord record) throws SQLException {
+        @Override public void prepareInsert(PreparedStatement statement, TestRecord record) throws SQLException {
             statement.setString(1, record.key);
             statement.setDouble(2, record.foo);
             statement.setInt(3, record.bar);
