@@ -20,8 +20,15 @@ import jam.util.SetUtil;
  * @param <V> the runtime type of the record values.
  */
 public abstract class SQLCache<K, V> {
-    private final Map<K, V> cache;
-    private final SQLStore<K, V> store;
+    /**
+     * The in-memory cache.
+     */
+    protected final Map<K, V> cache;
+
+    /**
+     * The persistent database store.
+     */
+    protected final SQLStore<K, V> store;
 
     /**
      * Creates a new cache with a backing database store to provide
