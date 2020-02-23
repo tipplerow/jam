@@ -1,35 +1,18 @@
 
 package jam.junit;
 
-import java.io.File;
-
 import jam.sql.SQLDb;
 import jam.sql.SQLiteDb;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class SQLDbTest {
-    public static final String FILE_NAME = "data/test/sql_db_test.db";
-
-    @Before public void tearDown() {
-        deleteDbFile();
-    }
-
-    @AfterClass public static void tearDownClass() {
-        deleteDbFile();
-    }
-
-    private static void deleteDbFile() {
-        File dbFile = new File(FILE_NAME);
-
-        if (dbFile.exists())
-            dbFile.delete();
+public class SQLDbTest extends SQLTestBase {
+    public SQLDbTest() {
+        super("data/test/sql_db_test.db");
     }
 
     @Test public void testCreateTable() {
-        SQLDb db = SQLiteDb.instance(FILE_NAME);
-
         db.verbose(true);
         assertFalse(db.tableExists("test_table"));
 

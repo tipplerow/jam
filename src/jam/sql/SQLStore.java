@@ -15,6 +15,10 @@ import jam.util.SetUtil;
 /**
  * Maintains a persistent database table and computes and stores new
  * records on demand.
+ *
+ * @param <K> the runtime type of the record keys.
+ *
+ * @param <V> the runtime type of the record values.
  */
 public abstract class SQLStore<K, V> {
     private final SQLTable<K, V> table;
@@ -52,6 +56,17 @@ public abstract class SQLStore<K, V> {
             records.add(compute(key));
 
         return records;
+    }
+
+    /**
+     * Returns the key for a given record.
+     *
+     * @param record a record to be indexed.
+     *
+     * @return the key for the specified record.
+     */
+    public K getKey(V record) {
+        return table.getKey(record);
     }
 
     /**
