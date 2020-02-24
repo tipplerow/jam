@@ -51,6 +51,10 @@ public final class StepConcentrationModel extends ConcentrationModel {
         return global;
     }
 
+    @Override public ConcentrationModelType getType() {
+        return ConcentrationModelType.STEP;
+    }
+
     @Override protected double translate(double expression) {
         //
         // Expressions below the threshold have already been removed...

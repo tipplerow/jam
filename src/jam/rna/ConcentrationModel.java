@@ -101,6 +101,13 @@ public abstract class ConcentrationModel {
     }
 
     /**
+     * Returns the enumerated type for this model.
+     *
+     * @return the enumerated type for this model.
+     */
+    public abstract ConcentrationModelType getType();
+
+    /**
      * Returns the minimum RNA expression required for positive
      * peptide concentration.
      *

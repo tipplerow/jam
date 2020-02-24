@@ -52,6 +52,10 @@ public final class LinearConcentrationModel extends ConcentrationModel {
         return global;
     }
 
+    @Override public ConcentrationModelType getType() {
+        return ConcentrationModelType.LINEAR;
+    }
+
     @Override protected double translate(double expression) {
         //
         // The expression has already been filtered...

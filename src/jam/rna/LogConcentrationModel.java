@@ -78,6 +78,10 @@ public final class LogConcentrationModel extends ConcentrationModel {
         return JamProperties.getOptionalDouble(ALPHA_PROPERTY, ALPHA_DEFAULT);
     }
 
+    @Override public ConcentrationModelType getType() {
+        return ConcentrationModelType.LOG;
+    }
+
     @Override protected double translate(double expression) {
         //
         // The expression has already been filtered... 
