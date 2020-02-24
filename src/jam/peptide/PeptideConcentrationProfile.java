@@ -1,6 +1,8 @@
 
 package jam.peptide;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 import jam.chem.Concentration;
+import jam.io.IOUtil;
+import jam.io.TableReader;
+import jam.lang.JamException;
 
 /**
  * Maps peptides to cellular concentrations.
@@ -28,6 +33,48 @@ public final class PeptideConcentrationProfile {
      */
     public static PeptideConcentrationProfile create() {
         return new PeptideConcentrationProfile();
+    }
+
+    /**
+     * Loads a peptide concentration profile from a data file.
+     *
+     * @param file the data file to load.
+     *
+     * @return the peptide concentration profile stored in the
+     * specified data file.
+     */
+    public static PeptideConcentrationProfile load(File file) {
+        try (TableReader reader = TableReader.open(file)) {
+            if (reader.ncol() != 2)
+                throw JamException.runtime("Invalid peptide concentration profile file: [%s].", file);
+
+            return load(reader);
+        }
+    }
+
+    private static PeptideConcentrationProfile load(TableReader reader) {
+        PeptideConcentrationProfile profile = create();
+
+        for (List<String> fields : reader) {
+            Peptide peptide = Peptide.parse(fields.get(0));
+            Concentration concentration = Concentration.parse(fields.get(1));
+
+            profile.add(peptide, concentration);
+        }
+
+        return profile;
+    }
+
+    /**
+     * Loads a peptide concentration profile from a data file.
+     *
+     * @param fileName the name of the data file to load.
+     *
+     * @return the peptide concentration profile stored in the
+     * specified data file.
+     */
+    public static PeptideConcentrationProfile load(String fileName) {
+        return load(new File(fileName));
     }
 
     /**
@@ -124,6 +171,46 @@ public final class PeptideConcentrationProfile {
             return record.getConcentration();
         else
             return Concentration.ZERO;
+    }
+
+    /**
+     * Stores this peptide concentration profile in a data file.
+     *
+     * @param file the data file to write (previous contents will be
+     * erased).
+     */
+    public void store(File file) {
+        try (PrintWriter writer = IOUtil.openWriter(file)) {
+            store(writer);
+        }
+    }
+
+    private void store(PrintWriter writer) {
+        writeHeader(writer);
+
+        for (PeptideConcentration conc : map.values())
+            writeConcentration(writer, conc);
+    }
+
+    private void writeHeader(PrintWriter writer) {
+        writer.println("Peptide,Concentration");
+    }
+
+    private void writeConcentration(PrintWriter writer, PeptideConcentration conc) {
+        String peptide = conc.getPeptide().formatString();
+        double concDbl = conc.getConcentration().doubleValue();
+
+        writer.println(String.format("%s,%.6E", peptide, concDbl));
+    }
+
+    /**
+     * Stores this peptide concentration profile in a data file.
+     *
+     * @param fileName the name of the data file to write (previous
+     * contents will be erased).
+     */
+    public void store(String fileName) {
+        store(new File(fileName));
     }
 
     /**

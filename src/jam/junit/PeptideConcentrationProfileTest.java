@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.io.File;
+
 import jam.chem.Concentration;
 import jam.peptide.Peptide;
 import jam.peptide.PeptideConcentrationProfile;
@@ -49,7 +51,15 @@ public class PeptideConcentrationProfileTest {
         assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
         assertEquals(Concentration.valueOf(5.0), profile.lookup(p2));
 
-        System.out.println(profile.list());
+        File file = new File("data/test/_conc_profile.csv");
+        profile.store(file);
+
+        PeptideConcentrationProfile profile2 = PeptideConcentrationProfile.load(file);
+
+        assertEquals(2, profile2.countPeptides());
+        assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
+        assertEquals(Concentration.valueOf(5.0), profile.lookup(p2));
+        file.delete();
     }
 
     public static void main(String[] args) {
