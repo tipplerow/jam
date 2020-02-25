@@ -2,7 +2,9 @@
 package jam.rna;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jam.data.DataMatrix;
 import jam.data.DenseDataMatrixLoader;
@@ -116,6 +118,27 @@ public final class TumorExpressionMatrix {
      */
     public boolean contains(TumorBarcode barcode, HugoSymbol symbol) {
         return expression.contains(barcode, symbol);
+    }
+
+    /**
+     * Returns the full expression profile for a given tumor.
+     *
+     * @param barcode the tumor barcode of interest.
+     *
+     * @return the full expression for the specified tumor, or
+     * {@code null} if this matrix does not contain the tumor.
+     */
+    public ExpressionProfile get(TumorBarcode barcode) {
+        if (!contains(barcode))
+            return null;
+
+        List<HugoSymbol> symbols = viewSymbols();
+        Map<HugoSymbol, Expression> profile = new HashMap<HugoSymbol, Expression>(symbols.size());
+
+        for (HugoSymbol symbol : symbols)
+            profile.put(symbol, get(barcode, symbol));
+
+        return ExpressionProfile.create(profile);
     }
 
     /**

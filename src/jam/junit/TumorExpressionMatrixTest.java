@@ -5,6 +5,7 @@ import java.util.List;
 
 import jam.hugo.HugoSymbol;
 import jam.rna.Expression;
+import jam.rna.ExpressionProfile;
 import jam.rna.TumorExpressionMatrix;
 import jam.tcga.TumorBarcode;
 
@@ -52,6 +53,14 @@ public class TumorExpressionMatrixTest extends NumericTestBase {
 
         assertEquals(List.of(tumor1, tumor2, tumor3), matrix.viewBarcodes());
         assertEquals(List.of(gene1, gene2, gene3, gene4, gene5), matrix.viewSymbols());
+
+        ExpressionProfile profile = matrix.get(tumor3);
+
+        assertExpression(  20.7377, profile.get(gene1));
+        assertExpression(   0.5925, profile.get(gene2));
+        assertExpression(   8.8876, profile.get(gene3));
+        assertExpression( 138.883,  profile.get(gene4));
+        assertExpression(7201.84,   profile.get(gene5));
     }
 
     private void assertExpression(double expected, Expression actual) {
