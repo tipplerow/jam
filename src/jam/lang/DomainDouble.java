@@ -1,6 +1,8 @@
 
 package jam.lang;
 
+import java.text.DecimalFormat;
+
 import jam.math.DoubleComparator;
 import jam.math.DoubleRange;
 import jam.vector.VectorView;
@@ -118,6 +120,17 @@ public abstract class DomainDouble implements Formatted {
 
     private boolean equalsDomainDouble(DomainDouble that) {
         return equals(that.value);
+    }
+
+    /**
+     * Formats this value as a string.
+     *
+     * @param fmt the format representation.
+     *
+     * @return this value formatted as described by {@code fmt}.
+     */
+    public String format(DecimalFormat fmt) {
+        return fmt.format(value);
     }
 
     /**
