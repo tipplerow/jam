@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import jam.app.JamLogger;
 import jam.hugo.HugoSymbol;
 import jam.io.TableReader;
 import jam.io.TableWriter;
@@ -44,6 +45,23 @@ public final class ExpressionProfile {
     }
 
     /**
+     * Creates a new expression profile from an expression mapping.
+     *
+     * @param symbols the genes to include in the profile.
+     *
+     * @param levels the RNA expression corresponding to each gene in
+     * the symbol list: {@code levels.get(k)} must be the expression
+     * level for {@code symbols.get(k)}.
+     *
+     * @return the new expression profile.
+     *
+     * @throws RuntimeException unless the lists have equal length.
+     */
+    public static ExpressionProfile create(List<HugoSymbol> symbols, List<Expression> levels) {
+        return new ExpressionProfile(MapUtil.zipHash(symbols, levels), false);
+    }
+
+    /**
      * Loads an expression profile from a data file.
      *
      * @param fileName the name of the file to load.
@@ -68,6 +86,8 @@ public final class ExpressionProfile {
      * valid expression profile.
      */
     public static ExpressionProfile load(File file) {
+        JamLogger.info("Loading expression profile [%s]...", file.getName());
+
         try (TableReader reader = TableReader.open(file)) {
             return load(reader);
         }
@@ -129,6 +149,8 @@ public final class ExpressionProfile {
      * writing.
      */
     public void store(File file) {
+        JamLogger.info("Storing expression profile [%s]...", file.getName());
+
         try (TableWriter writer = TableWriter.open(file)) {
             store(writer);
         }
