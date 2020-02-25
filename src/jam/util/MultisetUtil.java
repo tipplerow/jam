@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -132,6 +133,42 @@ public final class MultisetUtil {
         @Override public HashMultiset<E> newInstance() {
             return HashMultiset.create();
         }
+    }
+
+    /**
+     * Returns the maximum count among all elements of a multiset.
+     *
+     * @param set the set of interest.
+     *
+     * @return the maximum count among all elements of the input
+     * multiset.
+     */
+    public static int maxCount(Multiset<?> set) {
+        int max = 0;
+
+        for (Object key : set.elementSet())
+            max = Math.max(max, set.count(key));
+
+        return max;
+    }
+
+    /**
+     * Returns the most commonly occuring elements of a multiset.
+     *
+     * @param set the set of interest.
+     *
+     * @return a set containing the most commonly occuring elements in
+     * the input set (those with a count equal to thethe maximum count).
+     */
+    public static <E> Set<E> mostCommon(Multiset<E> set) {
+        int maxCount = maxCount(set);
+        Set<E> result = new HashSet<E>();
+
+        for (E key : set.elementSet())
+            if (set.count(key) == maxCount)
+                result.add(key);
+
+        return result;
     }
 
     /**

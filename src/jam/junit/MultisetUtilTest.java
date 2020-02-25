@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -131,6 +132,54 @@ public class MultisetUtilTest extends NumericTestBase {
         assertEquals("ghi", iter.next());
 
         assertFalse(iter.hasNext());
+    }
+
+    @Test public void testMaxCount() {
+        Multiset<String> set = HashMultiset.create();
+
+        assertEquals(0, MultisetUtil.maxCount(set));
+
+        set.add("A");
+        assertEquals(1, MultisetUtil.maxCount(set));
+
+        set.add("B");
+        assertEquals(1, MultisetUtil.maxCount(set));
+
+        set.add("B");
+        assertEquals(2, MultisetUtil.maxCount(set));
+        
+        set.add("C");
+        assertEquals(2, MultisetUtil.maxCount(set));
+
+        set.add("C");
+        assertEquals(2, MultisetUtil.maxCount(set));
+
+        set.add("C");
+        assertEquals(3, MultisetUtil.maxCount(set));
+    }
+
+    @Test public void testMostCommon() {
+        Multiset<String> set = HashMultiset.create();
+
+        assertEquals(Set.of(), MultisetUtil.mostCommon(set));
+
+        set.add("A");
+        assertEquals(Set.of("A"), MultisetUtil.mostCommon(set));
+
+        set.add("B");
+        assertEquals(Set.of("A", "B"), MultisetUtil.mostCommon(set));
+
+        set.add("B");
+        assertEquals(Set.of("B"), MultisetUtil.mostCommon(set));
+        
+        set.add("C");
+        assertEquals(Set.of("B"), MultisetUtil.mostCommon(set));
+
+        set.add("C");
+        assertEquals(Set.of("B", "C"), MultisetUtil.mostCommon(set));
+
+        set.add("C");
+        assertEquals(Set.of("C"), MultisetUtil.mostCommon(set));
     }
 
     @Test public void testSize() {
