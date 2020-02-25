@@ -12,6 +12,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import jam.lang.JamException;
+import jam.util.StringUtil;
 
 /**
  * Provides utility methods for I/O operations on compressed files.
@@ -88,5 +89,17 @@ public final class ZipUtil {
         catch (IOException ioex) {
             throw JamException.runtime(ioex);
         }
+    }
+
+    /**
+     * Removes the {@code .gz} suffix from a file name (if present).
+     *
+     * @param fileName the file name to strip.
+     *
+     * @return the file name with the suffix removed (or the original
+     * file name if the suffix was not present).
+     */
+    public static String removeSuffix(String fileName) {
+        return StringUtil.removeSuffix(fileName, GZIP_SUFFIX);
     }
 }
