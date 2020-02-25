@@ -10,12 +10,12 @@ import jam.tcga.TumorBarcode;
 /**
  * Stores unique RNA profiles for each tumor in the sample cohort.
  */
-public final class IndividualProfile extends ExpressionProfile {
+public final class IndividualExpressionModel extends ExpressionModel {
     private final TumorExpressionMatrix profile;
 
-    private static IndividualProfile global = null;
+    private static IndividualExpressionModel global = null;
 
-    private IndividualProfile(TumorExpressionMatrix profile) {
+    private IndividualExpressionModel(TumorExpressionMatrix profile) {
         this.profile = profile;
     }
 
@@ -33,14 +33,14 @@ public final class IndividualProfile extends ExpressionProfile {
      * @return the global expression profile defined by system
      * properties.
      */
-    public static IndividualProfile global() {
+    public static IndividualExpressionModel global() {
         if (global == null)
             global = createGlobal();
 
         return global;
     }
 
-    private static IndividualProfile createGlobal() {
+    private static IndividualExpressionModel createGlobal() {
         return load(resolveProfileFileName());
     }
 
@@ -59,8 +59,8 @@ public final class IndividualProfile extends ExpressionProfile {
      * @throws RuntimeException unless the specified file contains a
      * valid expression profile.
      */
-    public static IndividualProfile load(File file) {
-        return new IndividualProfile(TumorExpressionMatrix.load(file));
+    public static IndividualExpressionModel load(File file) {
+        return new IndividualExpressionModel(TumorExpressionMatrix.load(file));
     }
 
     /**
@@ -74,7 +74,7 @@ public final class IndividualProfile extends ExpressionProfile {
      * @throws RuntimeException unless the specified file contains a
      * valid expression profile.
      */
-    public static IndividualProfile load(String fileName) {
+    public static IndividualExpressionModel load(String fileName) {
         return load(new File(fileName));
     }
 

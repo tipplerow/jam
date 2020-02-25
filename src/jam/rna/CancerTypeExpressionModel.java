@@ -14,21 +14,21 @@ import jam.tcga.TumorBarcode;
 import jam.tcga.TumorPatientTable;
 
 /**
- * Represents a gene expression profile with uniform expression within
+ * Represents a gene expression model with uniform expression within
  * a cancer type (typically the median expression of a cancer-specific
  * cohort).  The mapping from tumor barcode to patient key is defined
  * by the global {@code TumorPatientTable} table, and the mapping from
  * patient to cancer type by the global {@code PatientCancerTypeTable}.
  */
-public final class CancerTypeProfile extends ExpressionProfile {
+public final class CancerTypeExpressionModel extends ExpressionModel {
     private final DataMatrix<HugoSymbol, CancerType> cancerTypeExpression;
 
     private final TumorPatientTable tumorPatientTable = TumorPatientTable.global();
     private final PatientCancerTypeTable patientCancerTypeTable = PatientCancerTypeTable.global();
 
-    private static CancerTypeProfile global = null;
+    private static CancerTypeExpressionModel global = null;
 
-    private CancerTypeProfile(DataMatrix<HugoSymbol, CancerType> cancerTypeExpression) {
+    private CancerTypeExpressionModel(DataMatrix<HugoSymbol, CancerType> cancerTypeExpression) {
         this.cancerTypeExpression = cancerTypeExpression.immutable();
     }
 
@@ -40,20 +40,20 @@ public final class CancerTypeProfile extends ExpressionProfile {
         "jam.rna.cancerTypeExpressionProfile";
 
     /**
-     * Returns the global expression profile defined by system
+     * Returns the global expression model defined by system
      * properties.
      *
-     * @return the global expression profile defined by system
+     * @return the global expression model defined by system
      * properties.
      */
-    public static CancerTypeProfile global() {
+    public static CancerTypeExpressionModel global() {
         if (global == null)
             global = createGlobal();
 
         return global;
     }
 
-    private static CancerTypeProfile createGlobal() {
+    private static CancerTypeExpressionModel createGlobal() {
         return instance(resolveProfileFileName());
     }
 
@@ -62,22 +62,22 @@ public final class CancerTypeProfile extends ExpressionProfile {
     }
 
     /**
-     * Creates a new cancer type expression profile by reading cancer
+     * Creates a new cancer type expression model by reading cancer
      * type expression data from a file.  (The mapping from tumor to
      * cancer type is defined by the global {@code CancerTypeDb}).
      *
      * @param expressionFile the file containing gene expression by
      * cancer type.
      *
-     * @return a new cancer type profile with gene expression data (by
+     * @return a new cancer type model with gene expression data (by
      * cancer type) loaded from the specified file.
      *
      * @throws RuntimeException unless the specified file can be
      * opened for reading and contains properly formatted gene
      * expression data by cancer type.
      */
-    public static CancerTypeProfile instance(File expressionFile) {
-        return new CancerTypeProfile(loadExpression(expressionFile));
+    public static CancerTypeExpressionModel instance(File expressionFile) {
+        return new CancerTypeExpressionModel(loadExpression(expressionFile));
     }
 
     private static DataMatrix<HugoSymbol, CancerType> loadExpression(File expressionFile) {
@@ -100,20 +100,20 @@ public final class CancerTypeProfile extends ExpressionProfile {
     }
 
     /**
-     * Creates a new cancer type expression profile by reading cancer
+     * Creates a new cancer type expression model by reading cancer
      * type expression data from a file.
      *
      * @param expressionFileName the name of the file containing gene
      * expression by cancer type.
      *
-     * @return a new cancer type profile with gene expression data (by
+     * @return a new cancer type model with gene expression data (by
      * cancer type) loaded from the specified file.
      *
      * @throws RuntimeException unless the specified file can be
      * opened for reading and contains properly formatted gene
      * expression data by cancer type.
      */
-    public static CancerTypeProfile instance(String expressionFileName) {
+    public static CancerTypeExpressionModel instance(String expressionFileName) {
         return instance(new File(expressionFileName));
     }
 

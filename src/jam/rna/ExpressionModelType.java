@@ -2,9 +2,9 @@
 package jam.rna;
 
 /**
- * Enumerates types of RNA expression profiles.
+ * Enumerates types of RNA expression profile models.
  */
-public enum ExpressionProfileType {
+public enum ExpressionModelType {
     /**
      * One aggregate expression profile applies to an entire cohort
      * (typically the median expression within another proxy cohort).

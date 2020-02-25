@@ -9,50 +9,50 @@ import jam.tcga.TumorBarcode;
 /**
  * Defines an interface to RNA expression data for a patient cohort.
  */
-public abstract class ExpressionProfile {
-    private static ExpressionProfile global = null;
+public abstract class ExpressionModel {
+    private static ExpressionModel global = null;
 
     /**
      * Name of the system property that specifies the type of the
-     * global RNA expression profile.
+     * global RNA expression model.
      */
-    public static final String PROFILE_TYPE_PROPERTY =
-        "jam.rna.expressionProfileType";
+    public static final String MODEL_TYPE_PROPERTY =
+        "jam.rna.expressionModelType";
 
     /**
-     * Returns the global expression profile defined by system
+     * Returns the global expression model defined by system
      * properties.
      *
-     * @return the global expression profile defined by system
+     * @return the global expression model defined by system
      * properties.
      */
-    public static ExpressionProfile global() {
+    public static ExpressionModel global() {
         if (global == null)
             global = createGlobal();
 
         return global;
     }
 
-    private static ExpressionProfile createGlobal() {
-        ExpressionProfileType type = resolveProfileType();
+    private static ExpressionModel createGlobal() {
+        ExpressionModelType type = resolveModelType();
 
         switch (type) {
         case AGGREGATE:
-            return AggregateProfile.global();
+            return AggregateExpressionModel.global();
 
         case CANCER_TYPE:
-            return CancerTypeProfile.global();
+            return CancerTypeExpressionModel.global();
 
         case INDIVIDUAL:
-            return IndividualProfile.global();
+            return IndividualExpressionModel.global();
 
         default:
-            throw JamException.runtime("Unsupported expression profile type: [%s].", type);
+            throw JamException.runtime("Unsupported expression model type: [%s].", type);
         }
     }
 
-    private static ExpressionProfileType resolveProfileType() {
-        return JamProperties.getRequiredEnum(PROFILE_TYPE_PROPERTY, ExpressionProfileType.class);
+    private static ExpressionModelType resolveModelType() {
+        return JamProperties.getRequiredEnum(MODEL_TYPE_PROPERTY, ExpressionModelType.class);
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class ExpressionProfile {
      * @param symbol the HUGO symbol for the gene of interest.
      *
      * @return the RNA expression level for the specified tumor and
-     * gene ({@code null} if the profile does not contain a matching
+     * gene ({@code null} if the model does not contain a matching
      * record).
      */
     public abstract Expression lookup(TumorBarcode barcode, HugoSymbol symbol);
@@ -80,7 +80,7 @@ public abstract class ExpressionProfile {
      * @return the RNA expression level (FPKM) for the specified tumor
      * and gene.
      *
-     * @throws RuntimeException unless the profile contains a matching
+     * @throws RuntimeException unless the model contains a matching
      * record.
      */
     public Expression require(TumorBarcode barcode, HugoSymbol symbol) {

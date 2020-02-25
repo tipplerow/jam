@@ -15,16 +15,16 @@ import jam.tcga.TumorBarcode;
 import jam.util.MapUtil;
 
 /**
- * Represents a gene expression profile in which a single profile
+ * Represents a gene expression model in which a single profile
  * applies to an entire cohort. The aggregate profile is typically
  * the median expression in another proxy cohort.
  */
-public final class AggregateProfile extends ExpressionProfile {
+public final class AggregateExpressionModel extends ExpressionModel {
     private final Map<HugoSymbol, Expression> profile;
 
-    private static AggregateProfile global = null;
+    private static AggregateExpressionModel global = null;
 
-    private AggregateProfile(Map<HugoSymbol, Expression> profile) {
+    private AggregateExpressionModel(Map<HugoSymbol, Expression> profile) {
         this.profile = Collections.unmodifiableMap(profile);
     }
 
@@ -36,20 +36,20 @@ public final class AggregateProfile extends ExpressionProfile {
         "jam.rna.aggregateExpressionProfile";
 
     /**
-     * Returns the global expression profile defined by system
+     * Returns the global expression model defined by system
      * properties.
      *
-     * @return the global expression profile defined by system
+     * @return the global expression model defined by system
      * properties.
      */
-    public static AggregateProfile global() {
+    public static AggregateExpressionModel global() {
         if (global == null)
             global = createGlobal();
 
         return global;
     }
 
-    private static AggregateProfile createGlobal() {
+    private static AggregateExpressionModel createGlobal() {
         return load(resolveProfileFileName());
     }
 
@@ -68,7 +68,7 @@ public final class AggregateProfile extends ExpressionProfile {
      * @throws RuntimeException unless the specified file contains a
      * valid expression profile.
      */
-    public static AggregateProfile load(File file) {
+    public static AggregateExpressionModel load(File file) {
         Map<HugoSymbol, Expression> profile =
             new HashMap<HugoSymbol, Expression>();
 
@@ -84,7 +84,7 @@ public final class AggregateProfile extends ExpressionProfile {
             MapUtil.putUnique(profile, symbol, level);
         }
 
-        return new AggregateProfile(profile);
+        return new AggregateExpressionModel(profile);
     }
 
     /**
@@ -98,7 +98,7 @@ public final class AggregateProfile extends ExpressionProfile {
      * @throws RuntimeException unless the specified file contains a
      * valid expression profile.
      */
-    public static AggregateProfile load(String fileName) {
+    public static AggregateExpressionModel load(String fileName) {
         return load(new File(fileName));
     }
 
