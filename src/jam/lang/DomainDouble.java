@@ -134,6 +134,17 @@ public abstract class DomainDouble implements Formatted {
     }
 
     /**
+     * Formats this value as a string.
+     *
+     * @param fmt the {@code String.format} representation.
+     *
+     * @return this value formatted as described by {@code fmt}.
+     */
+    public String format(String fmt) {
+        return String.format(fmt, value);
+    }
+
+    /**
      * Identifies negative values.
      *
      * @return {@code true} iff this value is negative allowing for
