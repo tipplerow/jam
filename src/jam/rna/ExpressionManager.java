@@ -15,6 +15,8 @@ public final class ExpressionManager {
         this.dirName = dirName;
     }
 
+    private static final String BASE_SUFFIX = "_expression_profile.csv.gz";
+
     /**
      * Creates a new expression data manager.
      *
@@ -26,6 +28,23 @@ public final class ExpressionManager {
      */
     public static ExpressionManager create(String dirName) {
         return new ExpressionManager(dirName);
+    }
+
+    /**
+     * Returns the full path name of the expression file for a given
+     * tumor sample.
+     *
+     * @param barcode the barcode of the tumor sample.
+     *
+     * @return the full path name of the expression file for a given
+     * tumor sample.
+     */
+    public File barcodeFile(TumorBarcode barcode) {
+        return new File(dirName, baseName(barcode));
+    }
+
+    private static String baseName(TumorBarcode barcode) {
+        return barcode.getKey() + BASE_SUFFIX;
     }
 
     /**
@@ -56,14 +75,6 @@ public final class ExpressionManager {
             return ExpressionProfile.load(file);
         else
             return null;
-    }
-
-    private File barcodeFile(TumorBarcode barcode) {
-        return new File(dirName, baseName(barcode));
-    }
-
-    private String baseName(TumorBarcode barcode) {
-        return barcode.getKey() + "_expression_profile.csv.gz";
     }
 
     /**
