@@ -22,32 +22,48 @@ import jam.util.RegexUtil;
  * <pre>
        &gt;Tumor_Barcode:BARCODE Hugo_Symbol:SYMBOL CCF:0.123
  * </pre>
+ *
+ * <p><b>Natural ordering.</b> The natural ordering imposed by the
+ * {@code compareTo} method considers the tumor barcode first, then
+ * HUGO symbol second.
  */
-public final class MAFFastaRecord {
+public final class MAFFastaRecord implements Comparable<MAFFastaRecord> {
     private final TumorBarcode tumorBarcode;
     private final HugoSymbol   hugoSymbol;
     private final CellFraction cellFraction;
     private final Peptide      peptide;
 
     /**
-     * A comparator that orders records by tumor barcode.
+     * A comparator that orders records by tumor barcode (breaking
+     * ties with the HUGO symbol).
      */
     public static final Comparator<MAFFastaRecord> BARCODE_COMPARATOR = new BarcodeComparator();
 
     private static final class BarcodeComparator implements Comparator<MAFFastaRecord> {
         @Override public int compare(MAFFastaRecord rec1, MAFFastaRecord rec2) {
-            return rec1.tumorBarcode.compareTo(rec2.tumorBarcode);
+            int result = rec1.tumorBarcode.compareTo(rec2.tumorBarcode);
+
+            if (result != 0)
+                return result;
+            else
+                return rec1.hugoSymbol.compareTo(rec2.hugoSymbol);
         }
     }
 
     /**
-     * A comparator that orders records by HUGO symbol.
+     * A comparator that orders records by HUGO symbol (breaking ties
+     * with the tumor barcode).
      */
     public static final Comparator<MAFFastaRecord> SYMBOL_COMPARATOR = new SymbolComparator();
 
     private static final class SymbolComparator implements Comparator<MAFFastaRecord> {
         @Override public int compare(MAFFastaRecord rec1, MAFFastaRecord rec2) {
-            return rec1.hugoSymbol.compareTo(rec2.hugoSymbol);
+            int result = rec1.hugoSymbol.compareTo(rec2.hugoSymbol);
+
+            if (result != 0)
+                return result;
+            else
+                return rec1.tumorBarcode.compareTo(rec2.tumorBarcode);
         }
     }
 
@@ -195,6 +211,10 @@ public final class MAFFastaRecord {
                              hugoSymbol.getKey(),
                              CellFraction.COLUMN_NAME,
                              cellFraction.doubleValue());
+    }
+
+    @Override public int compareTo(MAFFastaRecord that) {
+        return BARCODE_COMPARATOR.compare(this, that);
     }
 
     @Override public String toString() {

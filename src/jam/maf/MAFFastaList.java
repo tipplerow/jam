@@ -12,14 +12,17 @@ import java.util.List;
 public final class MAFFastaList extends AbstractList<MAFFastaRecord> {
     private final List<MAFFastaRecord> elements;
 
-    private MAFFastaList(Collection<MAFFastaRecord> records) {
-        this.elements = new ArrayList<MAFFastaRecord>(records);
+    private MAFFastaList(List<MAFFastaRecord> records, boolean copy) {
+        if (copy)
+            this.elements = new ArrayList<MAFFastaRecord>(records);
+        else
+            this.elements = records;
     }
 
     /**
      * The single empty list.
      */
-    public static final MAFFastaList EMPTY = new MAFFastaList(List.of());
+    public static final MAFFastaList EMPTY = new MAFFastaList(List.of(), false);
 
     /**
      * Creates a new immutable {@code MAFFastaRecord} list.
@@ -31,7 +34,21 @@ public final class MAFFastaList extends AbstractList<MAFFastaRecord> {
      * the input collection.
      */
     public static MAFFastaList create(Collection<MAFFastaRecord> records) {
-        return new MAFFastaList(records);
+        return new MAFFastaList(new ArrayList<MAFFastaRecord>(records), false);
+    }
+
+    /**
+     * Sorts the records in this list into their natural order and
+     * returns them in a new list; this list is unchanged.
+     *
+     * @return a new list containing the records of this list in
+     * their natural order.
+     */
+    public MAFFastaList sort() {
+        List<MAFFastaRecord> sorted = new ArrayList<MAFFastaRecord>(elements);
+        sorted.sort(MAFFastaRecord.BARCODE_COMPARATOR);
+
+        return new MAFFastaList(sorted, false);
     }
 
     @Override public MAFFastaRecord get(int index) {
