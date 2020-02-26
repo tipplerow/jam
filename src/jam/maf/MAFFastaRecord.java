@@ -1,6 +1,7 @@
 
 package jam.maf;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,28 @@ public final class MAFFastaRecord {
     private final HugoSymbol   hugoSymbol;
     private final CellFraction cellFraction;
     private final Peptide      peptide;
+
+    /**
+     * A comparator that orders records by tumor barcode.
+     */
+    public static final Comparator<MAFFastaRecord> BARCODE_COMPARATOR = new BarcodeComparator();
+
+    private static final class BarcodeComparator implements Comparator<MAFFastaRecord> {
+        @Override public int compare(MAFFastaRecord rec1, MAFFastaRecord rec2) {
+            return rec1.tumorBarcode.compareTo(rec2.tumorBarcode);
+        }
+    }
+
+    /**
+     * A comparator that orders records by HUGO symbol.
+     */
+    public static final Comparator<MAFFastaRecord> SYMBOL_COMPARATOR = new SymbolComparator();
+
+    private static final class SymbolComparator implements Comparator<MAFFastaRecord> {
+        @Override public int compare(MAFFastaRecord rec1, MAFFastaRecord rec2) {
+            return rec1.hugoSymbol.compareTo(rec2.hugoSymbol);
+        }
+    }
 
     /**
      * Creates a new FASTA record from the individual attributes.
