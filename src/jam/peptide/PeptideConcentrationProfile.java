@@ -2,7 +2,6 @@
 package jam.peptide;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,9 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jam.app.JamLogger;
 import jam.chem.Concentration;
-import jam.io.IOUtil;
 import jam.io.TableReader;
+import jam.io.TableWriter;
 import jam.lang.JamException;
 
 /**
@@ -23,8 +23,15 @@ public final class PeptideConcentrationProfile {
     private final Map<Peptide, PeptideConcentration> map =
         new HashMap<Peptide, PeptideConcentration>();
 
+    private static final String CONCENTRATION_FORMAT = "%.6E";
+
     private PeptideConcentrationProfile() {
     }
+
+    /**
+     * The single empty concentration profile.
+     */
+    public static PeptideConcentrationProfile EMPTY = new PeptideConcentrationProfile();
 
     /**
      * Creates a new, empty concentration profile.
@@ -44,15 +51,17 @@ public final class PeptideConcentrationProfile {
      * specified data file.
      */
     public static PeptideConcentrationProfile load(File file) {
-        try (TableReader reader = TableReader.open(file)) {
-            if (reader.ncol() != 2)
-                throw JamException.runtime("Invalid peptide concentration profile file: [%s].", file);
+        JamLogger.info("Loading peptide concentration profile [%s]...", file.getName());
 
+        try (TableReader reader = TableReader.open(file)) {
             return load(reader);
         }
     }
 
     private static PeptideConcentrationProfile load(TableReader reader) {
+        if (reader.ncol() != 2)
+            throw JamException.runtime("Exactly two columns are required for a concentration profile.");
+
         PeptideConcentrationProfile profile = create();
 
         for (List<String> fields : reader) {
@@ -180,27 +189,32 @@ public final class PeptideConcentrationProfile {
      * erased).
      */
     public void store(File file) {
-        try (PrintWriter writer = IOUtil.openWriter(file)) {
+        JamLogger.info("Storing peptide concentration profile [%s]...", file.getName());
+
+        try (TableWriter writer = TableWriter.open(file)) {
             store(writer);
         }
     }
 
-    private void store(PrintWriter writer) {
+    private void store(TableWriter writer) {
         writeHeader(writer);
+        writeConcentration(writer);
+    }
 
+    private void writeHeader(TableWriter writer) {
+        writer.println("Hugo_Symbol", "Concentration");
+    }
+
+    private void writeConcentration(TableWriter writer) {
         for (PeptideConcentration conc : map.values())
             writeConcentration(writer, conc);
     }
 
-    private void writeHeader(PrintWriter writer) {
-        writer.println("Peptide,Concentration");
-    }
-
-    private void writeConcentration(PrintWriter writer, PeptideConcentration conc) {
+    private void writeConcentration(TableWriter writer, PeptideConcentration conc) {
         String peptide = conc.getPeptide().formatString();
-        double concDbl = conc.getConcentration().doubleValue();
+        String concStr = conc.getConcentration().format(CONCENTRATION_FORMAT);
 
-        writer.println(String.format("%s,%.6E", peptide, concDbl));
+        writer.println(peptide, concStr);
     }
 
     /**
