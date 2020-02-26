@@ -33,6 +33,11 @@ public final class HugoPeptideTable {
     }
 
     /**
+     * The single empty peptide table.
+     */
+    public static final HugoPeptideTable EMPTY = new HugoPeptideTable();
+
+    /**
      * Creates a new table from a gene-peptide mapping.
      *
      * @param map a mapping from genes to their peptides.
