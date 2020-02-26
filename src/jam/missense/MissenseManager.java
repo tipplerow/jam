@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import jam.app.JamLogger;
+import jam.fasta.FastaReader;
+import jam.fasta.FastaRecord;
 import jam.io.IOUtil;
 import jam.maf.MAFFastaList;
 import jam.maf.MAFFastaRecord;
@@ -86,15 +88,19 @@ public final class MissenseManager {
     }
 
     private static MAFFastaList load(File file) {
-        Collection<MAFFastaRecord> records = new ArrayList<MAFFastaRecord>();
+        Collection<MAFFastaRecord> mafRecords = new ArrayList<MAFFastaRecord>();
         JamLogger.info("Loading missense FASTA file [%s]...", file.getName());
-        /*
-        try (PrintWriter writer = IOUtil.openWriter(file)) {
-            for (MAFFastaRecord record : records)
-                writer.println(record.format());
+
+        try (FastaReader reader = FastaReader.open(file)) {
+            for (FastaRecord baseRecord : reader) {
+                MAFFastaRecord mafRecord =
+                    MAFFastaRecord.parse(baseRecord);
+
+                mafRecords.add(mafRecord);
+            }
         }
-        */
-        return MAFFastaList.create(records);
+
+        return MAFFastaList.create(mafRecords);
     }
 
     /**
