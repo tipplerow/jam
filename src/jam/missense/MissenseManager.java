@@ -39,23 +39,6 @@ public final class MissenseManager {
     }
 
     /**
-     * Returns the full path name of the FASTA file for a given
-     * tumor sample.
-     *
-     * @param barcode the barcode of the tumor sample.
-     *
-     * @return the full path name of the FASTA file for a given
-     * tumor sample.
-     */
-    public File barcodeFile(TumorBarcode barcode) {
-        return new File(dirName, baseName(barcode));
-    }
-
-    private static String baseName(TumorBarcode barcode) {
-        return barcode.getKey() + BASE_SUFFIX;
-    }
-
-    /**
      * Determines whether the FASTA file for a given tumor
      * sample exists.
      *
@@ -65,7 +48,24 @@ public final class MissenseManager {
      * specified tumor sample exists in the data directory.
      */
     public boolean exists(TumorBarcode barcode) {
-        return barcodeFile(barcode).exists();
+        return fastaFile(barcode).exists();
+    }
+
+    /**
+     * Returns the full path name of the FASTA file for a given
+     * tumor sample.
+     *
+     * @param barcode the barcode of the tumor sample.
+     *
+     * @return the full path name of the FASTA file for a given
+     * tumor sample.
+     */
+    public File fastaFile(TumorBarcode barcode) {
+        return new File(dirName, baseName(barcode));
+    }
+
+    private static String baseName(TumorBarcode barcode) {
+        return barcode.getKey() + BASE_SUFFIX;
     }
 
     /**
@@ -77,7 +77,7 @@ public final class MissenseManager {
      * (an empty list if the sample is not found).
      */
     public MAFFastaList load(TumorBarcode barcode) {
-        File file = barcodeFile(barcode);
+        File file = fastaFile(barcode);
 
         if (file.canRead())
             return load(file);
@@ -105,7 +105,7 @@ public final class MissenseManager {
      * @param records the FASTA records for the tumor sample.
      */
     public void store(TumorBarcode barcode, Collection<MAFFastaRecord> records) {
-        store(barcodeFile(barcode), records);
+        store(fastaFile(barcode), records);
     }
 
     private static void store(File file, Collection<MAFFastaRecord> records) {

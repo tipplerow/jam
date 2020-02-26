@@ -39,7 +39,7 @@ public final class ExpressionManager {
      * @return the full path name of the expression file for a given
      * tumor sample.
      */
-    public File barcodeFile(TumorBarcode barcode) {
+    public File expressionFile(TumorBarcode barcode) {
         return new File(dirName, baseName(barcode));
     }
 
@@ -57,7 +57,7 @@ public final class ExpressionManager {
      * specified tumor sample exists in the data directory.
      */
     public boolean exists(TumorBarcode barcode) {
-        return barcodeFile(barcode).exists();
+        return expressionFile(barcode).exists();
     }
 
     /**
@@ -69,7 +69,7 @@ public final class ExpressionManager {
      * ({@code null} if the profile does not exist).
      */
     public ExpressionProfile load(TumorBarcode barcode) {
-        File file = barcodeFile(barcode);
+        File file = expressionFile(barcode);
 
         if (file.canRead())
             return ExpressionProfile.load(file);
@@ -85,6 +85,6 @@ public final class ExpressionManager {
      * @param profile the expression profile for the tumor sample.
      */
     public void store(TumorBarcode barcode, ExpressionProfile profile) {
-        profile.store(barcodeFile(barcode));
+        profile.store(expressionFile(barcode));
     }
 }
