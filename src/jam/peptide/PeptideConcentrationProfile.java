@@ -2,7 +2,7 @@
 package jam.peptide;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,26 +20,54 @@ import jam.lang.JamException;
  * Maps peptides to cellular concentrations.
  */
 public final class PeptideConcentrationProfile {
-    private final Map<Peptide, PeptideConcentration> map =
-        new HashMap<Peptide, PeptideConcentration>();
+    private final Map<Peptide, Concentration> map;
 
-    private static final String CONCENTRATION_FORMAT = "%.6E";
+    private static final DecimalFormat CONCENTRATION_FORMAT = new DecimalFormat("#0.0#####E0");
 
-    private PeptideConcentrationProfile() {
+    private PeptideConcentrationProfile(Map<Peptide, Concentration> map) {
+        this.map = map;
     }
 
     /**
      * The single empty concentration profile.
      */
-    public static PeptideConcentrationProfile EMPTY = new PeptideConcentrationProfile();
+    public static PeptideConcentrationProfile EMPTY =
+        new PeptideConcentrationProfile(Collections.emptyMap());
 
     /**
-     * Creates a new, empty concentration profile.
+     * Creates a new concentration profile from a collection of
+     * concentration records.
      *
-     * @return a new, empty concentration profile.
+     * <p>The concentration records in the input collection may
+     * contain duplicate peptides: all duplicates for a peptide
+     * will be grouped together and the total concentration will
+     * by mapped to that peptide.
+     *
+     * @param concentrations the peptide concentrations to include
+     * in the profile.
+     *
+     * @return a new concentration profile.
      */
-    public static PeptideConcentrationProfile create() {
-        return new PeptideConcentrationProfile();
+    public static PeptideConcentrationProfile create(Collection<PeptideConcentration> concentrations) {
+        PeptideConcentrationBuilder builder =
+            PeptideConcentrationBuilder.create();
+
+        for (PeptideConcentration concRecord : concentrations)
+            builder.add(concRecord);
+
+        return builder.build();
+    }
+
+    /**
+     * Creates a new concentration profile from an existing
+     * concentration map.
+     *
+     * @param map a mapping of peptides to concentration.
+     *
+     * @return a new concentration profile.
+     */
+    public static PeptideConcentrationProfile create(Map<Peptide, Concentration> map) {
+        return new PeptideConcentrationProfile(new HashMap<Peptide, Concentration>(map));
     }
 
     /**
@@ -62,16 +90,17 @@ public final class PeptideConcentrationProfile {
         if (reader.ncol() != 2)
             throw JamException.runtime("Exactly two columns are required for a concentration profile.");
 
-        PeptideConcentrationProfile profile = create();
+        PeptideConcentrationBuilder builder =
+            PeptideConcentrationBuilder.create();
 
         for (List<String> fields : reader) {
             Peptide peptide = Peptide.parse(fields.get(0));
             Concentration concentration = Concentration.parse(fields.get(1));
 
-            profile.add(peptide, concentration);
+            builder.add(peptide, concentration);
         }
 
-        return profile;
+        return builder.build();
     }
 
     /**
@@ -87,52 +116,6 @@ public final class PeptideConcentrationProfile {
     }
 
     /**
-     * Adds a positive peptide concentration to this profile.
-     *
-     * <p>If the peptide is already present in this profile, the
-     * specified concentration is added to the existing concentration.
-     *
-     * <p>Concentrations that are equal to zero (within the standard
-     * floating-point tolerance) will <em>not</em> be added, so that
-     * this profile will only contain peptides with a net positive
-     * concentration.
-     *
-     * @param peptide the peptide of interest.
-     *
-     * @param concentration the concentration of the peptide.
-     */
-    public void add(Peptide peptide, Concentration concentration) {
-        if (!concentration.isPositive())
-            return;
-
-        PeptideConcentration existing = map.get(peptide);
-
-        if (existing == null)
-            put(new PeptideConcentration(peptide, concentration));
-        else
-            put(existing.plus(concentration));
-    }
-
-    private void put(PeptideConcentration record) {
-        map.put(record.getPeptide(), record);
-    }
-
-    /**
-     * Adds peptides to this profile.
-     *
-     * <p>If any peptide is already present in this profile, the
-     * specified concentration is added to its existing concentration.
-     *
-     * @param peptides the peptides of interest.
-     *
-     * @param concentration the uniform concentration of each peptide.
-     */
-    public void addAll(Collection<Peptide> peptides, Concentration concentration) {
-        for (Peptide peptide : peptides)
-            add(peptide, concentration);
-    }
-
-    /**
      * Identifies peptides in this profile.
      *
      * @param peptide the peptide of interest.
@@ -145,26 +128,6 @@ public final class PeptideConcentrationProfile {
     }
 
     /**
-     * Returns the number of peptides in this concentration profile.
-     *
-     * @return the number of peptides in this concentration profile.
-     */
-    public int countPeptides() {
-        return map.size();
-    }
-
-    /**
-     * Returns a list containing the peptide concentration records in
-     * this profile.
-     *
-     * @return a list containing the peptide concentration records in
-     * this profile.
-     */
-    public List<PeptideConcentration> list() {
-        return new ArrayList<PeptideConcentration>(map.values());
-    }
-
-    /**
      * Returns the concentration of a given peptide.
      *
      * @param peptide the peptide of interest.
@@ -174,12 +137,21 @@ public final class PeptideConcentrationProfile {
      * peptide.
      */
     public Concentration lookup(Peptide peptide) {
-        PeptideConcentration record = map.get(peptide);
+        Concentration conc = map.get(peptide);
 
-        if (record != null)
-            return record.getConcentration();
+        if (conc != null)
+            return conc;
         else
             return Concentration.ZERO;
+    }
+
+    /**
+     * Returns the number of peptides in this concentration profile.
+     *
+     * @return the number of peptides in this concentration profile.
+     */
+    public int size() {
+        return map.size();
     }
 
     /**
@@ -206,15 +178,15 @@ public final class PeptideConcentrationProfile {
     }
 
     private void writeConcentration(TableWriter writer) {
-        for (PeptideConcentration conc : map.values())
-            writeConcentration(writer, conc);
+        for (Map.Entry<Peptide, Concentration> entry : map.entrySet())
+            writeConcentration(writer, entry.getKey(), entry.getValue());
     }
 
-    private void writeConcentration(TableWriter writer, PeptideConcentration conc) {
-        String peptide = conc.getPeptide().formatString();
-        String concStr = conc.getConcentration().format(CONCENTRATION_FORMAT);
+    private void writeConcentration(TableWriter writer, Peptide pep, Concentration conc) {
+        String pepStr = pep.formatString();
+        String concStr = conc.format(CONCENTRATION_FORMAT);
 
-        writer.println(peptide, concStr);
+        writer.println(pepStr, concStr);
     }
 
     /**
@@ -225,6 +197,17 @@ public final class PeptideConcentrationProfile {
      */
     public void store(String fileName) {
         store(new File(fileName));
+    }
+
+    /**
+     * Returns a read-only view of the concentration mappings in this
+     * profile.
+     *
+     * @return all peptide-concentration mappings in this profile in
+     * an unmodifiable set.
+     */
+    public Set<Map.Entry<Peptide, Concentration>> viewEntries() {
+        return Collections.unmodifiableSet(map.entrySet());
     }
 
     /**
