@@ -155,6 +155,8 @@ public final class MultisetUtil {
     /**
      * Returns the most commonly occuring elements of a multiset.
      *
+     * @param <E> the type of element to be stored in the multiset.
+     *
      * @param set the set of interest.
      *
      * @return a set containing the most commonly occuring elements in
