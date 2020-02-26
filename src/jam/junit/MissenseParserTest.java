@@ -3,9 +3,8 @@ package jam.junit;
 
 import java.util.List;
 
-import jam.maf.MAFProperties;
-import jam.maf.MissenseParser;
-import jam.maf.MissenseRecord;
+import jam.missense.MissenseParser;
+import jam.missense.MissenseRecord;
 
 import org.junit.*;
 import static org.junit.Assert.*;

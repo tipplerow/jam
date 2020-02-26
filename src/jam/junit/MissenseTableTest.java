@@ -2,8 +2,8 @@
 package jam.junit;
 
 import jam.hugo.HugoSymbol;
-import jam.maf.MissenseRecord;
-import jam.maf.MissenseTable;
+import jam.missense.MissenseRecord;
+import jam.missense.MissenseTable;
 import jam.tcga.TumorBarcode;
 
 import org.junit.*;
