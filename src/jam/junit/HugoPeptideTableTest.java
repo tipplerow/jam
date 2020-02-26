@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,6 +53,18 @@ public class HugoPeptideTableTest {
 
     @Test public void testViewSymbols() {
         assertEquals(Set.of(A1BG, ZZEF1), table.viewSymbols());
+    }
+
+    @Test public void testStore() {
+        File testFile = new File("data/test/_tmp_hugo_peptide_table.tsv.gz");
+        testFile.deleteOnExit();
+
+        table.store(testFile);
+
+        HugoPeptideTable table2 = HugoPeptideTable.load(testFile);
+
+        assertEquals(Set.of(ADSANYSCV, YWSLLTSLV), new HashSet<Peptide>(table2.get(ZZEF1)));
+        assertEquals(Set.of(AAPPPPVLM, AAPPPPVLMH, ADSANYSCV), new HashSet<Peptide>(table2.get(A1BG)));
     }
 
     public static void main(String[] args) {

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -14,6 +15,7 @@ import com.google.common.collect.Multimap;
 import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.io.TableReader;
+import jam.io.TableWriter;
 import jam.peptide.Peptide;
 
 /**
@@ -28,6 +30,21 @@ public final class HugoPeptideTable {
     private static final int PEPTIDE_INDEX = 1;
 
     private HugoPeptideTable() {
+    }
+
+    /**
+     * Creates a new table from a gene-peptide mapping.
+     *
+     * @param map a mapping from genes to their peptides.
+     *
+     * @return a new table containing the specifiedq gene-peptide
+     * mapping.
+     */
+    public static HugoPeptideTable create(Multimap<HugoSymbol, Peptide> map) {
+        HugoPeptideTable table = new HugoPeptideTable();
+        table.hugoMap.putAll(map);
+
+        return table;
     }
 
     /**
@@ -141,6 +158,57 @@ public final class HugoPeptideTable {
      */
     public int size() {
         return hugoMap.size();
+    }
+
+    /**
+     * Writes this gene-peptide map to a data file.
+     *
+     * @param file the file to write.
+     */
+    public void store(File file) {
+        JamLogger.info("HugoPeptideTable: Writing file [%s]...", file.getName());
+
+        try (TableWriter writer = TableWriter.open(file)) {
+            store(writer);
+        }
+    }
+
+    private void store(TableWriter writer) {
+        writeHeader(writer);
+        writePeptides(writer);
+    }
+
+    private static void writeHeader(TableWriter writer) {
+        writer.println("Hugo_Symbol", "Peptide");
+    }
+
+    private void writePeptides(TableWriter writer) {
+        //
+        // Nice to have everything in alphabetical order...
+        //
+        TreeSet<HugoSymbol> symbols = new TreeSet<HugoSymbol>(hugoMap.keySet());
+
+        for (HugoSymbol symbol : symbols)
+            writePeptides(writer, symbol);
+    }
+
+    private void writePeptides(TableWriter writer, HugoSymbol symbol) {
+        TreeSet<String> peptideStrings = new TreeSet<String>();
+
+        for (Peptide peptide : get(symbol))
+            peptideStrings.add(peptide.formatString());
+
+        for (String peptideString : peptideStrings)
+            writer.println(symbol.getKey(), peptideString);
+    }
+
+    /**
+     * Writes this gene-peptide map to a data file.
+     *
+     * @param fileName the name of the file to write.
+     */
+    public void store(String fileName) {
+        store(new File(fileName));
     }
 
     /**
