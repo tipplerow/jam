@@ -24,7 +24,7 @@ import jam.util.MapUtil;
 public final class ExpressionProfile {
     private final Map<HugoSymbol, Expression> profile;
 
-    private static final DecimalFormat FORMAT = new DecimalFormat("#0.0###");
+    private static final DecimalFormat EXPRESSION_FORMAT = new DecimalFormat("#0.0###");
 
     private ExpressionProfile(Map<HugoSymbol, Expression> profile, boolean copy) {
         if (copy)
@@ -179,6 +179,6 @@ public final class ExpressionProfile {
         Expression expression = profile.get(symbol);
 
         if (expression.isPositive())
-            writer.println(symbol.getKey(), expression.format(FORMAT));
+            writer.println(symbol.getKey(), expression.format(EXPRESSION_FORMAT));
     }
 }
