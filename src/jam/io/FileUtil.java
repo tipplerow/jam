@@ -70,6 +70,18 @@ public final class FileUtil {
     }
 
     /**
+     * Determines whether a file exists.
+     *
+     * @param fileName the name of the file to check.
+     *
+     * @return {@code true} iff a file with the specified name exists.
+     */
+    public static boolean exists(String fileName) {
+        File file = new File(fileName);
+        return file.exists();
+    }
+
+    /**
      * Returns the canonical path of the specified file but never
      * throws checked exceptions.
      *
