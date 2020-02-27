@@ -132,8 +132,8 @@
      <classpath>
        <path refid="classpath.run"/>
      </classpath>
-     <link href="http://docs.oracle.com/javase/8/docs/api"/>
-     <link href="http://google.github.io/guava/releases/21.0/api/docs"/>
+     <link href="https://docs.oracle.com/en/java/javase/13/docs/api"/>
+     <link href="https://guava.dev/releases/21.0/api/docs"/>
    </javadoc>
  </target>
 
