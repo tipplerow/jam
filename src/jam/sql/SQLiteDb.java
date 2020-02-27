@@ -1,6 +1,7 @@
 
 package jam.sql;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jam.app.JamLogger;
+import jam.io.FileUtil;
 import jam.lang.JamException;
 
 /**
@@ -33,6 +35,18 @@ public final class SQLiteDb extends SQLDb {
 
     private static String formatURL(String dbFile) {
         return "jdbc:sqlite:" + dbFile;
+    }
+
+    /**
+     * Returns the {@code SQLite} database manager for a given file.
+     *
+     * @param dbFile the persistent database file.
+     *
+     * @return the {@code SQLite} database manager for the specified
+     * persistent database file.
+     */
+    public static SQLiteDb instance(File dbFile) {
+        return instance(FileUtil.getCanonicalPath(dbFile));
     }
 
     /**
