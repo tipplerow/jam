@@ -119,7 +119,7 @@ public final class JamEnv {
     }
 
     /**
-     * Replaces environment variables delimited by <tt>${...}</tt>
+     * Replaces environment variables delimited by <code>${...}</code>
      * with their values (and removes the delimiters).
      *
      * @param s the string to examine.

@@ -30,8 +30,8 @@ import jam.util.RegexUtil;
  * then read additional properties from the specified properties file
  * and assign them to the system properties.
  *
- * <p>Property values with the special form <tt>${VARNAME}</tt> (e.g.,
- * <tt>${JAM_HOME}</tt>) are expanded to the value of the <em>environment
+ * <p>Property values with the special form <code>${VARNAME}</code> (e.g.,
+ * <code>${JAM_HOME}</code>) are expanded to the value of the <em>environment
  * variable</em> with that name.  Property values enclosed in brackets
  * (e.g., {@code &lt;user.name&gt;}) are expanded to the value of the
  * <em>system property</em> with that name.
@@ -475,7 +475,7 @@ public final class JamProperties {
      * system properties will be ignored unless the {@code override}
      * flag is {@code true}.
      *
-     * <p>Property values of the form <tt>${VARNAME}</tt> will be
+     * <p>Property values of the form <code>${VARNAME}</code> will be
      * expanded to the value of the environment variable with that
      * name.  Property values enclosed in double quotation marks
      * (e.g., {@code "user.name"}) will be expanded to the value 
@@ -504,7 +504,7 @@ public final class JamProperties {
      * system properties will be ignored unless the {@code override}
      * flag is {@code true}.
      *
-     * <p>Property values of the form <tt>${VARNAME}</tt> will be
+     * <p>Property values of the form <code>${VARNAME}</code> will be
      * expanded to the value of the environment variable with that
      * name.  Property values enclosed in double quotation marks
      * (e.g., {@code "user.name"}) will be expanded to the value 
@@ -542,7 +542,7 @@ public final class JamProperties {
      * system properties will be ignored unless the {@code override}
      * flag is {@code true}.
      *
-     * <p>Property values of the form <tt>${VARNAME}</tt> will be
+     * <p>Property values of the form <code>${VARNAME}</code> will be
      * expanded to the value of the environment variable with that
      * name.  Property values enclosed in double quotation marks
      * (e.g., {@code "user.name"}) will be expanded to the value 
