@@ -49,7 +49,7 @@ public final class SQLUtil {
      */
     public static void close(Connection connection) {
         try {
-            if (!connection.isClosed())
+            if (connection != null && !connection.isClosed())
                 connection.close();
         }
         catch (SQLException ex) {
@@ -64,7 +64,7 @@ public final class SQLUtil {
      */
     public static void close(ResultSet resultSet) {
         try {
-            if (!resultSet.isClosed())
+            if (resultSet != null && !resultSet.isClosed())
                 resultSet.close();
         }
         catch (SQLException ex) {
@@ -79,7 +79,7 @@ public final class SQLUtil {
      */
     public static void close(Statement statement) {
         try {
-            if (!statement.isClosed())
+            if (statement != null && !statement.isClosed())
                 statement.close();
         }
         catch (SQLException ex) {
