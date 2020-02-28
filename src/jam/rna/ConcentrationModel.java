@@ -3,7 +3,12 @@ package jam.rna;
 
 import jam.app.JamProperties;
 import jam.chem.Concentration;
+import jam.hugo.HugoSymbol;
+import jam.hugo.HugoPeptideTable;
 import jam.lang.JamException;
+import jam.peptide.Peptide;
+import jam.peptide.PeptideConcentrationBuilder;
+import jam.peptide.PeptideConcentrationProfile;
 
 /**
  * Defines an interface to models that convert RNA expression to
@@ -106,6 +111,34 @@ public abstract class ConcentrationModel {
      * @return the enumerated type for this model.
      */
     public abstract ConcentrationModelType getType();
+
+    /**
+     * Builds a protein concentration profile from RNA expression
+     * data.
+     *
+     * @param peptideTable a table containing peptides derived from
+     * proteins (e.g., by proteasomal cleavage).
+     *
+     * @param expressionProfile RNA expression indexed by gene.
+     *
+     * @return the protein concentration profile derived from the
+     * given expression profile.
+     */
+    public PeptideConcentrationProfile buildProfile(HugoPeptideTable peptideTable,
+                                                    ExpressionProfile expressionProfile) {
+        PeptideConcentrationBuilder builder =
+            PeptideConcentrationBuilder.create();
+
+        for (HugoSymbol symbol : peptideTable.viewSymbols()) {
+            Expression expression = expressionProfile.get(symbol);
+            Concentration concentration = translate(expression);
+
+            if (concentration.isPositive())
+                builder.addAll(peptideTable.get(symbol), concentration);
+        }
+
+        return builder.build();
+    }
 
     /**
      * Returns the minimum RNA expression required for positive
