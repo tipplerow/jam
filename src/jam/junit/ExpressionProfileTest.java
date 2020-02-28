@@ -2,6 +2,7 @@
 package jam.junit;
 
 import java.io.File;
+import java.util.Set;
 
 import jam.hugo.HugoSymbol;
 import jam.rna.Expression;
@@ -18,8 +19,16 @@ public class ExpressionProfileTest {
 
     private static final String FILE_NAME = "data/test/expression_profile.csv";
 
+    private static final ExpressionProfile profile = ExpressionProfile.load(FILE_NAME);
+
+    @Test public void testContains() {
+        assertTrue(profile.contains(A1BG));
+        assertTrue(profile.contains(A2BP1));
+        assertTrue(profile.contains(A2LD1));
+        assertFalse(profile.contains(XYZ));
+    }
+
     @Test public void testGet() {
-        ExpressionProfile profile = ExpressionProfile.load(FILE_NAME);
         assertProfile(profile);
     }
 
@@ -39,7 +48,10 @@ public class ExpressionProfileTest {
 
         ExpressionProfile profile2 = ExpressionProfile.load(tmpFile);
         assertProfile(profile2);
+    }
 
+    @Test public void testViewSymbols() {
+        assertEquals(Set.of(A1BG, A2BP1, A2LD1), profile.viewSymbols());
     }
 
     public static void main(String[] args) {

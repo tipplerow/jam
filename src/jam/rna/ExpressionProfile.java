@@ -111,6 +111,17 @@ public final class ExpressionProfile {
     }
 
     /**
+     * Identifies genes contained in this profile.
+     *
+     * @param symbol the HUGO symbol of the target gene.
+     *
+     * @return {@code true} iff this profile contains the target gene.
+     */
+    public boolean contains(HugoSymbol symbol) {
+        return profile.containsKey(symbol);
+    }
+
+    /**
      * Returns the RNA expression for a given gene.
      *
      * @param symbol the HUGO symbol of the target gene.
@@ -180,5 +191,25 @@ public final class ExpressionProfile {
 
         if (expression.isPositive())
             writer.println(symbol.getKey(), expression.format(EXPRESSION_FORMAT));
+    }
+
+    /**
+     * Returns a read-only view of the gene expression data in this
+     * profile.
+     *
+     * @return a read-only view of the gene expression data in this
+     * profile.
+     */
+    public Set<Map.Entry<HugoSymbol, Expression>> viewEntries() {
+        return Collections.unmodifiableSet(profile.entrySet());
+    }
+
+    /**
+     * Returns a read-only view of the genes in this profile.
+     *
+     * @return a read-only view of the genes in this profile.
+     */
+    public Set<HugoSymbol> viewSymbols() {
+        return Collections.unmodifiableSet(profile.keySet());
     }
 }
