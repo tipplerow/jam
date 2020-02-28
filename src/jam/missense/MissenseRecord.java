@@ -116,7 +116,7 @@ public final class MissenseRecord {
      */
     public static List<MissenseRecord> filterTranscript(List<MissenseRecord> records, EnsemblTranscript transcriptID) {
         if (transcriptID == null)
-            return ListUtil.filter(records, record -> record.getTranscriptID() == null);
+            return ListUtil.filter(records, record -> !record.hasTranscriptID());
         else
             return ListUtil.filter(records, record -> record.getTranscriptID().equals(transcriptID));
     }
@@ -165,4 +165,16 @@ public final class MissenseRecord {
     public CellFraction getCellFraction() {
         return cellFraction;
     }
+
+    /**
+     * Identifies records with non-{@code null} Ensembl transcript
+     * identifiers.
+     *
+     * @return {@code true} iff this record has a non-{@code null}
+     * Ensembl transcript identifier.
+     */
+    public boolean hasTranscriptID() {
+        return transcriptID != null;
+    }
+
 }

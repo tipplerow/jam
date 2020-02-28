@@ -81,18 +81,14 @@ final class MissenseEngine {
         // either case, but not one with partially missing
         // transcripts...
         //
-        boolean firstNull = isNullTranscript(missenseRecords.get(0));
+        boolean firstHasTranscript = missenseRecords.get(0).hasTranscriptID();
 
         for (int index = 1; index < missenseRecords.size(); ++index)
-            if (isNullTranscript(missenseRecords.get(index)) != firstNull)
+            if (missenseRecords.get(index).hasTranscriptID() != firstHasTranscript)
                 throw JamException.runtime("Missing transcript ID.");
 
-        // Either all records had null transcripts or none did...
-        return firstNull;
-    }
-
-    private static boolean isNullTranscript(MissenseRecord record) {
-        return record.getTranscriptID() == null;
+        // Either all records had transcripts or none did...
+        return firstHasTranscript;
     }
 
     private EnsemblTranscript getTranscript() {
