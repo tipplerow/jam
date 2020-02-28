@@ -132,11 +132,11 @@ public final class PeptideConcentrationProfile {
      *
      * @param peptide the peptide of interest.
      *
-     * @return the concentration of the specified peptide, or {@code
-     * Concentration.ZERO} if this profile does not contain the given
-     * peptide.
+     * @return the concentration of the specified peptide
+     * ({@code Concentration.ZERO}, not {@code null}, if
+     * this profile does not contain the given peptide.
      */
-    public Concentration lookup(Peptide peptide) {
+    public Concentration get(Peptide peptide) {
         Concentration conc = map.get(peptide);
 
         if (conc != null)

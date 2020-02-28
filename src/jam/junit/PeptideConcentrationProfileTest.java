@@ -31,9 +31,9 @@ public class PeptideConcentrationProfileTest {
         assertTrue(profile.contains(p2));
         assertFalse(profile.contains(p3));
 
-        assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
-        assertEquals(Concentration.valueOf(2.345), profile.lookup(p2));
-        assertEquals(Concentration.valueOf(0.0), profile.lookup(p3));
+        assertEquals(Concentration.valueOf(1.0), profile.get(p1));
+        assertEquals(Concentration.valueOf(2.345), profile.get(p2));
+        assertEquals(Concentration.valueOf(0.0), profile.get(p3));
 
         File file = new File("data/test/_conc_profile.csv");
 
@@ -43,8 +43,8 @@ public class PeptideConcentrationProfileTest {
         PeptideConcentrationProfile profile2 = PeptideConcentrationProfile.load(file);
 
         assertEquals(2, profile2.size());
-        assertEquals(Concentration.valueOf(1.0), profile.lookup(p1));
-        assertEquals(Concentration.valueOf(2.345), profile.lookup(p2));
+        assertEquals(Concentration.valueOf(1.0), profile.get(p1));
+        assertEquals(Concentration.valueOf(2.345), profile.get(p2));
     }
 
     public static void main(String[] args) {
