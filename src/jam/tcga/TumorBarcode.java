@@ -65,7 +65,7 @@ public final class TumorBarcode extends KeyedObject<String> {
 
         try (LineReader reader = LineReader.open(file)) {
             for (String line : reader)
-                barcodes.add(TumorBarcode.instance(line));
+                barcodes.add(instance(line));
         }
 
         JamLogger.info("Loaded [%d] barcodes...", barcodes.size());

@@ -52,6 +52,12 @@ public class AlleleTest {
         assertEquals(A1, Allele.instance("HLA-A-02-01"));
     }
 
+    @Test public void testLoad() {
+        List<Allele> alleles = Allele.load("data/test/alleles.txt");
+
+        assertEquals(List.of(Allele.instance("A0101"), Allele.instance("A0201")), alleles);
+    }
+
     @Test public void testParse() {
         assertEquals(List.of(C2, A1, B2), Allele.parse("C0702 A0201 B3501", RegexUtil.MULTI_WHITE_SPACE));
     }

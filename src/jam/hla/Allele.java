@@ -1,9 +1,13 @@
 
 package jam.hla;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import jam.app.JamLogger;
+import jam.io.LineReader;
 
 /**
  * Represents a single HLA allele.
@@ -87,6 +91,36 @@ public final class Allele implements Comparable<Allele> {
      */
     public static Allele instance(String s) {
         return Parser.parse(s);
+    }
+
+    /**
+     * Reads alleles from a flat file (no header, one allele per line).
+     *
+     * @param fileName the name of the file to load.
+     *
+     * @return a list containing the alleles from the specified file.
+     */
+    public static List<Allele> load(String fileName) {
+        return load(new File(fileName));
+    }
+
+    /**
+     * Reads alleles from a flat file (no header, one allele per line).
+     *
+     * @param file the file to load.
+     *
+     * @return a list containing the alleles from the specified file.
+     */
+    public static List<Allele> load(File file) {
+        List<Allele> alleles = new ArrayList<Allele>();
+
+        try (LineReader reader = LineReader.open(file)) {
+            for (String line : reader)
+                alleles.add(instance(line));
+        }
+
+        JamLogger.info("Loaded [%d] alleles...", alleles.size());
+        return alleles;
     }
 
     /**
