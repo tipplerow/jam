@@ -2,6 +2,7 @@
 package jam.junit;
 
 import java.util.Map;
+import java.util.Set;
 
 import jam.app.JamProperties;
 import jam.app.PropertyList;
@@ -24,6 +25,7 @@ public class JamPropertiesTest {
         System.setProperty("jam.boolean.bogus", "123");
         System.setProperty("jam.enum.ghi", "GHI");
         System.setProperty("jam.enum.xyz", "XYZ");
+        System.setProperty("jam.enumSet", "ABC, GHI");
     }
 
     @Test public void testAll() {
@@ -131,6 +133,10 @@ public class JamPropertiesTest {
     @Test(expected = RuntimeException.class)
     public void testEnumMismatch() {
         assertEquals(FOO.GHI, JamProperties.getRequiredEnum("jam.enum.xyz", FOO.class));
+    }
+
+    @Test public void testEnumSet() {
+        assertEquals(Set.of(FOO.ABC, FOO.GHI), JamProperties.getRequiredEnumSet("jam.enumSet", FOO.class));
     }
 
     @Test public void testInt() {

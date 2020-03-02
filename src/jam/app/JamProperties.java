@@ -4,9 +4,11 @@ package jam.app;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +49,7 @@ public final class JamProperties {
     private JamProperties() {}
 
     private static final Pattern COMMENT_PATTERN = RegexUtil.PYTHON_COMMENT;
+    private static final Pattern ENUM_SET_DELIM  = RegexUtil.COMMA;
     private static final Pattern KEY_VALUE_DELIM = Pattern.compile("=");
 
     private static final String OPEN_DELIM = "<";
@@ -199,6 +202,33 @@ public final class JamProperties {
      */
     public static <E extends Enum<E>> E getRequiredEnum(String propertyName, Class<E> enumClass) {
         return EnumUtil.valueOf(enumClass, getRequired(propertyName));
+    }
+
+    /**
+     * Returns a required system property converted to a set of
+     * enumerated values; the property string should contain the
+     * enumerated values separated by commas.
+     *
+     * @param <E> the runtime type for the enum class.
+     *
+     * @param propertyName the name of the system property.
+     *
+     * @param enumClass the desired runtime enum class.
+     *
+     * @return the enumerated values with names matching those in the
+     * comma-delimited property string.
+     *
+     * @throws RuntimeException unless the system property is defined
+     * and contains one or more enum values from the specified class.
+     */
+    public static <E extends Enum<E>> Set<E> getRequiredEnumSet(String propertyName, Class<E> enumClass) {
+        Set<E> enumSet = EnumSet.noneOf(enumClass);
+        String[] enumNames = RegexUtil.split(ENUM_SET_DELIM, getRequired(propertyName));
+
+        for (String enumName : enumNames)
+            enumSet.add(EnumUtil.valueOf(enumClass, enumName));
+
+        return enumSet;
     }
 
     /**
