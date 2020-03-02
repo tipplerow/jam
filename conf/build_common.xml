@@ -128,7 +128,8 @@
  </target>
 
  <target name="doc" depends="compile">
-   <javadoc sourcepath="${dir.src}" destdir="${dir.apidoc}" stylesheetfile="${dir.css}/ApacheCommonsMath3.css" linksource="yes">
+   <!--   <javadoc sourcepath="${dir.src}" destdir="${dir.apidoc}" stylesheetfile="${dir.css}/ApacheCommonsMath3.css" linksource="yes"> -->
+   <javadoc sourcepath="${dir.src}" destdir="${dir.apidoc}" linksource="yes">
      <classpath>
        <path refid="classpath.run"/>
      </classpath>
