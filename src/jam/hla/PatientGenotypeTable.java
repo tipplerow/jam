@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import jam.app.JamLogger;
@@ -114,6 +115,28 @@ public final class PatientGenotypeTable {
      */
     public Genotype lookup(PatientID patient) {
         return genotypes.get(patient);
+    }
+
+    /**
+     * Finds all patients whose genotype contains a given allele.
+     *
+     * @param allele the allele to match.
+     *
+     * @return a set containing all patients whose genotype contains
+     * the target allele.
+     */
+    public Set<PatientID> match(Allele allele) {
+        Set<PatientID> patients = new TreeSet<PatientID>();
+
+        for (Map.Entry<PatientID, Genotype> entry : genotypes.entrySet()) {
+            PatientID patient  = entry.getKey();
+            Genotype  genotype = entry.getValue();
+
+            if (genotype.contains(allele))
+                patients.add(patient);
+        }
+
+        return patients;
     }
 
     /**

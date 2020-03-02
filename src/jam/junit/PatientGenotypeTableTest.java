@@ -12,6 +12,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class PatientGenotypeTableTest {
+    private static final Allele A0101 = Allele.instance("A0101");
     private static final Allele A0201 = Allele.instance("A0201");
     private static final Allele A0301 = Allele.instance("A0301");
     private static final Allele A1101 = Allele.instance("A1101");
@@ -32,8 +33,9 @@ public class PatientGenotypeTableTest {
 
     private static final String FILE_NAME = "data/test/patient_genotype_table.csv";
 
+    private static final PatientGenotypeTable table = PatientGenotypeTable.load(FILE_NAME);
+
     @Test public void testLoad() {
-        PatientGenotypeTable table = PatientGenotypeTable.load(FILE_NAME);
         assertEquals(3, table.size());
 
         assertTrue(table.contains(Pat01));
@@ -48,6 +50,12 @@ public class PatientGenotypeTableTest {
         assertEquals(Genotype.instance(A0301, A1101, B0702, B5201, C0702, C1202), table.require(Pat02));
 
         assertNull(table.lookup(Pat04));
+    }
+
+    @Test public void testMatch() {
+        assertEquals(Set.of(), table.match(A0101));
+        assertEquals(Set.of(Pat01), table.match(A0201));
+        assertEquals(Set.of(Pat02, Pat03), table.match(A0301));
     }
 
     public static void main(String[] args) {
