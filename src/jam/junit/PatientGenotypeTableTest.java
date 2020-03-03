@@ -58,6 +58,11 @@ public class PatientGenotypeTableTest {
         assertEquals(Set.of(Pat02, Pat03), table.match(A0301));
     }
 
+    @Test public void testViewAlleles() {
+        assertEquals(Set.of(A0201, A0301, A1101, A3201, B0702, B1501, B5201, C0303, C0702, C1202),
+                     table.viewAlleles());
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.PatientGenotypeTableTest");
     }

@@ -168,6 +168,22 @@ public final class PatientGenotypeTable {
     }
 
     /**
+     * Returns a read-only view of the unique HLA alleles in this
+     * database.
+     *
+     * @return an unmodifiable set containing all unique HLA alleles
+     * from the genotypes in this database.
+     */
+    public Set<Allele> viewAlleles() {
+        Set<Allele> alleles = new TreeSet<Allele>();
+
+        for (Genotype genotype : genotypes.values())
+            alleles.addAll(genotype);
+
+        return alleles;
+    }
+
+    /**
      * Returns a read-only view of the patients in this database.
      *
      * @return an unmodifiable set containing all patient IDs
