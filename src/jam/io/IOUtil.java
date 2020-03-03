@@ -339,32 +339,34 @@ public final class IOUtil {
      * @throws RuntimeException unless the file was read successfully.
      */
     public static List<String> readLines(File file) {
-        List<String> lines = null;
         BufferedReader reader = openReader(file);
+        return readLines(reader);
+    }
+
+    /**
+     * Reads all lines from a {@code BufferedReader} and then closes
+     * the reader.
+     *
+     * @param reader the reader to process.
+     *
+     * @return a list containing the lines pulled from the reader,
+     * with each line as a separate element with the order maintained.
+     *
+     * @throws RuntimeException unless the reader was processed
+     * successfully.
+     */
+    public static List<String> readLines(BufferedReader reader) {
+        List<String> lines = new ArrayList<String>();
 
         try {
-            lines = readLines(reader);
+            for (String line = reader.readLine(); line != null; line = reader.readLine())
+                lines.add(line);
         }
-        catch (Exception ex) {
+        catch (IOException ex) {
             throw JamException.runtime(ex);
         }
         finally {
             close(reader);
-        }
-
-        return lines;
-    }
-
-    private static List<String> readLines(BufferedReader reader) throws IOException {
-        List<String> lines = new ArrayList<String>();
-
-        while (true) {
-            String line = reader.readLine();
-            
-            if (line != null)
-                lines.add(line);
-            else
-                break;
         }
 
         return lines;
