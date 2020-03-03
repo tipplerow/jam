@@ -9,7 +9,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ProcessRunnerTest {
-    @Test public void testEnv() {
+    @Test public void testRun() {
         assertTrue(ProcessRunner.run("ls").contains("build.xml"));
         assertEquals(201, ProcessRunner.run("cat", "LICENSE").size());
     }
