@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jam.math.DoubleUtil;
 import jam.rna.Expression;
+import jam.rna.ExpressionProfile;
 import jam.rna.TumorExpressionMatrix;
 import jam.tcga.TumorBarcode;
 
@@ -45,6 +46,20 @@ public final class ExpressionClassI {
         expr.put(Locus.C, exprC);
 
         return new ExpressionClassI(expr);
+    }
+
+    /**
+     * Creates a new expression record from an RNA expression profile.
+     *
+     * @param profile an RNA expression profile.
+     *
+     * @return a new expression record with RNA levels extracted from
+     * the input profile.
+     */
+    public static ExpressionClassI create(ExpressionProfile profile) {
+        return create(profile.get(Locus.A.getHugoSymbol()),
+                      profile.get(Locus.B.getHugoSymbol()),
+                      profile.get(Locus.C.getHugoSymbol()));
     }
 
     /**
