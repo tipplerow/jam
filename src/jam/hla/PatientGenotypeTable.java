@@ -2,6 +2,7 @@
 package jam.hla;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import jam.app.JamLogger;
 import jam.io.TableReader;
@@ -30,12 +34,25 @@ import jam.util.RegexUtil;
  */
 public final class PatientGenotypeTable {
     private final Map<PatientID, Genotype> genotypes;
+    private final Multimap<Allele, PatientID> alleleMap = HashMultimap.create();
 
     private PatientGenotypeTable(Map<PatientID, Genotype> genotypes, boolean copy) {
         if (copy)
             this.genotypes = new TreeMap<PatientID, Genotype>(genotypes);
         else
             this.genotypes = genotypes;
+
+        fillAlleleMap();
+    }
+
+    private void fillAlleleMap() {
+        for (Map.Entry<PatientID, Genotype> entry : genotypes.entrySet()) {
+            PatientID patient  = entry.getKey();
+            Genotype  genotype = entry.getValue();
+
+            for (Allele allele : genotype.viewUniqueAlleles())
+                alleleMap.put(allele, patient);
+        }
     }
 
     /**
@@ -122,21 +139,11 @@ public final class PatientGenotypeTable {
      *
      * @param allele the allele to match.
      *
-     * @return a set containing all patients whose genotype contains
-     * the target allele.
+     * @return a read-only view of the patients whose genotype
+     * contains the target allele.
      */
-    public Set<PatientID> match(Allele allele) {
-        Set<PatientID> patients = new TreeSet<PatientID>();
-
-        for (Map.Entry<PatientID, Genotype> entry : genotypes.entrySet()) {
-            PatientID patient  = entry.getKey();
-            Genotype  genotype = entry.getValue();
-
-            if (genotype.contains(allele))
-                patients.add(patient);
-        }
-
-        return patients;
+    public Collection<PatientID> match(Allele allele) {
+        return Collections.unmodifiableCollection(alleleMap.get(allele));
     }
 
     /**

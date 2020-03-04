@@ -2,6 +2,7 @@
 package jam.junit;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 import jam.hla.Allele;
 import jam.hla.Genotype;
@@ -53,9 +54,9 @@ public class PatientGenotypeTableTest {
     }
 
     @Test public void testMatch() {
-        assertEquals(Set.of(), table.match(A0101));
-        assertEquals(Set.of(Pat01), table.match(A0201));
-        assertEquals(Set.of(Pat02, Pat03), table.match(A0301));
+        assertEquals(Set.of(), new TreeSet<PatientID>(table.match(A0101)));
+        assertEquals(Set.of(Pat01), new TreeSet<PatientID>(table.match(A0201)));
+        assertEquals(Set.of(Pat02, Pat03), new TreeSet<PatientID>(table.match(A0301)));
     }
 
     @Test public void testViewAlleles() {
