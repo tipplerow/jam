@@ -193,6 +193,26 @@ ImmuneLandscape.writePatientGenotype <- function() {
 
 ## ---------------------------------------------------------------------
 
+ImmuneLandscape.commonAlleles <- function(N = 10) {
+    genoFrame <- ImmuneLandscape.loadGenotypeDetail()
+
+    hlaA <- c(genoFrame$A1, genoFrame$A2)
+    hlaB <- c(genoFrame$B1, genoFrame$B2)
+    hlaC <- c(genoFrame$C1, genoFrame$C2)
+
+    countA <- rev(sort(by(hlaA, hlaA, length)))
+    countB <- rev(sort(by(hlaB, hlaB, length)))
+    countC <- rev(sort(by(hlaC, hlaC, length)))
+
+    commonA <- head(names(countA), N)
+    commonB <- head(names(countB), N)
+    commonC <- head(names(countC), N)
+
+    c(commonA, commonB, commonC)
+}
+
+## ---------------------------------------------------------------------
+
 ImmuneLandscape.findUniqueAlleles <- function(genoFrame) {
     alleles <- sort(unique(unlist(strsplit(genoFrame$Genotype, " "))))
     alleles <- gsub("\\*", "", alleles)
