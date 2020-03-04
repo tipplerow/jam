@@ -4,6 +4,7 @@ package jam.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,5 +56,25 @@ public final class StreamUtil {
             resultList.addAll(apply(subList.parallelStream(), function));
 
         return resultList;
+    }
+
+    /**
+     * Performs an action on each element of a list using parallel
+     * streams with a maximum concurrency.
+     *
+     * @param <T> element type for the source list.
+     *
+     * @param source the objects to process.
+     *
+     * @param action the action to perform on each object.
+     *
+     * @param concurrency the maximum number of concurrent threads.
+     *
+     * @throws IllegalArgumentException unless the concurrency is
+     * positive.
+     */
+    public static <T> void forEach(List<T> source, Consumer<? super T> action, int concurrency) {
+        for (List<T> subList : ListUtil.split(source, concurrency))
+            subList.parallelStream().forEach(action);
     }
 }
