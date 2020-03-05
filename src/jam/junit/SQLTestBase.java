@@ -131,8 +131,13 @@ public abstract class SQLTestBase {
     }
 
     public static final class TestCache extends SQLCache<String, TestRecord> {
-        public TestCache(TestStore store) {
-            super(store);
+        public TestCache(TestTable table) {
+            super(table);
+        }
+
+        @Override protected TestRecord compute(String key) {
+            int keylen = key.length();
+            return new TestRecord(key, keylen * keylen, keylen);
         }
 
         @Override public String getName() {

@@ -1,8 +1,8 @@
 
 package jam.sql;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +13,7 @@ import jam.util.SetUtil;
 
 /**
  * Maintains an in-memory cache of records backed by a persistent
- * database store.
+ * database table.
  *
  * @param <K> the runtime type of the record keys.
  *
@@ -26,19 +26,45 @@ public abstract class SQLCache<K, V> {
     protected final Map<K, V> cache;
 
     /**
-     * The persistent database store.
+     * The persistent database table.
      */
-    protected final SQLStore<K, V> store;
+    protected final SQLTable<K, V> table;
 
     /**
-     * Creates a new cache with a backing database store to provide
+     * Creates a new cache with a backing database table to provide
      * persistent storage and to compute records on demand.
      *
-     * @param store the backing database store.
+     * @param table the backing database table.
      */
-    protected SQLCache(SQLStore<K, V> store) {
-        this.store = store;
-        this.cache = new HashMap<K, V>();
+    protected SQLCache(SQLTable<K, V> table) {
+        this.table = table;
+        this.cache = table.load();
+    }
+
+    /**
+     * Computes a new record on demand.
+     *
+     * @param key the key of the desired record.
+     *
+     * @return the new record for the specified key.
+     */
+    protected abstract V compute(K key);
+
+    /**
+     * Computes new records on demand.
+     *
+     * @param keys the keys of the desired records.
+     *
+     * @return the new records with keys in the same order as the
+     * iterator of the input collection.
+     */
+    protected List<V> compute(Collection<K> keys) {
+        List<V> records = new ArrayList<V>(keys.size());
+
+        for (K key : keys)
+            records.add(compute(key));
+
+        return records;
     }
 
     /**
@@ -104,17 +130,18 @@ public abstract class SQLCache<K, V> {
 
         if (!missing.isEmpty()) {
             //
-            // Query the persistent store (and compute on-demand)
-            // for each missing key...
+            // Compute records for the missing keys...
             //
-            List<V> records = store.get(missing);
+            List<V> records = compute(missing);
 
-            // Add the new records to the in-memory cache (the
-            // persistent store is updated automatically)...
+            // Add the new records to the in-memory cache and the
+            // persistent database table...
             updateCache(records);
+            updateTable(records);
         }
 
-        // Pull the records from the cache in the order requested...
+        // Pull the records from the cache in the order requested;
+        // all keys are guaranteed to be present in the cache...
         return MapUtil.get(cache, keys);
     }
 
@@ -122,9 +149,13 @@ public abstract class SQLCache<K, V> {
         JamLogger.info("Adding [%d] records to cache [%s]...", records.size(), getName());
 
         for (V record : records)
-            cache.put(getKey(record), record);
+            cache.put(table.getKey(record), record);
 
         JamLogger.info("Added [%d] records to cache [%s].", records.size(), getName());
+    }
+
+    private void updateTable(List<V> records) {
+        table.store(records);
     }
 
     /**
@@ -135,6 +166,6 @@ public abstract class SQLCache<K, V> {
      * @return the key for the specified record.
      */
     public K getKey(V record) {
-        return store.getKey(record);
+        return table.getKey(record);
     }
 }

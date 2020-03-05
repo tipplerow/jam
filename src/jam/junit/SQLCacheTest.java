@@ -13,13 +13,13 @@ public class SQLCacheTest extends SQLTestBase {
 
     @Test public void testGet() {
         TestTable table = new TestTable(db);
-        TestStore store = new TestStore(table);
-        TestCache cache = new TestCache(store);
+        TestCache cache = new TestCache(table);
 
         // Database should be empty...
         assertFalse(table.exists());
 
         // Compute on demand and cache...
+        assertEquals(List.of(rec1, rec3), cache.get(List.of(key1, key3)));
         assertEquals(List.of(rec1, rec3), cache.get(List.of(key1, key3)));
         assertEquals(List.of(rec1, rec3), cache.get(List.of(key1, key3)));
 
