@@ -19,11 +19,11 @@ public class HugoPeptideTableTest {
     private static final HugoSymbol XXXX  = HugoSymbol.instance("XXXX");
     private static final HugoSymbol ZZEF1 = HugoSymbol.instance("ZZEF1");
 
-    private static final Peptide AAPPPPVLM  = Peptide.parse("AAPPPPVLM");
-    private static final Peptide AAPPPPVLMH = Peptide.parse("AAPPPPVLMH");
-    private static final Peptide ADSANYSCV  = Peptide.parse("ADSANYSCV");
-    private static final Peptide YWSLLTSLV  = Peptide.parse("YWSLLTSLV");
-    private static final Peptide VVVVVVVVV  = Peptide.parse("VVVVVVVVV");
+    private static final Peptide AAPPPPVLM  = Peptide.instance("AAPPPPVLM");
+    private static final Peptide AAPPPPVLMH = Peptide.instance("AAPPPPVLMH");
+    private static final Peptide ADSANYSCV  = Peptide.instance("ADSANYSCV");
+    private static final Peptide YWSLLTSLV  = Peptide.instance("YWSLLTSLV");
+    private static final Peptide VVVVVVVVV  = Peptide.instance("VVVVVVVVV");
 
     private static final HugoPeptideTable table = HugoPeptideTable.load(PEPTIDE_FILE);
 

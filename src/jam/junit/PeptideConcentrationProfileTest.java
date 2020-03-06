@@ -14,9 +14,9 @@ import static org.junit.Assert.*;
 
 public class PeptideConcentrationProfileTest {
     @Test public void testBasic() {
-        Peptide p1 = Peptide.parse("ALY");
-        Peptide p2 = Peptide.parse("ILE");
-        Peptide p3 = Peptide.parse("LIE");
+        Peptide p1 = Peptide.instance("ALY");
+        Peptide p2 = Peptide.instance("ILE");
+        Peptide p3 = Peptide.instance("LIE");
 
         PeptideConcentrationBuilder builder =
             PeptideConcentrationBuilder.create();

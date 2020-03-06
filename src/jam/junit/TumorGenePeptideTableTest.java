@@ -24,13 +24,13 @@ public class TumorGenePeptideTableTest {
     private static final HugoSymbol A4GNT = HugoSymbol.instance("A4GNT");
     private static final HugoSymbol GeneX = HugoSymbol.instance("GeneX");
 
-    private static final Peptide AAA = Peptide.parse("AAA");
-    private static final Peptide VVV = Peptide.parse("VVV");
-    private static final Peptide FSF = Peptide.parse("FSF");
-    private static final Peptide WRE = Peptide.parse("WRE");
-    private static final Peptide DVP = Peptide.parse("DVP");
-    private static final Peptide EAE = Peptide.parse("EAE");
-    private static final Peptide END = Peptide.parse("END");
+    private static final Peptide AAA = Peptide.instance("AAA");
+    private static final Peptide VVV = Peptide.instance("VVV");
+    private static final Peptide FSF = Peptide.instance("FSF");
+    private static final Peptide WRE = Peptide.instance("WRE");
+    private static final Peptide DVP = Peptide.instance("DVP");
+    private static final Peptide EAE = Peptide.instance("EAE");
+    private static final Peptide END = Peptide.instance("END");
 
     private static final TumorGenePeptideTable table = TumorGenePeptideTable.load(PEPTIDE_FILE);
 

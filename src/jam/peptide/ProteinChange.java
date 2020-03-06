@@ -216,7 +216,7 @@ public final class ProteinChange {
     public boolean isNative(Peptide peptide) {
         int residueIndex = getResidueIndex();
 
-        return residueIndex < peptide.length() && peptide.at(residueIndex).equals(native_);
+        return residueIndex < peptide.length() && peptide.get(residueIndex).equals(native_);
     }
          
     @Override public boolean equals(Object obj) {

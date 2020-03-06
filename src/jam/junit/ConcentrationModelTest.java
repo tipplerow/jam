@@ -26,9 +26,9 @@ public class ConcentrationModelTest {
     private static final HugoSymbol gene1 = HugoSymbol.instance("Gene1");
     private static final HugoSymbol gene2 = HugoSymbol.instance("Gene2");
 
-    private static final Peptide pep1 = Peptide.parse("ALL");
-    private static final Peptide pep2 = Peptide.parse("VAV");
-    private static final Peptide pep3 = Peptide.parse("ILE");
+    private static final Peptide pep1 = Peptide.instance("ALL");
+    private static final Peptide pep2 = Peptide.instance("VAV");
+    private static final Peptide pep3 = Peptide.instance("ILE");
 
     private static final Expression expr1 = Expression.valueOf(10.0);
     private static final Expression expr2 = Expression.valueOf(20.0);

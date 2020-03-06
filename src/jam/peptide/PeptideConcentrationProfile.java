@@ -94,7 +94,7 @@ public final class PeptideConcentrationProfile {
             PeptideConcentrationBuilder.create();
 
         for (List<String> fields : reader) {
-            Peptide peptide = Peptide.parse(fields.get(0));
+            Peptide peptide = Peptide.instance(fields.get(0));
             Concentration concentration = Concentration.parse(fields.get(1));
 
             builder.add(peptide, concentration);

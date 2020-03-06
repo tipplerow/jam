@@ -60,7 +60,7 @@ public final class FastaRecord {
             if (index % LINE_LENGTH == 0)
                 builder.append(System.lineSeparator());
 
-            builder.append(peptide.at(index).code1());
+            builder.append(peptide.get(index).code1());
         }
 
         return builder.toString();

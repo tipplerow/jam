@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class MAFFastaRecordTest {
     @Test public void testParse() {
-        Peptide peptide = Peptide.parse("VLXLRLGELSLY");
+        Peptide peptide = Peptide.instance("VLXLRLGELSLY");
 
         FastaRecord record1 =
             new FastaRecord("Tumor_Barcode:BARCODE",

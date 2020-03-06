@@ -190,7 +190,7 @@ public final class FastaReader implements Closeable, Iterable<FastaRecord>, Iter
 
         String  key     = fields[0];
         String  descrip = (fields.length == 2) ? fields[1] : "";
-        Peptide peptide = Peptide.parse(String.join("", peptideLines));
+        Peptide peptide = Peptide.instance(String.join("", peptideLines));
 
         return new FastaRecord(key, descrip, peptide);
     }

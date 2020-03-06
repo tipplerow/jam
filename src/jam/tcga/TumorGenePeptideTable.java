@@ -81,7 +81,7 @@ public final class TumorGenePeptideTable {
     private void processFields(List<String> fields) {
         TumorBarcode barcode = TumorBarcode.instance(fields.get(BARCODE_INDEX));
         HugoSymbol   symbol  = HugoSymbol.instance(fields.get(SYMBOL_INDEX));
-        Peptide      peptide = Peptide.parse(fields.get(PEPTIDE_INDEX));
+        Peptide      peptide = Peptide.instance(fields.get(PEPTIDE_INDEX));
 
         table.put(barcode, symbol, peptide);
     }

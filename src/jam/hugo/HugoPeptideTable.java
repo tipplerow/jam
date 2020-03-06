@@ -110,7 +110,7 @@ public final class HugoPeptideTable {
 
     private void processFields(List<String> fields) {
         HugoSymbol symbol  = HugoSymbol.instance(fields.get(SYMBOL_INDEX));
-        Peptide    peptide = Peptide.parse(fields.get(PEPTIDE_INDEX));
+        Peptide    peptide = Peptide.instance(fields.get(PEPTIDE_INDEX));
 
         addPeptide(symbol, peptide);
     }

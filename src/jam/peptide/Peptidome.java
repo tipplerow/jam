@@ -71,7 +71,7 @@ public final class Peptidome extends AbstractSet<Peptide> {
      * @throws RuntimeException if any I/O errors occur.
      */
     public static Peptidome load(String fileName) {
-        return Peptidome.create(Peptide.loadFlatFile(fileName));
+        return Peptidome.create(Peptide.load(fileName));
     }
 
     /**

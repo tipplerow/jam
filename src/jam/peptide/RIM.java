@@ -116,7 +116,7 @@ public final class RIM {
         double result = 0.0;
 
         for (int k = 0; k < pep1.length(); k++)
-            result += get(pep1.at(k), pep2.at(k));
+            result += get(pep1.get(k), pep2.get(k));
 
         return result;
     }
@@ -148,7 +148,7 @@ public final class RIM {
         double result = 0.0;
 
         for (int binderIndex = 0; binderIndex < binder.length(); ++binderIndex)
-            result += get(binder.at(binderIndex), target.at(TIPs.get(binderIndex)));
+            result += get(binder.get(binderIndex), target.get(TIPs.get(binderIndex)));
 
         return result;
     }
