@@ -1,6 +1,7 @@
 
 package jam.hugo;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,11 +9,11 @@ import java.util.List;
 import jam.peptide.Peptide;
 
 /**
- * Associates a HUGO symbol with a list of peptides (e.g., the peptide
- * fragments produced by proteasomal cleavage of the protein encoded
- * by the gene).
+ * Associates a HUGO symbol with an immutable list of peptides
+ * (e.g., the fragments produced by proteasomal cleavage of the
+ * protein encoded by the gene).
  */
-public final class HugoPeptideList {
+public final class HugoPeptideList extends AbstractList<Peptide> {
     private final HugoSymbol symbol;
     private final List<Peptide> peptides;
 
@@ -22,7 +23,7 @@ public final class HugoPeptideList {
         if (copy)
             this.peptides = new ArrayList<Peptide>(peptides);
         else
-            this.peptides = Collections.unmodifiableList(peptides);
+            this.peptides = peptides;
     }
 
     /**
@@ -41,19 +42,6 @@ public final class HugoPeptideList {
     }
 
     /**
-     * Returns the peptides at a given position in the list.
-     *
-     * @param index the index of the peptide in the list.
-     *
-     * @return the peptide at the specified position in the list.
-     *
-     * @throws IndexOutOfBoundsException unless the index is valid.
-     */
-    public Peptide getPeptide(int index) {
-        return peptides.get(index);
-    }
-
-    /**
      * Returns the HUGO symbol that is associated with the peptides in
      * this list.
      *
@@ -64,21 +52,11 @@ public final class HugoPeptideList {
         return symbol;
     }
 
-    /**
-     * Returns the number of peptides in this list.
-     *
-     * @return the number of peptides in this list.
-     */
-    public int size() {
-        return peptides.size();
+    @Override public Peptide get(int index) {
+        return peptides.get(index);
     }
 
-    /**
-     * Returns a read-only view of the peptides in this list.
-     *
-     * @return a read-only view of the peptides in this list.
-     */
-    public List<Peptide> viewPeptides() {
-        return peptides;
+    @Override public int size() {
+        return peptides.size();
     }
 }

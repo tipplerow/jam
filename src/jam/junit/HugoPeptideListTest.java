@@ -18,20 +18,25 @@ public class HugoPeptideListTest {
     private static final Peptide pep1 = Peptide.instance("ADSANYSCV");
     private static final Peptide pep2 = Peptide.instance("YWSLLTSLV");
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void testAdd() {
+        HugoPeptideList.wrap(hugo, List.of(pep0, pep1)).add(pep2);
+    }
+
     @Test public void testBasic() {
         HugoPeptideList list = HugoPeptideList.wrap(hugo, List.of(pep0, pep1, pep2));
 
         assertEquals(3, list.size());
 
         assertEquals(hugo, list.getSymbol());
-        assertEquals(pep0, list.getPeptide(0));
-        assertEquals(pep1, list.getPeptide(1));
-        assertEquals(pep2, list.getPeptide(2));
+        assertEquals(pep0, list.get(0));
+        assertEquals(pep1, list.get(1));
+        assertEquals(pep2, list.get(2));
 
-        assertEquals(List.of(pep0, pep1, pep2), list.viewPeptides());
+        assertEquals(List.of(pep0, pep1, pep2), list);
     }
 
-    @Test public void testModify() {
+    @Test public void testModifyUnderlying() {
         List<Peptide> peptides = new ArrayList<Peptide>();
 
         peptides.add(pep0);
@@ -40,12 +45,22 @@ public class HugoPeptideListTest {
         HugoPeptideList list = HugoPeptideList.wrap(hugo, peptides);
 
         assertEquals(2, list.size());
-        assertEquals(List.of(pep0, pep1), list.viewPeptides());
+        assertEquals(List.of(pep0, pep1), list);
 
         peptides.add(pep2);
 
         assertEquals(3, list.size());
-        assertEquals(List.of(pep0, pep1, pep2), list.viewPeptides());
+        assertEquals(List.of(pep0, pep1, pep2), list);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testRemove() {
+        HugoPeptideList.wrap(hugo, List.of(pep0, pep1)).remove(pep0);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testSet() {
+        HugoPeptideList.wrap(hugo, List.of(pep0, pep1, pep2)).set(1, pep0);
     }
 
     public static void main(String[] args) {
