@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -47,9 +48,16 @@ public final class HugoPeptideTable {
      */
     public static HugoPeptideTable create(Multimap<HugoSymbol, Peptide> map) {
         HugoPeptideTable table = new HugoPeptideTable();
-        table.hugoMap.putAll(map);
+
+        for (Map.Entry<HugoSymbol, Peptide> entry : map.entries())
+            table.addPeptide(entry.getKey(), entry.getValue());
 
         return table;
+    }
+
+    private void addPeptide(HugoSymbol symbol, Peptide peptide) {
+        peptides.add(peptide);
+        hugoMap.put(symbol, peptide);
     }
 
     /**
@@ -113,11 +121,6 @@ public final class HugoPeptideTable {
         Peptide    peptide = Peptide.instance(fields.get(PEPTIDE_INDEX));
 
         addPeptide(symbol, peptide);
-    }
-
-    private void addPeptide(HugoSymbol symbol, Peptide peptide) {
-        peptides.add(peptide);
-        hugoMap.put(symbol, peptide);
     }
 
     /**
