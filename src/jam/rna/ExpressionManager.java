@@ -3,6 +3,7 @@ package jam.rna;
 
 import java.io.File;
 
+import jam.lang.JamException;
 import jam.tcga.TumorBarcode;
 
 /**
@@ -75,6 +76,24 @@ public final class ExpressionManager {
             return ExpressionProfile.load(file);
         else
             return null;
+    }
+
+    /**
+     * Loads the expression profile for a given tumor sample.
+     *
+     * @param barcode the barcode of the desired tumor sample.
+     *
+     * @return the expression profile for the specified tumor sample.
+     *
+     * @throws RuntimeException if the profile does not exist.
+     */
+    public ExpressionProfile require(TumorBarcode barcode) {
+        ExpressionProfile profile = load(barcode);
+
+        if (profile == null)
+            throw JamException.runtime("No expression profile for barcode [%s].", barcode.getKey());
+
+        return profile;
     }
 
     /**
