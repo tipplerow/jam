@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -58,8 +59,22 @@ public final class ZipUtil {
      * and is open for reading.
      */
     public static BufferedReader openGZipReader(File file) {
+        return new BufferedReader(new InputStreamReader(openGZipStream(file)));
+    }
+
+    /**
+     * Opens an input stream for a GZIP file.
+     *
+     * @param file the file to read.
+     *
+     * @return an input stream for the specified GZIP file.
+     *
+     * @throws RuntimeException unless the file is a valid GZIP file
+     * and is open for reading.
+     */
+    public static InputStream openGZipStream(File file) {
         try {
-            return new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
+            return new GZIPInputStream(new FileInputStream(file));
         }
         catch (IOException ioex) {
             throw JamException.runtime(ioex);

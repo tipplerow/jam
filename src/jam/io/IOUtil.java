@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Flushable;
@@ -183,6 +184,34 @@ public final class IOUtil {
      */
     public static BufferedReader openReader(InputStream stream) {
         return new BufferedReader(new InputStreamReader(stream));
+    }
+
+    /**
+     * Opens an input stream for a file.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate stream
+     * will be returned.
+     *
+     * @param file the file to read.
+     *
+     * @return an input stream for the specified file.
+     *
+     * @throws RuntimeException unless the file is open for reading.
+     */
+    public static InputStream openStream(File file) {
+        if (ZipUtil.isGZipFile(file))
+            return ZipUtil.openGZipStream(file);
+
+        try {
+            return new FileInputStream(file);
+        }
+        catch (IOException ioex) {
+            throw JamException.runtime(ioex);
+        }
     }
 
     /**
