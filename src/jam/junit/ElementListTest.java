@@ -3,8 +3,6 @@ package jam.junit;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import jam.xml.DOMUtil;
 import jam.xml.ElementList;
