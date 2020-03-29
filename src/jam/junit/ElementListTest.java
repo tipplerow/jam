@@ -13,28 +13,68 @@ import static org.junit.Assert.*;
 public class ElementListTest {
     private static final String DESC_SAMPLE_FILE = "data/test/mesh_desc_sample.xml";
 
-    @Test public void testCreate() {
-        Document document = DOMUtil.parse(DESC_SAMPLE_FILE);
+    private static final Document    DOCUMENT    = DOMUtil.parse(DESC_SAMPLE_FILE);
+    private static final Element     DOC_ELEMENT = DOCUMENT.getDocumentElement();
+    private static final ElementList PARENT_LIST = ElementList.childrenOf(DOC_ELEMENT);
+    private static final ElementList CHILD_LIST  = ElementList.childrenOf(PARENT_LIST.get(0));
 
-        Element docElement = document.getDocumentElement();
-        assertEquals("DescriptorRecordSet", docElement.getTagName());
+    @Test public void testAssertTagNames() {
+        PARENT_LIST.assertTagNames("DescriptorRecord",
+                                   "DescriptorRecord",
+                                   "DescriptorRecord");
 
-        ElementList descriptorList = ElementList.childrenOf(docElement);
-        assertEquals(3, descriptorList.size());
+        CHILD_LIST.assertTagNames("DescriptorUI",
+                                  "DescriptorName",
+                                  "DateCreated",
+                                  "DateRevised",
+                                  "DateEstablished",
+                                  "AllowableQualifiersList",
+                                  "HistoryNote",
+                                  "OnlineNote",
+                                  "PublicMeSHNote",
+                                  "PreviousIndexingList",
+                                  "PharmacologicalActionList",
+                                  "TreeNumberList",
+                                  "ConceptList");
+    }
 
-        for (Element descriptorElement : descriptorList)
-            assertEquals("DescriptorRecord", descriptorElement.getTagName());
+    @Test(expected = RuntimeException.class)
+    public void testAssertTagNamesException() {
+        PARENT_LIST.assertTagNames("DescriptorRecord", "DescriptorRecord");
+    }
 
-        ElementList childList = ElementList.childrenOf(descriptorList.get(0), 2);
-        assertEquals(2, childList.size());
+    @Test public void testChildrenOf() {
+        assertEquals("D000001", CHILD_LIST.get(0).getTextContent());
+        assertEquals("Calcimycin", CHILD_LIST.get(1).getTextContent());
+    }
 
-        childList.assertTagNames("DescriptorUI", "DescriptorName");
+    @Test public void testGetOptional() {
+        assertEquals("DateCreated", CHILD_LIST.getOptional("DateCreated").getTagName());
+        assertNull(CHILD_LIST.getOptional("missing"));
+    }
 
-        assertEquals("DescriptorUI", childList.get(0).getTagName());
-        assertEquals("DescriptorName", childList.get(1).getTagName());
+    @Test(expected = RuntimeException.class)
+    public void testGetOptionalDuplicate() {
+        PARENT_LIST.getOptional("DescriptorRecord");
+    }
 
-        assertEquals("D000001", childList.get(0).getTextContent());
-        assertEquals("Calcimycin", childList.get(1).getTextContent());
+    @Test public void testGetRequired() {
+        assertEquals("DateRevised", CHILD_LIST.getRequired("DateRevised").getTagName());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetRequiredMissing() {
+        PARENT_LIST.getRequired("missing");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetRequiredDuplicate() {
+        PARENT_LIST.getRequired("DescriptorRecord");
+    }
+
+    @Test public void testSize() {
+        assertEquals(3, PARENT_LIST.size());
+        assertEquals(13, CHILD_LIST.size());
     }
 
     public static void main(String[] args) {

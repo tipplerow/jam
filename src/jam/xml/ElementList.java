@@ -9,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import jam.lang.JamException;
+
 /**
  * Represents a sequential list of DOM {@code Element} nodes.
  */
@@ -100,8 +102,58 @@ public final class ElementList extends AbstractList<Element> {
      * in this list match the input sequence exactly.
      */
     public void assertTagNames(String... tagNames) {
+        if (tagNames.length != size())
+            throw JamException.runtime("Expected [%d] elements, found [%d].", tagNames.length, size());
+
         for (int index = 0; index < tagNames.length; ++index)
             DOMParser.assertTagName(get(index), tagNames[index]);
+    }
+
+    /**
+     * Searches for an optional element (an {@code O(n)} operation).
+     *
+     * @param tagName the name of the target element.
+     *
+     * @return the single element with the target tag, if present,
+     * or {@code null} if there is no matching element.
+     *
+     * @throws RuntimeException if this list contains two or more
+     * elements with the target tag.
+     */
+    public Element getOptional(String tagName) {
+        Element target = null;
+
+        for (Element element : this) {
+            if (element.getTagName().equals(tagName)) {
+                if (target == null) {
+                    target = element;
+                }
+                else {
+                    throw JamException.runtime("Duplicate element: [%s].", tagName);
+                }
+            }
+        }
+
+        return target;
+    }
+
+    /**
+     * Searches for a unique required element (an {@code O(n)} operation).
+     *
+     * @param tagName the name of the target element.
+     *
+     * @return the single element with the target tag.
+     *
+     * @throws RuntimeException unless this list contains exactly one
+     * element with a matching tag name.
+     */
+    public Element getRequired(String tagName) {
+        Element target = getOptional(tagName);
+
+        if (target != null)
+            return target;
+        else
+            throw JamException.runtime("Missing required element: [%s].", tagName);
     }
 
     @Override public Element get(int index) {
