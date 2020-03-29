@@ -19,13 +19,13 @@ public class ElementListTest {
         Element docElement = document.getDocumentElement();
         assertEquals("DescriptorRecordSet", docElement.getTagName());
 
-        ElementList descriptorList = ElementList.create(docElement.getChildNodes());
+        ElementList descriptorList = ElementList.childrenOf(docElement);
         assertEquals(3, descriptorList.size());
 
         for (Element descriptorElement : descriptorList)
             assertEquals("DescriptorRecord", descriptorElement.getTagName());
 
-        ElementList childList = ElementList.create(descriptorList.get(0).getChildNodes(), 2);
+        ElementList childList = ElementList.childrenOf(descriptorList.get(0), 2);
         assertEquals(2, childList.size());
 
         assertEquals("DescriptorUI", childList.get(0).getTagName());

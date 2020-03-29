@@ -20,6 +20,35 @@ public final class ElementList extends AbstractList<Element> {
     }
 
     /**
+     * Extracts the child elements (direct descendents) of an XML
+     * element.
+     *
+     * @param element the XML element of interest.
+     *
+     * @return a new list containing all child elements of the input
+     * element.
+     */
+    public static ElementList childrenOf(Element element) {
+        return create(element.getChildNodes());
+    }
+
+    /**
+     * Extracts at most {@code maxSize} child elements (direct
+     * descendents) of an XML element.
+     *
+     * @param element the XML element of interest.
+     *
+     * @param maxSize the maximum number of children to extract.
+     *
+     * @return a new list containing the first {@code maxSize} child
+     * elements of the input element (or all elements if there are
+     * fewer than {@code maxSize} children present).
+     */
+    public static ElementList childrenOf(Element element, int maxSize) {
+        return create(element.getChildNodes(), maxSize);
+    }
+
+    /**
      * Extracts all elements from a node list.
      *
      * @param nodeList the node list to process.
@@ -32,7 +61,7 @@ public final class ElementList extends AbstractList<Element> {
     }
 
     /**
-     * Extracts the first {@code size} elements from a node list.
+     * Extracts at most {@code maxSize} elements from a node list.
      *
      * @param nodeList the node list to process.
      *
