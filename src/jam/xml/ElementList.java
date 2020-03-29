@@ -90,6 +90,20 @@ public final class ElementList extends AbstractList<Element> {
         return new ElementList(elementList);
     }
 
+    /**
+     * Validates the tag names of the elements in this list.
+     *
+     * @param tagNames the expected tag names for every element in
+     * this list.
+     *
+     * @throws RuntimeException unless the tag names of the elements
+     * in this list match the input sequence exactly.
+     */
+    public void assertTagNames(String... tagNames) {
+        for (int index = 0; index < tagNames.length; ++index)
+            DOMParser.assertTagName(get(index), tagNames[index]);
+    }
+
     @Override public Element get(int index) {
         return elements.get(index);
     }

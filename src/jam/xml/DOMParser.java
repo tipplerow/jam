@@ -77,7 +77,7 @@ public abstract class DOMParser {
      * @throws RuntimeException unless the specified element has the
      * specified tag name.
      */
-    public static void assertElement(Element element, String tagName) {
+    public static void assertTagName(Element element, String tagName) {
         if (!element.getTagName().equals(tagName))
             throw JamException.runtime("Found [%s] element, expected [%s].", element.getTagName(), tagName);
     }

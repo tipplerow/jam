@@ -21,13 +21,13 @@ public class DOMParserTest {
     @Test public void testParse() {
         MyParser parser = new MyParser(DESC_SAMPLE_FILE);
 
-        parser.assertElement(parser.getDocumentElement(), "DescriptorRecordSet");
+        parser.assertTagName(parser.getDocumentElement(), "DescriptorRecordSet");
 
         ElementList descriptorList = parser.getDocElementChildren();
         assertEquals(3, descriptorList.size());
 
         for (Element descriptorElement : descriptorList)
-            parser.assertElement(descriptorElement, "DescriptorRecord");
+            parser.assertTagName(descriptorElement, "DescriptorRecord");
     }
 
     public static void main(String[] args) {

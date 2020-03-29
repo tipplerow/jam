@@ -28,6 +28,8 @@ public class ElementListTest {
         ElementList childList = ElementList.childrenOf(descriptorList.get(0), 2);
         assertEquals(2, childList.size());
 
+        childList.assertTagNames("DescriptorUI", "DescriptorName");
+
         assertEquals("DescriptorUI", childList.get(0).getTagName());
         assertEquals("DescriptorName", childList.get(1).getTagName());
 
