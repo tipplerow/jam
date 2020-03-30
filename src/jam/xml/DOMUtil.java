@@ -7,7 +7,10 @@ import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import jam.app.JamLogger;
@@ -18,6 +21,43 @@ import jam.lang.JamException;
  * Provides utility methods for parsing XML files.
  */
 public final class DOMUtil {
+    /**
+     * Returns a named attribute from the attribute list
+     * of an element.
+     *
+     * @param element the element to examine.
+     *
+     * @param attrName the name of the desired attribute.
+     *
+     * @return the string value of the desired attribute
+     * ({@code null} if there is no matching attribute).
+     */
+    public static String getAttribute(Element element, String attrName) {
+        NamedNodeMap attrList = element.getAttributes();
+
+        if (attrList == null)
+            return null;
+
+        Node node = attrList.getNamedItem(attrName);
+
+        if (node == null)
+            return null;
+
+        Attr attr = (Attr) node;
+        return attr.getValue();
+    }
+
+    /**
+     * Identifies attribute nodes.
+     *
+     * @param node a node to examine.
+     *
+     * @return {@code true} iff the input node is a DOM {@code Attr}.
+     */
+    public static boolean isAttribute(Node node) {
+        return node.getNodeType() == Node.ATTRIBUTE_NODE;
+    }
+
     /**
      * Identifies element nodes.
      *
