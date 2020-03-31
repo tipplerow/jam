@@ -17,17 +17,34 @@ public class JamBooleanTest {
 	assertEquals(1, JamBoolean.intValue(true));
     }
 
-    @Test public void testValueOf() {
+    @Test public void testValueOfCharacter() {
 	assertTrue(JamBoolean.valueOf('1'));
 	assertTrue(JamBoolean.valueOf('T'));
+	assertTrue(JamBoolean.valueOf('Y'));
 
 	assertFalse(JamBoolean.valueOf('0'));
 	assertFalse(JamBoolean.valueOf('F'));
+	assertFalse(JamBoolean.valueOf('N'));
+    }
+
+    @Test public void testValueOfString() {
+	assertTrue(JamBoolean.valueOf("1"));
+	assertTrue(JamBoolean.valueOf("Y"));
+	assertTrue(JamBoolean.valueOf("true"));
+
+	assertFalse(JamBoolean.valueOf("0"));
+	assertFalse(JamBoolean.valueOf("N"));
+	assertFalse(JamBoolean.valueOf("false"));
     }
 
     @Test(expected = RuntimeException.class)
-    public void testValueOfInvalid() {
+    public void testValueOfInvalidCharacter() {
 	JamBoolean.valueOf('a');
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testValueOfInvalidString() {
+	JamBoolean.valueOf("no");
     }
 
     public static void main(String[] args) {

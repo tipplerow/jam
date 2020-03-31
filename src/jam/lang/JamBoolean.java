@@ -30,9 +30,10 @@ public final class JamBoolean {
     /**
      * Parses a character representation of a boolean value.
      *
-     * <p>The characters {@code 'T'} and {@code '1'} evaluate to
-     * {@code true}, while {@code 'F'} and {@code '0'} evaluate to
-     * {@code false}; all other characters result in an exception.
+     * <p>The characters {@code 'T'}, {@code 'Y'}, and {@code '1'}
+     * evaluate to {@code true}, while {@code 'F'}, {@code 'N'}, and
+     * {@code '0'} evaluate to {@code false}; all other characters
+     * result in an exception.
      *
      * @param c the character to parse.
      *
@@ -46,10 +47,16 @@ public final class JamBoolean {
 	case 'T':
 	    return true;
 
+	case 'Y':
+	    return true;
+
 	case '1':
 	    return true;
 
 	case 'F':
+	    return false;
+
+	case 'N':
 	    return false;
 
 	case '0':
@@ -57,5 +64,44 @@ public final class JamBoolean {
 	}
 
 	throw JamException.runtime("Undefined boolean character [%c]", c);
+    }
+
+    /**
+     * Parses a string representation of a boolean value.
+     *
+     * <p>The strings {@code "true"}, {@code "Y"}, and {@code "1"}
+     * evaluate to {@code true}, while {@code "false"}, {@code "N"},
+     * and {@code "0"} evaluate to {@code false}; all other strings
+     * result in an exception.
+     *
+     * @param s the string to parse.
+     *
+     * @return the boolean value represented by the given string.
+     *
+     * @throws RuntimeException unless the string is a valid boolean
+     * representation as described above.
+     */
+    public static boolean valueOf(String s) {
+	switch (s) {
+	case "true":
+	    return true;
+
+	case "Y":
+	    return true;
+
+	case "1":
+	    return true;
+
+	case "false":
+	    return false;
+
+	case "N":
+	    return false;
+
+	case "0":
+	    return false;
+	}
+
+	throw JamException.runtime("Undefined boolean string [%s]", s);
     }
 }
