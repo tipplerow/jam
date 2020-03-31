@@ -31,6 +31,9 @@ public class DOMParserTest {
 
         assertEquals("1", parser.getRequiredAttribute(descriptorList.get(0), "DescriptorClass"));
         assertEquals("bar", parser.getOptionalAttribute(descriptorList.get(0), "foo", "bar"));
+
+        assertEquals(1, parser.getIntAttribute(descriptorList.get(0), "DescriptorClass"));
+        assertEquals(2, parser.getIntAttribute(descriptorList.get(0), "foo", 2));
     }
 
     public static void main(String[] args) {
