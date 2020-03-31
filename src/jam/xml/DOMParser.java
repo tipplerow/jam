@@ -117,4 +117,47 @@ public abstract class DOMParser {
     public ElementList getDocElementChildren() {
         return docElementChildren;
     }
+
+    /**
+     * Returns an optional named attribute from the attribute list
+     * of an element.
+     *
+     * @param element the element to examine.
+     *
+     * @param attrName the name of the desired attribute.
+     *
+     * @param defaultVal the default value to be used for missing
+     * attributes.
+     *
+     * @return the string value of the desired attribute, if present,
+     * or the default value otherwise.
+     */
+    public String getOptionalAttribute(Element element, String attrName, String defaultVal) {
+        String attrValue = DOMUtil.getAttribute(element, attrName);
+
+        if (attrValue != null)
+            return attrValue;
+        else
+            return defaultVal;
+    }
+
+    /**
+     * Returns a required named attribute from the attribute list of
+     * an element.
+     *
+     * @param element the element to examine.
+     *
+     * @param attrName the name of the desired attribute.
+     *
+     * @return the string value of the desired attribute.
+     */
+    public String getRequiredAttribute(Element element, String attrName) {
+        String attrValue = DOMUtil.getAttribute(element, attrName);
+
+        if (attrValue != null)
+            return attrValue;
+        else
+            throw JamException.runtime("Missing required attribute: [%s:%s].",
+                                       element.getTagName(), attrName);
+    }
 }

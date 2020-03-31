@@ -28,6 +28,9 @@ public class DOMParserTest {
 
         for (Element descriptorElement : descriptorList)
             parser.assertTagName(descriptorElement, "DescriptorRecord");
+
+        assertEquals("1", parser.getRequiredAttribute(descriptorList.get(0), "DescriptorClass"));
+        assertEquals("bar", parser.getOptionalAttribute(descriptorList.get(0), "foo", "bar"));
     }
 
     public static void main(String[] args) {
