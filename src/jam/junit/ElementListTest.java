@@ -43,6 +43,19 @@ public class ElementListTest {
         PARENT_LIST.assertTagNames("DescriptorRecord", "DescriptorRecord");
     }
 
+    @Test public void testByTagName() {
+        ElementList conceptList;
+
+        conceptList = ElementList.byTagName(PARENT_LIST.get(0), "Concept");
+        conceptList.assertTagNames("Concept", "Concept");
+
+        conceptList = ElementList.byTagName(PARENT_LIST.get(1), "Concept");
+        conceptList.assertTagNames("Concept", "Concept", "Concept");
+
+        conceptList = ElementList.byTagName(PARENT_LIST.get(2), "Concept");
+        conceptList.assertTagNames("Concept");
+    }
+
     @Test public void testChildrenOf() {
         assertEquals("D000001", CHILD_LIST.get(0).getTextContent());
         assertEquals("Calcimycin", CHILD_LIST.get(1).getTextContent());

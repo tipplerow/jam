@@ -22,6 +22,20 @@ public final class ElementList extends AbstractList<Element> {
     }
 
     /**
+     * Extracts all descendant elements with a given tag name (in
+     * document order).
+     *
+     * @param element the XML element of interest.
+     *
+     * @param tagName the name of the tag to match.
+     *
+     * @return a list of matching elements.
+     */
+    public static ElementList byTagName(Element element, String tagName) {
+        return create(element.getElementsByTagName(tagName));
+    }
+
+    /**
      * Extracts the child elements (direct descendents) of an XML
      * element.
      *
