@@ -1,6 +1,8 @@
 
 package jam.xml;
 
+import java.util.List;
+
 import org.jdom2.Element;
 
 import jam.lang.JamBoolean;
@@ -24,6 +26,25 @@ public class JDOMParser {
         if (!element.getName().equals(tagName))
             throw JamException.runtime("Expected element [%s], but found [%s].",
                                        tagName, element.getName());
+    }
+
+    /**
+     * Asserts that elements in a list have specific tags.
+     *
+     * @param elements the element list to validate.
+     *
+     * @param tagNames the expected tag names.
+     *
+     * @throws RuntimeException unless the list contains at least
+     * {@code tagNames.length} elements and their names exactly match.
+     */
+    public void assertTagNames(List<Element> elements, String... tagNames) {
+        if (elements.size() < tagNames.length)
+            throw JamException.runtime("Expected at least [%d] elements, but found [%d].",
+                                       tagNames.length, elements.size());
+
+        for (int index = 0; index < tagNames.length; ++index)
+            assertTagName(elements.get(index), tagNames[index]);
     }
 
     /**

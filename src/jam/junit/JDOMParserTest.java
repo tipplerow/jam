@@ -23,11 +23,13 @@ public class JDOMParserTest {
         List<Element> descriptorList = document.getRootElementChildren();
         assertEquals(3, descriptorList.size());
 
-        for (Element descriptorElement : descriptorList)
-            parser.assertTagName(descriptorElement, "DescriptorRecord");
+        parser.assertTagNames(descriptorList, "DescriptorRecord", "DescriptorRecord", "DescriptorRecord");
 
-        assertEquals("1", parser.getRequiredAttribute(descriptorList.get(0), "DescriptorClass"));
-        assertEquals("bar", parser.getOptionalAttribute(descriptorList.get(0), "foo", "bar"));
+        Element descriptorElement =
+            parser.getRequiredChild(document.getRootElement(), "DescriptorRecord");
+
+        assertEquals("1", parser.getRequiredAttribute(descriptorElement, "DescriptorClass"));
+        assertEquals("bar", parser.getOptionalAttribute(descriptorElement, "foo", "bar"));
 
         assertEquals(1, parser.getIntAttribute(descriptorList.get(0), "DescriptorClass"));
         assertEquals(2, parser.getIntAttribute(descriptorList.get(0), "foo", 2));
