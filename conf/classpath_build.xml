@@ -10,6 +10,7 @@
       <include name="commons-primitives/commons-primitives-1.0.jar"/>
       <include name="fastutil/fastutil-8.1.1.jar"/>
       <include name="guava/guava-20.0.jar"/>
+      <include name="jdom/jdom-2.0.6.jar"/>
       <include name="junit/junit-4.11.jar"/>
       <include name="junit/hamcrest-core-1.3.jar"/>
       <include name="sqlite-jdbc/sqlite-jdbc-3.23.1.jar"/>
