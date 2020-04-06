@@ -120,7 +120,7 @@ public final class ElementList extends AbstractList<Element> {
             throw JamException.runtime("Expected [%d] elements, found [%d].", tagNames.length, size());
 
         for (int index = 0; index < tagNames.length; ++index)
-            DOMParser.assertTagName(get(index), tagNames[index]);
+            DOMUtil.assertTagName(get(index), tagNames[index]);
     }
 
     /**

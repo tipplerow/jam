@@ -22,6 +22,21 @@ import jam.lang.JamException;
  */
 public final class DOMUtil {
     /**
+     * Asserts that a given element has a specific tag.
+     *
+     * @param element the element to validate.
+     *
+     * @param tagName the expected tag name.
+     *
+     * @throws RuntimeException unless the specified element has the
+     * specified tag name.
+     */
+    public static void assertTagName(Element element, String tagName) {
+        if (!element.getTagName().equals(tagName))
+            throw JamException.runtime("Found [%s] element, expected [%s].", element.getTagName(), tagName);
+    }
+
+    /**
      * Returns a named attribute from the attribute list
      * of an element.
      *

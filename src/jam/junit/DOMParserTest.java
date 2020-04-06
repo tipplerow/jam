@@ -3,27 +3,23 @@ package jam.junit;
 
 import org.w3c.dom.Element;
 
+import jam.xml.DOMDocument;
 import jam.xml.DOMParser;
 import jam.xml.ElementList;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-final class MyParser extends DOMParser {
-    public MyParser(String xmlFile) {
-        super(xmlFile);
-    }
-}
-
 public class DOMParserTest {
     private static final String DESC_SAMPLE_FILE = "data/test/mesh_desc_sample.xml";
 
-    @Test public void testParse() {
-        MyParser parser = new MyParser(DESC_SAMPLE_FILE);
+    @Test public void testParser() {
+        DOMDocument document = DOMDocument.parse(DESC_SAMPLE_FILE);
+        DOMParser parser = new DOMParser();
 
-        parser.assertTagName(parser.getDocumentElement(), "DescriptorRecordSet");
+        parser.assertTagName(document.getDocumentElement(), "DescriptorRecordSet");
 
-        ElementList descriptorList = parser.getDocElementChildren();
+        ElementList descriptorList = document.getDocElementChildren();
         assertEquals(3, descriptorList.size());
 
         for (Element descriptorElement : descriptorList)
