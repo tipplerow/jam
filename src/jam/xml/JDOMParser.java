@@ -197,4 +197,20 @@ public class JDOMParser {
         else
             return defaultVal;
     }
+
+    /**
+     * Returns the first child element with a given name.
+     *
+     * @param tagName the name of the desired element.
+     *
+     * @return the first child element with the given name.
+     */
+    public Element getRequiredChild(Element element, String tagName) {
+        Element child = element.getChild(tagName);
+
+        if (child != null)
+            return child;
+        else
+            throw JamException.runtime("Missing child [%s].", tagName);
+    }
 }
