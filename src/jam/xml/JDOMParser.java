@@ -201,12 +201,14 @@ public class JDOMParser {
     /**
      * Returns the first child element with a given name.
      *
+     * @param parent the parent element to search.
+     *
      * @param tagName the name of the desired element.
      *
      * @return the first child element with the given name.
      */
-    public Element getRequiredChild(Element element, String tagName) {
-        Element child = element.getChild(tagName);
+    public Element getRequiredChild(Element parent, String tagName) {
+        Element child = parent.getChild(tagName);
 
         if (child != null)
             return child;
