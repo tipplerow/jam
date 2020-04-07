@@ -40,6 +40,7 @@ public final class JDOMDocument {
 
         try (InputStream stream = IOUtil.openStream(xmlFile)) {
             SAXBuilder builder = new SAXBuilder();
+            builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             return builder.build(stream);
         }
         catch (Exception ex) {
