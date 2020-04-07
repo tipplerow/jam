@@ -2,6 +2,7 @@
 package jam.xml;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 import org.jdom2.Document;
@@ -9,6 +10,7 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import jam.app.JamLogger;
+import jam.io.IOUtil;
 import jam.lang.JamException;
 
 /**
@@ -29,11 +31,11 @@ public final class JDOMDocument {
     }
 
     private static Document parseSAX(File xmlFile) {
-        SAXBuilder builder = new SAXBuilder();
         JamLogger.info("Parsing [%s]...", xmlFile);
 
-        try {
-            return builder.build(xmlFile);
+        try (InputStream stream = IOUtil.openStream(xmlFile)) {
+            SAXBuilder builder = new SAXBuilder();
+            return builder.build(stream);
         }
         catch (Exception ex) {
             throw JamException.runtime(ex);
