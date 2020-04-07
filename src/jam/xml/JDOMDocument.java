@@ -5,9 +5,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.StAXStreamBuilder;
 
 import jam.app.JamLogger;
 import jam.io.IOUtil;
@@ -26,6 +30,7 @@ public final class JDOMDocument {
     private JDOMDocument(File xmlFile) {
         this.xmlFile = xmlFile;
         this.document = parseSAX(xmlFile);
+        //this.document = parseStax(xmlFile);
         this.rootElement = document.getRootElement();
         this.rootElementChildren = rootElement.getChildren();
     }
@@ -36,6 +41,21 @@ public final class JDOMDocument {
         try (InputStream stream = IOUtil.openStream(xmlFile)) {
             SAXBuilder builder = new SAXBuilder();
             return builder.build(stream);
+        }
+        catch (Exception ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    private static Document parseStax(File xmlFile) {
+        JamLogger.info("Parsing [%s]...", xmlFile);
+
+        try (InputStream stream = IOUtil.openStream(xmlFile)) {
+            XMLInputFactory   factory = XMLInputFactory.newFactory();
+            XMLStreamReader   reader  = factory.createXMLStreamReader(stream);
+            StAXStreamBuilder builder = new StAXStreamBuilder();
+
+            return builder.build(reader);
         }
         catch (Exception ex) {
             throw JamException.runtime(ex);
