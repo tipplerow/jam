@@ -1,3 +1,4 @@
+
 package jam.junit;
 
 import java.util.Arrays;
@@ -84,6 +85,19 @@ public class RegexUtilTest extends NumericTestBase {
     @Test public void testPipe() {
         testSplit(RegexUtil.PIPE, "abc def", 1, "abc def");
         testSplit(RegexUtil.PIPE, "abc|def", 2, "abc", "def");
+    }
+
+    @Test public void testPunctuation() {
+        testSplit(RegexUtil.PUNCTUATION, "abc, def. ghi", 3, "abc", " def", " ghi");
+    }
+
+    @Test public void testPunctuationWhiteSpace() {
+        assertSplit(RegexUtil.PUNCTUATION_WHITE_SPACE, "abc, def. ghi", "abc", "def", "ghi");
+        assertSplit(RegexUtil.PUNCTUATION_WHITE_SPACE, "abc, def: ghi. foo (bar).", "abc", "def", "ghi", "foo", "bar");
+    }
+
+    private void assertSplit(Pattern pattern, String string, String... expected) {
+        assertTrue(Arrays.equals(expected, pattern.split(string)));
     }
 
     @Test public void testPythonComment() {

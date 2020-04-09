@@ -55,6 +55,17 @@ public final class RegexUtil {
     public static final Pattern PIPE = Pattern.compile(Pattern.quote("|"));
 
     /**
+     * Matches one or more punctuation characters.
+     */
+    public static final Pattern PUNCTUATION = Pattern.compile("\\p{Punct}+");
+
+    /**
+     * Matches one or more punctuation characters between optional
+     * white space.
+     */
+    public static final Pattern PUNCTUATION_WHITE_SPACE = Pattern.compile("\\s*\\p{Punct}+\\s*");
+
+    /**
      * Matches the Python and R single-line comment markers.
      */
     public static final Pattern PYTHON_COMMENT = Pattern.compile("#");
