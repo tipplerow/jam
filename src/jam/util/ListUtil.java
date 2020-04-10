@@ -93,6 +93,26 @@ public final class ListUtil {
     }
 
     /**
+     * Determines whether a list ends with a particular sublist.
+     *
+     * @param <V> the element type.
+     *
+     * @param full the full list to examine.
+     *
+     * @param sub the sublist to test.
+     *
+     * @return {@code true} iff the last {@code k} elements of the
+     * complete list {@code full} are the elements in the sublist
+     * {@code sub}, where {@code k} is the length of {@code sub}.
+     */
+    public static <V> boolean endsWith(List<V> full, List<V> sub) {
+        int fullLength = full.size();
+        int subLength  = sub.size();
+
+        return subLength <= fullLength && full.subList(fullLength - subLength, fullLength).equals(sub);
+    }
+
+    /**
      * Removes elements of a list that do not pass a filter predicate.
      *
      * @param <V> the runtime element type.
@@ -372,6 +392,26 @@ public final class ListUtil {
             subLists.add(list.subList(fromIndex, Math.min(fromIndex + size, list.size())));
 
         return subLists;
+    }
+
+    /**
+     * Determines whether a list starts with a particular sublist.
+     *
+     * @param <V> the element type.
+     *
+     * @param full the full list to examine.
+     *
+     * @param sub the sublist to test.
+     *
+     * @return {@code true} iff the first {@code k} elements of the
+     * complete list {@code full} are the elements in the sublist
+     * {@code sub}, where {@code k} is the length of {@code sub}.
+     */
+    public static <V> boolean startsWith(List<V> full, List<V> sub) {
+        int fullLength = full.size();
+        int subLength  = sub.size();
+
+        return subLength <= fullLength && full.subList(0, subLength).equals(sub);
     }
 
     /**

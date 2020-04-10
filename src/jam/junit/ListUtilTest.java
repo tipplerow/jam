@@ -41,6 +41,20 @@ public class ListUtilTest {
         assertEquals(List.of("A", "B", "C", "D", "E", "F"), ListUtil.cat(list1, list2, list3));
     }
 
+    @Test public void testEndsWith() {
+        assertTrue(ListUtil.endsWith(List.of(), List.of()));
+        assertFalse(ListUtil.endsWith(List.of(), List.of("A")));
+
+        assertTrue(ListUtil.endsWith(List.of("A", "B", "C"), List.of()));
+        assertTrue(ListUtil.endsWith(List.of("A", "B", "C"), List.of("C")));
+        assertTrue(ListUtil.endsWith(List.of("A", "B", "C"), List.of("B", "C")));
+        assertTrue(ListUtil.endsWith(List.of("A", "B", "C"), List.of("A", "B", "C")));
+        assertFalse(ListUtil.endsWith(List.of("A", "B", "C"), List.of("D", "A", "B", "C")));
+
+        assertFalse(ListUtil.endsWith(List.of("A", "B", "C"), List.of("A")));
+        assertFalse(ListUtil.endsWith(List.of("A", "B", "C"), List.of("A", "B")));
+    }
+
     @Test public void testFactories() {
         ObjectFactory<ArrayList<String>> arrayFactory = ListUtil.arrayFactory();
         ObjectFactory<LinkedList<String>> linkedFactory = ListUtil.linkedFactory();
@@ -182,6 +196,20 @@ public class ListUtilTest {
         subLists = ListUtil.split(list, 2);
         subLists.get(0).remove(1);
         assertEquals(List.of("A", "C", "D", "E"), list);
+    }
+
+    @Test public void testStartsWith() {
+        assertTrue(ListUtil.startsWith(List.of(), List.of()));
+        assertFalse(ListUtil.startsWith(List.of(), List.of("A")));
+
+        assertTrue(ListUtil.startsWith(List.of("A", "B", "C"), List.of()));
+        assertTrue(ListUtil.startsWith(List.of("A", "B", "C"), List.of("A")));
+        assertTrue(ListUtil.startsWith(List.of("A", "B", "C"), List.of("A", "B")));
+        assertTrue(ListUtil.startsWith(List.of("A", "B", "C"), List.of("A", "B", "C")));
+        assertFalse(ListUtil.startsWith(List.of("A", "B", "C"), List.of("A", "B", "C", "D")));
+
+        assertFalse(ListUtil.startsWith(List.of("A", "B", "C"), List.of("B")));
+        assertFalse(ListUtil.startsWith(List.of("A", "B", "C"), List.of("C", "B")));
     }
 
     @Test public void testTranspose() {
