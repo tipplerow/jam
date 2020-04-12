@@ -99,7 +99,7 @@ public final class TextMatcher {
         if (targetEnd > text.length())
             return false;
 
-        if (!TextUtil.isRightWordBoundary(text.charAt(targetEnd)))
+        if (targetEnd < text.length() && !TextUtil.isRightWordBoundary(text.charAt(targetEnd)))
             return false;
 
         return text.regionMatches(ignoreCase, begin, target, 0, target.length());
