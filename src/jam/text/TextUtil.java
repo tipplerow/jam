@@ -198,11 +198,11 @@ public final class TextUtil {
      * @return the words contained in the text string.
      */
     public static List<String> splitWords(String text) {
-        String[] wordArray = RegexUtil.MULTI_WHITE_SPACE.split(text);
-        List<String> wordList = new ArrayList<String>(wordArray.length);
+        List<String> wordList = new ArrayList<String>();
+        WordIterator iterator = WordIterator.split(text);
 
-        for (String word : wordArray)
-            wordList.add(trimWord(word));
+        while (iterator.hasNext())
+            wordList.add(iterator.next());
 
         return wordList;
     }
