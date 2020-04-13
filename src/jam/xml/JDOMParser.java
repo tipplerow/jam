@@ -48,6 +48,31 @@ public class JDOMParser {
     }
 
     /**
+     * Finds a child with a desired attribute.
+     *
+     * @param parent the parent element.
+     *
+     * @param childName the name of the child element to examine.
+     *
+     * @param attrName the name of the child attribute to examine.
+     *
+     * @param targetValue the desired attribute value.
+     *
+     * @return the first child element with the specified name and
+     * attribute (or {@code null} if no matching child is found).
+     */
+    public Element findChildElement(Element parent, String childName, String attrName, String targetValue) {
+        for (Element child : parent.getChildren(childName)) {
+            String attrValue = child.getAttributeValue(attrName);
+
+            if (attrValue != null && attrValue.equals(targetValue))
+                return child;
+        }
+
+        return null;
+    }
+
+    /**
      * Returns an optional named attribute from the attribute list
      * of an element.
      *
@@ -217,6 +242,37 @@ public class JDOMParser {
             return Integer.parseInt(attrValue);
         else
             return defaultVal;
+    }
+
+    /**
+     * Returns the normalized text from an element, which may be
+     * {@code null}.
+     *
+     * @param element the text-containing element.
+     *
+     * @return the normalized text contained in the given element, or
+     * an empty string if the element is {@code null}.
+     */
+    public String getElementText(Element element) {
+        if (element != null)
+            return element.getTextNormalize();
+        else
+            return "";
+    }
+
+    /**
+     * Returns the normalized text from the direct child of element,
+     * which may be missing.
+     *
+     * @param element the element containing a text-containing child.
+     *
+     * @param childName the name of the text-containing child.
+     *
+     * @return the normalized text contained in the specified child,
+     * or an empty string if the child is not present.
+     */
+    public String getChildText(Element element, String childName) {
+        return getElementText(element.getChild(childName));
     }
 
     /**
