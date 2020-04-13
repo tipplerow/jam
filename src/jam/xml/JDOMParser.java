@@ -292,4 +292,18 @@ public class JDOMParser {
         else
             throw JamException.runtime("Missing child [%s].", tagName);
     }
+
+    /**
+     * Determines whether a parent element has a direct child element.
+     *
+     * @param parent the parent element to examine.
+     *
+     * @param childName the name of the child element in question.
+     *
+     * @return {@code true} iff the parent has a child with the given
+     * name.
+     */
+    public boolean hasChild(Element parent, String childName) {
+        return parent.getChild(childName) != null;
+    }
 }

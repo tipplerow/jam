@@ -51,6 +51,13 @@ public class JDOMParserTest {
         assertEquals("D000001", parser.getElementText(descriptorUIElement));
     }
 
+    @Test public void testHasChild() {
+        Element descriptorElement = descriptorList.get(0);
+
+        assertTrue(parser.hasChild(descriptorElement, "DescriptorUI"));
+        assertFalse(parser.hasChild(descriptorElement, "String"));
+    }
+
     @Test public void testParser() {
         parser.assertTagName(document.getRootElement(), "DescriptorRecordSet");
 
