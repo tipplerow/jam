@@ -95,6 +95,21 @@ public abstract class SQLDb {
     }
 
     /**
+     * Deletes a database table if it exists.
+     *
+     * @param tableName the name of the database table to delete.
+     *
+     * @throws RuntimeException if the table cannot be deleted.
+     */
+    public void dropTable(String tableName) {
+        executeUpdate(dropTableUpdate(tableName));
+    }
+
+    private static String dropTableUpdate(String tableName) {
+        return String.format("DROP TABLE IF EXISTS %s", tableName);
+    }
+
+    /**
      * Executes a query using a new database connection.
      *
      * <p>The new connection, statement, and result set should be

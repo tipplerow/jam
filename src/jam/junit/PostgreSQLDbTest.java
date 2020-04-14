@@ -57,7 +57,7 @@ public class PostgreSQLDbTest {
         }
     }
 
-    @Test public void testCreateTable() {
+    @Test public void testCreateDrop() {
         if (!canConnect)
             return;
 
@@ -67,9 +67,12 @@ public class PostgreSQLDbTest {
         assertFalse(db.tableExists("test_table"));
 
         db.createTable("test_table", "key text PRIMARY KEY, value integer");
+        db.createTable("test_table", "key text PRIMARY KEY, value integer");
         assertTrue(db.tableExists("test_table"));
 
-        db.executeUpdate("drop table test_table");
+        db.dropTable("test_table");
+        db.dropTable("test_table");
+        assertFalse(db.tableExists("test_table"));
     }
 
     @Test public void testUserExists() {
