@@ -12,8 +12,9 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class PostgreSQLDbTest {
+    private static boolean canConnect = false;
 
-    private static SQLDb createDb() {
+    private static PostgreSQLDb createDb() {
         if (!PostgreSQLDb.isInstalled())
             return null;
 
@@ -47,17 +48,17 @@ public class PostgreSQLDbTest {
         }
     }
 
-    private static boolean canConnect() {
+    static {
         try (Connection connection = createDb().openConnection()) {
-            return true;
+            canConnect = true;
         }
         catch (Exception ex) {
-            return false;
+            canConnect = false;
         }
     }
 
     @Test public void testCreateTable() {
-        if (!canConnect())
+        if (!canConnect)
             return;
 
         SQLDb db = createDb();
@@ -69,6 +70,16 @@ public class PostgreSQLDbTest {
         assertTrue(db.tableExists("test_table"));
 
         db.executeUpdate("drop table test_table");
+    }
+
+    @Test public void testUserExists() {
+        if (!canConnect)
+            return;
+
+        PostgreSQLDb db = createDb();
+
+        assertTrue(db.userExists(JamEnv.getRequired("USER")));
+        assertFalse(db.userExists("no such user"));
     }
 
     public static void main(String[] args) {

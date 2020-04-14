@@ -66,6 +66,24 @@ public final class PostgreSQLDb extends SQLDb {
     }
 
     /**
+     * Creates a new database user.
+     *
+     * @param username the name of the user to create.
+     *
+     * @param password the login password for the user.
+     *
+     * @throws RuntimeException if the user already exists.
+     */
+    public void createUser(String username, String password) {
+        String updateStr = createUserUpdate(username, password);
+        executeUpdate(updateStr);
+    }
+
+    private static String createUserUpdate(String username, String password) {
+        return String.format("create role %s login password '%s'", username, password);
+    }
+
+    /**
      * Returns the connection endpoint.
      *
      * @return the connection endpoint.
@@ -85,6 +103,25 @@ public final class PostgreSQLDb extends SQLDb {
         String database = endpoint.getDatabase();
 
         return String.format("jdbc:postgresql://%s:%d/%s", hostname, port, database);
+    }
+
+    /**
+     * Determines whether a database user exists.
+     *
+     * @param username the name of the user in question.
+     *
+     * @return {@code true} iff a user with the given name exists.
+     */
+    public boolean userExists(String username) {
+        String queryStr = countUserQuery(username);
+
+        try (QueryResult queryResult = executeQuery(queryStr)) {
+            return getCount(queryResult.getResultSet()) == 1;
+        }
+    }
+
+    private static String countUserQuery(String username) {
+        return String.format("select count(*) from pg_roles where rolname = '%s'", username);
     }
 
     @Override public Connection openConnection() {
