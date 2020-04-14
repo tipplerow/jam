@@ -73,14 +73,9 @@ public final class QueryResult implements AutoCloseable {
     }
 
     @Override public void close() {
-        //
-        // Always close the (privately created) statement and result
-        // set; only close the connection if the user indicated so...
-        //
-        SQLUtil.close(getResultSet());
-        SQLUtil.close(getStatement());
-
         if (closeConn)
             SQLUtil.close(getConnection());
+        else
+            SQLUtil.close(getStatement());
     }
 }
