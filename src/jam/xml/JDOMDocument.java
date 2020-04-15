@@ -3,6 +3,7 @@ package jam.xml;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
@@ -12,6 +13,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.StAXStreamBuilder;
+import org.jdom2.output.XMLOutputter;
 
 import jam.app.JamLogger;
 import jam.io.IOUtil;
@@ -125,5 +127,35 @@ public final class JDOMDocument {
      */
     public List<Element> getRootElementChildren() {
         return rootElementChildren;
+    }
+
+    /**
+     * Writes this document to an XML file with default formatting.
+     *
+     * @param xmlFile the XML file to write.
+     *
+     * @throws RuntimeException if any I/O errors occur.
+     */
+    public void unparse(String xmlFile) {
+        unparse(new File(xmlFile));
+    }
+
+    /**
+     * Writes this document to an XML file with default formatting.
+     *
+     * @param xmlFile the XML file to write.
+     *
+     * @throws RuntimeException if any I/O errors occur.
+     */
+    public void unparse(File xmlFile) {
+        JamLogger.info("Unparsing document into [%s]...", xmlFile);
+
+        try (OutputStream stream = IOUtil.openOutputStream(xmlFile)) {
+            XMLOutputter outputter = new XMLOutputter();
+            outputter.output(document, stream);
+        }
+        catch (Exception ex) {
+            throw JamException.runtime(ex);
+        }
     }
 }

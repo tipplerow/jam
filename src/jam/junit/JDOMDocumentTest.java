@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.io.File;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -15,7 +16,18 @@ public class JDOMDocumentTest {
 
     @Test public void testParse() {
         JDOMDocument document = JDOMDocument.parse(DESC_SAMPLE_FILE);
+        assertDocument(document);
 
+        File unparsed = new File("data/test/__foo.xml.gz");
+        unparsed.deleteOnExit();
+
+        document.unparse(unparsed);
+
+        JDOMDocument document2 = JDOMDocument.parse(unparsed);
+        assertDocument(document2);
+    }
+
+    private void assertDocument(JDOMDocument document) {
         assertEquals("DescriptorRecordSet", document.getRootElement().getName());
         
         List<Element> descriptorList = document.getRootElementChildren();
@@ -23,6 +35,11 @@ public class JDOMDocumentTest {
 
         for (Element descriptorElement : descriptorList)
             assertEquals("DescriptorRecord", descriptorElement.getName());
+
+        List<Element> descriptorChildren = descriptorList.get(0).getChildren();
+        assertEquals(13, descriptorChildren.size());
+        assertEquals("DescriptorUI", descriptorChildren.get(0).getName());
+        assertEquals("ConceptList", descriptorChildren.get(12).getName());
     }
 
     public static void main(String[] args) {
