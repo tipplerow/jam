@@ -18,7 +18,7 @@ public class JDOMDocumentTest {
         JDOMDocument document = JDOMDocument.parse(DESC_SAMPLE_FILE);
         assertDocument(document);
 
-        File unparsed = new File("data/test/__foo.xml.gz");
+        File unparsed = new File("data/test/__foo1.xml.gz");
         unparsed.deleteOnExit();
 
         document.unparse(unparsed);
@@ -40,6 +40,39 @@ public class JDOMDocumentTest {
         assertEquals(13, descriptorChildren.size());
         assertEquals("DescriptorUI", descriptorChildren.get(0).getName());
         assertEquals("ConceptList", descriptorChildren.get(12).getName());
+    }
+
+    @Test public void testRemoveChild() {
+        JDOMDocument document = JDOMDocument.parse(DESC_SAMPLE_FILE);
+        assertDocument(document);
+
+        List<Element> descriptorList = document.getRootElementChildren();
+
+        assertEquals(3, descriptorList.size());
+        assertEquals("D000001", descriptorList.get(0).getChildren().get(0).getTextNormalize());
+        assertEquals("D000002", descriptorList.get(1).getChildren().get(0).getTextNormalize());
+        assertEquals("D000003", descriptorList.get(2).getChildren().get(0).getTextNormalize());
+
+        document.getRootElement().removeContent(descriptorList.get(0));
+
+        descriptorList = document.getRootElementChildren();
+
+        assertEquals(2, descriptorList.size());
+        assertEquals("D000002", descriptorList.get(0).getChildren().get(0).getTextNormalize());
+        assertEquals("D000003", descriptorList.get(1).getChildren().get(0).getTextNormalize());
+
+        File unparsed = new File("data/test/__foo2.xml");
+        unparsed.deleteOnExit();
+
+        document.unparse(unparsed);
+
+        JDOMDocument document2 = JDOMDocument.parse(unparsed);
+
+        descriptorList = document2.getRootElementChildren();
+
+        assertEquals(2, descriptorList.size());
+        assertEquals("D000002", descriptorList.get(0).getChildren().get(0).getTextNormalize());
+        assertEquals("D000003", descriptorList.get(1).getChildren().get(0).getTextNormalize());
     }
 
     public static void main(String[] args) {
