@@ -125,7 +125,7 @@ public final class DOMUtil {
     public static Document parse(File xmlFile) {
         JamLogger.info("Parsing [%s]...", xmlFile);
 
-        try (InputStream stream = IOUtil.openStream(xmlFile)) {
+        try (InputStream stream = IOUtil.openInputStream(xmlFile)) {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
 

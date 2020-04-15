@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -49,6 +50,44 @@ public final class ZipUtil {
     }
 
     /**
+     * Opens an input stream for a GZIP file.
+     *
+     * @param file the file to read.
+     *
+     * @return an input stream for the specified GZIP file.
+     *
+     * @throws RuntimeException unless the file is a valid GZIP file
+     * and is open for reading.
+     */
+    public static InputStream openGZipInputStream(File file) {
+        try {
+            return new GZIPInputStream(new FileInputStream(file));
+        }
+        catch (IOException ioex) {
+            throw JamException.runtime(ioex);
+        }
+    }
+
+    /**
+     * Opens an output stream for a GZIP file.
+     *
+     * @param file the file to write.
+     *
+     * @return an output stream for the specified GZIP file.
+     *
+     * @throws RuntimeException unless the file is a valid GZIP file
+     * and is open for writing.
+     */
+    public static OutputStream openGZipOutputStream(File file) {
+        try {
+            return new GZIPOutputStream(new FileOutputStream(file));
+        }
+        catch (IOException ioex) {
+            throw JamException.runtime(ioex);
+        }
+    }
+
+    /**
      * Opens a reader for a GZIP file.
      *
      * @param file the file to read.
@@ -59,26 +98,7 @@ public final class ZipUtil {
      * and is open for reading.
      */
     public static BufferedReader openGZipReader(File file) {
-        return new BufferedReader(new InputStreamReader(openGZipStream(file)));
-    }
-
-    /**
-     * Opens an input stream for a GZIP file.
-     *
-     * @param file the file to read.
-     *
-     * @return an input stream for the specified GZIP file.
-     *
-     * @throws RuntimeException unless the file is a valid GZIP file
-     * and is open for reading.
-     */
-    public static InputStream openGZipStream(File file) {
-        try {
-            return new GZIPInputStream(new FileInputStream(file));
-        }
-        catch (IOException ioex) {
-            throw JamException.runtime(ioex);
-        }
+        return new BufferedReader(new InputStreamReader(openGZipInputStream(file)));
     }
 
     /**
@@ -97,13 +117,8 @@ public final class ZipUtil {
         if (!isGZipFile(file))
             throw JamException.runtime("File [%s] is not a GZIP file.");
 
-        try {
-            FileUtil.ensureParentDirs(file);
-            return new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
-        }
-        catch (IOException ioex) {
-            throw JamException.runtime(ioex);
-        }
+        FileUtil.ensureParentDirs(file);
+        return new PrintWriter(openGZipOutputStream(file));
     }
 
     /**

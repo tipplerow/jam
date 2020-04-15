@@ -38,7 +38,7 @@ public final class JDOMDocument {
     private static Document parseSAX(File xmlFile) {
         JamLogger.info("Parsing [%s]...", xmlFile);
 
-        try (InputStream stream = IOUtil.openStream(xmlFile)) {
+        try (InputStream stream = IOUtil.openInputStream(xmlFile)) {
             SAXBuilder builder = new SAXBuilder();
             builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             return builder.build(stream);
@@ -51,7 +51,7 @@ public final class JDOMDocument {
     private static Document parseStax(File xmlFile) {
         JamLogger.info("Parsing [%s]...", xmlFile);
 
-        try (InputStream stream = IOUtil.openStream(xmlFile)) {
+        try (InputStream stream = IOUtil.openInputStream(xmlFile)) {
             XMLInputFactory   factory = XMLInputFactory.newFactory();
             XMLStreamReader   reader  = factory.createXMLStreamReader(stream);
             StAXStreamBuilder builder = new StAXStreamBuilder();

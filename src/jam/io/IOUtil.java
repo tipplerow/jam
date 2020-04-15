@@ -6,12 +6,14 @@ import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Flushable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import java.util.ArrayList;
@@ -101,6 +103,62 @@ public final class IOUtil {
     }
 
     /**
+     * Opens an input stream for a file.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate stream
+     * will be returned.
+     *
+     * @param file the file to read.
+     *
+     * @return an input stream for the specified file.
+     *
+     * @throws RuntimeException unless the file is open for reading.
+     */
+    public static InputStream openInputStream(File file) {
+        if (ZipUtil.isGZipFile(file))
+            return ZipUtil.openGZipInputStream(file);
+
+        try {
+            return new FileInputStream(file);
+        }
+        catch (IOException ioex) {
+            throw JamException.runtime(ioex);
+        }
+    }
+
+    /**
+     * Opens an output stream for a file.
+     *
+     * <p>This method is provided to encapsulate and centralize the
+     * standard chaining of readers.
+     *
+     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
+     * file will assumed to be a GZIP file and an appropriate stream
+     * will be returned.
+     *
+     * @param file the file to read.
+     *
+     * @return an output stream for the specified file.
+     *
+     * @throws RuntimeException unless the file is open for writing.
+     */
+    public static OutputStream openOutputStream(File file) {
+        if (ZipUtil.isGZipFile(file))
+            return ZipUtil.openGZipOutputStream(file);
+
+        try {
+            return new FileOutputStream(file);
+        }
+        catch (IOException ioex) {
+            throw JamException.runtime(ioex);
+        }
+    }
+
+    /**
      * Opens a reader for a file.
      *
      * <p>This method is provided to encapsulate and centralize the
@@ -184,34 +242,6 @@ public final class IOUtil {
      */
     public static BufferedReader openReader(InputStream stream) {
         return new BufferedReader(new InputStreamReader(stream));
-    }
-
-    /**
-     * Opens an input stream for a file.
-     *
-     * <p>This method is provided to encapsulate and centralize the
-     * standard chaining of readers.
-     *
-     * <p>If the file name ends in the GZIP suffix ({@code .gz}), the
-     * file will assumed to be a GZIP file and an appropriate stream
-     * will be returned.
-     *
-     * @param file the file to read.
-     *
-     * @return an input stream for the specified file.
-     *
-     * @throws RuntimeException unless the file is open for reading.
-     */
-    public static InputStream openStream(File file) {
-        if (ZipUtil.isGZipFile(file))
-            return ZipUtil.openGZipStream(file);
-
-        try {
-            return new FileInputStream(file);
-        }
-        catch (IOException ioex) {
-            throw JamException.runtime(ioex);
-        }
     }
 
     /**
