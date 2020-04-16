@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 import jam.app.JamLogger;
 import jam.lang.JamException;
+import jam.lang.KeyedObject;
 
 /**
  * Manages a persistent database table of records.
@@ -163,6 +165,43 @@ public abstract class SQLTable<K, V> {
             return ((Double) obj).doubleValue();
         else
             return Double.NaN;
+    }
+
+    /**
+     * Assigns a possibly {@code null} string value as a parameter in
+     * a prepared statement.
+     *
+     * @param statement the prepared statement to populate.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first is 1, second is 2, ...).
+     *
+     * @param value the possibly {@code null} string value to assign.
+     */
+    protected static void setKeyedObject(PreparedStatement statement, int index,
+                                         KeyedObject<String> object) throws SQLException {
+        if (object != null)
+            setString(statement, index, object.getKey());
+        else
+            statement.setNull(index, Types.VARCHAR);
+    }
+
+    /**
+     * Assigns a possibly {@code null} string value as a parameter in
+     * a prepared statement.
+     *
+     * @param statement the prepared statement to populate.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first is 1, second is 2, ...).
+     *
+     * @param value the possibly {@code null} string value to assign.
+     */
+    protected static void setString(PreparedStatement statement, int index, String value) throws SQLException {
+        if (value != null)
+            statement.setString(index, value);
+        else
+            statement.setNull(index, Types.VARCHAR);
     }
 
     /**
