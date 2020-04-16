@@ -130,6 +130,24 @@ public final class ListUtil {
     }
 
     /**
+     * Removes elements of a list that do not pass a filter predicate
+     * <em>using a parallel stream</em>.
+     *
+     * @param <V> the runtime element type.
+     *
+     * @param list the list to be filtered.
+     *
+     * @param predicate the predicate filter to apply to each element
+     * in the list.
+     *
+     * @return a list containing only elements for which the predicate
+     * evaluates to {@code true}.
+     */
+    public static <V> List<V> filterParallel(List<V> list, Predicate<? super V> predicate) {
+        return list.parallelStream().filter(predicate).collect(Collectors.toList());
+    }
+
+    /**
      * Returns the first element from a list.
      *
      * @param <V> the element type.
