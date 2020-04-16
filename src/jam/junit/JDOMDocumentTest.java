@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.List;
 
 import org.jdom2.Element;
+import org.jdom2.output.Format;
 
 import jam.xml.JDOMDocument;
 
@@ -21,7 +22,7 @@ public class JDOMDocumentTest {
         File unparsed = new File("data/test/__foo1.xml.gz");
         unparsed.deleteOnExit();
 
-        document.unparse(unparsed);
+        document.unparse(unparsed, Format.getCompactFormat());
 
         JDOMDocument document2 = JDOMDocument.parse(unparsed);
         assertDocument(document2);
@@ -64,7 +65,7 @@ public class JDOMDocumentTest {
         File unparsed = new File("data/test/__foo2.xml");
         unparsed.deleteOnExit();
 
-        document.unparse(unparsed);
+        document.unparse(unparsed, Format.getPrettyFormat());
 
         JDOMDocument document2 = JDOMDocument.parse(unparsed);
 

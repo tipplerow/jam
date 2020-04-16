@@ -13,6 +13,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.StAXStreamBuilder;
+import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import jam.app.JamLogger;
@@ -130,7 +131,7 @@ public final class JDOMDocument {
     }
 
     /**
-     * Writes this document to an XML file with default formatting.
+     * Writes this document to an XML file with pretty formatting.
      *
      * @param xmlFile the XML file to write.
      *
@@ -141,17 +142,33 @@ public final class JDOMDocument {
     }
 
     /**
-     * Writes this document to an XML file with default formatting.
+     * Writes this document to an XML file with pretty formatting.
      *
      * @param xmlFile the XML file to write.
      *
      * @throws RuntimeException if any I/O errors occur.
      */
     public void unparse(File xmlFile) {
+        unparse(xmlFile, Format.getPrettyFormat());
+    }
+
+    /**
+     * Writes this document to an XML file with custom formatting.
+     *
+     * @param xmlFile the XML file to write.
+     *
+     * @param format the XML format to use.
+     *
+     * @throws RuntimeException if any I/O errors occur.
+     */
+    public void unparse(File xmlFile, Format format) {
+        unparse(xmlFile, new XMLOutputter(format));
+    }
+
+    private void unparse(File xmlFile, XMLOutputter outputter) {
         JamLogger.info("Unparsing document into [%s]...", xmlFile);
 
         try (OutputStream stream = IOUtil.openOutputStream(xmlFile)) {
-            XMLOutputter outputter = new XMLOutputter();
             outputter.output(document, stream);
         }
         catch (Exception ex) {
