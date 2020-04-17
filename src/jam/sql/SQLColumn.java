@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jam.report.LineBuilder;
+import jam.util.ListUtil;
 
 /**
  * Encapsulates SQL schema meta-data for a database column.
@@ -34,6 +35,17 @@ public final class SQLColumn {
     }
 
     /**
+     * Extracts the names from a list of columns.
+     *
+     * @param columns the table columns.
+     *
+     * @return the names of the given columns (in the same order).
+     */
+    public static List<String> getNames(List<SQLColumn> columns) {
+        return ListUtil.apply(columns, x -> x.getName());
+    }
+
+    /**
      * Joins column descriptions to form a complete table schema
      * description.
      *
@@ -41,7 +53,7 @@ public final class SQLColumn {
      *
      * @return the table schema.
      */
-    public static String schema(SQLColumn... columns) {
+    public static String schema(List<SQLColumn> columns) {
         LineBuilder builder = new LineBuilder(", ");
 
         for (SQLColumn column : columns)

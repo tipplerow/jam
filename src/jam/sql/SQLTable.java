@@ -62,13 +62,13 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
-     * Returns the names of the table columns (ordered from left to right).
+     * Returns the column meta-data (ordered from left to right).
      *
      * <p>The key must be in the first (left-most) column.
      *
-     * @return the names of the table columns (ordered from left to right).
+     * @return the column meta-data (ordered from left to right).
      */
-    public abstract List<String> getColumnNames();
+    public abstract List<SQLColumn> getColumns();
 
     /**
      * Returns the key for a given record.
@@ -97,13 +97,6 @@ public abstract class SQLTable<K, V> {
      * @return the name of the database table.
      */
     public abstract String getTableName();
-
-    /**
-     * Returns the schema required to create the table.
-     *
-     * @return the schema required to create the table.
-     */
-    public abstract String getTableSchema();
 
     /**
      * Assigns the fields of a record to the parameters of a prepared
@@ -359,12 +352,30 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
+     * Returns the names of the columns (in order from left to right).
+     *
+     * @return the names of the columns (in order from left to right).
+     */
+    public List<String> getColumnNames() {
+        return SQLColumn.getNames(getColumns());
+    }
+
+    /**
      * Returns the name of the key column.
      *
      * @return the name of the key column.
      */
     public String getKeyName() {
-        return getColumnNames().get(0);
+        return getColumns().get(0).getName();
+    }
+
+    /**
+     * Returns the schema required to create the table.
+     *
+     * @return the schema required to create the table.
+     */
+    public String getTableSchema() {
+        return SQLColumn.schema(getColumns());
     }
 
     /**
@@ -540,7 +551,7 @@ public abstract class SQLTable<K, V> {
         builder.append(getTableName());
         builder.append(" VALUES(?");
 
-        for (int k = 1; k < getColumnNames().size(); ++k)
+        for (int k = 1; k < getColumns().size(); ++k)
             builder.append(", ?");
 
         builder.append(")");

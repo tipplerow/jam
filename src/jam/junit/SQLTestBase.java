@@ -10,6 +10,7 @@ import java.util.Map;
 
 import jam.math.DoubleComparator;
 import jam.sql.SQLCache;
+import jam.sql.SQLColumn;
 import jam.sql.SQLDb;
 import jam.sql.SQLiteDb;
 import jam.sql.SQLStore;
@@ -92,8 +93,12 @@ public abstract class SQLTestBase {
             super(db);
         }
 
-        @Override public List<String> getColumnNames() {
-            return List.of("key", "foo", "bar");
+        private static SQLColumn KEY_COLUMN = SQLColumn.create("key", "string").primaryKey();
+        private static SQLColumn FOO_COLUMN = SQLColumn.create("foo", "double");
+        private static SQLColumn BAR_COLUMN = SQLColumn.create("bar", "int");
+
+        @Override public List<SQLColumn> getColumns() {
+            return List.of(KEY_COLUMN, FOO_COLUMN, BAR_COLUMN);
         }
 
         @Override public String getKey(TestRecord record) {
@@ -110,10 +115,6 @@ public abstract class SQLTestBase {
 
         @Override public String getTableName() {
             return "test_table";
-        }
-
-        @Override public String getTableSchema() {
-            return "key string PRIMARY KEY, foo double, bar int";
         }
 
         @Override public void prepareInsert(PreparedStatement statement, TestRecord record) throws SQLException {
