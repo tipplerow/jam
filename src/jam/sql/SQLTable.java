@@ -183,6 +183,23 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
+     * Retrieves a {@code String} value from a result set.
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnLabel the column label.
+     *
+     * @return the {@code String} value in the specified column of the
+     * result set.
+     *
+     * @throws SQLException if the column label is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public static String getString(ResultSet resultSet, String columnLabel) throws SQLException {
+        return resultSet.getString(columnLabel);
+    }
+
+    /**
      * Assigns a possibly {@code null} string value as a parameter in
      * a prepared statement.
      *
