@@ -121,6 +121,10 @@ public abstract class SQLTestBase {
             statement.setDouble(2, record.foo);
             statement.setInt(3, record.bar);
         }
+
+        @Override public void prepareKey(PreparedStatement statement, int index, String key) throws SQLException {
+            statement.setString(index, key);
+        }
     }
 
     public static final class TestStore extends SQLStore<String, TestRecord> {

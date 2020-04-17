@@ -127,9 +127,6 @@ public abstract class SQLTable<K, V> {
     /**
      * Assigns the record key to a prepared statement.
      *
-     * <p>This default implementation assumes that the key is stored
-     * in the database as {@code key.toString()}.
-     *
      * @param statement an open prepared statement.
      *
      * @param index the parameter index of the key in the statement.
@@ -138,9 +135,7 @@ public abstract class SQLTable<K, V> {
      *
      * @throws SQLException if the assignment fails.
      */
-    public void prepareKey(PreparedStatement statement, int index, K key) throws SQLException {
-        statement.setString(index, key.toString());
-    }
+    public abstract void prepareKey(PreparedStatement statement, int index, K key) throws SQLException;
 
     /**
      * Retrieves a {@code double} value from a result set, converting
