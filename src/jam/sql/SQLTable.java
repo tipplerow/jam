@@ -27,6 +27,13 @@ import jam.lang.KeyedObject;
  * @param <V> the runtime type of the record values.
  */
 public abstract class SQLTable<K, V> {
+    private Connection connection = null;
+
+    private PreparedStatement fetchStatement = null;
+    private PreparedStatement storeStatement = null;
+    private PreparedStatement removeStatement = null;
+    private PreparedStatement containsStatement = null;
+
     /**
      * The manager for the database containing this table.
      */
@@ -39,6 +46,19 @@ public abstract class SQLTable<K, V> {
      */
     protected SQLTable(SQLDb db) {
         this.db = db;
+    }
+
+    private Connection getConnection() throws SQLException {
+        if (connection == null) {
+            connection = db.openConnection();
+            connection.setAutoCommit(false);
+        }
+
+        return connection;
+    }
+
+    private PreparedStatement prepareStatement(String sql) throws SQLException {
+        return getConnection().prepareStatement(sql);
     }
 
     /**
@@ -137,7 +157,7 @@ public abstract class SQLTable<K, V> {
      * @throws SQLException if the column index is not valid; if a
      * database error occurs; or if called on a closed result set.
      */
-    protected static double getDouble(ResultSet resultSet, int columnIndex) throws SQLException {
+    public static double getDouble(ResultSet resultSet, int columnIndex) throws SQLException {
         return getDouble(resultSet.getObject(columnIndex));
     }
 
@@ -156,7 +176,7 @@ public abstract class SQLTable<K, V> {
      * @throws SQLException if the column label is not valid; if a
      * database error occurs; or if called on a closed result set.
      */
-    protected static double getDouble(ResultSet resultSet, String columnLabel) throws SQLException {
+    public static double getDouble(ResultSet resultSet, String columnLabel) throws SQLException {
         return getDouble(resultSet.getObject(columnLabel));
     }
 
@@ -176,10 +196,13 @@ public abstract class SQLTable<K, V> {
      * @param index the index of the parameter in the statement (the
      * first is 1, second is 2, ...).
      *
-     * @param value the possibly {@code null} string value to assign.
+     * @param object the possibly {@code null} object to assign.
+     *
+     * @throws SQLException if the statement is closed, the index is
+     * invalid, or if a database error occurs.
      */
-    protected static void setKeyedObject(PreparedStatement statement, int index,
-                                         KeyedObject<String> object) throws SQLException {
+    public static void setKeyedObject(PreparedStatement statement, int index,
+                                      KeyedObject<String> object) throws SQLException {
         if (object != null)
             setString(statement, index, object.getKey());
         else
@@ -196,8 +219,11 @@ public abstract class SQLTable<K, V> {
      * first is 1, second is 2, ...).
      *
      * @param value the possibly {@code null} string value to assign.
+     *
+     * @throws SQLException if the statement is closed, the index is
+     * invalid, or if a database error occurs.
      */
-    protected static void setString(PreparedStatement statement, int index, String value) throws SQLException {
+    public static void setString(PreparedStatement statement, int index, String value) throws SQLException {
         if (value != null)
             statement.setString(index, value);
         else
@@ -211,26 +237,39 @@ public abstract class SQLTable<K, V> {
      *
      * @return {@code true} iff this table contains a record with the
      * specfied key.
+     *
+     * @throws RuntimeException unless the table exists.
      */
-    public boolean contains(K key) {
-        if (!exists())
-            return false;
-
-        try (Connection connection = db.openConnection()) {
-            return contains(connection, key);
+    public synchronized boolean contains(K key) {
+        try {
+            return contains(getContainsStatement(), key);
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
     }
 
-    /**
-     * Creates this table in the database unless it already exists.
-     *
-     * @throws RuntimeException if the table cannot be created.
-     */
-    public synchronized void create() {
-        db.createTable(getTableName(), getTableSchema());
+    private PreparedStatement getContainsStatement() throws SQLException {
+        if (containsStatement == null)
+            containsStatement = prepareStatement(formatContainsQuery());
+
+        return containsStatement;
+    }
+
+    private String formatContainsQuery() {
+        return String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", getTableName(), getKeyName());
+    }
+
+    private boolean contains(PreparedStatement statement, K key) throws SQLException {
+        prepareKey(statement, 1, key);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            return contains(resultSet);
+        }
+    }
+
+    private boolean contains(ResultSet resultSet) {
+        return db.getCount(resultSet) > 0;
     }
 
     /**
@@ -251,9 +290,6 @@ public abstract class SQLTable<K, V> {
      * there is no matching key in this table.
      */
     public V fetch(K key) {
-        if (!exists())
-            return null;
-
         return fetch(List.of(key)).get(0);
     }
 
@@ -266,146 +302,20 @@ public abstract class SQLTable<K, V> {
      * returned by the collection iterator.  If any keys are not found,
      * the corresponding elements will be {@code null}.
      */
-    public List<V> fetch(Collection<K> keys) {
-        if (!exists())
-            return new ArrayList<V>();
-
-        try (Connection connection = db.openConnection()) {
-            return fetch(connection, keys);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-    }
-
-    /**
-     * Returns the name of the key column.
-     *
-     * @return the name of the key column.
-     */
-    public String getKeyName() {
-        return getColumnNames().get(0);
-    }
-
-    /**
-     * Loads all rows in the database table.
-     *
-     * @return all rows contained in the database table.
-     *
-     * @throws RuntimeException if any errors occur.
-     */
-    public Map<K, V> load() {
-        Map<K, V> records = null;
-        JamLogger.info("Loading table [%s]...", getTableName());
-
+    public synchronized List<V> fetch(Collection<K> keys) {
         try {
-            records = loadSync();
+            return fetch(getFetchStatement(), keys);
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
-
-        JamLogger.info("Loaded [%d] records from table [%s]...", records.size(), getTableName());
-        return records;
     }
 
-    /**
-     * Removes a record from this table (if it is present); a no-op if
-     * the key is not present.
-     *
-     * @param key the key of the record to remove.
-     */
-    public void remove(K key) {
-        remove(List.of(key));
-    }
+    private PreparedStatement getFetchStatement() throws SQLException {
+        if (fetchStatement == null)
+            fetchStatement = prepareStatement(formatFetchQuery());
 
-    /**
-     * Removes records from this table.
-     *
-     * @param keys the keys of the records to remove.
-     */
-    public void remove(Collection<K> keys) {
-        JamLogger.info("Removing [%d] records from table [%s]...", keys.size(), getTableName());
-
-        try {
-            removeSync(keys);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-
-        JamLogger.info("Removed [%d] records from table [%s].", keys.size(), getTableName());
-    }
-
-    /**
-     * Stores a new unique record in the database table.
-     *
-     * @param record the record to store, which must have a unique
-     * primary keys
-     *
-     * @throws RuntimeException if the records has a duplicate key or
-     * if any SQL errors occur.
-     */
-    public void store(V record) {
-        store(List.of(record));
-    }
-
-    /**
-     * Stores new unique records in the database table.
-     *
-     * @param records the records to store, which must have unique
-     * primary keys.
-     *
-     * @throws RuntimeException if any records have duplicate keys or
-     * if any SQL errors occur.
-     */
-    public void store(Collection<V> records) {
-        JamLogger.info("Adding [%d] records to table [%s]...", records.size(), getTableName());
-
-        try {
-            storeSync(records);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-
-        JamLogger.info("Added [%d] records to table [%s].", records.size(), getTableName());
-    }
-
-    // -----------------------------------------------------------------
-
-    private boolean contains(Connection connection, K key) throws SQLException {
-        String queryString = formatContainsQuery();
-
-        try (PreparedStatement statement = connection.prepareStatement(queryString)) {
-            return contains(statement, key);
-        }
-    }
-
-    private String formatContainsQuery() {
-        return String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", getTableName(), getKeyName());
-    }
-
-    private boolean contains(PreparedStatement statement, K key) throws SQLException {
-        prepareKey(statement, 1, key);
-
-        try (ResultSet resultSet = statement.executeQuery()) {
-            return contains(resultSet);
-        }
-    }
-
-    private boolean contains(ResultSet resultSet) {
-        return db.getCount(resultSet) > 0;
-    }
-
-    // -----------------------------------------------------------------
-
-    private List<V> fetch(Connection connection, Collection<K> keys) throws SQLException {
-        String queryString = formatFetchQuery();
-
-        try (PreparedStatement statement = connection.prepareStatement(queryString)) {
-            return fetch(statement, keys);
-        }
+        return fetchStatement;
     }
 
     private String formatFetchQuery() {
@@ -436,15 +346,35 @@ public abstract class SQLTable<K, V> {
             return null;
     }
 
-    // -----------------------------------------------------------------
+    /**
+     * Returns the name of the key column.
+     *
+     * @return the name of the key column.
+     */
+    public String getKeyName() {
+        return getColumnNames().get(0);
+    }
 
-    private synchronized Map<K, V> loadSync() throws SQLException {
-        if (!exists())
-            return new HashMap<K, V>();
+    /**
+     * Loads all rows in the database table.
+     *
+     * @return all rows contained in the database table.
+     *
+     * @throws RuntimeException if any errors occur.
+     */
+    public synchronized Map<K, V> load() {
+        JamLogger.info("Loading table [%s]...", getTableName());
+        Map<K, V> records = null;
 
-        try (Connection connection = db.openConnection(false)) {
-            return load(connection.createStatement());
+        try {
+            records = load(getConnection());
         }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+
+        JamLogger.info("Loaded [%d] records from table [%s]...", records.size(), getTableName());
+        return records;
     }
 
     private Map<K, V> load(Connection connection) throws SQLException {
@@ -476,23 +406,35 @@ public abstract class SQLTable<K, V> {
         return records;
     }
 
-    // -----------------------------------------------------------------
+    /**
+     * Removes a record from this table (if it is present); a no-op if
+     * the key is not present.
+     *
+     * @param key the key of the record to remove.
+     */
+    public void remove(K key) {
+        remove(List.of(key));
+    }
 
-    private synchronized void removeSync(Collection<K> keys) throws SQLException {
-        if (!exists())
-            return;
-
-        try (Connection connection = db.openConnection(false)) {
-            remove(connection, keys);
+    /**
+     * Removes records from this table.
+     *
+     * @param keys the keys of the records to remove.
+     */
+    public synchronized void remove(Collection<K> keys) {
+        try {
+            remove(getRemoveStatement(), keys);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
         }
     }
 
-    private void remove(Connection connection, Collection<K> keys) throws SQLException {
-        String updateString = formatDeleteStatement();
+    private PreparedStatement getRemoveStatement() throws SQLException {
+        if (removeStatement == null)
+            removeStatement = prepareStatement(formatDeleteStatement());
 
-        try (PreparedStatement statement = connection.prepareStatement(updateString)) {
-            remove(statement, keys);
-        }
+        return removeStatement;
     }
 
     private String formatDeleteStatement() {
@@ -531,25 +473,52 @@ public abstract class SQLTable<K, V> {
         }
     }
 
-    // -----------------------------------------------------------------
+    /**
+     * Creates this table in the database unless it already exists.
+     *
+     * @throws RuntimeException if the table does not already exist
+     * and cannot be created.
+     */
+    public synchronized void require() {
+        db.createTable(getTableName(), getTableSchema());
+    }
 
-    private synchronized void storeSync(Collection<V> records) throws SQLException {
-        if (!exists()) {
-            JamLogger.info("Creating table [%s]...", getTableName());
-            create();
+    /**
+     * Stores a new unique record in the database table.
+     *
+     * @param record the record to store, which must have a unique
+     * primary keys
+     *
+     * @throws RuntimeException if the records has a duplicate key or
+     * if any SQL errors occur.
+     */
+    public void store(V record) {
+        store(List.of(record));
+    }
+
+    /**
+     * Stores new unique records in the database table.
+     *
+     * @param records the records to store, which must have unique
+     * primary keys.
+     *
+     * @throws RuntimeException if any records have duplicate keys or
+     * if any SQL errors occur.
+     */
+    public synchronized void store(Collection<V> records) {
+        try {
+            store(getStoreStatement(), records);
         }
-
-        try (Connection connection = db.openConnection(false)) {
-            store(connection, records);
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
         }
     }
 
-    private void store(Connection connection, Collection<V> records) throws SQLException {
-        String updateString = formatInsertCommand();
+    private PreparedStatement getStoreStatement() throws SQLException {
+        if (storeStatement == null)
+            storeStatement = prepareStatement(formatInsertCommand());
 
-        try (PreparedStatement statement = connection.prepareStatement(updateString)) {
-            store(statement, records);
-        }
+        return storeStatement;
     }
 
     private String formatInsertCommand() {

@@ -16,12 +16,10 @@ public class SQLStoreTest extends SQLTestBase {
         TestTable table = new TestTable(db);
         TestStore store = new TestStore(table);
 
-        assertFalse(db.tableExists(table.getTableName()));
+        assertTrue(db.tableExists(table.getTableName()));
         assertTrue(table.load().isEmpty());
 
         table.store(List.of(rec1, rec2));
-
-        assertTrue(db.tableExists(table.getTableName()));
         assertRecords(List.of(rec1, rec2), table.load());
 
         // Retrieve pre-computed records...

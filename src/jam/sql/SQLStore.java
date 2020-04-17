@@ -30,6 +30,7 @@ public abstract class SQLStore<K, V> {
      */
     protected SQLStore(SQLTable<K, V> table) {
         this.table = table;
+        table.require();
     }
 
     /**

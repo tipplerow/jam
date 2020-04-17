@@ -30,10 +30,14 @@ public abstract class SQLTestBase {
     public static final String key1 = "k1";
     public static final String key2 = "key2";
     public static final String key3 = "key3";
+    public static final String key4 = "key4";
+    public static final String key5 = "key5";
 
     public static final TestRecord rec1 = new TestRecord(key1, 4.0, 2);
     public static final TestRecord rec2 = new TestRecord(key2, Double.NaN, -1);
     public static final TestRecord rec3 = new TestRecord(key3, 16.0, 4);
+    public static final TestRecord rec4 = new TestRecord(key4, 25.0, 5);
+    public static final TestRecord rec5 = new TestRecord(key5, 36.0, 6);
 
     @Before public void setUp() {
         deleteDbFile();
@@ -140,8 +144,16 @@ public abstract class SQLTestBase {
             return new TestRecord(key, keylen * keylen, keylen);
         }
 
+        @Override public Class getKeyClass() {
+            return String.class;
+        }
+
         @Override public String getName() {
             return "test_cache";
+        }
+
+        @Override public Class getRecordClass() {
+            return TestRecord.class;
         }
     }
 }

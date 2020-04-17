@@ -16,13 +16,15 @@ public class SQLTableTest extends SQLTestBase {
         TestTable table = new TestTable(db);
 
         assertFalse(table.exists());
-        assertFalse(table.contains(key1));
-        assertNull(table.fetch(key1));
-        assertTrue(table.load().isEmpty());
-
-        table.store(List.of(rec1, rec2));
-
+        table.require();
         assertTrue(table.exists());
+
+        assertFalse(table.contains(key1));
+        assertFalse(table.contains(key2));
+        assertTrue(table.load().isEmpty());
+        
+        table.store(List.of(rec1, rec2));
+        
         assertTrue(table.contains(key1));
         assertEquals(rec1, table.fetch(key1));
 

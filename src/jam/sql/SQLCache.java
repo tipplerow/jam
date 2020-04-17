@@ -1,8 +1,10 @@
 
 package jam.sql;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +21,7 @@ import jam.util.SetUtil;
  *
  * @param <V> the runtime type of the record values.
  */
-public abstract class SQLCache<K, V> {
+public abstract class SQLCache<K, V> extends AbstractCollection<V> {
     /**
      * The in-memory cache.
      */
@@ -37,8 +39,27 @@ public abstract class SQLCache<K, V> {
      * @param table the backing database table.
      */
     protected SQLCache(SQLTable<K, V> table) {
+        table.require();
+
         this.table = table;
         this.cache = table.load();
+    }
+
+    private void updateCache(V record) {
+        cache.put(table.getKey(record), record);
+    }
+
+    private void updateCache(List<V> records) {
+        for (V record : records)
+            updateCache(record);
+    }
+
+    private void updateTable(V record) {
+        table.store(record);
+    }
+
+    private void updateTable(List<V> records) {
+        table.store(records);
     }
 
     /**
@@ -68,6 +89,13 @@ public abstract class SQLCache<K, V> {
     }
 
     /**
+     * Returns the runtime class for the key objects.
+     *
+     * @return the runtime class for the key objects.
+     */
+    public abstract Class getKeyClass();
+
+    /**
      * Returns the name of this cache (for message logging).
      *
      * @return the name of this cache (for message logging).
@@ -75,17 +103,46 @@ public abstract class SQLCache<K, V> {
     public abstract String getName();
 
     /**
-     * Removes all cached records from memory (but retains them in the
-     * persistent database).
+     * Returns the runtime class for the record objects.
+     *
+     * @return the runtime class for the record objects.
      */
-    public void clear() {
-        JamLogger.info("Clearing cache [%s]...", getName());
+    public abstract Class getRecordClass();
 
-        synchronized (cache) {
-            cache.clear();
-        }
+    /**
+     * Identifies records contained in this cache.
+     *
+     * @param key the key of a record in question.
+     *
+     * @return {@code true} iff this cache contains a record with the
+     * specified key.
+     */
+    public boolean containsKey(K key) {
+        return cache.containsKey(key);
+    }
 
-        JamLogger.info("Cleared cache [%s].", getName());
+    /**
+     * Retrieves a record by key (but does not compute missing keys
+     * on demand).
+     *
+     * @param key the key of the desired record.
+     *
+     * @return the record with the desired key, or {@code null} if
+     * there is no matching key.
+     */
+    public V fetch(K key) {
+        return cache.get(key);
+    }
+
+    /**
+     * Returns the key for a given record.
+     *
+     * @param record a record to be indexed.
+     *
+     * @return the key for the specified record.
+     */
+    public K getKey(V record) {
+        return table.getKey(record);
     }
 
     /**
@@ -98,8 +155,8 @@ public abstract class SQLCache<K, V> {
      *
      * @return the record for the specified key.
      */
-    public V get(K key) {
-        return get(List.of(key)).get(0);
+    public V require(K key) {
+        return require(List.of(key)).get(0);
     }
 
     /**
@@ -113,15 +170,7 @@ public abstract class SQLCache<K, V> {
      * @return the records for the specified keys (in the order
      * returned by the collection iterator).
      */
-    public List<V> get(Collection<K> keys) {
-        JamLogger.info("Requesting [%d] records from cache [%s]...", keys.size(), getName());
-        List<V> records = getSync(keys);
-
-        JamLogger.info("Returned [%d] records from cache [%s].", records.size(), getName());
-        return records;
-    }
-
-    private List<V> getSync(Collection<K> keys) {
+    public synchronized List<V> require(Collection<K> keys) {
         //
         // Identify keys from the input collection that are not
         // present in the cache...
@@ -145,27 +194,80 @@ public abstract class SQLCache<K, V> {
         return MapUtil.get(cache, keys);
     }
 
-    private void updateCache(List<V> records) {
-        JamLogger.info("Adding [%d] records to cache [%s]...", records.size(), getName());
+    @Override public boolean add(V record) {
+        if (containsKey(getKey(record)))
+            return false;
 
-        for (V record : records)
-            cache.put(table.getKey(record), record);
+        updateCache(record);
+        updateTable(record);
 
-        JamLogger.info("Added [%d] records to cache [%s].", records.size(), getName());
+        return true;
     }
 
-    private void updateTable(List<V> records) {
-        table.store(records);
+    @Override public boolean addAll(Collection<? extends V> records) {
+        //
+        // We cannot add duplicate records to the database,
+        // so select those not already present...
+        //
+        List<V> missing = new ArrayList<V>(records.size());
+
+        for (V record : records)
+            if (!containsKey(getKey(record)))
+                missing.add(record);
+
+        if (missing.isEmpty())
+            return false;
+
+        updateCache(missing);
+        updateTable(missing);
+
+        return true;
     }
 
     /**
-     * Returns the key for a given record.
-     *
-     * @param record a record to be indexed.
-     *
-     * @return the key for the specified record.
+     * Removes all cached records from memory (but retains them in the
+     * persistent database).
      */
-    public K getKey(V record) {
-        return table.getKey(record);
+    @Override public synchronized void clear() {
+        cache.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public boolean contains(Object obj) {
+        if (obj == null)
+            return false;
+
+        if (obj.getClass().equals(getKeyClass()))
+            return containsKey((K) obj);
+
+        if (obj.getClass().equals(getRecordClass()))
+            return containsKey(getKey((V) obj));
+
+        return false;
+    }
+
+    @Override public Iterator<V> iterator() {
+        return cache.values().iterator();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public boolean remove(Object obj) {
+        if (!contains(obj))
+            return false;
+
+        K key = getKey((V) obj);
+
+        cache.remove(key);
+        table.remove(key);
+
+        return true;
+    }
+
+    @Override public int size() {
+        return cache.size();
+    }
+
+    @Override public String toString() {
+        return String.format("SQLCache(%s)", getName());
     }
 }
