@@ -1,11 +1,11 @@
 
 package jam.sql;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import jam.report.LineBuilder;
+import jam.util.FixedList;
 import jam.util.ListUtil;
 
 /**
@@ -14,11 +14,12 @@ import jam.util.ListUtil;
 public final class SQLColumn {
     private final String name;
     private final String type;
-    private final List<String> qualifiers = new ArrayList<String>();
+    private final FixedList<String> qualifiers;
 
-    private SQLColumn(String name, String type) {
+    private SQLColumn(String name, String type, FixedList<String> qualifiers) {
         this.name = name;
         this.type = type;
+        this.qualifiers = qualifiers;
     }
 
     /**
@@ -31,7 +32,7 @@ public final class SQLColumn {
      * @return the SQL column meta-data.
      */
     public static SQLColumn create(String name, String type) {
-        return new SQLColumn(name, type);
+        return new SQLColumn(name, type, FixedList.empty());
     }
 
     /**
@@ -63,8 +64,7 @@ public final class SQLColumn {
     }
 
     private SQLColumn addQualifier(String qualifier) {
-        qualifiers.add(qualifier);
-        return this;
+        return new SQLColumn(name, type, qualifiers.append(qualifier));
     }
 
     /**
@@ -87,41 +87,45 @@ public final class SQLColumn {
     }
 
     /**
-     * Adds a foreign key constraint to this column.
+     * Creates a new column like this column with a new foreign key
+     * constraint; this column is unchanged.
      *
      * @param tableName the name of the referenced table.
      *
      * @param foreignKey the name of the key column in the referenced
      * table.
      *
-     * @return {@code this} column, for operator chaining.
+     * @return the new column description.
      */
     public SQLColumn foreignKey(String tableName, String foreignKey) {
         return addQualifier(String.format("REFERENCES %s(%s)", tableName, foreignKey));
     }
 
     /**
-     * Adds a primary key constraint to this column.
+     * Creates a new column like this column with a primary key
+     * constraint; this column is unchanged.
      *
-     * @return {@code this} column, for operator chaining.
+     * @return the new column description.
      */
     public SQLColumn primaryKey() {
         return addQualifier("PRIMARY KEY");
     }
 
     /**
-     * Adds a uniqueness constraint to this column.
+     * Creates a new column like this column with a uniqueness
+     * constraint; this column is unchanged.
      *
-     * @return {@code this} column, for operator chaining.
+     * @return the new column description.
      */
     public SQLColumn unique() {
         return addQualifier("UNIQUE");
     }
 
     /**
-     * Adds a non-null constraint to this column.
+     * Creates a new column like this column with a non-null
+     * constraint; this column is unchanged.
      *
-     * @return {@code this} column, for operator chaining.
+     * @return the new column description.
      */
     public SQLColumn notNull() {
         return addQualifier("NOT NULL");
