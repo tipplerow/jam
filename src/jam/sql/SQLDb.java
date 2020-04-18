@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
+import java.util.List;
 
 import jam.app.JamLogger;
 import jam.lang.JamException;
@@ -90,6 +91,32 @@ public abstract class SQLDb {
 
     private static String formatCreateIndex(String tableName, String columnName) {
         return String.format("CREATE INDEX IF NOT EXISTS %s_idx ON %s(%s)", columnName, tableName, columnName);
+    }
+
+    /**
+     * Creates a new database table unless it already exists.
+     *
+     * @param tableName the name of the database table.
+     *
+     * @param columns meta-data for each column in the table.
+     *
+     * @throws RuntimeException if the table cannot be created.
+     */
+    public void createTable(String tableName, SQLColumn... columns) {
+        createTable(tableName, List.of(columns));
+    }
+
+    /**
+     * Creates a new database table unless it already exists.
+     *
+     * @param tableName the name of the database table.
+     *
+     * @param columns meta-data for each column in the table.
+     *
+     * @throws RuntimeException if the table cannot be created.
+     */
+    public void createTable(String tableName, List<SQLColumn> columns) {
+        createTable(tableName, SQLColumn.schema(columns));
     }
 
     /**
