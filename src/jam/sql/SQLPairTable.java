@@ -154,6 +154,24 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
     }
 
     /**
+     * Returns the column meta-data for the first key.
+     *
+     * @return the column meta-data for the first key.
+     */
+    public SQLColumn getKey1Column() {
+        return SQLColumn.create(getKey1Name(), getKey1Type()).notNull();
+    }
+
+    /**
+     * Returns the column meta-data for the second key.
+     *
+     * @return the column meta-data for the second key.
+     */
+    public SQLColumn getKey2Column() {
+        return SQLColumn.create(getKey2Name(), getKey2Type()).notNull();
+    }
+
+    /**
      * Returns the schema for the database table.
      *
      * @return the schema for the database table.
@@ -162,11 +180,8 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
         String key1 = getKey1Name();
         String key2 = getKey2Name();
 
-        String column1 =
-            String.format("%s %s NOT NULL", key1, getKey1Type());
-
-        String column2 =
-            String.format("%s %s NOT NULL", key2, getKey2Type());
+        String column1 = getKey1Column().join();
+        String column2 = getKey2Column().join();
 
         String primaryKey =
             String.format("CONSTRAINT %s_%s PRIMARY KEY(%s, %s)", key1, key2, key1, key2);
