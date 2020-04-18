@@ -78,6 +78,21 @@ public abstract class SQLDb {
     }
 
     /**
+     * Creates an index on an existing database table.
+     *
+     * @param tableName the name of the existing table.
+     *
+     * @param columnName the name of the column to be indexed.
+     */
+    public void createIndex(String tableName, String columnName) {
+        executeUpdate(formatCreateIndex(tableName, columnName));
+    }
+
+    private static String formatCreateIndex(String tableName, String columnName) {
+        return String.format("CREATE INDEX IF NOT EXISTS %s_idx ON %s(%s)", columnName, tableName, columnName);
+    }
+
+    /**
      * Creates a new database table unless it already exists.
      *
      * @param tableName the name of the database table.
