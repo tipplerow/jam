@@ -75,6 +75,19 @@ public class PostgreSQLDbTest {
         assertFalse(db.tableExists("test_table"));
     }
 
+    private static enum Foo {
+        ABC, DEF, GHI;
+    }
+
+    @Test public void testCreateEnum() {
+        if (!canConnect)
+            return;
+
+        PostgreSQLDb db = createDb();
+        db.createEnum("my_enum", Foo.class);
+        db.executeUpdate("DROP TYPE my_enum");
+    }
+
     @Test public void testUserExists() {
         if (!canConnect)
             return;

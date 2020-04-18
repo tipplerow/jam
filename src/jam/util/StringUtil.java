@@ -22,6 +22,11 @@ public final class StringUtil {
     public static final String DOUBLE_QUOTE = "\"";
 
     /**
+     * One single quotation mark.
+     */
+    public static final String SINGLE_QUOTE = "'";
+
+    /**
      * Removes the last character from a string.
      *
      * @param s the string on which to operate.
@@ -35,6 +40,17 @@ public final class StringUtil {
     }
 
     /**
+     * Encloses a string in double quotation marks.
+     *
+     * @param s the string to enclose.
+     *
+     * @return the string enclosed in double quotation marks.
+     */
+    public static String doubleQuote(String s) {
+        return DOUBLE_QUOTE + s + DOUBLE_QUOTE;
+    }
+
+    /**
      * Identifies strings contained in double quotation marks.
      *
      * @param s the string to evaluate.
@@ -44,6 +60,18 @@ public final class StringUtil {
      */
     public static boolean isDoubleQuoted(String s) {
         return s.startsWith(StringUtil.DOUBLE_QUOTE) && s.endsWith(StringUtil.DOUBLE_QUOTE);
+    }
+
+    /**
+     * Identifies strings contained in single quotation marks.
+     *
+     * @param s the string to evaluate.
+     *
+     * @return {@code true} iff the input string starts and ends with
+     * single quotation marks.
+     */
+    public static boolean isSingleQuoted(String s) {
+        return s.startsWith(StringUtil.SINGLE_QUOTE) && s.endsWith(StringUtil.SINGLE_QUOTE);
     }
 
     /**
@@ -132,5 +160,16 @@ public final class StringUtil {
      */
     public static String removeWhiteSpace(String s) {
         return RegexUtil.SINGLE_WHITE_SPACE.matcher(s).replaceAll("");
+    }
+
+    /**
+     * Encloses a string in single quotation marks.
+     *
+     * @param s the string to enclose.
+     *
+     * @return the string enclosed in single quotation marks.
+     */
+    public static String singleQuote(String s) {
+        return SINGLE_QUOTE + s + SINGLE_QUOTE;
     }
 }

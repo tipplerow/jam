@@ -5,10 +5,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import jam.app.JamLogger;
 import jam.lang.JamException;
+import jam.util.StringUtil;
 
 /**
  * Manages a SQL database and its connections.
@@ -76,6 +78,27 @@ public abstract class SQLDb {
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
+    }
+
+    /**
+     * Creates an enumerated database type.
+     *
+     * @param typeName the name for the enum type in the database (not
+     * necessarily the name of the Java enum class).
+     *
+     * @param enumClass the class object for the enum to create.
+     */
+    public <E extends Enum<E>> void createEnum(String typeName, Class<E> enumClass) {
+        executeUpdate(formatCreateEnum(typeName, enumClass));
+    }
+
+    private static <E extends Enum<E>> String formatCreateEnum(String typeName, Class<E> enumClass) {
+        List<String> quotedNames = new ArrayList<String>();
+
+        for (E value : enumClass.getEnumConstants())
+            quotedNames.add(StringUtil.singleQuote(value.name()));
+
+        return String.format("CREATE TYPE %s AS ENUM (%s)", typeName, String.join(", ", quotedNames));
     }
 
     /**
