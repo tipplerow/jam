@@ -118,10 +118,10 @@ public abstract class FixedList<E> extends AbstractList<E> implements RandomAcce
             return this;
 
         case 1:
-            return cat1(that.get(0));
+            return append(that.get(0));
 
         case 2:
-            return cat2(that.get(0), that.get(1));
+            return append(that.get(0), that.get(1));
 
         default:
             //
@@ -131,8 +131,94 @@ public abstract class FixedList<E> extends AbstractList<E> implements RandomAcce
         }
     }
 
-    protected abstract FixedList<E> cat1(E item);
-    protected abstract FixedList<E> cat2(E first, E second);
+    /**
+     * Returns an empty fixed list.
+     *
+     * @param <E> the list element type.
+     *
+     * @return an empty fixed list.
+     */
+    public static <E> FixedList<E> of() {
+        return empty();
+    }
+
+    /**
+     * Returns a fixed list containing one element.
+     *
+     * @param <E> the list element type.
+     *
+     * @param item the single element.
+     *
+     * @return a fixed list containing the specified element.
+     */
+    public static <E> FixedList<E> of(E item) {
+        return singleList(item);
+    }
+
+    /**
+     * Returns a fixed list containing two elements.
+     *
+     * @param <E> the list element type.
+     *
+     * @param first the first element.
+     *
+     * @param second the second element.
+     *
+     * @return a fixed list containing the specified elements.
+     */
+    public static <E> FixedList<E> of(E first, E second) {
+        return pairList(first, second);
+    }
+
+    /**
+     * Returns a fixed list containing a sequence of elements.
+     *
+     * @param <E> the list element type.
+     *
+     * @param items the list items.
+     *
+     * @return a fixed list containing the specified elements.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> FixedList<E> of(E... items) {
+        return arrayList(items, true);
+    }
+
+    /**
+     * Adds one item to the end of this list and returns the result in
+     * a new fixed list.
+     *
+     * @param item the item to append.
+     *
+     * @return a new fixed list with the added item.
+     */
+    public abstract FixedList<E> append(E item);
+
+    /**
+     * Adds two items to the end of this list and returns the result
+     * in a new fixed list.
+     *
+     * @param first the first item to append.
+     *
+     * @param second the second item to append.
+     *
+     * @return a new fixed list with the added items.
+     */
+    public abstract FixedList<E> append(E first, E second);
+
+    /**
+     * Adds a sequence of items to the end of this list and returns
+     * the result in a new fixed list.
+     *
+     * @param items the items to append.
+     *
+     * @return a new fixed list with the added items.
+     */
+    @SuppressWarnings("unchecked")
+    public FixedList<E> append(E... items) {
+        return catList((ArrayFixedList<E>) arrayList(items));
+    }
+
     protected abstract FixedList<E> catList(ArrayFixedList<E> that);
 
     @Override public boolean remove(Object o) {
@@ -153,11 +239,11 @@ public abstract class FixedList<E> extends AbstractList<E> implements RandomAcce
         private EmptyFixedList() {
         }
 
-        @Override protected FixedList<E> cat1(E item) {
+        @Override public FixedList<E> append(E item) {
             return singleList(item);
         }
 
-        @Override protected FixedList<E> cat2(E first, E second) {
+        @Override public FixedList<E> append(E first, E second) {
             return pairList(first, second);
         }
 
@@ -193,12 +279,12 @@ public abstract class FixedList<E> extends AbstractList<E> implements RandomAcce
             this.item = item;
         }
 
-        @Override protected FixedList<E> cat1(E newItem) {
+        @Override public FixedList<E> append(E newItem) {
             return pairList(this.item, newItem);
         }
 
         @SuppressWarnings("unchecked")
-        @Override protected FixedList<E> cat2(E firstNew, E secondNew) {
+        @Override public FixedList<E> append(E firstNew, E secondNew) {
             return arrayList(this.item, firstNew, secondNew);
         }
 
@@ -241,12 +327,12 @@ public abstract class FixedList<E> extends AbstractList<E> implements RandomAcce
         }
 
         @SuppressWarnings("unchecked")
-        @Override protected FixedList<E> cat1(E newItem) {
+        @Override public FixedList<E> append(E newItem) {
             return arrayList(this.first, this.second, newItem);
         }
 
         @SuppressWarnings("unchecked")
-        @Override protected FixedList<E> cat2(E firstNew, E secondNew) {
+        @Override public FixedList<E> append(E firstNew, E secondNew) {
             return arrayList(this.first, this.second, firstNew, secondNew);
         }
 
@@ -307,12 +393,12 @@ public abstract class FixedList<E> extends AbstractList<E> implements RandomAcce
         }
 
         @SuppressWarnings("unchecked")
-        @Override protected FixedList<E> cat1(E item) {
+        @Override public FixedList<E> append(E item) {
             return arrayList(this.items, (E[]) new Object[] { item });
         }
 
         @SuppressWarnings("unchecked")
-        @Override protected FixedList<E> cat2(E firstNew, E secondNew) {
+        @Override public FixedList<E> append(E firstNew, E secondNew) {
             return arrayList(this.items, (E[]) new Object[] { firstNew, secondNew });
         }
 

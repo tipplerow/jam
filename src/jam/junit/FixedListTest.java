@@ -149,6 +149,22 @@ public class FixedListTest {
         }
     }
 
+    @Test public void testAppendOne() {
+        assertEquals(List.of("A"), FixedList.of().append("A"));
+        assertEquals(List.of("A", "B"), FixedList.of("A").append("B"));
+        assertEquals(List.of("A", "B", "C"), FixedList.of("A", "B").append("C"));
+        assertEquals(List.of("A", "B", "C", "D"), FixedList.of("A", "B", "C").append("D"));
+        assertEquals(List.of("A", "B", "C", "D", "E"), FixedList.of("A", "B", "C", "D").append("E"));
+    }
+
+    @Test public void testAppendTwo() {
+        assertEquals(List.of("A", "B"), FixedList.of().append("A", "B"));
+        assertEquals(List.of("A", "B", "C"), FixedList.of("A").append("B", "C"));
+        assertEquals(List.of("A", "B", "C", "D"), FixedList.of("A", "B").append("C", "D"));
+        assertEquals(List.of("A", "B", "C", "D", "E"), FixedList.of("A", "B", "C").append("D", "E"));
+        assertEquals(List.of("A", "B", "C", "D", "E", "F"), FixedList.of("A", "B", "C", "D").append("E", "F"));
+    }
+
     @Test public void testCatEmpty() {
         checkStandard(FIXED0.cat(FIXED0),
                       FIXED1.cat(FIXED0),
