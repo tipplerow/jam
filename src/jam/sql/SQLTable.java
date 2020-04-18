@@ -10,7 +10,6 @@ import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -512,7 +511,7 @@ public abstract class SQLTable<K, V> {
      * @param record the record to store, which must have a unique
      * primary keys
      *
-     * @throws RuntimeException if the records has a duplicate key or
+     * @throws RuntimeException if the record has a duplicate key or
      * if any SQL errors occur.
      */
     public void store(V record) {
