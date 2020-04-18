@@ -561,9 +561,18 @@ public abstract class SQLTable<K, V> {
         Connection connection = statement.getConnection();
 
         try {
-            for (V record : records)
-                store(statement, record);
+            int count = 0;
 
+            for (V record : records) {
+                ++count;
+
+                if (count % 1000 == 0)
+                    JamLogger.info("Inserting record [%d] of [%d]...", count, records.size());
+
+                store(statement, record);
+            }
+
+            JamLogger.info("Committing update...");
             connection.commit();
         }
         catch (SQLException ex) {
