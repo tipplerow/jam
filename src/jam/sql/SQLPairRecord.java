@@ -16,8 +16,11 @@ package jam.sql;
  * @param <K2> the runtime type of the second key.
  */
 public abstract class SQLPairRecord<K1, K2> {
-    private final K1 key1;
-    private final K2 key2;
+    /** The first key. */
+    protected final K1 key1;
+
+    /** The second key. */
+    protected final K2 key2;
 
     /**
      * Creates a new pair record.
