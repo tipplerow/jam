@@ -49,6 +49,18 @@ public interface BulkRecord {
     public abstract String formatBulk();
 
     /**
+     * Formats a {@code boolean} column value.
+     *
+     * @param value the value to format.
+     *
+     * @return a string representation of the boolean value that will
+     * be understood by the database server.
+     */
+    public default String format(boolean value) {
+        return value ? "true" : "false";
+    }
+
+    /**
      * Formats a possibly {@code null} keyed object.
      *
      * @param obj the (possibly {@code null}) keyed object.
