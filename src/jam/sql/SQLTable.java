@@ -315,7 +315,10 @@ public abstract class SQLTable<K, V> {
      * returned by the collection iterator.  If any keys are not found,
      * the corresponding elements will be {@code null}.
      */
-    public synchronized List<V> fetch(Collection<K> keys) {
+    public List<V> fetch(Collection<K> keys) {
+        if (keys.isEmpty())
+            return List.of();
+
         try {
             return fetch(getFetchStatement(), keys);
         }
@@ -324,7 +327,7 @@ public abstract class SQLTable<K, V> {
         }
     }
 
-    private PreparedStatement getFetchStatement() throws SQLException {
+    private synchronized PreparedStatement getFetchStatement() throws SQLException {
         if (fetchStatement == null)
             fetchStatement = prepareStatement(formatFetchQuery());
 
@@ -452,7 +455,10 @@ public abstract class SQLTable<K, V> {
      *
      * @param keys the keys of the records to remove.
      */
-    public synchronized void remove(Collection<K> keys) {
+    public void remove(Collection<K> keys) {
+        if (keys.isEmpty())
+            return;
+
         try {
             remove(getRemoveStatement(), keys);
         }
@@ -461,7 +467,7 @@ public abstract class SQLTable<K, V> {
         }
     }
 
-    private PreparedStatement getRemoveStatement() throws SQLException {
+    private synchronized PreparedStatement getRemoveStatement() throws SQLException {
         if (removeStatement == null)
             removeStatement = prepareStatement(formatDeleteStatement());
 
@@ -472,7 +478,7 @@ public abstract class SQLTable<K, V> {
         return String.format("DELETE FROM %s WHERE %s = ?", getTableName(), getKeyName());
     }
 
-    private void remove(PreparedStatement statement, Collection<K> keys) throws SQLException {
+    private synchronized void remove(PreparedStatement statement, Collection<K> keys) throws SQLException {
         Connection connection = statement.getConnection();
 
         try {
@@ -536,7 +542,10 @@ public abstract class SQLTable<K, V> {
      * @throws RuntimeException if any records have duplicate keys or
      * if any SQL errors occur.
      */
-    public synchronized void store(Collection<V> records) {
+    public void store(Collection<V> records) {
+        if (records.isEmpty())
+            return;
+
         try {
             store(getStoreStatement(), records);
         }
@@ -545,7 +554,7 @@ public abstract class SQLTable<K, V> {
         }
     }
 
-    private PreparedStatement getStoreStatement() throws SQLException {
+    private synchronized PreparedStatement getStoreStatement() throws SQLException {
         if (storeStatement == null)
             storeStatement = prepareStatement(formatInsertCommand());
 
@@ -566,7 +575,7 @@ public abstract class SQLTable<K, V> {
         return builder.toString();
     }
 
-    private void store(PreparedStatement statement, Collection<V> records) throws SQLException {
+    private synchronized void store(PreparedStatement statement, Collection<V> records) throws SQLException {
         Connection connection = statement.getConnection();
 
         try {
