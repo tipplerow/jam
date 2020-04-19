@@ -1,13 +1,17 @@
 
 package jam.sql;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import jam.app.JamEnv;
 import jam.app.JamLogger;
 import jam.lang.JamException;
 import jam.util.StringUtil;
@@ -42,12 +46,6 @@ public abstract class SQLDb {
     }
 
     /**
-     * The string used in bulk imports to identify {@code NULL}
-     * columns.
-     */
-    public static final String NULL_STRING = "(null)";
-
-    /**
      * Opens a new database connection.
      *
      * @return a new open database connection.
@@ -68,6 +66,29 @@ public abstract class SQLDb {
     protected abstract String countTableNamesQuery(String tableName);
 
     /**
+     * Imports a collection of records into a database table.
+     *
+     * @param tableName the name of the table to update.
+     *
+     * @param records the records to import.
+     */
+    public void bulkImport(String tableName, Collection<? extends BulkRecord> records) {
+        File bulkFile = null;
+
+        try {
+            bulkFile = File.createTempFile("bulk_", ".psv", JamEnv.tmpdir());
+            BulkRecord.writeBulkFile(bulkFile, records);
+            bulkImport(tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER, BulkRecord.NULL_STRING);
+        }
+        catch (Exception ex) {
+            throw JamException.runtime(ex);
+        }
+        finally {
+            bulkFile.delete();
+        }
+    }
+
+    /**
      * Copies rows from a delimited file (with no header line).
      *
      * @param tableName the name of the table to populate.
@@ -77,15 +98,17 @@ public abstract class SQLDb {
      *
      * @param delimiter the column delimiter in the flat file.
      *
+     * @param nullString the SQL {@code NULL} identifier in the flat file.
+     *
      * @throws RuntimeException if the update cannot be executed.
      */
-    public void bulkInsert(String tableName, String fileName, String delimiter) {
-        executeUpdate(formatBulkInsert(tableName, fileName,delimiter));
+    public void bulkImport(String tableName, String fileName, String delimiter, String nullString) {
+        executeUpdate(formatBulkImport(tableName, fileName, delimiter, nullString));
     }
 
-    private static String formatBulkInsert(String tableName, String fileName, String delimiter) {
+    private static String formatBulkImport(String tableName, String fileName, String delimiter, String nullString) {
         return String.format("COPY %s FROM '%s' WITH DELIMITER '%s' NULL '%s'",
-                             tableName, fileName, delimiter, NULL_STRING);
+                             tableName, fileName, delimiter, nullString);
     }
 
     /**

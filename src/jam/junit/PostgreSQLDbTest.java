@@ -4,9 +4,11 @@ package jam.junit;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import jam.app.JamEnv;
 import jam.io.FileUtil;
+import jam.sql.BulkRecord;
 import jam.sql.PostgreSQLDb;
 import jam.sql.QueryResult;
 import jam.sql.SQLDb;
@@ -61,22 +63,45 @@ public class PostgreSQLDbTest {
         }
     }
 
-    @Test public void testBulkImport() throws SQLException {
+    private static final String TEST_TABLE_NAME = "test_table";
+    private static final String TEST_TABLE_SCHEMA = "key text PRIMARY KEY, value integer";
+
+    private static final String BULK_IMPORT_FILE =
+        FileUtil.join(JamEnv.getRequired("JAM_HOME"), "data", "test", "bulk_insert.psv");
+
+    private void createTestTable(SQLDb db) {
+        db.createTable(TEST_TABLE_NAME, TEST_TABLE_SCHEMA);
+    }
+
+    private static class TestRecord implements BulkRecord {
+        public final String key;
+        public final Integer value;
+
+        public TestRecord(String key, Integer value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override public String formatBulk() {
+            return joinBulk(key, value != null ? value.toString() : NULL_STRING);
+        }
+    }
+
+    @Test public void testBulkImport1() throws SQLException {
         if (!canConnect)
             return;
 
         SQLDb db = createDb();
 
-        String tableName = "test_table";
-        String tableSchema = "key text PRIMARY KEY, value integer";
-        String fileName = FileUtil.join(JamEnv.getRequired("JAM_HOME"), "data", "test", "bulk_insert.psv");
-        String delimiter = "|";
- 
         db.verbose(true);
-        db.createTable(tableName, tableSchema);
-        db.bulkInsert(tableName, fileName, delimiter);
+        createTestTable(db);
 
-        try (QueryResult queryResult = db.executeQuery(String.format("SELECT * FROM %s", tableName))) {
+        db.bulkImport(TEST_TABLE_NAME, BULK_IMPORT_FILE, BulkRecord.DELIMITER, BulkRecord.NULL_STRING);
+        assertBulkImport(db);
+    }
+
+    private void assertBulkImport(SQLDb db) throws SQLException {
+        try (QueryResult queryResult = db.executeQuery(String.format("SELECT * FROM %s", TEST_TABLE_NAME))) {
             ResultSet resultSet = queryResult.getResultSet();
 
             resultSet.next();
@@ -100,8 +125,27 @@ public class PostgreSQLDbTest {
             assertEquals(0, resultSet.getInt(2));
         }
         finally {
-            db.dropTable("test_table");
+            db.dropTable(TEST_TABLE_NAME);
         }
+    }
+
+    @Test public void testBulkImport2() throws SQLException {
+        if (!canConnect)
+            return;
+
+        SQLDb db = createDb();
+
+        db.verbose(true);
+        createTestTable(db);
+
+        db.bulkImport(TEST_TABLE_NAME,
+                      List.of(new TestRecord("abc", 1),
+                              new TestRecord("def", 2),
+                              new TestRecord("ghi", 3),
+                              new TestRecord("foo", null),
+                              new TestRecord("bar", null)));
+                      
+        assertBulkImport(db);
     }
 
     @Test public void testCreateDrop() {
@@ -111,15 +155,15 @@ public class PostgreSQLDbTest {
         SQLDb db = createDb();
 
         db.verbose(true);
-        assertFalse(db.tableExists("test_table"));
+        assertFalse(db.tableExists(TEST_TABLE_NAME));
 
-        db.createTable("test_table", "key text PRIMARY KEY, value integer");
-        db.createTable("test_table", "key text PRIMARY KEY, value integer");
-        assertTrue(db.tableExists("test_table"));
+        db.createTable(TEST_TABLE_NAME, TEST_TABLE_SCHEMA);
+        db.createTable(TEST_TABLE_NAME, TEST_TABLE_SCHEMA);
+        assertTrue(db.tableExists(TEST_TABLE_NAME));
 
-        db.dropTable("test_table");
-        db.dropTable("test_table");
-        assertFalse(db.tableExists("test_table"));
+        db.dropTable(TEST_TABLE_NAME);
+        db.dropTable(TEST_TABLE_NAME);
+        assertFalse(db.tableExists(TEST_TABLE_NAME));
     }
 
     private static enum Foo {
