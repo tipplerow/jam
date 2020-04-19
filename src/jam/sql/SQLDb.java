@@ -83,6 +83,8 @@ public abstract class SQLDb {
     /**
      * Creates an enumerated database type.
      *
+     * @param <E> the enumerated class.
+     *
      * @param typeName the name for the enum type in the database (not
      * necessarily the name of the Java enum class).
      *
