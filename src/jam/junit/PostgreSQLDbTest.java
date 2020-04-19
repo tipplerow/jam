@@ -2,9 +2,13 @@
 package jam.junit;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import jam.app.JamEnv;
+import jam.io.FileUtil;
 import jam.sql.PostgreSQLDb;
+import jam.sql.QueryResult;
 import jam.sql.SQLDb;
 import jam.sql.SQLEndpoint;
 
@@ -57,6 +61,49 @@ public class PostgreSQLDbTest {
         }
     }
 
+    @Test public void testBulkImport() throws SQLException {
+        if (!canConnect)
+            return;
+
+        SQLDb db = createDb();
+
+        String tableName = "test_table";
+        String tableSchema = "key text PRIMARY KEY, value integer";
+        String fileName = FileUtil.join(JamEnv.getRequired("JAM_HOME"), "data", "test", "bulk_insert.psv");
+        String delimiter = "|";
+ 
+        db.verbose(true);
+        db.createTable(tableName, tableSchema);
+        db.bulkInsert(tableName, fileName, delimiter);
+
+        try (QueryResult queryResult = db.executeQuery(String.format("SELECT * FROM %s", tableName))) {
+            ResultSet resultSet = queryResult.getResultSet();
+
+            resultSet.next();
+            assertEquals("abc", resultSet.getString(1));
+            assertEquals(1, resultSet.getInt(2));
+
+            resultSet.next();
+            assertEquals("def", resultSet.getString(1));
+            assertEquals(2, resultSet.getInt(2));
+
+            resultSet.next();
+            assertEquals("ghi", resultSet.getString(1));
+            assertEquals(3, resultSet.getInt(2));
+
+            resultSet.next();
+            assertEquals("foo", resultSet.getString(1));
+            assertEquals(0, resultSet.getInt(2));
+
+            resultSet.next();
+            assertEquals("bar", resultSet.getString(1));
+            assertEquals(0, resultSet.getInt(2));
+        }
+        finally {
+            db.dropTable("test_table");
+        }
+    }
+
     @Test public void testCreateDrop() {
         if (!canConnect)
             return;
@@ -102,11 +149,3 @@ public class PostgreSQLDbTest {
         org.junit.runner.JUnitCore.main("jam.junit.PostgreSQLDbTest");
     }
 }
-
-
-
-
-
-
-
-

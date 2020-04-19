@@ -42,6 +42,12 @@ public abstract class SQLDb {
     }
 
     /**
+     * The string used in bulk imports to identify {@code NULL}
+     * columns.
+     */
+    public static final String NULL_STRING = "(null)";
+
+    /**
      * Opens a new database connection.
      *
      * @return a new open database connection.
@@ -60,6 +66,27 @@ public abstract class SQLDb {
      * the specified name.
      */
     protected abstract String countTableNamesQuery(String tableName);
+
+    /**
+     * Copies rows from a delimited file (with no header line).
+     *
+     * @param tableName the name of the table to populate.
+     *
+     * @param fileName the name of a delimited file containing the
+     * rows to be added (with no header line).
+     *
+     * @param delimiter the column delimiter in the flat file.
+     *
+     * @throws RuntimeException if the update cannot be executed.
+     */
+    public void bulkInsert(String tableName, String fileName, String delimiter) {
+        executeUpdate(formatBulkInsert(tableName, fileName,delimiter));
+    }
+
+    private static String formatBulkInsert(String tableName, String fileName, String delimiter) {
+        return String.format("COPY %s FROM '%s' WITH DELIMITER '%s' NULL '%s'",
+                             tableName, fileName, delimiter, NULL_STRING);
+    }
 
     /**
      * Commits pending transactions on a connection (unless the
