@@ -1,6 +1,7 @@
 
 package jam.app;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,6 +22,11 @@ public final class JamEnv {
 
     private static final Pattern SYSTEM_ENV_PATTERN =
         Pattern.compile(Pattern.quote(OPEN_DELIM) + "(\\w+)" + Pattern.quote(CLOSE_DELIM));
+
+    /**
+     * Name of a directory that will be used for temporary files.
+     */
+    public static final String JAM_TMPDIR = "JAM_TMPDIR";
 
     /**
      * Returns a read-only view of a subset of environment variables,
@@ -144,5 +150,17 @@ public final class JamEnv {
         }
 
         return s;
+    }
+
+    /**
+     * Resolves the directory that will be used for temporary files
+     * written by the {@code jam} library.
+     *
+     * @return the environment variable {@code JAM_TMPDIR}, if it is
+     * set; the environment variable {@code TMPDIR}, if it is set; or
+     * finally the current working directory.
+     */
+    public static File tmpdir() {
+        return new File(getOptional(JAM_TMPDIR, getOptional("TMPDIR", ".")));
     }
 }
