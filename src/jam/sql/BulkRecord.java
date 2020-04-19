@@ -56,7 +56,7 @@ public interface BulkRecord {
      * @return a string representation of the boolean value that will
      * be understood by the database server.
      */
-    public default String format(boolean value) {
+    public default String formatBulk(boolean value) {
         return value ? "true" : "false";
     }
 
@@ -68,7 +68,7 @@ public interface BulkRecord {
      * @return the string value of the key, if the object is not
      * {@code null}, otherwise the {@code NULL_STRING}.
      */
-    public default String format(KeyedObject<String> obj) {
+    public default String formatBulk(KeyedObject<String> obj) {
         return (obj != null) ? obj.getKey() : NULL_STRING;
     }
 
@@ -80,7 +80,7 @@ public interface BulkRecord {
      * @return the string value itself, if it is not {@code null};
      * otherwise the {@code NULL_STRING}.
      */
-    public default String format(String str) {
+    public default String formatBulk(String str) {
         return (str != null) ? str : NULL_STRING;
     }
 
