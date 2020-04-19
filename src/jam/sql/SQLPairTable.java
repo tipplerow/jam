@@ -145,6 +145,15 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
     public abstract void setKey2(PreparedStatement statement, int index, K2 key2) throws SQLException;
 
     /**
+     * Returns the database that contains this table.
+     *
+     * @return the database that contains this table.
+     */
+    public SQLDb db() {
+        return db;
+    }
+
+    /**
      * Determines whether this table exists in the database.
      *
      * @return {@code true} iff this table exists in the database.
