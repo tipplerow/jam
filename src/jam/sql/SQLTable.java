@@ -381,15 +381,6 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
-     * Returns the schema required to create the table.
-     *
-     * @return the schema required to create the table.
-     */
-    public String getTableSchema() {
-        return SQLColumn.schema(getColumns());
-    }
-
-    /**
      * Loads all rows in the database table.
      *
      * @return all rows contained in the database table.
@@ -517,7 +508,7 @@ public abstract class SQLTable<K, V> {
      * and cannot be created.
      */
     public synchronized void require() {
-        db.createTable(getTableName(), getTableSchema());
+        db.createTable(getTableName(), getColumns());
     }
 
     /**
