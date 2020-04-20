@@ -27,6 +27,23 @@ public class JamProcessTest {
         assertEquals(201, process.stdout().size());
     }
 
+    @Test public void testSetEnv() {
+        JamProcess process = JamProcess.create("env");
+
+        assertFalse(process.executed());
+
+        process.run();
+
+        assertTrue(process.executed());
+        assertFalse(process.stdout().contains("MYTESTVAR=foo"));
+
+        process.setenv("MYTESTVAR", "foo");
+        process.run();
+
+        assertTrue(process.executed());
+        assertTrue(process.stdout().contains("MYTESTVAR=foo"));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.JamProcessTest");
     }

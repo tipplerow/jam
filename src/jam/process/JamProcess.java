@@ -25,7 +25,39 @@ public final class JamProcess {
     }
 
     /**
-     * Runs a command-line process.
+     * Creates a command-line process (but does not yet execute it).
+     *
+     * <p>To execute the process, call the {@code run()} command on
+     * the returned object.  This two-stage approach is required when
+     * the runtime environment must be customized before the command
+     * is executed.
+     *
+     * @param command the command-line program and its arguments.
+     *
+     * @return the staged process object.
+     */
+    public static JamProcess create(String... command) {
+        return create(List.of(command));
+    }
+
+    /**
+     * Creates a command-line process (but does not yet execute it).
+     *
+     * <p>To execute the process, call the {@code run()} command on
+     * the returned object.  This two-stage approach is required when
+     * the runtime environment must be customized before the command
+     * is executed.
+     *
+     * @param command the command-line program and its arguments.
+     *
+     * @return the staged process object.
+     */
+    public static JamProcess create(List<String> command) {
+        return new JamProcess(command);
+    }
+
+    /**
+     * Runs a command-line process and logs console error messages.
      *
      * @param command the command-line program and its arguments.
      *
@@ -51,7 +83,25 @@ public final class JamProcess {
         return process;
     }
 
-    private void run() {
+    /**
+     * Determines whether this process has been executed yet.
+     *
+     * @return {@code true} iff this process has been executed.
+     */
+    public boolean executed() {
+        return process != null;
+    }
+
+    /**
+     * Runs the process and logs console error messages.  Console
+     * output to the {@code stdout} stream is availble by calling
+     * the {@code stdout()} method.
+     *
+     * @return the best guess as to the success or failure of the
+     * process (whether the process wrote any error messages to the
+     * {@code stderr} stream).
+     */
+    public boolean run() {
         JamLogger.info("Running system command: %s", builder.command());
 
         try {
@@ -69,23 +119,47 @@ public final class JamProcess {
         catch (IOException ex) {
             throw JamException.runtime(ex);
         }
+
+        return success();
+    }
+
+    /**
+     * Assigns an environment variable for the executing shell.
+     *
+     * @param name the name of the environment variable to assign.
+     *
+     * @param value the value of the environment variable to assign.
+     */
+    public void setenv(String name, String value) {
+        builder.environment().put(name, value);
     }
 
     /**
      * Returns the console output written to the {@code stderr} stream.
      *
      * @return the console output written to the {@code stderr} stream.
+     *
+     * @throws IllegalStateException unless the process has been executed.
      */
     public List<String> stderr() {
+        ensureExecuted();
         return Collections.unmodifiableList(stderr);
+    }
+
+    private void ensureExecuted() {
+        if (!executed())
+            throw new IllegalStateException("The process has not been executed.");
     }
 
     /**
      * Returns the console output written to the {@code stdout} stream.
      *
      * @return the console output written to the {@code stdout} stream.
+     *
+     * @throws IllegalStateException unless the process has been executed.
      */
     public List<String> stdout() {
+        ensureExecuted();
         return Collections.unmodifiableList(stdout);
     }
 
@@ -95,8 +169,11 @@ public final class JamProcess {
      *
      * @return {@code true} iff the {@code stderr} output stream is
      * empty.
+     *
+     * @throws IllegalStateException unless the process has been executed.
      */
     public boolean success() {
+        ensureExecuted();
         return stderr.isEmpty();
     }
 }
