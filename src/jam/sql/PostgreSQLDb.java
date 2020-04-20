@@ -1,16 +1,20 @@
 
 package jam.sql;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import jam.app.JamEnv;
 import jam.app.JamLogger;
 import jam.lang.JamException;
-import jam.process.ProcessRunner;
+import jam.process.JamProcess;
 
 /**
  * Manages a {@code PostgreSQL} database and its connections.
@@ -61,8 +65,58 @@ public final class PostgreSQLDb extends SQLDb {
      * is on the execution path.
      */
     public static boolean isInstalled() {
-        List<String> output = ProcessRunner.run("which", "psql");
-        return output.size() == 1 && output.get(0).endsWith("psql");
+        JamProcess process = JamProcess.run("which", "psql");
+
+        return process.success()
+            && process.stdout().size() == 1
+            && process.stdout().get(0).endsWith("psql");
+    }
+
+    /**
+     * Imports a collection of records into a database table using the
+     * {@code psql \copy} command.
+     *
+     * <p>This method is required in places of {@code bulkImport()} on
+     * AWS-managed servers where superuser roles cannot be granted).
+     *
+     * @param tableName the name of the table to update.
+     *
+     * @param records the records to import.
+     *
+     * @return the success or failure of the bulk copy.
+     */
+    public boolean bulkCopy(String tableName, Collection<? extends BulkRecord> records) {
+        File bulkFile = null;
+
+        try {
+            bulkFile = File.createTempFile("bulk_", ".psv", JamEnv.tmpdir());
+            BulkRecord.writeBulkFile(bulkFile, records);
+
+            JamProcess process =
+                JamProcess.create("psql",
+                                  "-h", endpoint.getHostname(),
+                                  "-p", endpoint.portString(),
+                                  "-U", endpoint.getUsername(),
+                                  "-d", endpoint.getDatabase(),
+                                  "-c", formatBulkCopy(tableName, bulkFile));
+
+            process.setenv("PGPASSWORD", endpoint.getPassword());
+            process.run();
+
+            return process.success();
+        }
+        catch (Exception ex) {
+            throw JamException.runtime(ex);
+        }
+        finally {
+            if (bulkFile != null)
+                bulkFile.delete();
+        }
+    }
+
+    private static String formatBulkCopy(String tableName, File bulkFile) throws IOException {
+        return String.format("\\copy %s from '%s' with DELIMITER '%s' NULL '%s'",
+                             tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER, BulkRecord.NULL_STRING);
     }
 
     /**

@@ -84,7 +84,8 @@ public abstract class SQLDb {
             throw JamException.runtime(ex);
         }
         finally {
-            bulkFile.delete();
+            if (bulkFile != null)
+                bulkFile.delete();
         }
     }
 

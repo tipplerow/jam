@@ -87,6 +87,25 @@ public class PostgreSQLDbTest {
         }
     }
 
+    @Test public void testBulkCopy() throws SQLException {
+        if (!canConnect)
+            return;
+
+        PostgreSQLDb db = createDb();
+
+        db.verbose(true);
+        createTestTable(db);
+
+        db.bulkCopy(TEST_TABLE_NAME,
+                    List.of(new TestRecord("abc", 1),
+                            new TestRecord("def", 2),
+                            new TestRecord("ghi", 3),
+                            new TestRecord("foo", null),
+                            new TestRecord("bar", null)));
+
+        assertBulkImport(db);
+    }
+
     @Test public void testBulkImport1() throws SQLException {
         if (!canConnect)
             return;
@@ -144,7 +163,7 @@ public class PostgreSQLDbTest {
                               new TestRecord("ghi", 3),
                               new TestRecord("foo", null),
                               new TestRecord("bar", null)));
-                      
+
         assertBulkImport(db);
     }
 

@@ -90,6 +90,15 @@ public final class SQLEndpoint {
         return password;
     }
 
+    /**
+     * Returns the port number formatted as a string.
+     *
+     * @return the port number formatted as a string.
+     */
+    public String portString() {
+        return Integer.toString(port);
+    }
+
     @Override public boolean equals(Object obj) {
         return (obj instanceof SQLEndpoint) && equalsEndpoint((SQLEndpoint) obj);
     }
