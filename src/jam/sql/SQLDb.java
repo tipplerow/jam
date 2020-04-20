@@ -193,6 +193,10 @@ public abstract class SQLDb {
      */
     public void createTable(String tableName, List<SQLColumn> columns) {
         createTable(tableName, SQLColumn.schema(columns));
+
+        for (SQLColumn column : columns)
+            if (column.hasIndex())
+                createIndex(tableName, column.getName());
     }
 
     /**
