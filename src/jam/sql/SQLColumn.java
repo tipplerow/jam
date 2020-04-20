@@ -2,10 +2,11 @@
 package jam.sql;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import jam.report.LineBuilder;
-import jam.util.FixedList;
 import jam.util.ListUtil;
 
 /**
@@ -14,9 +15,30 @@ import jam.util.ListUtil;
 public final class SQLColumn {
     private final String name;
     private final String type;
-    private final FixedList<String> qualifiers;
+    private final Set<Qualifier> qualifiers;
 
-    private SQLColumn(String name, String type, FixedList<String> qualifiers) {
+    private enum Qualifier {
+        NOT_NULL("NOT NULL"),
+        PRIMARY_KEY("PRIMARY KEY"),
+        UNIQUE("UNIQUE"),
+        WITH_INDEX(null);
+
+        private final String schemaString;
+
+        private Qualifier(String schemaString) {
+            this.schemaString = schemaString;
+        }
+
+        public boolean inSchema() {
+            return schemaString != null;
+        }
+
+        public String schemaString() {
+            return schemaString;
+        }
+    }
+
+    private SQLColumn(String name, String type, Set<Qualifier> qualifiers) {
         this.name = name;
         this.type = type;
         this.qualifiers = qualifiers;
@@ -32,7 +54,7 @@ public final class SQLColumn {
      * @return the SQL column meta-data.
      */
     public static SQLColumn create(String name, String type) {
-        return new SQLColumn(name, type, FixedList.empty());
+        return new SQLColumn(name, type, EnumSet.noneOf(Qualifier.class));
     }
 
     /**
@@ -63,8 +85,12 @@ public final class SQLColumn {
         return builder.toString();
     }
 
-    private SQLColumn addQualifier(String qualifier) {
-        return new SQLColumn(name, type, qualifiers.append(qualifier));
+    private SQLColumn add(Qualifier qualifier) {
+        SQLColumn newColumn =
+            new SQLColumn(name, type, EnumSet.copyOf(qualifiers));
+
+        newColumn.qualifiers.add(qualifier);
+        return newColumn;
     }
 
     /**
@@ -80,25 +106,11 @@ public final class SQLColumn {
         builder.append(name);
         builder.append(type);
 
-        for (String qualifier : qualifiers)
-            builder.append(qualifier);
+        for (Qualifier qualifier : qualifiers)
+            if (qualifier.inSchema())
+                builder.append(qualifier.schemaString());
 
         return builder.toString();
-    }
-
-    /**
-     * Creates a new column like this column with a new foreign key
-     * constraint; this column is unchanged.
-     *
-     * @param tableName the name of the referenced table.
-     *
-     * @param foreignKey the name of the key column in the referenced
-     * table.
-     *
-     * @return the new column description.
-     */
-    public SQLColumn foreignKey(String tableName, String foreignKey) {
-        return addQualifier(String.format("REFERENCES %s(%s)", tableName, foreignKey));
     }
 
     /**
@@ -106,9 +118,15 @@ public final class SQLColumn {
      * constraint; this column is unchanged.
      *
      * @return the new column description.
+     *
+     * @throws IllegalStateException if this column has any other
+     * qualifiers.
      */
     public SQLColumn primaryKey() {
-        return addQualifier("PRIMARY KEY");
+        if (!qualifiers.isEmpty())
+            throw new IllegalStateException("PRIMARY KEY must be the only column qualifier.");
+
+        return add(Qualifier.PRIMARY_KEY);
     }
 
     /**
@@ -116,9 +134,18 @@ public final class SQLColumn {
      * constraint; this column is unchanged.
      *
      * @return the new column description.
+     *
+     * @throws IllegalStateException if this column is a primary key
+     * column or has an explicit index.
      */
     public SQLColumn unique() {
-        return addQualifier("UNIQUE");
+        if (isPrimaryKey())
+            throw new IllegalStateException("Primary keys are already unique.");
+
+        if (hasIndex())
+            throw new IllegalStateException("A uniqueness constraint would add a redundant index.");
+
+        return add(Qualifier.UNIQUE);
     }
 
     /**
@@ -128,7 +155,29 @@ public final class SQLColumn {
      * @return the new column description.
      */
     public SQLColumn notNull() {
-        return addQualifier("NOT NULL");
+        if (isPrimaryKey())
+            throw new IllegalStateException("Primary keys are already non-null.");
+
+        return add(Qualifier.NOT_NULL);
+    }
+
+    /**
+     * Creates a new column like this column with an index
+     * constraint; this column is unchanged.
+     *
+     * @return the new column description.
+     *
+     * @throws IllegalStateException if this column is a primary key
+     * or has been marked as unique (has an implicit index).
+     */
+    public SQLColumn withIndex() {
+        if (isPrimaryKey())
+            throw new IllegalStateException("Primary keys are already indexed.");
+
+        if (isUnique())
+            throw new IllegalStateException("Unique columns are already indexed.");
+
+        return add(Qualifier.WITH_INDEX);
     }
 
     /**
@@ -150,11 +199,41 @@ public final class SQLColumn {
     }
 
     /**
-     * Returns a read-only view of the qualifiers for this column.
+     * Identifies primary key columns.
      *
-     * @return a read-only view of the qualifiers for this column.
+     * @return {@code true} iff this column is the primary key for its
+     * table.
      */
-    public List<String> getQualifiers() {
-        return Collections.unmodifiableList(qualifiers);
+    public boolean isPrimaryKey() {
+        return qualifiers.contains(Qualifier.PRIMARY_KEY);
+    }
+
+    /**
+     * Identifies unique (but not primary key) columns.
+     *
+     * @return {@code true} iff this column requires unique values but
+     * is not the primary key column.
+     */
+    public boolean isUnique() {
+        return qualifiers.contains(Qualifier.UNIQUE);
+    }
+
+    /**
+     * Identifies non-null columns.
+     *
+     * @return {@code true} iff this column forbids {@code NULL}
+     * values.
+     */
+    public boolean isNotNull() {
+        return qualifiers.contains(Qualifier.NOT_NULL);
+    }
+
+    /**
+     * Identifies indexed (but not unique) columns.
+     *
+     * @return {@code true} iff this column has a table index.
+     */
+    public boolean hasIndex() {
+        return qualifiers.contains(Qualifier.WITH_INDEX);
     }
 }
