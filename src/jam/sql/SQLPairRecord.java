@@ -66,4 +66,8 @@ public abstract class SQLPairRecord<K1, K2> {
     @Override public int hashCode() {
         return key1.hashCode() + 31 * key2.hashCode();
     }
+
+    @Override public String toString() {
+        return String.format("%s(%s, %s)", getClass().getSimpleName(), key1.toString(), key2.toString());
+    }
 }
