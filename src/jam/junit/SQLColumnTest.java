@@ -47,36 +47,41 @@ public class SQLColumnTest {
 
     @Test public void testQualifiers() {
         SQLColumn base = SQLColumn.create("pmid", "integer");
-        assertQualifiers(base, false, false, false, false);
+        assertQualifiers(base, false, false, false, false, false);
+
+        SQLColumn compkey = base.compositeKey();
+        assertQualifiers(compkey, true, false, false, false, true);
 
         SQLColumn pkey = base.primaryKey();
-        assertQualifiers(base, false, false, false, false);
-        assertQualifiers(pkey, true, false, false, false);
+        assertQualifiers(base, false, false, false, false, false);
+        assertQualifiers(pkey, false, true, false, false, false);
 
         SQLColumn unique = base.unique();
-        assertQualifiers(base, false, false, false, false);
-        assertQualifiers(unique, false, true, false, false);
+        assertQualifiers(base, false, false, false, false, false);
+        assertQualifiers(unique, false, false, true, false, false);
 
         SQLColumn uniqueNotNull = unique.notNull();
-        assertQualifiers(base, false, false, false, false);
-        assertQualifiers(unique, false, true, false, false);
-        assertQualifiers(uniqueNotNull, false, true, true, false);
+        assertQualifiers(base, false, false, false, false, false);
+        assertQualifiers(unique, false, false, true, false, false);
+        assertQualifiers(uniqueNotNull, false, false, true, true, false);
 
         SQLColumn withIndex = base.withIndex();
-        assertQualifiers(base, false, false, false, false);
-        assertQualifiers(withIndex, false, false, false, true);
+        assertQualifiers(base, false, false, false, false, false);
+        assertQualifiers(withIndex, false, false, false, false, true);
 
         SQLColumn withIndexNotNull = withIndex.notNull();
-        assertQualifiers(base, false, false, false, false);
-        assertQualifiers(withIndex, false, false, false, true);
-        assertQualifiers(withIndexNotNull, false, false, true, true);
+        assertQualifiers(base, false, false, false, false, false);
+        assertQualifiers(withIndex, false, false, false, false, true);
+        assertQualifiers(withIndexNotNull, false, false, false, true, true);
     }
 
     private void assertQualifiers(SQLColumn column,
+                                  boolean   isCompositeKey,
                                   boolean   isPrimaryKey,
                                   boolean   isUnique,
                                   boolean   isNotNull,
                                   boolean   hasIndex) {
+        assertEquals(isCompositeKey, column.isCompositeKey());
         assertEquals(isPrimaryKey, column.isPrimaryKey());
         assertEquals(isUnique, column.isUnique());
         assertEquals(isNotNull, column.isNotNull());

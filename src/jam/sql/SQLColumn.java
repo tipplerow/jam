@@ -18,23 +18,24 @@ public final class SQLColumn {
     private final Set<Qualifier> qualifiers;
 
     private enum Qualifier {
+        COMPOSITE_KEY(null),
         NOT_NULL("NOT NULL"),
         PRIMARY_KEY("PRIMARY KEY"),
         UNIQUE("UNIQUE"),
         WITH_INDEX(null);
 
-        private final String schemaString;
+        private final String columnConstraintString;
 
-        private Qualifier(String schemaString) {
-            this.schemaString = schemaString;
+        private Qualifier(String columnConstraintString) {
+            this.columnConstraintString = columnConstraintString;
         }
 
-        public boolean inSchema() {
-            return schemaString != null;
+        public String getColumnConstraintString() {
+            return columnConstraintString;
         }
 
-        public String schemaString() {
-            return schemaString;
+        public boolean isColumnConstraint() {
+            return columnConstraintString != null;
         }
     }
 
@@ -85,11 +86,13 @@ public final class SQLColumn {
         return builder.toString();
     }
 
-    private SQLColumn add(Qualifier qualifier) {
+    private SQLColumn add(Qualifier... qualifierList) {
         SQLColumn newColumn =
             new SQLColumn(name, type, EnumSet.copyOf(qualifiers));
 
-        newColumn.qualifiers.add(qualifier);
+        for (Qualifier qualifier : qualifierList)
+            newColumn.qualifiers.add(qualifier);
+
         return newColumn;
     }
 
@@ -107,15 +110,32 @@ public final class SQLColumn {
         builder.append(type);
 
         for (Qualifier qualifier : qualifiers)
-            if (qualifier.inSchema())
-                builder.append(qualifier.schemaString());
+            if (qualifier.isColumnConstraint())
+                builder.append(qualifier.getColumnConstraintString());
 
         return builder.toString();
     }
 
     /**
-     * Creates a new column like this column with a primary key
-     * constraint; this column is unchanged.
+     * Creates a new column like this column as a composite key for
+     * its table and adds a non-unique index for the column; this
+     * column is unchanged.
+     *
+     * @return the new column description.
+     *
+     * @throws IllegalStateException if this column has any other
+     * qualifiers.
+     */
+    public SQLColumn compositeKey() {
+        if (!qualifiers.isEmpty())
+            throw new IllegalStateException("No other qualifiers are allowed.");
+
+        return add(Qualifier.COMPOSITE_KEY, Qualifier.WITH_INDEX);
+    }
+
+    /**
+     * Creates a new column like this column as the primary key for
+     * its table; this column is unchanged.
      *
      * @return the new column description.
      *
@@ -177,6 +197,9 @@ public final class SQLColumn {
         if (isUnique())
             throw new IllegalStateException("Unique columns are already indexed.");
 
+        if (hasIndex())
+            throw new IllegalStateException("This column is already indexed.");
+
         return add(Qualifier.WITH_INDEX);
     }
 
@@ -196,6 +219,16 @@ public final class SQLColumn {
      */
     public String getType() {
         return type;
+    }
+
+    /**
+     * Identifies composite key columns.
+     *
+     * @return {@code true} iff this column is a component of the
+     * composite key for its table.
+     */
+    public boolean isCompositeKey() {
+        return qualifiers.contains(Qualifier.COMPOSITE_KEY);
     }
 
     /**
