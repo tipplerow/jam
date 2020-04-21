@@ -166,7 +166,8 @@ public abstract class SQLDb {
     }
 
     private static String formatCreateIndex(String tableName, String columnName) {
-        return String.format("CREATE INDEX IF NOT EXISTS %s_idx ON %s(%s)", columnName, tableName, columnName);
+        return String.format("CREATE INDEX IF NOT EXISTS %s_%s_idx ON %s(%s)",
+                             tableName, columnName, tableName, columnName);
     }
 
     /**
