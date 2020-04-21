@@ -69,23 +69,6 @@ public final class SQLColumn {
         return ListUtil.apply(columns, x -> x.getName());
     }
 
-    /**
-     * Joins column descriptions to form a complete table schema
-     * description.
-     *
-     * @param columns the table columns.
-     *
-     * @return the table schema.
-     */
-    public static String schema(List<SQLColumn> columns) {
-        LineBuilder builder = new LineBuilder(", ");
-
-        for (SQLColumn column : columns)
-            builder.append(column.join());
-
-        return builder.toString();
-    }
-
     private SQLColumn add(Qualifier... qualifierList) {
         SQLColumn newColumn =
             new SQLColumn(name, type, EnumSet.copyOf(qualifiers));

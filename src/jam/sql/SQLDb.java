@@ -193,11 +193,7 @@ public abstract class SQLDb {
      * @throws RuntimeException if the table cannot be created.
      */
     public void createTable(String tableName, List<SQLColumn> columns) {
-        createTable(tableName, SQLColumn.schema(columns));
-
-        for (SQLColumn column : columns)
-            if (column.hasIndex())
-                createIndex(tableName, column.getName());
+        SQLSchema.create(tableName, columns).createTable(this);
     }
 
     /**

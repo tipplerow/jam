@@ -168,7 +168,7 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
      * @return the column meta-data for the first key.
      */
     public SQLColumn getKey1Column() {
-        return SQLColumn.create(getKey1Name(), getKey1Type()).notNull();
+        return SQLColumn.create(getKey1Name(), getKey1Type()).compositeKey();
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
      * @return the column meta-data for the second key.
      */
     public SQLColumn getKey2Column() {
-        return SQLColumn.create(getKey2Name(), getKey2Type()).notNull();
+        return SQLColumn.create(getKey2Name(), getKey2Type()).compositeKey();
     }
 
     /**
@@ -185,17 +185,8 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
      *
      * @return the schema for the database table.
      */
-    public String getTableSchema() {
-        String key1 = getKey1Name();
-        String key2 = getKey2Name();
-
-        String column1 = getKey1Column().join();
-        String column2 = getKey2Column().join();
-
-        String primaryKey =
-            String.format("CONSTRAINT %s_%s PRIMARY KEY(%s, %s)", key1, key2, key1, key2);
-
-        return String.join(", ", column1, column2, primaryKey);
+    public SQLSchema getSchema() {
+        return SQLSchema.create(getTableName(), getKey1Column(), getKey2Column());
     }
 
     /**
@@ -205,11 +196,7 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
      * and cannot be created.
      */
     public synchronized void require() {
-        if (!db.tableExists(getTableName())) {
-            db.createTable(getTableName(), getTableSchema());
-            db.createIndex(getTableName(), getKey1Name());
-            db.createIndex(getTableName(), getKey2Name());
-        }
+        getSchema().createTable(db);
     }
 
     /**

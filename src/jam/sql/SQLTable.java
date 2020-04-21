@@ -91,6 +91,15 @@ public abstract class SQLTable<K, V> {
     public abstract V getRow(ResultSet resultSet) throws SQLException;
 
     /**
+     * Returns the table schema.
+     *
+     * @return the table schema.
+     */
+    public SQLSchema getSchema() {
+        return SQLSchema.create(getTableName(), getColumns());
+    }
+
+    /**
      * Returns the name of the database table.
      *
      * @return the name of the database table.
@@ -508,7 +517,7 @@ public abstract class SQLTable<K, V> {
      * and cannot be created.
      */
     public synchronized void require() {
-        db.createTable(getTableName(), getColumns());
+        getSchema().createTable(db);
     }
 
     /**
