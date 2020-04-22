@@ -113,38 +113,39 @@ public final class ListUtil {
     }
 
     /**
-     * Removes elements of a list that do not pass a filter predicate.
+     * Removes elements of a collection that do not pass a filter
+     * predicate.
      *
      * @param <V> the runtime element type.
      *
-     * @param list the list to be filtered.
+     * @param collection the collection to be filtered.
      *
      * @param predicate the predicate filter to apply to each element
-     * in the list.
+     * in the collection.
      *
      * @return a list containing only elements for which the predicate
      * evaluates to {@code true}.
      */
-    public static <V> List<V> filter(List<V> list, Predicate<? super V> predicate) {
-        return list.stream().filter(predicate).collect(Collectors.toList());
+    public static <V> List<V> filter(Collection<V> collection, Predicate<? super V> predicate) {
+        return collection.stream().filter(predicate).collect(Collectors.toList());
     }
 
     /**
-     * Removes elements of a list that do not pass a filter predicate
-     * <em>using a parallel stream</em>.
+     * Removes elements of a collection that do not pass a filter
+     * predicate <em>using a parallel stream</em>.
      *
      * @param <V> the runtime element type.
      *
-     * @param list the list to be filtered.
+     * @param collection the collection to be filtered.
      *
      * @param predicate the predicate filter to apply to each element
-     * in the list.
+     * in the collection.
      *
      * @return a list containing only elements for which the predicate
      * evaluates to {@code true}.
      */
-    public static <V> List<V> filterParallel(List<V> list, Predicate<? super V> predicate) {
-        return list.parallelStream().filter(predicate).collect(Collectors.toList());
+    public static <V> List<V> filterParallel(Collection<V> collection, Predicate<? super V> predicate) {
+        return collection.parallelStream().filter(predicate).collect(Collectors.toList());
     }
 
     /**
