@@ -115,8 +115,8 @@ public final class PostgreSQLDb extends SQLDb {
     }
 
     private static String formatBulkCopy(String tableName, File bulkFile) throws IOException {
-        return String.format("\\copy %s from '%s' with DELIMITER '%s' NULL '%s'",
-                             tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER, BulkRecord.NULL_STRING);
+        return String.format("\\copy %s from '%s' with DELIMITER '%c' NULL '%s'",
+                             tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER_CHAR, BulkRecord.NULL_STRING);
     }
 
     /**

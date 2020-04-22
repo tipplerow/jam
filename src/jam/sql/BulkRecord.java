@@ -47,14 +47,20 @@ public interface BulkRecord {
     public static void writeBulkFile(File bulkFile, Collection<? extends BulkRecord> records) {
         try (PrintWriter writer = IOUtil.openWriter(bulkFile)) {
             JamLogger.info("Writing bulk import file [%s]...", bulkFile);
-
-            for (BulkRecord record : records) {
-                String formatted = record.formatBulk();
-                String replaced  = formatted.replace(DELIMITER_CHAR, DELIMITER_SUBSTITUTE);
-
-                writer.println(replaced);
-            }
+            records.stream().forEach(record -> writer.println(record.formatBulk()));
         }
+    }
+
+    /**
+     * Ensures that the string representation of a field is valid by
+     * replacing delimiter characters with the substitute character.
+     *
+     * @param field the string representation of a field.
+     *
+     * @return a cleaned version of the string.
+     */
+    public default String cleanField(String field) {
+        return field.replace(DELIMITER_CHAR, DELIMITER_SUBSTITUTE);
     }
 
     /**

@@ -78,7 +78,7 @@ public abstract class SQLDb {
         try {
             bulkFile = File.createTempFile("bulk_", ".psv", JamEnv.tmpdir());
             BulkRecord.writeBulkFile(bulkFile, records);
-            bulkImport(tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER, BulkRecord.NULL_STRING);
+            bulkImport(tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER_CHAR, BulkRecord.NULL_STRING);
         }
         catch (Exception ex) {
             throw JamException.runtime(ex);
@@ -103,12 +103,12 @@ public abstract class SQLDb {
      *
      * @throws RuntimeException if the update cannot be executed.
      */
-    public void bulkImport(String tableName, String fileName, String delimiter, String nullString) {
+    public void bulkImport(String tableName, String fileName, char delimiter, String nullString) {
         executeUpdate(formatBulkImport(tableName, fileName, delimiter, nullString));
     }
 
-    private static String formatBulkImport(String tableName, String fileName, String delimiter, String nullString) {
-        return String.format("COPY %s FROM '%s' WITH DELIMITER '%s' NULL '%s'",
+    private static String formatBulkImport(String tableName, String fileName, char delimiter, String nullString) {
+        return String.format("COPY %s FROM '%s' WITH DELIMITER '%c' NULL '%s'",
                              tableName, fileName, delimiter, nullString);
     }
 

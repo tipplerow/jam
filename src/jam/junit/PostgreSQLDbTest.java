@@ -115,7 +115,7 @@ public class PostgreSQLDbTest {
         db.verbose(true);
         createTestTable(db);
 
-        db.bulkImport(TEST_TABLE_NAME, BULK_IMPORT_FILE, BulkRecord.DELIMITER, BulkRecord.NULL_STRING);
+        db.bulkImport(TEST_TABLE_NAME, BULK_IMPORT_FILE, BulkRecord.DELIMITER_CHAR, BulkRecord.NULL_STRING);
         assertBulkImport(db);
     }
 
