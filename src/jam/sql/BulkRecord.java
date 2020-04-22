@@ -92,7 +92,7 @@ public interface BulkRecord {
      * {@code null}, otherwise the {@code NULL_STRING}.
      */
     public default String formatBulk(KeyedObject<String> obj) {
-        return (obj != null) ? obj.getKey() : NULL_STRING;
+        return (obj != null) ? cleanField(obj.getKey()) : NULL_STRING;
     }
 
     /**
@@ -104,7 +104,7 @@ public interface BulkRecord {
      * otherwise the {@code NULL_STRING}.
      */
     public default String formatBulk(String str) {
-        return (str != null) ? str : NULL_STRING;
+        return (str != null) ? cleanField(str) : NULL_STRING;
     }
 
     /**
