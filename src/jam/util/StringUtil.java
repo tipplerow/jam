@@ -17,6 +17,16 @@ public final class StringUtil {
     public static final String EMPTY = "";
 
     /**
+     * The backslash string.
+     */
+    public static final String BACK_SLASH = "\\";
+
+    /**
+     * A string with two backslashes.
+     */
+    public static final String DOUBLE_BACK_SLASH = BACK_SLASH + BACK_SLASH;
+
+    /**
      * One double quotation mark.
      */
     public static final String DOUBLE_QUOTE = "\"";

@@ -8,6 +8,7 @@ import java.util.Collection;
 import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.lang.KeyedObject;
+import jam.util.StringUtil;
 
 /**
  * A database record that may be written to a delimited flat file to
@@ -25,10 +26,10 @@ public interface BulkRecord {
     public static final String DELIMITER_STRING = String.valueOf(DELIMITER_CHAR);
 
     /**
-     * The character used to replace delimiter characters in fields
-     * written to bulk flat files.
+     * The string that is substituted for delimiters in bulk flat
+     * files.
      */
-    public static final char DELIMITER_SUBSTITUTE = '-';
+    public static final String DELIMITER_SUBSTITUTE = StringUtil.BACK_SLASH + DELIMITER_STRING;
 
     /**
      * The string used in bulk imports to identify {@code NULL}
@@ -60,7 +61,14 @@ public interface BulkRecord {
      * @return a cleaned version of the string.
      */
     public default String cleanField(String field) {
-        return field.replace(DELIMITER_CHAR, DELIMITER_SUBSTITUTE);
+        //
+        // Add the "escape" backslash before backslashes and delimiter
+        // characters...
+        //
+        field = field.replace(StringUtil.BACK_SLASH, StringUtil.DOUBLE_BACK_SLASH);
+        field = field.replace(DELIMITER_STRING, DELIMITER_SUBSTITUTE);
+
+        return field;
     }
 
     /**

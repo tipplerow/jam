@@ -11,6 +11,10 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class StringUtilTest {
+    @Test public void testBackslash() {
+        assertEquals(1, StringUtil.BACK_SLASH.length());
+        assertEquals(2, StringUtil.DOUBLE_BACK_SLASH.length());
+    }
 
     @Test public void testChop() {
         assertEquals("cho", StringUtil.chop("chop"));
