@@ -208,6 +208,18 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
+     * Returns a {@code RuntimeException} to throw when passed an
+     * invalid column name.
+     *
+     * @param badColumn the invalid column name.
+     *
+     * @return the {@code RuntimeException} to be thrown.
+     */
+    public static RuntimeException invalidColumn(String badColumn) {
+        return JamException.runtime("Invalid column: [%s].", badColumn);
+    }
+
+    /**
      * Assigns a possibly {@code null} string value as a parameter in
      * a prepared statement.
      *

@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import jam.lang.JamException;
 import jam.math.DoubleComparator;
 import jam.sql.SQLCache;
 import jam.sql.SQLColumn;
@@ -137,7 +136,7 @@ public abstract class SQLTestBase {
                 break;
 
             default:
-                throw JamException.runtime("Invalid column name: [%s]", columnName);
+                throw invalidColumn(columnName);
             }
         }
 
