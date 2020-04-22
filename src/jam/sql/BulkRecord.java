@@ -17,7 +17,18 @@ public interface BulkRecord {
     /**
      * The delimiter to use in bulk flat files.
      */
-    public static final String DELIMITER = "|";
+    public static final char DELIMITER_CHAR = '|';
+
+    /**
+     * The delimiter to use in bulk flat files.
+     */
+    public static final String DELIMITER_STRING = String.valueOf(DELIMITER_CHAR);
+
+    /**
+     * The character used to replace delimiter characters in fields
+     * written to bulk flat files.
+     */
+    public static final char DELIMITER_SUBSTITUTE = '-';
 
     /**
      * The string used in bulk imports to identify {@code NULL}
@@ -36,7 +47,13 @@ public interface BulkRecord {
     public static void writeBulkFile(File bulkFile, Collection<? extends BulkRecord> records) {
         try (PrintWriter writer = IOUtil.openWriter(bulkFile)) {
             JamLogger.info("Writing bulk import file [%s]...", bulkFile);
-            records.stream().forEach(record -> writer.println(record.formatBulk()));
+
+            for (BulkRecord record : records) {
+                String formatted = record.formatBulk();
+                String replaced  = formatted.replace(DELIMITER_CHAR, DELIMITER_SUBSTITUTE);
+
+                writer.println(replaced);
+            }
         }
     }
 
@@ -92,6 +109,6 @@ public interface BulkRecord {
      * @return the delimited string representation for the row.
      */
     public default String joinBulk(String... columns) {
-        return String.join(DELIMITER, columns);
+        return String.join(DELIMITER_STRING, columns);
     }
 }
