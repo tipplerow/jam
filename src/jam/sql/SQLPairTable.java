@@ -38,6 +38,8 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
     private PreparedStatement storeStatement = null;
     private PreparedStatement fetchKey1Statement = null;
     private PreparedStatement fetchKey2Statement = null;
+    private PreparedStatement removeKey1Statement = null;
+    private PreparedStatement removeKey2Statement = null;
     private PreparedStatement containsBothStatement = null;
     private PreparedStatement containsKey1Statement = null;
     private PreparedStatement containsKey2Statement = null;
@@ -458,6 +460,77 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
 
     private String formatLoadQuery() {
         return String.format("SELECT * FROM %s", getTableName());
+    }
+
+    /**
+     * Removes all many-to-many relationship containing the first
+     * key.
+     *
+     * @param key1 the key of interest.
+     */
+    public synchronized void removeKey1(K1 key1) {
+        try {
+            removeKey1(getRemoveKey1Statement(), key1);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    private PreparedStatement getRemoveKey1Statement() throws SQLException {
+        if (removeKey1Statement == null)
+            removeKey1Statement = prepareStatement(formatRemoveKey1Command());
+
+        return removeKey1Statement;
+    }
+
+    private String formatRemoveKey1Command() {
+        return formatRemoveOneCommand(getKey1Name());
+    }
+
+    private String formatRemoveOneCommand(String keyName) {
+        return String.format("DELETE FROM %s WHERE %s = ?", getTableName(), keyName);
+    }
+
+    private void removeKey1(PreparedStatement statement, K1 key1) throws SQLException {
+        setKey1(statement, 1, key1);
+        remove(statement);
+    }
+
+    private void remove(PreparedStatement statement) throws SQLException {
+        statement.executeUpdate();
+        connection.commit();
+    }
+
+    /**
+     * Removes all many-to-many relationship containing the second
+     * key.
+     *
+     * @param key2 the key of interest.
+     */
+    public synchronized void removeKey2(K2 key2) {
+        try {
+            removeKey2(getRemoveKey2Statement(), key2);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    private PreparedStatement getRemoveKey2Statement() throws SQLException {
+        if (removeKey2Statement == null)
+            removeKey2Statement = prepareStatement(formatRemoveKey2Command());
+
+        return removeKey2Statement;
+    }
+
+    private String formatRemoveKey2Command() {
+        return formatRemoveOneCommand(getKey2Name());
+    }
+
+    private void removeKey2(PreparedStatement statement, K2 key2) throws SQLException {
+        setKey2(statement, 1, key2);
+        remove(statement);
     }
 
     /**

@@ -73,7 +73,7 @@ public class SQLPairTableTest {
     }
 
 
-    @Test public void testLoadStore() {
+    @Test public void testLoadStoreRemove() {
         PairTable table = new PairTable(db);
 
         assertFalse(table.exists());
@@ -147,7 +147,7 @@ public class SQLPairTableTest {
         assertEquals(List.of(rec11, rec21, rec31), table.fetchKey2("1"));
         assertEquals(List.of(rec12), table.fetchKey2("2"));
         assertEquals(List.of(rec13), table.fetchKey2("3"));
-        
+
         assertTrue(table.contains(rec11));
         assertTrue(table.contains(rec12));
         assertTrue(table.contains(rec13));
@@ -161,6 +161,38 @@ public class SQLPairTableTest {
         assertTrue(table.containsKey2("1"));
         assertTrue(table.containsKey2("2"));
         assertTrue(table.containsKey2("3"));
+
+        table.removeKey1(1);
+
+        assertFalse(table.contains(rec11));
+        assertFalse(table.contains(rec12));
+        assertFalse(table.contains(rec13));
+        assertTrue(table.contains(rec21));
+        assertTrue(table.contains(rec31));
+
+        assertFalse(table.containsKey1(1));
+        assertTrue(table.containsKey1(2));
+        assertTrue(table.containsKey1(3));
+
+        assertTrue(table.containsKey2("1"));
+        assertFalse(table.containsKey2("3"));
+        assertFalse(table.containsKey2("3"));
+
+        table.removeKey2("1");
+
+        assertFalse(table.contains(rec11));
+        assertFalse(table.contains(rec12));
+        assertFalse(table.contains(rec13));
+        assertFalse(table.contains(rec21));
+        assertFalse(table.contains(rec31));
+
+        assertFalse(table.containsKey1(1));
+        assertFalse(table.containsKey1(2));
+        assertFalse(table.containsKey1(3));
+
+        assertFalse(table.containsKey2("1"));
+        assertFalse(table.containsKey2("3"));
+        assertFalse(table.containsKey2("3"));
     }
 
     public static void main(String[] args) {
