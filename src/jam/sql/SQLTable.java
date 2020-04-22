@@ -17,6 +17,7 @@ import java.util.Map;
 import jam.app.JamLogger;
 import jam.lang.JamException;
 import jam.lang.KeyedObject;
+import jam.report.LineBuilder;
 
 /**
  * Manages a persistent database table of records.
@@ -31,6 +32,7 @@ public abstract class SQLTable<K, V> {
     private PreparedStatement fetchStatement = null;
     private PreparedStatement storeStatement = null;
     private PreparedStatement removeStatement = null;
+    private PreparedStatement updateStatement = null;
     private PreparedStatement containsStatement = null;
 
     /**
@@ -47,14 +49,7 @@ public abstract class SQLTable<K, V> {
         this.db = db;
     }
 
-    /**
-     * Returns the open database connection for this table.
-     *
-     * @return the open database connection for this table.
-     *
-     * @throws SQLException if a connection cannot be opened.
-     */
-    protected synchronized Connection getConnection() throws SQLException {
+    private Connection getConnection() throws SQLException {
         if (connection == null) {
             connection = db.openConnection();
             connection.setAutoCommit(false);
@@ -65,6 +60,15 @@ public abstract class SQLTable<K, V> {
 
     private PreparedStatement prepareStatement(String sql) throws SQLException {
         return getConnection().prepareStatement(sql);
+    }
+
+    /**
+     * Returns the number of columns in this table.
+     *
+     * @return the number of columns in this table.
+     */
+    public int countColumns() {
+        return getColumns().size();
     }
 
     /**
@@ -114,23 +118,19 @@ public abstract class SQLTable<K, V> {
     public abstract String getTableName();
 
     /**
-     * Assigns the fields of a record to the parameters of a prepared
-     * {@code INSERT} statement.
+     * Assigns a record field to a parameter in a prepared statement.
      *
-     * <p>The prepared statement is created by the following SQL text:
-     * {@code INSERT INTO table VALUES(?, ?, ..., ?)}, where {@code
-     * table} is the name of this table and the number of parameters
-     * (question marks) matches the number of columns.
+     * @param statement an open prepared statement.
      *
-     * @param statement a prepared statement that has been created
-     * using the SQL text above.
+     * @param index the index of the parameter in the statement.
      *
-     * @param record the record to be inserted into the table.
+     * @param record the record to be assigned.
      *
-     * @throws SQLException if any of the individual field assignments
-     * fail.
+     * @param colName the name of the column to be assigned.
+     *
+     * @throws SQLException if the assignment fails.
      */
-    public abstract void prepareInsert(PreparedStatement statement, V record) throws SQLException;
+    public abstract void prepareColumn(PreparedStatement statement, int index, V record, String colName) throws SQLException;
 
     /**
      * Assigns the record key to a prepared statement.
@@ -379,6 +379,18 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
+     * Returns the name of an indexed column <em>with the first column
+     * having index 1</em>.
+     *
+     * @param index the unit-offset index (first column = 1).
+     *
+     * @return the name of the indexed column.
+     */
+    public String getColumnName(int index) {
+        return getColumns().get(index - 1).getName();
+    }
+
+    /**
      * Returns the names of the columns (in order from left to right).
      *
      * @return the names of the columns (in order from left to right).
@@ -575,7 +587,7 @@ public abstract class SQLTable<K, V> {
         builder.append(getTableName());
         builder.append(" VALUES(?");
 
-        for (int k = 1; k < getColumns().size(); ++k)
+        for (int k = 1; k < countColumns(); ++k)
             builder.append(", ?");
 
         builder.append(")");
@@ -586,18 +598,9 @@ public abstract class SQLTable<K, V> {
         Connection connection = statement.getConnection();
 
         try {
-            int count = 0;
-
-            for (V record : records) {
-                ++count;
-
-                if (count % 1000 == 0)
-                    JamLogger.info("Inserting record [%d] of [%d]...", count, records.size());
-
+            for (V record : records)
                 store(statement, record);
-            }
 
-            JamLogger.info("Committing update...");
             connection.commit();
         }
         catch (SQLException ex) {
@@ -609,5 +612,100 @@ public abstract class SQLTable<K, V> {
     private void store(PreparedStatement statement, V record) throws SQLException {
         prepareInsert(statement, record);
         statement.executeUpdate();
+    }
+
+    private void prepareInsert(PreparedStatement statement, V record) throws SQLException {
+        for (int index = 1; index <= countColumns(); ++index)
+            prepareColumn(statement, index, record, getColumnName(index));
+    }
+
+    /**
+     * Updates a record in the database table (if it exists).
+     *
+     * @param record the record to update.
+     *
+     * @throws RuntimeException if any SQL errors occur.
+     */
+    public void update(V record) {
+        update(List.of(record));
+    }
+
+    /**
+     * Updates records in the database table.
+     *
+     * @param records the records to update.
+     *
+     * @throws RuntimeException if any SQL errors occur.
+     */
+    public void update(Collection<V> records) {
+        if (records.isEmpty())
+            return;
+
+        try {
+            update(getUpdateStatement(), records);
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    private synchronized PreparedStatement getUpdateStatement() throws SQLException {
+        if (updateStatement == null)
+            updateStatement = prepareStatement(formatUpdateCommand());
+
+        return updateStatement;
+    }
+
+    private String formatUpdateCommand() {
+        //
+        // Recall that the primary key must be the first column, and
+        // there must be at least two columns...
+        //
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("UPDATE ");
+        builder.append(getTableName());
+        builder.append(" SET ");
+        builder.append(getColumnName(2));
+        builder.append(" = ?");
+
+        for (int index = 3; index <= countColumns(); ++index) {
+            builder.append(", ");
+            builder.append(getColumnName(index));
+            builder.append(" = ?");
+        }
+
+        builder.append(" WHERE ");
+        builder.append(getKeyName());
+        builder.append(" = ?");
+
+        return builder.toString();
+    }
+
+    private synchronized void update(PreparedStatement statement, Collection<V> records) throws SQLException {
+        Connection connection = statement.getConnection();
+
+        try {
+            for (V record : records)
+                update(statement, record);
+
+            connection.commit();
+        }
+        catch (SQLException ex) {
+            rollback(connection);
+            throw ex;
+        }
+    }
+
+    private void update(PreparedStatement statement, V record) throws SQLException {
+        prepareUpdate(statement, record);
+        statement.executeUpdate();
+    }
+
+    private void prepareUpdate(PreparedStatement statement, V record) throws SQLException {
+        for (int index = 2; index <= countColumns(); ++index)
+            prepareColumn(statement, index - 1, record, getColumnName(index));
+
+        prepareColumn(statement, countColumns(), record, getColumnName(1));
     }
 }

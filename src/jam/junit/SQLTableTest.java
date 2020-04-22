@@ -12,7 +12,7 @@ public class SQLTableTest extends SQLTestBase {
         super("data/test/sql_table_test.db");
     }
 
-    @Test public void testLoadStore() {
+    @Test public void testAll() {
         TestTable table = new TestTable(db);
 
         assertFalse(table.exists());
@@ -38,6 +38,9 @@ public class SQLTableTest extends SQLTestBase {
         assertEquals(rec2, table.fetch(key2));
         assertEquals(List.of(rec2, rec1), table.fetch(List.of(key2, key1)));
 
+        table.update(List.of(rec1U, rec2U));
+        assertEquals(List.of(rec1U, rec2U), table.fetch(List.of(key1, key2)));
+
         table.remove(key1);
 
         assertTrue(table.exists());
@@ -46,7 +49,7 @@ public class SQLTableTest extends SQLTestBase {
 
         table.store(rec3);
         assertTrue(table.contains(key3));
-        assertEquals(List.of(rec2, rec3), table.fetch(List.of(key2, key3)));
+        assertEquals(List.of(rec2U, rec3), table.fetch(List.of(key2, key3)));
     }
 
     public static void main(String[] args) {

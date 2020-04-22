@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import jam.lang.JamException;
 import jam.math.DoubleComparator;
 import jam.sql.SQLCache;
 import jam.sql.SQLColumn;
@@ -39,6 +40,9 @@ public abstract class SQLTestBase {
     public static final TestRecord rec3 = new TestRecord(key3, 16.0, 4);
     public static final TestRecord rec4 = new TestRecord(key4, 25.0, 5);
     public static final TestRecord rec5 = new TestRecord(key5, 36.0, 6);
+
+    public static final TestRecord rec1U = new TestRecord(key1, 4.1, 21);
+    public static final TestRecord rec2U = new TestRecord(key2, 8.2, 42);
 
     @Before public void setUp() {
         deleteDbFile();
@@ -117,10 +121,24 @@ public abstract class SQLTestBase {
             return "test_table";
         }
 
-        @Override public void prepareInsert(PreparedStatement statement, TestRecord record) throws SQLException {
-            statement.setString(1, record.key);
-            statement.setDouble(2, record.foo);
-            statement.setInt(3, record.bar);
+        @Override public void prepareColumn(PreparedStatement statement, int index,
+                                            TestRecord record, String columnName) throws SQLException {
+            switch (columnName) {
+            case "key":
+                statement.setString(index, record.key);
+                break;
+
+            case "foo":
+                statement.setDouble(index, record.foo);
+                break;
+
+            case "bar":
+                statement.setInt(index, record.bar);
+                break;
+
+            default:
+                throw JamException.runtime("Invalid column name: [%s]", columnName);
+            }
         }
 
         @Override public void prepareKey(PreparedStatement statement, int index, String key) throws SQLException {
