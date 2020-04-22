@@ -106,7 +106,8 @@ public final class PostgreSQLDb extends SQLDb {
             return process.success();
         }
         catch (Exception ex) {
-            throw JamException.runtime(ex);
+            JamLogger.error(ex.getMessage());
+            return false;
         }
         finally {
             if (bulkFile != null)
