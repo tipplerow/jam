@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -479,6 +480,21 @@ public final class ListUtil {
                 transpose.get(transposeRowIndex).add(row.get(transposeRowIndex));
 
         return transpose;
+    }
+
+    /**
+     * Retains only the unique elements in a list (in their original
+     * order).
+     *
+     * @param <V> the element type.
+     *
+     * @param elements the elements to be selected.
+     *
+     * @return a new list containing only the first occurrence of each
+     * element in the input list; the input list is unchanged.
+     */
+    public static <V> List<V> unique(List<V> elements) {
+        return new ArrayList<V>(new LinkedHashSet<V>(elements));
     }
 
     /**

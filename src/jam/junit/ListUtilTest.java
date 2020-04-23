@@ -227,6 +227,13 @@ public class ListUtilTest {
         assertEquals(List.of("F"),           transpose.get(3));
     }
 
+    @Test public void testUnique() {
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "B", "C")));
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "A", "B", "C")));
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "B", "C", "A", "B", "C")));
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "B", "B", "A", "C", "C", "B", "A")));
+    }
+
     @Test public void testView() {
         Collection<String> coll = new TreeSet<String>();
         coll.add("abc");
