@@ -3,6 +3,7 @@ package jam.junit;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -27,6 +28,7 @@ public class SQLTableTest extends SQLTestBase {
         
         assertTrue(table.contains(key1));
         assertEquals(rec1, table.fetch(key1));
+        assertEquals(Set.of(key1, key2), table.loadKeys());
 
         Map<String, TestRecord> map = table.load();
 
@@ -42,6 +44,7 @@ public class SQLTableTest extends SQLTestBase {
         assertEquals(List.of(rec1U, rec2U), table.fetch(List.of(key1, key2)));
 
         table.remove(key1);
+        assertEquals(Set.of(key2), table.loadKeys());
 
         assertTrue(table.exists());
         assertFalse(table.contains(key1));
@@ -50,6 +53,7 @@ public class SQLTableTest extends SQLTestBase {
         table.store(rec3);
         assertTrue(table.contains(key3));
         assertEquals(List.of(rec2U, rec3), table.fetch(List.of(key2, key3)));
+        assertEquals(Set.of(key2, key3), table.loadKeys());
     }
 
     public static void main(String[] args) {

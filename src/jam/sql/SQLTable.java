@@ -11,8 +11,10 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jam.app.JamLogger;
 import jam.lang.JamException;
@@ -88,6 +90,19 @@ public abstract class SQLTable<K, V> {
      * @return the key for the specified record.
      */
     public abstract K getKey(V record);
+
+    /**
+     * Returns the key stored in the first column of the current row
+     * of the result set returned from a {@code SELECT} query.
+     *
+     * @param resultSet an active {@code SELECT} result set.
+     *
+     * @return the key stored in the first column of the current row
+     * of the result set.
+     *
+     * @throws SQLException if a database error occurs.
+     */
+    public abstract K getKey(ResultSet resultSet) throws SQLException;
 
     /**
      * Returns the record stored in the current row of the result set
@@ -469,6 +484,55 @@ public abstract class SQLTable<K, V> {
         }
 
         return records;
+    }
+
+    /**
+     * Loads all keys from the database table.
+     *
+     * @return all keys contained in the database table.
+     *
+     * @throws RuntimeException if any errors occur.
+     */
+    public synchronized Set<K> loadKeys() {
+        JamLogger.info("Loading table keys [%s]...", getTableName());
+        Set<K> keys = null;
+
+        try {
+            keys = loadKeys(getConnection());
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+
+        JamLogger.info("Loaded [%d] keys from table [%s]...", keys.size(), getTableName());
+        return keys;
+    }
+
+    private Set<K> loadKeys(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            return loadKeys(statement);
+        }
+    }
+
+    private Set<K> loadKeys(Statement statement) throws SQLException {
+        String queryString = formatLoadKeysQuery();
+
+        try (ResultSet resultSet = db.executeQuery(statement, queryString)) {
+            return loadKeys(resultSet);
+        }
+    }
+
+    private String formatLoadKeysQuery() {
+        return String.format("SELECT %s FROM %s", getColumnNames().get(0), getTableName());
+    }
+
+    private Set<K> loadKeys(ResultSet resultSet) throws SQLException {
+        Set<K> keys = new HashSet<K>();
+
+        while (resultSet.next())
+            keys.add(getKey(resultSet));
+
+        return keys;
     }
 
     /**
