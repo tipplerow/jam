@@ -108,8 +108,8 @@ public abstract class SQLTestBase {
             return record.key;
         }
 
-        @Override public String getKey(ResultSet resultSet) throws SQLException {
-            return resultSet.getString(1);
+        @Override public String getKey(ResultSet resultSet, String columnLabel) throws SQLException {
+            return resultSet.getString(columnLabel);
         }
 
         @Override public TestRecord getRow(ResultSet resultSet) throws SQLException {

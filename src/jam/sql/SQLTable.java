@@ -92,17 +92,19 @@ public abstract class SQLTable<K, V> {
     public abstract K getKey(V record);
 
     /**
-     * Returns the key stored in the first column of the current row
-     * of the result set returned from a {@code SELECT} query.
+     * Returns the key stored in the current row of the result set
+     * returned from a {@code SELECT} query.
      *
      * @param resultSet an active {@code SELECT} result set.
      *
-     * @return the key stored in the first column of the current row
-     * of the result set.
+     * @param columnLabel the name of the column containing the key.
+     *
+     * @return the key stored in the specified column of the current
+     * row of the result set.
      *
      * @throws SQLException if a database error occurs.
      */
-    public abstract K getKey(ResultSet resultSet) throws SQLException;
+    public abstract K getKey(ResultSet resultSet, String columnLabel) throws SQLException;
 
     /**
      * Returns the record stored in the current row of the result set
@@ -523,14 +525,15 @@ public abstract class SQLTable<K, V> {
     }
 
     private String formatLoadKeysQuery() {
-        return String.format("SELECT %s FROM %s", getColumnNames().get(0), getTableName());
+        return String.format("SELECT %s FROM %s", getKeyName(), getTableName());
     }
 
     private Set<K> loadKeys(ResultSet resultSet) throws SQLException {
         Set<K> keys = new HashSet<K>();
+        String label = getKeyName();
 
         while (resultSet.next())
-            keys.add(getKey(resultSet));
+            keys.add(getKey(resultSet, label));
 
         return keys;
     }
