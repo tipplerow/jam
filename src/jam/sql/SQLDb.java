@@ -142,7 +142,17 @@ public abstract class SQLDb {
      * @param enumClass the class object for the enum to create.
      */
     public <E extends Enum<E>> void createEnum(String typeName, Class<E> enumClass) {
-        executeUpdate(formatCreateEnum(typeName, enumClass));
+        //
+        // There is no "create if not exists" for types, so catch the
+        // exception that will occur if the enum already exists...
+        //
+        try {
+            executeUpdate(formatCreateEnum(typeName, enumClass));
+        }
+        catch (Exception ex) {
+            if (!ex.getMessage().endsWith("already exists"))
+                throw JamException.runtime(ex);
+        }
     }
 
     private static <E extends Enum<E>> String formatCreateEnum(String typeName, Class<E> enumClass) {
