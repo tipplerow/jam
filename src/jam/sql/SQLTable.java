@@ -240,6 +240,8 @@ public abstract class SQLTable<K, V> {
      * Assigns a possibly {@code null} enumerated value as a parameter
      * in a prepared statement.
      *
+     * @param <E> the enumerated class.
+     *
      * @param statement the prepared statement to populate.
      *
      * @param index the index of the parameter in the statement (the
