@@ -237,6 +237,27 @@ public abstract class SQLTable<K, V> {
     }
 
     /**
+     * Assigns a possibly {@code null} enumerated value as a parameter
+     * in a prepared statement.
+     *
+     * @param statement the prepared statement to populate.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first is 1, second is 2, ...).
+     *
+     * @param value the possibly {@code null} enum value to assign.
+     *
+     * @throws SQLException if the statement is closed, the index is
+     * invalid, or if a database error occurs.
+     */
+    public static <E extends Enum<E>> void setEnum(PreparedStatement statement, int index, E value) throws SQLException {
+        if (value != null)
+            statement.setObject(index, value, Types.OTHER);
+        else
+            statement.setNull(index, Types.OTHER);
+    }
+
+    /**
      * Assigns a possibly {@code null} string value as a parameter in
      * a prepared statement.
      *
