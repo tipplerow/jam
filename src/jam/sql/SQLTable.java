@@ -51,7 +51,14 @@ public abstract class SQLTable<K, V> {
         this.db = db;
     }
 
-    private Connection getConnection() throws SQLException {
+    /**
+     * Returns the open database connection for this table.
+     *
+     * @return the open database connection for this table.
+     *
+     * @throws SQLException if a connection cannot be opened.
+     */
+    protected synchronized Connection getConnection() throws SQLException {
         if (connection == null) {
             connection = db.openConnection();
             connection.setAutoCommit(false);
