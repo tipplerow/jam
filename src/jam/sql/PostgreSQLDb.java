@@ -85,7 +85,7 @@ public final class PostgreSQLDb extends SQLDb {
      *
      * @return the success or failure of the bulk copy.
      */
-    public boolean bulkCopy(String tableName, Collection<? extends BulkRecord> records) {
+    @Override public boolean bulkCopy(String tableName, Collection<? extends BulkRecord> records) {
         File bulkFile = null;
 
         try {

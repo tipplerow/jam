@@ -148,25 +148,6 @@ public class PostgreSQLDbTest {
         }
     }
 
-    @Test public void testBulkImport2() throws SQLException {
-        if (!canConnect)
-            return;
-
-        SQLDb db = createDb();
-
-        db.verbose(true);
-        createTestTable(db);
-
-        db.bulkImport(TEST_TABLE_NAME,
-                      List.of(new TestRecord("abc", 1),
-                              new TestRecord("def", 2),
-                              new TestRecord("ghi", 3),
-                              new TestRecord("foo", null),
-                              new TestRecord("bar", null)));
-
-        assertBulkImport(db);
-    }
-
     @Test public void testCreateDrop() {
         if (!canConnect)
             return;

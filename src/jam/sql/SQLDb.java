@@ -71,17 +71,21 @@ public abstract class SQLDb {
      * @param tableName the name of the table to update.
      *
      * @param records the records to import.
+     *
+     * @return the success or failure of the bulk copy.
      */
-    public void bulkImport(String tableName, Collection<? extends BulkRecord> records) {
+    public boolean bulkCopy(String tableName, Collection<? extends BulkRecord> records) {
         File bulkFile = null;
 
         try {
             bulkFile = File.createTempFile("bulk_", ".psv", JamEnv.tmpdir());
             BulkRecord.writeBulkFile(bulkFile, records);
             bulkImport(tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER_CHAR, BulkRecord.NULL_STRING);
+            return true;
         }
         catch (Exception ex) {
-            throw JamException.runtime(ex);
+            JamLogger.error(ex.getMessage());
+            return false;
         }
         finally {
             if (bulkFile != null)
