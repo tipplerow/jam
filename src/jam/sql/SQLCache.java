@@ -30,7 +30,7 @@ public abstract class SQLCache<K, V> extends AbstractCollection<V> {
     /**
      * The persistent database table.
      */
-    protected final SQLTable<K, V> table;
+    protected final SQLKeyTable<K, V> table;
 
     /**
      * Creates a new cache with a backing database table to provide
@@ -38,7 +38,7 @@ public abstract class SQLCache<K, V> extends AbstractCollection<V> {
      *
      * @param table the backing database table.
      */
-    protected SQLCache(SQLTable<K, V> table) {
+    protected SQLCache(SQLKeyTable<K, V> table) {
         table.require();
 
         this.table = table;

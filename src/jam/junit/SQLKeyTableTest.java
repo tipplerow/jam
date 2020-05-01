@@ -8,8 +8,8 @@ import java.util.Set;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class SQLTableTest extends SQLTestBase {
-    public SQLTableTest() {
+public class SQLKeyTableTest extends SQLTestBase {
+    public SQLKeyTableTest() {
         super("data/test/sql_table_test.db");
     }
 
@@ -57,6 +57,6 @@ public class SQLTableTest extends SQLTestBase {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.junit.SQLTableTest");
+        org.junit.runner.JUnitCore.main("jam.junit.SQLKeyTableTest");
     }
 }

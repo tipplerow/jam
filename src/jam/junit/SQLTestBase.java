@@ -12,9 +12,9 @@ import jam.math.DoubleComparator;
 import jam.sql.SQLCache;
 import jam.sql.SQLColumn;
 import jam.sql.SQLDb;
+import jam.sql.SQLKeyTable;
 import jam.sql.SQLiteDb;
 import jam.sql.SQLStore;
-import jam.sql.SQLTable;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -91,7 +91,7 @@ public abstract class SQLTestBase {
         }
     }
 
-    public static final class TestTable extends SQLTable<String, TestRecord> {
+    public static final class TestTable extends SQLKeyTable<String, TestRecord> {
         public TestTable(SQLDb db) {
             super(db);
         }

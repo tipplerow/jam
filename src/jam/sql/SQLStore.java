@@ -21,14 +21,14 @@ import jam.util.SetUtil;
  * @param <V> the runtime type of the record values.
  */
 public abstract class SQLStore<K, V> {
-    private final SQLTable<K, V> table;
+    private final SQLKeyTable<K, V> table;
 
     /**
      * Creates a new SQL store backed by a database table.
      *
      * @param table the persistent backing database table.
      */
-    protected SQLStore(SQLTable<K, V> table) {
+    protected SQLStore(SQLKeyTable<K, V> table) {
         this.table = table;
         table.require();
     }

@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import jam.app.JamLogger;
 import jam.lang.JamException;
-import jam.lang.KeyedObject;
 
 /**
  * Manages a persistent database table of <em>pair records</em>.
@@ -32,9 +30,7 @@ import jam.lang.KeyedObject;
  *
  * @param <K2> the runtime type of the second key.
  */
-public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
-    private Connection connection = null;
-
+public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> extends SQLTable {
     private PreparedStatement storeStatement = null;
     private PreparedStatement fetchKey1Statement = null;
     private PreparedStatement fetchKey2Statement = null;
@@ -45,37 +41,12 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
     private PreparedStatement containsKey2Statement = null;
 
     /**
-     * The manager for the database containing this table.
-     */
-    protected final SQLDb db;
-
-    /**
      * Creates a new table with a fixed database manager.
      *
      * @param db the manager for the database containing the table.
      */
     protected SQLPairTable(SQLDb db) {
-        this.db = db;
-    }
-
-    /**
-     * Returns the open database connection for this table.
-     *
-     * @return the open database connection for this table.
-     *
-     * @throws SQLException if a connection cannot be opened.
-     */
-    protected synchronized Connection getConnection() throws SQLException {
-        if (connection == null) {
-            connection = db.openConnection();
-            connection.setAutoCommit(false);
-        }
-
-        return connection;
-    }
-
-    private PreparedStatement prepareStatement(String sql) throws SQLException {
-        return getConnection().prepareStatement(sql);
+        super(db);
     }
 
     /**
@@ -119,13 +90,6 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
     public abstract V getRecord(ResultSet resultSet) throws SQLException;
 
     /**
-     * Returns the name of the database table.
-     *
-     * @return the name of the database table.
-     */
-    public abstract String getTableName();
-
-    /**
      * Assigns the first key to a prepared statement.
      *
      * @param statement an open prepared statement.
@@ -154,24 +118,6 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
     public abstract void setKey2(PreparedStatement statement, int index, K2 key2) throws SQLException;
 
     /**
-     * Returns the database that contains this table.
-     *
-     * @return the database that contains this table.
-     */
-    public SQLDb db() {
-        return db;
-    }
-
-    /**
-     * Determines whether this table exists in the database.
-     *
-     * @return {@code true} iff this table exists in the database.
-     */
-    public synchronized boolean exists() {
-        return db.tableExists(getTableName());
-    }
-
-    /**
      * Returns the column meta-data for the first key.
      *
      * @return the column meta-data for the first key.
@@ -187,25 +133,6 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
      */
     public SQLColumn getKey2Column() {
         return SQLColumn.create(getKey2Name(), getKey2Type()).compositeKey();
-    }
-
-    /**
-     * Returns the schema for the database table.
-     *
-     * @return the schema for the database table.
-     */
-    public SQLSchema getSchema() {
-        return SQLSchema.create(getTableName(), getKey1Column(), getKey2Column());
-    }
-
-    /**
-     * Creates this table in the database unless it already exists.
-     *
-     * @throws RuntimeException if the table does not already exist
-     * and cannot be created.
-     */
-    public synchronized void require() {
-        getSchema().createTable(db);
     }
 
     /**
@@ -506,7 +433,7 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
 
     private void remove(PreparedStatement statement) throws SQLException {
         statement.executeUpdate();
-        connection.commit();
+        statement.getConnection().commit();
     }
 
     /**
@@ -604,15 +531,7 @@ public abstract class SQLPairTable<K1, K2, V extends SQLPairRecord<K1, K2>> {
         statement.executeUpdate();
     }
 
-    private void rollback(Connection connection) throws SQLException {
-        JamLogger.warn("Failed to update database table!");
-
-        try {
-            connection.rollback();
-        }
-        catch (SQLException ex) {
-            JamLogger.warn("Failed to rollback update transaction!");
-            JamLogger.warn(ex);
-        }
+    @Override public List<SQLColumn> getColumns() {
+        return List.of(getKey1Column(), getKey2Column());
     }
 }
