@@ -23,8 +23,8 @@ public class QueryBuilderTest {
 
         builder.innerJoin("titles", "pmid", "articles", "pmid");
 
-        builder.where("articles", "pmid", "> 123456");
-        builder.where("titles", "title",  "like '%cancer%'");
+        builder.where("articles", "pmid", ">", "123456", false);
+        builder.where("titles", "title", "like", "%cancer%", true);
 
         builder.orderBy("substances", "short_name");
         builder.orderByDesc("articles", "pub_date");

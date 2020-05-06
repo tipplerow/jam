@@ -4,6 +4,8 @@ package jam.sql;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.util.StringUtil;
+
 /**
  * Assembles SQL queries piece by piece.
  */
@@ -184,15 +186,22 @@ public final class QueryBuilder {
      *
      * @param column the column in the {@code WHERE} condition.
      *
-     * @param condition the operator and target in the {@code WHERE}
-     * condition.
+     * @param operator the operator in the {@code WHERE} condition.
+     *
+     * @param target the target in the {@code WHERE} condition.
+     *
+     * @param quote whether the target string must be enclosed in
+     * single quotes.
      */
-    public void where(String table, String column, String condition) {
-        where(whereClause(table, column, condition));
+    public void where(String table, String column, String operator, String target, boolean quote) {
+        where(whereClause(table, column, operator, target, quote));
     }
 
-    private static String whereClause(String table, String column, String condition) {
-        return tableColumn(table, column) + " " + condition;
+    private static String whereClause(String table, String column, String operator, String target, boolean quote) {
+        if (quote)
+            target = StringUtil.singleQuote(target);
+
+        return tableColumn(table, column) + " " + operator + " " + target;
     }
 
     @Override public String toString() {
