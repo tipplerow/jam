@@ -35,6 +35,15 @@ public final class LineBuilder {
         return new LineBuilder(",");
     }
 
+    /**
+     * Creates a new tab-delimted line builder.
+     *
+     * @return a new tab-delimted line builder.
+     */
+    public static LineBuilder tsv() {
+        return new LineBuilder("\t");
+    }
+
     private void newField() {
         //
         // The delimiter is added only after the first field...
