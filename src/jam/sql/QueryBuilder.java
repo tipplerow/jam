@@ -58,20 +58,43 @@ public final class QueryBuilder {
     }
 
     /**
+     * Adds a {@code GROUP BY} clause to this query.
+     *
+     * @param table the table containing the column to group by.
+     *
+     * @param column the column to group by.
+     */
+    public void groupBy(String table, String column) {
+        groupBy(tableColumn(table, column));
+    }
+
+    private static String tableColumn(String table, String column) {
+        return table + "." + column;
+    }
+
+    /**
      * Adds an {@code INNER JOIN} condition to this query:
      *
      * <pre>
-     *    INNER JOIN table ON column1 = column2
+     *    INNER JOIN joinTable ON joinTable.joinColumn = baseTable.baseCcolumn
      * </pre>
      *
-     * @param table the table to be joined.
+     * @param joinTable the joining table.
      *
-     * @param column1 the first column in the join equality.
+     * @param joinColumn the column in the join table to match.
      *
-     * @param column2 the first column in the join equality.
+     * @param baseTable the base table.
+     *
+     * @param baseColumn the column in the base table to match.
      */
-    public void innerJoin(String table, String column1, String column2) {
-        innerJoins.add(String.format(" INNER JOIN %s ON %s = %s", table, column1, column2));
+    public void innerJoin(String joinTable,
+                          String joinColumn,
+                          String baseTable,
+                          String baseColumn) {
+        innerJoins.add(String.format(" INNER JOIN %s ON %s = %s",
+                                     joinTable,
+                                     tableColumn(joinTable, joinColumn),
+                                     tableColumn(baseTable, baseColumn)));
     }
 
     /**
@@ -84,6 +107,17 @@ public final class QueryBuilder {
     }
 
     /**
+     * Adds an ascending {@code ORDER BY} clause to this query.
+     *
+     * @param table the table containing the column to order by.
+     *
+     * @param column the column to order by.
+     */
+    public void orderBy(String table, String column) {
+        orderBy(tableColumn(table, column));
+    }
+
+    /**
      * Adds a descending {@code ORDER BY} clause to this query.
      *
      * @param by the column to order by.
@@ -93,12 +127,34 @@ public final class QueryBuilder {
     }
 
     /**
+     * Adds a descending {@code ORDER BY} clause to this query.
+     *
+     * @param table the table containing the column to order by.
+     *
+     * @param column the column to order by.
+     */
+    public void orderByDesc(String table, String column) {
+        orderByDesc(tableColumn(table, column));
+    }
+
+    /**
      * Adds an item to the {@code SELECT} list.
      *
-     * @param what the item to select.
+     * @param what the column or item to select.
      */
     public void select(String what) {
         selectWhat.add(what);
+    }
+
+    /**
+     * Adds a table column to the {@code SELECT} list.
+     *
+     * @param table the table to select from.
+     *
+     * @param column the column to select.
+     */
+    public void select(String table, String column) {
+        select(tableColumn(table, column));
     }
 
     /**
@@ -119,6 +175,24 @@ public final class QueryBuilder {
      */
     public void where(String cond) {
         whereConds.add(cond);
+    }
+
+    /**
+     * Adds a {@code WHERE} condition to this query.
+     *
+     * @param table the table in the {@code WHERE} condition.
+     *
+     * @param column the column in the {@code WHERE} condition.
+     *
+     * @param condition the operator and target in the {@code WHERE}
+     * condition.
+     */
+    public void where(String table, String column, String condition) {
+        where(whereClause(table, column, condition));
+    }
+
+    private static String whereClause(String table, String column, String condition) {
+        return tableColumn(table, column) + " " + condition;
     }
 
     @Override public String toString() {
