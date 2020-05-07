@@ -16,11 +16,15 @@ public class TextMatcherTest {
         String text4 = "Jon, my brother-in-law, doesn't like lobster (  and he's from Maine  ].";
         String text5 = "Two essentials: cheese curds and cold beer.";
 
-        TextMatcher matcher = TextMatcher.create(List.of("grandstand", "standard", "stand"), false);
+        TextMatcher matcher = TextMatcher.create(false, "grandstand", "standard", "stand");
+        assertTrue(matcher.matches(text1));
         assertEquals("stand", matcher.matchOne(text1));
 
         assertNull(matcher.matchOne(text2));
         assertNull(matcher.matchOne(text3));
+
+        assertFalse(matcher.matches(text2));
+        assertFalse(matcher.matches(text3));
 
         matcher = TextMatcher.create(List.of("Stand"), false);
         assertNull(matcher.matchOne(text1));

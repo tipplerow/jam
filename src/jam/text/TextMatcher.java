@@ -2,6 +2,7 @@
 package jam.text;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Searches text for target words or phrases.
@@ -28,6 +29,20 @@ public final class TextMatcher {
      * Creates a new text matcher for a fixed collection of target
      * words or phrases.
      *
+     * @param ignoreCase whether to ignore case when matching strings.
+     *
+     * @param targets the words or phrases to be matched against.
+     *
+     * @return a new text filter for the specified targets.
+     */
+    public static TextMatcher create(boolean ignoreCase, String... targets) {
+        return create(List.of(targets), ignoreCase);
+    }
+
+    /**
+     * Creates a new text matcher for a fixed collection of target
+     * words or phrases.
+     *
      * @param targets the words or phrases to be matched against.
      *
      * @param ignoreCase whether to ignore case when matching strings.
@@ -36,6 +51,19 @@ public final class TextMatcher {
      */
     public static TextMatcher create(Collection<String> targets, boolean ignoreCase) {
         return new TextMatcher(targets, ignoreCase);
+    }
+
+    /**
+     * Determines whether a text sample contains one or more of the
+     * target words or phrases.
+     *
+     * @param text the sample text to search.
+     *
+     * @return {@code true} iff the sample text contains one or more
+     * of the target words or phrases.
+     */
+    public boolean matches(String text) {
+        return matchOne(text) != null;
     }
 
     /**
