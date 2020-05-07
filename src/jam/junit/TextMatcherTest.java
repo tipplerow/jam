@@ -26,10 +26,10 @@ public class TextMatcherTest {
         assertFalse(matcher.matches(text2));
         assertFalse(matcher.matches(text3));
 
-        matcher = TextMatcher.create(List.of("Stand"), false);
+        matcher = TextMatcher.caseSensitive(List.of("Stand"));
         assertNull(matcher.matchOne(text1));
 
-        matcher = TextMatcher.create(List.of("bandstand", "Stand"), true);
+        matcher = TextMatcher.ignoreCase("bandstand", "Stand");
         assertEquals("Stand", matcher.matchOne(text1));
 
         matcher = TextMatcher.create(List.of("ABC", "brother-in-law", "Maine", "essentials"), false);

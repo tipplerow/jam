@@ -54,6 +54,58 @@ public final class TextMatcher {
     }
 
     /**
+     * Creates a new case-sensitive text matcher for a fixed
+     * collection of target words or phrases.
+     *
+     * @param targets the words or phrases to be matched against.
+     *
+     * @return a new case-sensitive text filter for the specified
+     * targets.
+     */
+    public static TextMatcher caseSensitive(String... targets) {
+        return caseSensitive(List.of(targets));
+    }
+
+    /**
+     * Creates a new case-sensitive text matcher for a fixed
+     * collection of target words or phrases.
+     *
+     * @param targets the words or phrases to be matched against.
+     *
+     * @return a new case-sensitive text filter for the specified
+     * targets.
+     */
+    public static TextMatcher caseSensitive(Collection<String> targets) {
+        return create(targets, false);
+    }
+
+    /**
+     * Creates a new case-insensitive text matcher for a fixed
+     * collection of target words or phrases.
+     *
+     * @param targets the words or phrases to be matched against.
+     *
+     * @return a new case-insensitive text filter for the specified
+     * targets.
+     */
+    public static TextMatcher ignoreCase(String... targets) {
+        return ignoreCase(List.of(targets));
+    }
+
+    /**
+     * Creates a new case-insensitive text matcher for a fixed
+     * collection of target words or phrases.
+     *
+     * @param targets the words or phrases to be matched against.
+     *
+     * @return a new case-insensitive text filter for the specified
+     * targets.
+     */
+    public static TextMatcher ignoreCase(Collection<String> targets) {
+        return create(targets, true);
+    }
+
+    /**
      * Determines whether a text sample contains one or more of the
      * target words or phrases.
      *
