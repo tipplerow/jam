@@ -11,6 +11,7 @@ import java.util.List;
 import jam.app.JamLogger;
 import jam.lang.JamException;
 import jam.lang.KeyedObject;
+import jam.util.EnumUtil;
 
 /**
  * Provides the base class for database table managers.
@@ -140,6 +141,28 @@ public abstract class SQLTable {
             return ((Double) obj).doubleValue();
         else
             return Double.NaN;
+    }
+
+    /**
+     * Retrieves an enumerated value from a result set.
+     *
+     * @param <E> the runtime enum type.
+     *
+     * @param resultSet an open result set.
+     *
+     * @param enumClass the desired runtime enum class.
+     *
+     * @param columnLabel the column label.
+     *
+     * @return the enumerated value.
+     *
+     * @throws SQLException if the column label is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public static <E extends Enum<E>> E getEnum(ResultSet resultSet,
+                                                Class<E>  enumClass,
+                                                String    columnLabel) throws SQLException {
+        return EnumUtil.valueOf(enumClass, getString(resultSet, columnLabel));
     }
 
     /**
