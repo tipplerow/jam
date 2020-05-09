@@ -92,6 +92,19 @@ public interface BulkRecord {
     }
 
     /**
+     * Formats an enumerated value.
+     *
+     * @param <E> the enumerated type.
+     *
+     * @param obj the enumerated value to format.
+     *
+     * @return the Java name of the object.
+     */
+    public default <E extends Enum<E>> String formatBulk(E obj) {
+        return (obj != null) ? obj.name() : NULL_STRING;
+    }
+
+    /**
      * Formats a possibly {@code null} keyed object.
      *
      * @param obj the (possibly {@code null}) keyed object.
