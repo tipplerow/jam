@@ -92,6 +92,30 @@ public interface BulkRecord {
     }
 
     /**
+     * Formats a {@code double} column value.
+     *
+     * @param value the value to format.
+     *
+     * @return a string representation of the double-precision value
+     * that will be understood by the database server.
+     */
+    public default String formatBulk(double value) {
+        return Double.toString(value);
+    }
+
+    /**
+     * Formats an {@code int} column value.
+     *
+     * @param value the value to format.
+     *
+     * @return a string representation of the integer value that will
+     * be understood by the database server.
+     */
+    public default String formatBulk(int value) {
+        return Integer.toString(value);
+    }
+
+    /**
      * Formats an enumerated value.
      *
      * @param <E> the enumerated type.
