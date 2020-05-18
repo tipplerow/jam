@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -98,6 +99,23 @@ public abstract class SQLTable {
      * @return the name of the database table.
      */
     public abstract String getTableName();
+
+    /**
+     * Retrieves a {@code LocalDate} value from a result set.
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnLabel the column label.
+     *
+     * @return the {@code LocalDate} value in the specified column
+     * of the result set.
+     *
+     * @throws SQLException if the column label is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public static LocalDate getDate(ResultSet resultSet, String columnLabel) throws SQLException {
+        return resultSet.getObject(columnLabel, LocalDate.class);
+    }
 
     /**
      * Retrieves a {@code double} value from a result set, converting
@@ -210,6 +228,27 @@ public abstract class SQLTable {
      */
     public static RuntimeException invalidColumn(String badColumn) {
         return JamException.runtime("Invalid column: [%s].", badColumn);
+    }
+
+    /**
+     * Assigns a possibly {@code null} date as a parameter in a
+     * prepared statement.
+     *
+     * @param statement the prepared statement to populate.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first is 1, second is 2, ...).
+     *
+     * @param value the possibly {@code null} date to assign.
+     *
+     * @throws SQLException if the statement is closed, the index is
+     * invalid, or if a database error occurs.
+     */
+    public static void setDate(PreparedStatement statement, int index, LocalDate value) throws SQLException {
+        if (value != null)
+            statement.setObject(index, value);
+        else
+            statement.setNull(index, Types.OTHER);
     }
 
     /**
