@@ -3,6 +3,7 @@ package jam.sql;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -142,15 +143,15 @@ public interface BulkRecord {
     }
 
     /**
-     * Formats a possibly {@code null} string column.
+     * Formats a possibly {@code null} date column.
      *
-     * @param str the (possibly {@code null}) string value.
+     * @param value the (possibly {@code null}) date.
      *
-     * @return the string value itself, if it is not {@code null};
-     * otherwise the {@code NULL_STRING}.
+     * @return the string representation of the date, if it is not
+     * {@code null}; otherwise the {@code NULL_STRING}.
      */
-    public default String formatBulk(String str) {
-        return (str != null) ? cleanField(str) : NULL_STRING;
+    public default String formatBulk(LocalDate value) {
+        return (value != null) ? value.toString() : NULL_STRING;
     }
 
     /**
@@ -163,6 +164,18 @@ public interface BulkRecord {
      */
     public default String formatBulk(LocalDateTime value) {
         return (value != null) ? value.toString() : NULL_STRING;
+    }
+
+    /**
+     * Formats a possibly {@code null} string column.
+     *
+     * @param str the (possibly {@code null}) string value.
+     *
+     * @return the string value itself, if it is not {@code null};
+     * otherwise the {@code NULL_STRING}.
+     */
+    public default String formatBulk(String str) {
+        return (str != null) ? cleanField(str) : NULL_STRING;
     }
 
     /**
