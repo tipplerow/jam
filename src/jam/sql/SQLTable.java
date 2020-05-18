@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jam.app.JamLogger;
@@ -183,6 +184,23 @@ public abstract class SQLTable {
     }
 
     /**
+     * Retrieves a {@code LocalDateTime} value from a result set.
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnLabel the column label.
+     *
+     * @return the {@code LocalDateTime} value in the specified column
+     * of the result set.
+     *
+     * @throws SQLException if the column label is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public static LocalDateTime getTimeStamp(ResultSet resultSet, String columnLabel) throws SQLException {
+        return resultSet.getObject(columnLabel, LocalDateTime.class);
+    }
+
+    /**
      * Returns a {@code RuntimeException} to throw when passed an
      * invalid column name.
      *
@@ -257,6 +275,27 @@ public abstract class SQLTable {
             statement.setString(index, value);
         else
             statement.setNull(index, Types.VARCHAR);
+    }
+
+    /**
+     * Assigns a possibly {@code null} time stamp as a parameter in a
+     * prepared statement.
+     *
+     * @param statement the prepared statement to populate.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first is 1, second is 2, ...).
+     *
+     * @param value the possibly {@code null} time stamp value to assign.
+     *
+     * @throws SQLException if the statement is closed, the index is
+     * invalid, or if a database error occurs.
+     */
+    public static void setTimeStamp(PreparedStatement statement, int index, LocalDateTime value) throws SQLException {
+        if (value != null)
+            statement.setObject(index, value);
+        else
+            statement.setNull(index, Types.OTHER);
     }
 
     /**
