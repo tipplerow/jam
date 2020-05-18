@@ -3,6 +3,7 @@ package jam.sql;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import jam.app.JamLogger;
@@ -150,6 +151,18 @@ public interface BulkRecord {
      */
     public default String formatBulk(String str) {
         return (str != null) ? cleanField(str) : NULL_STRING;
+    }
+
+    /**
+     * Formats a possibly {@code null} time stamp column.
+     *
+     * @param value the (possibly {@code null}) time stamp value.
+     *
+     * @return the string representation of the time stamp, if it is
+     * not {@code null}; otherwise the {@code NULL_STRING}.
+     */
+    public default String formatBulk(LocalDateTime value) {
+        return (value != null) ? value.toString() : NULL_STRING;
     }
 
     /**
