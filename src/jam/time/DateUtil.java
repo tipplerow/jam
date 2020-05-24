@@ -100,6 +100,31 @@ public final class DateUtil {
             return date.minusDays(1);
         }
     }
+
+    /**
+     * Returns the current date.
+     *
+     * @return the current date.
+     */
+    public static LocalDate today() {
+        return LocalDate.now();
+    }
+
+    /**
+     * Returns the date that will occur tomorrow.
+     *
+     * @return the date that will occur tomorrow.
+     */
+    public static LocalDate tomorrow() {
+        return next(today());
+    }
+
+    /**
+     * Returns the date that occurred yesterday.
+     *
+     * @return the date that occurred yesterday.
+     */
+    public static LocalDate yesterday() {
+        return prev(today());
+    }
 }
-
-
