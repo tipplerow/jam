@@ -13,32 +13,32 @@ public class TargetListTest {
         TargetList.create("abc", "def", "ghi", "abc", "jkl");
 
     @Test public void testContainsTarget() {
-        assertTrue(targetList.containsTarget("abc"));
-        assertTrue(targetList.containsTarget("def"));
-        assertTrue(targetList.containsTarget("ghi"));
-        assertTrue(targetList.containsTarget("jkl"));
-        assertFalse(targetList.containsTarget("foo"));
-        assertFalse(targetList.containsTarget("bar"));
+        assertTrue(targetList.contains("abc"));
+        assertTrue(targetList.contains("def"));
+        assertTrue(targetList.contains("ghi"));
+        assertTrue(targetList.contains("jkl"));
+        assertFalse(targetList.contains("foo"));
+        assertFalse(targetList.contains("bar"));
     }
 
     @Test public void testContainsTargets() {
-        assertFalse(targetList.containsTargets(List.of()));
+        assertFalse(targetList.contains(List.of()));
 
-        assertTrue(targetList.containsTargets(List.of("abc")));
-        assertTrue(targetList.containsTargets(List.of("def")));
-        assertTrue(targetList.containsTargets(List.of("ghi")));
-        assertTrue(targetList.containsTargets(List.of("jkl")));
-        assertFalse(targetList.containsTargets(List.of("foo")));
-        assertFalse(targetList.containsTargets(List.of("bar")));
+        assertTrue(targetList.contains(List.of("abc")));
+        assertTrue(targetList.contains(List.of("def")));
+        assertTrue(targetList.contains(List.of("ghi")));
+        assertTrue(targetList.contains(List.of("jkl")));
+        assertFalse(targetList.contains(List.of("foo")));
+        assertFalse(targetList.contains(List.of("bar")));
 
-        assertTrue(targetList.containsTargets(List.of("abc", "def", "ghi")));
-        assertFalse(targetList.containsTargets(List.of("ghi", "abc", "def")));
+        assertTrue(targetList.contains(List.of("abc", "def", "ghi")));
+        assertFalse(targetList.contains(List.of("ghi", "abc", "def")));
 
-        assertTrue(targetList.containsTargets(List.of("abc", "jkl")));
-        assertFalse(targetList.containsTargets(List.of("abc", "jkl", "abc")));
+        assertTrue(targetList.contains(List.of("abc", "jkl")));
+        assertFalse(targetList.contains(List.of("abc", "jkl", "abc")));
 
-        assertTrue(targetList.containsTargets(List.of("abc", "def", "ghi", "abc", "jkl")));
-        assertFalse(targetList.containsTargets(List.of("abc", "def", "ghi", "abc", "jkl", "abc")));
+        assertTrue(targetList.contains(List.of("abc", "def", "ghi", "abc", "jkl")));
+        assertFalse(targetList.contains(List.of("abc", "def", "ghi", "abc", "jkl", "abc")));
     }
 
     @Test(expected = UnsupportedOperationException.class)

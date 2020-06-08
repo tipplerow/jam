@@ -65,8 +65,24 @@ public final class TargetList<E> extends AbstractList<E> {
      * @return {@code true} iff this list contains the specified
      * target.
      */
-    public boolean containsTarget(E target) {
-        return contains(target);
+    @Override public boolean contains(Object target) {
+        return getPositionMap().containsKey(target);
+    }
+
+    private synchronized Multimap<E, Integer> getPositionMap() {
+        if (positionMap == null)
+            positionMap = createPositionMap();
+
+        return positionMap;
+    }
+
+    private Multimap<E, Integer> createPositionMap() {
+        Multimap<E, Integer> map = HashMultimap.create();
+
+        for (int index = 0; index < targets.size(); ++index)
+            map.put(targets.get(index), index);
+
+        return map;
     }
 
     /**
@@ -81,7 +97,7 @@ public final class TargetList<E> extends AbstractList<E> {
      * @return {@code true} iff the specified list is a sublist within
      * this list.
      */
-    public boolean containsTargets(List<E> subList) {
+    public boolean contains(List<E> subList) {
         if (subList.isEmpty())
             return false;
 
@@ -101,22 +117,6 @@ public final class TargetList<E> extends AbstractList<E> {
         return getPositionMap().get(target);
     }
 
-    private synchronized Multimap<E, Integer> getPositionMap() {
-        if (positionMap == null)
-            positionMap = createPositionMap();
-
-        return positionMap;
-    }
-
-    private Multimap<E, Integer> createPositionMap() {
-        Multimap<E, Integer> map = HashMultimap.create();
-
-        for (int index = 0; index < targets.size(); ++index)
-            map.put(targets.get(index), index);
-
-        return map;
-    }
-
     private boolean containsSubList(List<E> subList, int subListHead) {
         //
         // The first element of the sublist already matches the target
@@ -133,10 +133,6 @@ public final class TargetList<E> extends AbstractList<E> {
         }
 
         return true;
-    }
-
-    @Override public boolean contains(Object obj) {
-        return getPositionMap().containsKey(obj);
     }
 
     @Override public E get(int index) {
