@@ -21,24 +21,48 @@ public class TargetListTest {
         assertFalse(targetList.contains("bar"));
     }
 
-    @Test public void testContainsTargets() {
-        assertFalse(targetList.contains(List.of()));
+    @Test public void testContainsTargetSequence() {
+        assertFalse(targetList.containsSequence(List.of()));
 
-        assertTrue(targetList.contains(List.of("abc")));
-        assertTrue(targetList.contains(List.of("def")));
-        assertTrue(targetList.contains(List.of("ghi")));
-        assertTrue(targetList.contains(List.of("jkl")));
-        assertFalse(targetList.contains(List.of("foo")));
-        assertFalse(targetList.contains(List.of("bar")));
+        assertTrue(targetList.containsSequence(List.of("abc")));
+        assertTrue(targetList.containsSequence(List.of("def")));
+        assertTrue(targetList.containsSequence(List.of("ghi")));
+        assertTrue(targetList.containsSequence(List.of("jkl")));
+        assertFalse(targetList.containsSequence(List.of("foo")));
+        assertFalse(targetList.containsSequence(List.of("bar")));
 
-        assertTrue(targetList.contains(List.of("abc", "def", "ghi")));
-        assertFalse(targetList.contains(List.of("ghi", "abc", "def")));
+        assertTrue(targetList.containsSequence(List.of("abc", "def", "ghi")));
+        assertFalse(targetList.containsSequence(List.of("ghi", "abc", "def")));
 
-        assertTrue(targetList.contains(List.of("abc", "jkl")));
-        assertFalse(targetList.contains(List.of("abc", "jkl", "abc")));
+        assertTrue(targetList.containsSequence(List.of("abc", "jkl")));
+        assertFalse(targetList.containsSequence(List.of("abc", "jkl", "abc")));
 
-        assertTrue(targetList.contains(List.of("abc", "def", "ghi", "abc", "jkl")));
-        assertFalse(targetList.contains(List.of("abc", "def", "ghi", "abc", "jkl", "abc")));
+        assertTrue(targetList.containsSequence(List.of("abc", "def", "ghi", "abc", "jkl")));
+        assertFalse(targetList.containsSequence(List.of("abc", "def", "ghi", "abc", "jkl", "abc")));
+    }
+
+    @Test public void testCountTarget() {
+        assertEquals(2, targetList.count("abc"));
+        assertEquals(1, targetList.count("def"));
+        assertEquals(1, targetList.count("ghi"));
+        assertEquals(1, targetList.count("jkl"));
+        assertEquals(0, targetList.count("foo"));
+        assertEquals(0, targetList.count("bar"));
+    }
+
+    @Test public void testCountTargetSequence() {
+        TargetList<String> targetList =
+            TargetList.create("A", "B", "C", "C", "A", "B", "D", "A", "B", "E");
+
+        assertEquals(3, targetList.countSequence(List.of("A")));
+        assertEquals(3, targetList.countSequence(List.of("B")));
+        assertEquals(2, targetList.countSequence(List.of("C")));
+        assertEquals(1, targetList.countSequence(List.of("D")));
+        assertEquals(1, targetList.countSequence(List.of("E")));
+        assertEquals(3, targetList.countSequence(List.of("A", "B")));
+        assertEquals(1, targetList.countSequence(List.of("A", "B", "C")));
+        assertEquals(1, targetList.countSequence(List.of("A", "B", "D")));
+        assertEquals(1, targetList.countSequence(List.of("A", "B", "E")));
     }
 
     @Test(expected = UnsupportedOperationException.class)

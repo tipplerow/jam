@@ -92,22 +92,22 @@ public final class TargetList<E> extends AbstractList<E> {
      * <p>This method executes in <em>amortized</em> {@code O(n)} time,
      * where {@code n} is the length of the input list.
      *
-     * @param subList the target sequence to search for.
+     * @param sequence the target sequence to search for.
      *
      * @return {@code true} iff the specified list is a sublist within
      * this list.
      */
-    public boolean contains(List<E> subList) {
-        if (subList.isEmpty())
+    public boolean containsSequence(List<E> sequence) {
+        if (sequence.isEmpty())
             return false;
 
-        if (subList.size() > targets.size())
+        if (sequence.size() > targets.size())
             return false;
 
-        Collection<Integer> subListHeads = find(subList.get(0));
+        Collection<Integer> sequenceHeads = find(sequence.get(0));
 
-        for (int subListHead : subListHeads)
-            if (containsSubList(subList, subListHead))
+        for (int sequenceHead : sequenceHeads)
+            if (containsSequence(sequence, sequenceHead))
                 return true;
 
         return false;
@@ -117,22 +117,65 @@ public final class TargetList<E> extends AbstractList<E> {
         return getPositionMap().get(target);
     }
 
-    private boolean containsSubList(List<E> subList, int subListHead) {
+    private boolean containsSequence(List<E> sequence, int sequenceHead) {
         //
         // The first element of the sublist already matches the target
-        // as position "subListHead"...
+        // as position "sequenceHead"...
         //
-        if (subList.size() > targets.size() - subListHead)
+        if (sequence.size() > targets.size() - sequenceHead)
             return false;
 
-        for (int subListIndex = 1; subListIndex < subList.size(); ++subListIndex) {
-            int targetIndex = subListIndex + subListHead;
+        for (int sequenceIndex = 1; sequenceIndex < sequence.size(); ++sequenceIndex) {
+            int targetIndex = sequenceIndex + sequenceHead;
 
-            if (!targets.get(targetIndex).equals(subList.get(subListIndex)))
+            if (!targets.get(targetIndex).equals(sequence.get(sequenceIndex)))
                 return false;
         }
 
         return true;
+    }
+
+    /**
+     * Counts the number of times a specific target appears in this
+     * list.
+     *
+     * <p>This method executes in <em>amortized constant time</em>.
+     *
+     * @param target the target to search for.
+     *
+     * @return the number of times the specified target appears in
+     * this list.
+     */
+    public int count(E target) {
+        return getPositionMap().get(target).size();
+    }
+
+    /**
+     * Counts the number of times a specific sequence of targets
+     * appears in this list.
+     *
+     * <p>This method executes in <em>amortized constant time</em>.
+     *
+     * @param sequence the target sequence to search for.
+     *
+     * @return the number of times the specified target appears in
+     * this list.
+     */
+    public int countSequence(List<E> sequence) {
+        if (sequence.isEmpty())
+            return 0;
+
+        if (sequence.size() > targets.size())
+            return 0;
+
+        int count = 0;
+        Collection<Integer> sequenceHeads = find(sequence.get(0));
+
+        for (int sequenceHead : sequenceHeads)
+            if (containsSequence(sequence, sequenceHead))
+                ++count;
+
+        return count;
     }
 
     @Override public E get(int index) {
