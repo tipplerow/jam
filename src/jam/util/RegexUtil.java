@@ -40,6 +40,11 @@ public final class RegexUtil {
     public static final Pattern DOT = Pattern.compile("\\.");
 
     /**
+     * Matches one or more integers anywhere within a string.
+     */
+    public static final Pattern INTEGERS = Pattern.compile("[0-9]+");
+
+    /**
      * Matches one or more whitespace characters.
      */
     public static final Pattern MULTI_WHITE_SPACE = Pattern.compile("\\s+");

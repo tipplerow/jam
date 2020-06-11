@@ -2,6 +2,7 @@
 package jam.junit;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import jam.util.RegexUtil;
@@ -43,6 +44,20 @@ public class RegexUtilTest extends NumericTestBase {
     @Test public void testDot() {
         testSplit(RegexUtil.DOT,   "abc.def", 2, "abc", "def");
         testSplit(RegexUtil.COLON, "abc.def", 1, "abc.def");
+    }
+
+    @Test public void testIntegers() {
+        Predicate<String> predicate = RegexUtil.INTEGERS.asPredicate();
+
+        assertTrue(predicate.test("123"));
+        assertTrue(predicate.test("2-DG"));
+        assertTrue(predicate.test("2-DG"));
+        assertTrue(predicate.test("TP53"));
+        assertTrue(predicate.test("PIK3CA"));
+
+        assertFalse(predicate.test(""));
+        assertFalse(predicate.test("abc"));
+        assertFalse(predicate.test("anti-inflammatory"));
     }
 
     @Test public void testMultiWhiteSpace() {
