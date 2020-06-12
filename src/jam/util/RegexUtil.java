@@ -3,6 +3,7 @@ package jam.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jam.math.IntUtil;
@@ -43,6 +44,11 @@ public final class RegexUtil {
      * Matches one or more integers anywhere within a string.
      */
     public static final Pattern INTEGERS = Pattern.compile("[0-9]+");
+
+    /**
+     * Matches one or more non-word characters.
+     */
+    public static final Pattern MULTI_NON_WORD = Pattern.compile("\\W+");
 
     /**
      * Matches one or more whitespace characters.
@@ -197,6 +203,22 @@ public final class RegexUtil {
             result[index] = IntUtil.parseInt(fields[index]);
 
         return result;
+    }
+
+    /**
+     * Replaces every substring matching a given pattern.
+     *
+     * @param pattern the pattern to match.
+     *
+     * @param original the original source to search.
+     *
+     * @param replacement the text that will replace substrings
+     * matching the pattern.
+     *
+     * @return a string with every instance of the pattern replaced.
+     */
+    public static String replace(Pattern pattern, String original, String replacement) {
+        return pattern.matcher(original).replaceAll(replacement);
     }
 
     /**
