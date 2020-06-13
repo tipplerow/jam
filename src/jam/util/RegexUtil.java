@@ -206,6 +206,19 @@ public final class RegexUtil {
     }
 
     /**
+     * Removes every substring matching a given pattern.
+     *
+     * @param pattern the pattern to match.
+     *
+     * @param original the original source to search.
+     *
+     * @return a string with every instance of the pattern removed.
+     */
+    public static String remove(Pattern pattern, String original) {
+        return replace(pattern, original, "");
+    }
+
+    /**
      * Replaces every substring matching a given pattern.
      *
      * @param pattern the pattern to match.

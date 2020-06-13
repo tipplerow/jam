@@ -120,6 +120,14 @@ public class RegexUtilTest extends NumericTestBase {
         testSplit(RegexUtil.PYTHON_COMMENT, "abc#def",  2, "abc", "def");
     }
 
+    @Test public void testRemove() {
+        assertEquals("2DG", RegexUtil.remove(RegexUtil.MULTI_NON_WORD, "2DG"));
+        assertEquals("2DG", RegexUtil.remove(RegexUtil.MULTI_NON_WORD, "2-DG"));
+        assertEquals("2DG", RegexUtil.remove(RegexUtil.MULTI_NON_WORD, "2---DG"));
+        assertEquals("2DG", RegexUtil.remove(RegexUtil.MULTI_NON_WORD, "2-D   G"));
+        assertEquals("2_DG", RegexUtil.remove(RegexUtil.MULTI_NON_WORD, "2_DG"));
+    }
+
     @Test public void testReplacement() {
         assertEquals("2DG", RegexUtil.replace(RegexUtil.MULTI_NON_WORD, "2DG", "_"));
         assertEquals("2_DG", RegexUtil.replace(RegexUtil.MULTI_NON_WORD, "2-DG", "_"));
