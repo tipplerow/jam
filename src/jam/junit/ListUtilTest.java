@@ -228,10 +228,10 @@ public class ListUtilTest {
     }
 
     @Test public void testUnique() {
-        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "B", "C")));
-        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "A", "B", "C")));
-        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "B", "C", "A", "B", "C")));
-        assertEquals(List.of("A", "B", "C"), ListUtil.unique(List.of("A", "B", "B", "A", "C", "C", "B", "A")));
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique("A", "B", "C"));
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique("A", "A", "B", "C"));
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique("A", "B", "C", "A", "B", "C"));
+        assertEquals(List.of("A", "B", "C"), ListUtil.unique("A", "B", "B", "A", "C", "C", "B", "A"));
     }
 
     @Test public void testView() {

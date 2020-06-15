@@ -483,6 +483,22 @@ public final class ListUtil {
     }
 
     /**
+     * Retains only the unique elements in a sequence (in their original
+     * order).
+     *
+     * @param <V> the element type.
+     *
+     * @param elements the elements to be selected.
+     *
+     * @return a new list containing only the first occurrence of each
+     * element in the input list.
+     */
+    @SuppressWarnings("unchecked")
+    public static <V> List<V> unique(V... elements) {
+        return unique(List.of(elements));
+    }
+
+    /**
      * Retains only the unique elements in a list (in their original
      * order).
      *
