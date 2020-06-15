@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
+import jam.app.JamLogger;
 import jam.lang.JamException;
 import jam.util.RegexUtil;
 
@@ -17,20 +18,27 @@ import jam.util.RegexUtil;
  * by line.
  *
  * <p>The files to be processed must contain delimited columns and a
- * header line.  The delimiter may be a comma, tab, or pipe character
+ * header line. The delimiter may be a comma, tab, or pipe character
  * ({@code |}).  If none of these characters are found in the header
  * line, the reader assumes that the columns are delimted by white
  * space.
+ *
+ * <p><b>Ragged lines.</b> Readers created by the {@code ragged()}
+ * methods will allow files with lines containing different numbers
+ * of columns.  Readers created by the {@code open()} methods will
+ * throw exceptions if they encounter ragged lines.
  */
 public final class TableReader implements Closeable, Iterable<List<String>>, Iterator<List<String>> {
     private final LineReader reader;
+    private final boolean ragged;
 
     private final String header;
     private final Pattern delimiter;
     private final List<String> columnKeys;
 
-    private TableReader(LineReader reader) {
+    private TableReader(LineReader reader, boolean ragged) {
         this.reader = reader;
+        this.ragged = ragged;
 
         this.header = readHeader();
         this.delimiter = resolveDelimiter();
@@ -77,6 +85,10 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
         return List.of(RegexUtil.split(delimiter, header));
     }
 
+    private static TableReader open(File file, boolean ragged) {
+        return new TableReader(LineReader.open(file), ragged);
+    }
+
     /**
      * Creates a new table reader for a specified file.
      *
@@ -88,7 +100,22 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      * reading.
      */
     public static TableReader open(File file) {
-        return new TableReader(LineReader.open(file));
+        return open(file, false);
+    }
+
+    /**
+     * Creates a new table reader for a specified file that may
+     * contain <em>ragged</em> lines.
+     *
+     * @param file the file to read.
+     *
+     * @return the table reader for the specified file.
+     *
+     * @throws RuntimeException if the file cannot be opened for
+     * reading.
+     */
+    public static TableReader ragged(File file) {
+        return open(file, true);
     }
 
     /**
@@ -101,7 +128,21 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      * @throws RuntimeException if the file cannot be opened for reading.
      */
     public static TableReader open(String fileName) {
-        return new TableReader(LineReader.open(fileName));
+        return open(new File(fileName), false);
+    }
+
+    /**
+     * Creates a new table reader for a specified file that may
+     * contain <em>ragged</em> lines.
+     *
+     * @param fileName the name of the file to read.
+     *
+     * @return the table reader for the specified file.
+     *
+     * @throws RuntimeException if the file cannot be opened for reading.
+     */
+    public static TableReader ragged(String fileName) {
+        return open(new File(fileName), true);
     }
 
     /**
@@ -176,9 +217,29 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      *
      * @throws NoSuchElementException if the reader has reached the
      * end of the file.
+     *
+     * @throws RuntimeException if the number of columns in the next
+     * line does not match the number of column keys and ragged lines
+     * are not allowed.
      */
     @Override public List<String> next() {
-        return List.of(RegexUtil.split(delimiter, reader.next(), columnKeys.size()));
+        String line = reader.next();
+        List<String> columns = List.of(RegexUtil.split(delimiter, line));
+
+        if (!ragged)
+            validateColumns(line, columns);
+
+        return columns;
+    }
+
+    private void validateColumns(String line, List<String> columns) {
+        int actual = columns.size();
+        int expected = columnKeys.size();
+
+        if (actual != expected) {
+            JamLogger.error("Invalid data line: [%s].", line);
+            throw JamException.runtime("Expected [%d] columns but found [%d].", expected, actual);
+        }
     }
 
     /**

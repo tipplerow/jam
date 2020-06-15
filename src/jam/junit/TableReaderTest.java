@@ -76,6 +76,18 @@ public class TableReaderTest {
         reader.close();
     }
 
+    @Test public void testRagged() {
+        TableReader reader = TableReader.ragged("data/test/ragged_table.csv");
+
+        assertEquals(List.of("Key", "Value"), reader.columnKeys());
+        assertEquals(List.of("abc", "0"), reader.next());
+        assertEquals(List.of("def"), reader.next());
+        assertEquals(List.of("ghi", "2", "44"), reader.next());
+        assertFalse(reader.hasNext());
+
+        reader.close();
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.TableReaderTest");
     }
