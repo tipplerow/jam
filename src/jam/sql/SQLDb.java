@@ -24,6 +24,7 @@ import jam.util.StringUtil;
  */
 public abstract class SQLDb {
     private boolean verbose = false;
+    private Connection connection = null;
 
     /**
      * Creates a new SQL database manager.
@@ -43,6 +44,13 @@ public abstract class SQLDb {
         catch (ClassNotFoundException ex) {
             throw JamException.runtime(ex);
         }
+    }
+
+    private synchronized Connection getConnection() {
+        if (connection == null)
+            connection = openConnection();
+
+        return connection;
     }
 
     /**
@@ -243,11 +251,10 @@ public abstract class SQLDb {
     }
 
     /**
-     * Executes a query using a new database connection.
+     * Executes a database query.
      *
-     * <p>The new connection, statement, and result set should be
-     * closed after the query result has been processed by calling
-     * {@code queryResult.close()}.
+     * <p>The database resources must be released after the result
+     * set has been processed by calling {@code queryResult.close()}.
      *
      * @param queryStr the SQL query to execute.
      *
@@ -256,7 +263,7 @@ public abstract class SQLDb {
      * @throws RuntimeException if the query cannot be executed.
      */
     public QueryResult executeQuery(String queryStr) {
-        return QueryResult.create(openConnection(), queryStr, true);
+        return QueryResult.create(getConnection(), queryStr, false);
     }
 
     /**
@@ -284,8 +291,7 @@ public abstract class SQLDb {
     }
 
     /**
-     * Executes and commits an atomic update command using a new
-     * database connection (which is closed before returning).
+     * Executes and commits an atomic update command.
      *
      * @param updateStr the SQL update to execute.
      *
@@ -294,8 +300,8 @@ public abstract class SQLDb {
      * @throws RuntimeException if the update cannot be executed.
      */
     public int executeUpdate(String updateStr) {
-        try (Connection connection = openConnection()) {
-            return executeUpdate(connection.createStatement(), updateStr, true);
+        try (Statement statement = getConnection().createStatement()) {
+            return executeUpdate(statement, updateStr, true);
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);
