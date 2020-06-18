@@ -3,6 +3,7 @@ package jam.junit;
 
 import java.io.File;
 
+import jam.app.JamHome;
 import jam.io.FileUtil;
 
 import org.junit.*;
@@ -38,6 +39,14 @@ public class FileUtilTest {
 
         assertTrue(dir.exists());
         assertTrue(dir.delete());
+    }
+
+    @Test public void testGetCanonicalPath() {
+        assertEquals(FileUtil.join(JamHome.NAME, "foo.txt"), FileUtil.getCanonicalPath(new File("foo.txt")));
+    }
+
+    @Test public void testGetCanonicalPrefix() {
+        assertEquals(FileUtil.join(JamHome.NAME, "foo"), FileUtil.getCanonicalPrefix(new File("foo.xml.gz")));
     }
 
     @Test public void testGetParentName() {

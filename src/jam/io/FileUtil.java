@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import jam.app.JamLogger;
 import jam.lang.JamException;
+import jam.util.RegexUtil;
 
 /**
  * Provides utility methods for operating on files and file names.
@@ -103,6 +104,22 @@ public final class FileUtil {
         }
 
         return result;
+    }
+
+    /**
+     * Returns the canonical <em>prefix</em> of the specified file
+     * (everything before the first dot in the canonical path) but
+     * never throws checked exceptions.
+     *
+     * @param file a file to examine.
+     *
+     * @return the canonical prefix of the specified file.
+     *
+     * @throws RuntimeException if {@code file.getCanonicalPath}
+     * throws an {@code IOException}.
+     */
+    public static String getCanonicalPrefix(File file) {
+        return RegexUtil.DOT.split(getCanonicalPath(file))[0];
     }
 
     /**
