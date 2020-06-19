@@ -86,13 +86,13 @@ public class IOUtilTest {
         assertEquals(Arrays.asList("line 1", "line 2", "line 3"), IOUtil.readLines("data/test/lines123.txt"));
     }
 
-    @Test public void testWriteFile() {
+    @Test public void testWriteLines() {
         File tmpFile = new File("tmp2.txt");
         tmpFile.deleteOnExit();
 
-        IOUtil.writeFile(tmpFile, false, "foo", "bar");
-        IOUtil.writeFile(tmpFile, false, "abc", "def");
-        IOUtil.writeFile(tmpFile, true,  "ghi", "jkl");
+        IOUtil.writeLines(tmpFile, false, "foo", "bar");
+        IOUtil.writeLines(tmpFile, false, "abc", "def");
+        IOUtil.writeLines(tmpFile, true,  "ghi", "jkl");
 
         assertEquals(Arrays.asList("abc", "def", "ghi", "jkl"), IOUtil.readLines(tmpFile));
     }

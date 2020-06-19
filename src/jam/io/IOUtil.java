@@ -432,72 +432,72 @@ public final class IOUtil {
     }
 
     /**
-     * Writes objects to a text file.
+     * Writes lines to a text file.
      *
      * @param fileName the name of the file to write.
      *
      * @param append whether to write at the end of the file instead
      * of the beginning.
      *
-     * @param objects the objects to write.
+     * @param lines the lines to write.
      *
      * @throws RuntimeException unless the file was written successfully.
      */
-    public static void writeFile(String fileName, boolean append, Collection<Object> objects) {
-        writeFile(new File(fileName), append, objects);
+    public static void writeLines(String fileName, boolean append, Collection<String> lines) {
+        writeLines(new File(fileName), append, lines);
     }
 
     /**
-     * Writes objects to a text file.
+     * Writes lines to a text file.
      *
      * @param file the file to write.
      *
      * @param append whether to write at the end of the file instead
      * of the beginning.
      *
-     * @param objects the objects to write.
+     * @param lines the lines to write.
      *
      * @throws RuntimeException unless the file was read successfully.
      */
-    public static void writeFile(File file, boolean append, Collection<Object> objects) {
+    public static void writeLines(File file, boolean append, Collection<String> lines) {
         PrintWriter writer = openWriter(file, append);
 
-        for (Object object : objects)
-            writer.println(object);
+        for (String line : lines)
+            writer.println(line);
 
         close(writer);
     }
 
     /**
-     * Writes objects to a text file.
+     * Writes lines to a text file.
      *
      * @param fileName the name of the file to write.
      *
      * @param append whether to write at the end of the file instead
      * of the beginning.
      *
-     * @param objects the objects to write.
+     * @param lines the lines to write.
      *
      * @throws RuntimeException unless the file was written successfully.
      */
-    public static void writeFile(String fileName, boolean append, Object... objects) {
-        writeFile(fileName, append, Arrays.asList(objects));
+    public static void writeLines(String fileName, boolean append, String... lines) {
+        writeLines(fileName, append, Arrays.asList(lines));
     }
 
     /**
-     * Writes objects to a text file.
+     * Writes lines to a text file.
      *
      * @param file the file to write.
      *
      * @param append whether to write at the end of the file instead
      * of the beginning.
      *
-     * @param objects the objects to write.
+     * @param lines the lines to write.
      *
      * @throws RuntimeException unless the file was read successfully.
      */
-    public static void writeFile(File file, boolean append, Object... objects) {
-        writeFile(file, append, Arrays.asList(objects));
+    public static void writeLines(File file, boolean append, String... lines) {
+        writeLines(file, append, Arrays.asList(lines));
     }
 }
 
