@@ -9,25 +9,24 @@ import java.util.regex.Pattern;
 
 import jam.lang.JamException;
 import jam.report.LineBuilder;
-import jam.util.RegexUtil;
-import jam.util.StringUtil;
 
 /**
  * Writes tabular (delimited) data files and resolves the delimiter
  * automatically from the file name suffix.
  */
 public final class TableWriter implements Closeable {
-    private final String delim;
+    private final Delimiter delim;
     private final PrintWriter writer;
 
-    private TableWriter(PrintWriter writer, String delim) {
+    private TableWriter(PrintWriter writer, Delimiter delim) {
         this.delim = delim;
         this.writer = writer;
     }
 
     /**
      * Opens a {@code TableWriter} for a given file and creates any
-     * required subdirectories.
+     * required subdirectories; the delimiter is inferred from the
+     * file name suffix.
      *
      * @param file the file to write.
      *
@@ -42,7 +41,8 @@ public final class TableWriter implements Closeable {
 
     /**
      * Opens a {@code TableWriter} for a given file and creates any
-     * required subdirectories.
+     * required subdirectories; the delimiter is inferred from the
+     * file name suffix.
      *
      * @param fileName the name of the file to write.
      *
@@ -76,16 +76,16 @@ public final class TableWriter implements Closeable {
      * @return the delimiter character to use for the specified
      * file name.
      */
-    public static String resolveDelim(String fileName) {
+    public static Delimiter resolveDelim(String fileName) {
         fileName = ZipUtil.removeSuffix(fileName);
 
         if (fileName.endsWith(".csv"))
-            return ",";
+            return Delimiter.COMMA;
 
         if (fileName.endsWith(".psv"))
-            return "|";
+            return Delimiter.PIPE;
 
-        return "\t";
+        return Delimiter.TAB;
     }
 
     /**
@@ -93,7 +93,7 @@ public final class TableWriter implements Closeable {
      *
      * @return the delimiter string for this table writer.
      */
-    public String getDelim() {
+    public Delimiter getDelim() {
         return delim;
     }
 
@@ -112,12 +112,7 @@ public final class TableWriter implements Closeable {
      * @param fields the fields to write.
      */
     public void println(List<String> fields) {
-        LineBuilder builder = new LineBuilder(delim);
-
-        for (String field : fields)
-            builder.append(field);
-
-        writer.println(builder.toString());
+        writer.println(delim.join(fields));
     }
 
     /**

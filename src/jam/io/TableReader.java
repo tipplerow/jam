@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.regex.Pattern;
 
 import jam.app.JamLogger;
 import jam.lang.JamException;
-import jam.util.RegexUtil;
 
 /**
  * Provides for {@code Iterable} reading of tabular data files, line
@@ -33,7 +31,7 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
     private final boolean ragged;
 
     private final String header;
-    private final Pattern delimiter;
+    private final Delimiter delimiter;
     private final List<String> columnKeys;
 
     private TableReader(LineReader reader, boolean ragged) {
@@ -52,26 +50,26 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
             throw JamException.runtime("Empty tabular file.");
     }
 
-    private Pattern resolveDelimiter() {
+    private Delimiter resolveDelimiter() {
         //
         // The header line may contain zero or one of the possible
         // delimiter set (",", "\t", "|").  If it contains none of
         // those, then the delimiter is white space.
         //
-        List<Pattern> delimiters = new ArrayList<Pattern>();
+        List<Delimiter> delimiters = new ArrayList<Delimiter>();
 
         if (header.contains(","))
-            delimiters.add(RegexUtil.COMMA);
+            delimiters.add(Delimiter.COMMA);
 
         if (header.contains("\t"))
-            delimiters.add(RegexUtil.TAB);
+            delimiters.add(Delimiter.TAB);
 
         if (header.contains("|"))
-            delimiters.add(RegexUtil.PIPE);
+            delimiters.add(Delimiter.PIPE);
 
         switch (delimiters.size()) {
         case 0:
-            return RegexUtil.MULTI_WHITE_SPACE;
+            return Delimiter.WHITE_SPACE;
 
         case 1:
             return delimiters.get(0);
@@ -82,7 +80,7 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
     }
 
     private List<String> parseHeader() {
-        return List.of(RegexUtil.split(delimiter, header));
+        return List.of(delimiter.split(header));
     }
 
     private static TableReader open(File file, boolean ragged) {
@@ -224,7 +222,7 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      */
     @Override public List<String> next() {
         String line = reader.next();
-        List<String> columns = List.of(RegexUtil.split(delimiter, line));
+        List<String> columns = List.of(delimiter.split(line));
 
         if (!ragged)
             validateColumns(line, columns);

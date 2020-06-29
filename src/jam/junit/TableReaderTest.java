@@ -18,6 +18,17 @@ public class TableReaderTest {
         runTest("data/test/table.psv");
     }
 
+    @Test public void testPSV2() {
+        TableReader reader = TableReader.open("data/test/table2.psv");
+
+        assertEquals(List.of("abc",  "|0"), reader.next());
+        assertEquals(List.of("|def", "1"),  reader.next());
+        assertEquals(List.of("ghi",  "2"),  reader.next());
+        assertFalse(reader.hasNext());
+            
+        reader.close();
+    }
+
     @Test public void testTSV() {
         runTest("data/test/table.tsv");
     }
