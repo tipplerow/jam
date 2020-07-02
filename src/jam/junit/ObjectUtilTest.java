@@ -17,14 +17,35 @@ public class ObjectUtilTest {
         Object o3 = new Double(3.3);
         
         assertTrue(ObjectUtil.equals(null, null));
+
         assertFalse(ObjectUtil.equals(null, o1));
         assertFalse(ObjectUtil.equals(null, o2));
         assertFalse(ObjectUtil.equals(null, o3));
 
         assertFalse(ObjectUtil.equals(o1, null));
+        assertFalse(ObjectUtil.equals(o2, null));
+        assertFalse(ObjectUtil.equals(o3, null));
+
         assertTrue(ObjectUtil.equals(o1, o1));
         assertTrue(ObjectUtil.equals(o1, o2));
         assertFalse(ObjectUtil.equals(o1, o3));
+    }
+
+    @Test public void testEqualsClass() {
+        Object o1 = "abc";
+        Object o2 = "def";
+        Object o3 = Integer.valueOf(1);
+        Object o4 = Integer.valueOf(2);
+
+        assertTrue(ObjectUtil.equalsClass(null, null));
+
+        assertFalse(ObjectUtil.equalsClass(o1, null));
+        assertFalse(ObjectUtil.equalsClass(null, o1));
+
+        assertTrue(ObjectUtil.equalsClass(o1, o1));
+        assertTrue(ObjectUtil.equalsClass(o1, o2));
+        assertFalse(ObjectUtil.equalsClass(o1, o3));
+        assertFalse(ObjectUtil.equalsClass(o1, o4));
     }
 
     @Test public void testHasDefaultConstructor() {
