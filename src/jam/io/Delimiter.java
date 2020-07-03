@@ -4,6 +4,8 @@ package jam.io;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import jam.lang.JamException;
+
 /**
  * Enscapsulates the form and function of a flat-file delimiter.
  */
@@ -121,6 +123,38 @@ public final class Delimiter {
                 fields[index] = unescape(fields[index]);
 
         return fields;
+    }
+
+    /**
+     * Extracts the individual fields from a delimited string.
+     *
+     * @param line the line to split.
+     *
+     * @param count the number of fields to expect.
+     *
+     * @return the fields contained in the delimited string (with
+     * leading and trailing white space removed).
+     *
+     * @throws RuntimeException unless the number of fields matches
+     * the expected count.
+     */
+    public String[] split(String line, int count) {
+        String[] fields = split(line);
+
+        if (fields.length != count)
+            throw JamException.runtime("Invalid line [%s]: expected [%d] fields but found [%d].",
+                                       line, count, fields.length);
+
+        return fields;
+    }
+
+    /**
+     * Returns the literal delimiter string.
+     *
+     * @return the literal delimiter string.
+     */
+    public String string() {
+        return delimString;
     }
 
     /**

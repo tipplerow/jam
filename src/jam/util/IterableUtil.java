@@ -12,6 +12,8 @@ public final class IterableUtil {
     /**
      * Determines whether two iterable objects are equal.
      *
+     * @param <T> the common runtime type.
+     *
      * @param obj1 the first iterable object to compare.
      *
      * @param obj2 the second iterable object to compare.
