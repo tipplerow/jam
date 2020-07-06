@@ -234,6 +234,28 @@ public class JDOMElement {
     }
 
     /**
+     * Returns all direct children of this element.
+     *
+     * @return all direct children of this element.
+     */
+    public List<Element> getChildren() {
+        return element.getChildren();
+    }
+
+    /**
+     * Returns the direct children of this element having a given tag
+     * name.
+     *
+     * @param tagName the child tag name to match.
+     *
+     * @return the direct children of this element matching the given
+     * tag name.
+     */
+    public List<Element> getChildren(String tagName) {
+        return element.getChildren(tagName);
+    }
+
+    /**
      * Returns the normalized text from a direct child of this
      * element (which may be missing).
      *
