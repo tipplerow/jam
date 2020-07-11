@@ -22,6 +22,16 @@ public class StreamUtilTest {
         assertSquare(result.get(sampleSize - 1));
     }
 
+    @Test public void testApplyParallel() {
+        int sampleSize = 100000;
+
+        List<Integer> source = createSource(sampleSize);
+        List<IntPair> result = StreamUtil.applyParallel(source, x -> IntPair.of(x, x * x));
+
+        assertSquare(result.get(0));
+        assertSquare(result.get(sampleSize - 1));
+    }
+
     private List<Integer> createSource(int size) {
         List<Integer> source = new ArrayList<Integer>(size);
 

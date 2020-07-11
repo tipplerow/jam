@@ -2,6 +2,7 @@
 package jam.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import java.util.function.Consumer;
@@ -9,7 +10,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Provides utility methods operating on streams.
+ */
 public final class StreamUtil {
+    private StreamUtil() {}
+
     /**
      * Applies a function (or lambda expression) to each element of a
      * stream.
@@ -27,6 +33,25 @@ public final class StreamUtil {
      */
     public static <T, R> List<R> apply(Stream<T> stream, Function<? super T, ? extends R> function) {
         return stream.map(function).collect(Collectors.toList());
+    }
+
+    /**
+     * Applies a function (or lambda expression) to each element of a
+     * collection using a parallel stream.
+     *
+     * @param <T> element type for the source list.
+     *
+     * @param <R> element type for the result list.
+     *
+     * @param collection the collection to process.
+     *
+     * @param function the function (or lambda expression) to apply.
+     *
+     * @return a list containing the objects produced by the mapping
+     * function.
+     */
+    public static <T, R> List<R> applyParallel(Collection<T> collection, Function<? super T, ? extends R> function) {
+        return apply(collection.parallelStream(), function);
     }
 
     /**
