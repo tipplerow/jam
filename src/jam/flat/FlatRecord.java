@@ -26,23 +26,6 @@ public interface FlatRecord<K> {
     public static final String NULL_STRING = "(null)";
 
     /**
-     * Splits a line in a flat file into its individual fields.
-     *
-     * @param line the line to split.
-     *
-     * @param count the number of fields to expect.
-     *
-     * @return an array containing the record fields (with leading and
-     * trailing white space removed).
-     *
-     * @throws RuntimeException unless the number of fields matches
-     * the expected count.
-     */
-    public static String[] split(String line, int count) {
-        return DELIMITER.split(line, count);
-    }
-
-    /**
      * Formats the fields of this record as strings to be exported to
      * a flat file (with delimiter characters properly escaped).
      *
@@ -160,5 +143,80 @@ public interface FlatRecord<K> {
      */
     public default String format(String str) {
         return (str != null) ? DELIMITER.escape(str) : NULL_STRING;
+    }
+
+    /**
+     * Determines whether a string field represents a {@code null}
+     * value.
+     *
+     * @param field the string field to examine.
+     *
+     * @return {@code true} iff the given string field represents a
+     * {@code null} value.
+     */
+    public static boolean isNull(String field) {
+        return field == null || field.equals(NULL_STRING);
+    }
+
+    /**
+     * Parses a double-precision field.
+     *
+     * @param field the field to parse.
+     *
+     * @return the double-precision value of the given field (or
+     * {@code Double.NaN} for the {@code (null)} string).
+     */
+    public static double parseDouble(String field) {
+        if (isNull(field))
+            return Double.NaN;
+        else
+            return Double.parseDouble(field);
+    }
+
+    /**
+     * Parses an integer field.
+     *
+     * @param field the field to parse.
+     *
+     * @return the integer value of the given field ({@code 0} for the
+     * {@code (null)} string).
+     */
+    public static int parseInt(String field) {
+        if (isNull(field))
+            return 0;
+        else
+            return Integer.parseInt(field);
+    }
+
+    /**
+     * Parses a string field.
+     *
+     * @param field the field to parse.
+     *
+     * @return the string value of the given field ({@code null} for
+     * the {@code (null)} string).
+     */
+    public static String parseString(String field) {
+        if (isNull(field))
+            return null;
+        else
+            return field;
+    }
+
+    /**
+     * Splits a line in a flat file into its individual fields.
+     *
+     * @param line the line to split.
+     *
+     * @param count the number of fields to expect.
+     *
+     * @return an array containing the record fields (with leading and
+     * trailing white space removed).
+     *
+     * @throws RuntimeException unless the number of fields matches
+     * the expected count.
+     */
+    public static String[] split(String line, int count) {
+        return DELIMITER.split(line, count);
     }
 }
