@@ -4,8 +4,11 @@ package jam.io;
 import java.io.Closeable;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import jam.app.JamLogger;
@@ -33,6 +36,7 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
     private final String header;
     private final Delimiter delimiter;
     private final List<String> columnKeys;
+    private final Map<String, Integer> columnIndex;
 
     private TableReader(LineReader reader, boolean ragged) {
         this.reader = reader;
@@ -41,6 +45,7 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
         this.header = readHeader();
         this.delimiter = resolveDelimiter();
         this.columnKeys = parseHeader();
+        this.columnIndex = indexHeader();
     }
 
     private String readHeader() {
@@ -81,6 +86,15 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
 
     private List<String> parseHeader() {
         return List.of(delimiter.split(header));
+    }
+
+    private Map<String, Integer> indexHeader() {
+        Map<String, Integer> columnIndex = new HashMap<String, Integer>();
+
+        for (int index = 0; index < columnKeys.size(); ++index)
+            columnIndex.put(columnKeys.get(index), index);
+
+        return Collections.unmodifiableMap(columnIndex);
     }
 
     private static TableReader open(File file, boolean ragged) {
@@ -161,7 +175,36 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      * {@code -1} if the key was not found in the header line.
      */
     public int findColumn(String columnKey) {
-        return columnKeys.indexOf(columnKey);
+        Integer index = columnIndex.get(columnKey);
+
+        if (index != null)
+            return index;
+        else
+            return -1;
+    }
+
+    /**
+     * Extracts a column field from a parsed data line.
+     *
+     * @param columns a parsed data line (a column list returned by
+     * the iterator {@code next()} method).
+     *
+     * @param columnKey the key of the column to extract.
+     *
+     * @return the field in the specified column (or {@code null} if
+     * this reader is processing a ragged file and the specified line
+     * does not contain the column).
+     *
+     * @throws RuntimeException unless the column key is found in the
+     * header line.
+     */
+    public String getColumn(List<String> columns, String columnKey) {
+        int index = requireColumn(columnKey);
+
+        if (columns.size() > index)
+            return columns.get(index);
+        else
+            return null;
     }
 
     /**

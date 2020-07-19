@@ -87,6 +87,17 @@ public class TableReaderTest {
         reader.close();
     }
 
+    @Test public void testGetColumn() {
+        TableReader reader = TableReader.ragged("data/test/ragged_table.csv");
+        reader.close();
+
+        assertEquals("abc", reader.getColumn(List.of("abc", "1"), "Key"));
+        assertEquals("1", reader.getColumn(List.of("abc", "1"), "Value"));
+
+        assertEquals("abc", reader.getColumn(List.of("abc"), "Key"));
+        assertNull(reader.getColumn(List.of("abc"), "Value"));
+    }
+
     @Test public void testRagged() {
         TableReader reader = TableReader.ragged("data/test/ragged_table.csv");
 
