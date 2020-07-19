@@ -167,6 +167,27 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      * columns most recently returned by the {@code iterator.next()}
      * method).
      *
+     * @param index the index of the column to extract.
+     *
+     * @return the field with the specified (or {@code null} if this
+     * reader is processing a ragged file and the current line does
+     * not contain the column).
+     */
+    public String columnAt(int index) {
+        if (columns == null)
+            throw new IllegalStateException("The iterator has not advanced to the first line.");
+
+        if (columns.size() > index)
+            return columns.get(index);
+        else
+            return null;
+    }
+
+    /**
+     * Extracts a column from the current location in the file (the
+     * columns most recently returned by the {@code iterator.next()}
+     * method).
+     *
      * @param columnKey the key of the column to extract.
      *
      * @return the field index by the the specified column key (or
@@ -176,29 +197,8 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      * @throws RuntimeException unless the column key is found in the
      * header line.
      */
-    public String column(String columnKey) {
-        return column(requireColumn(columnKey));
-    }
-
-    /**
-     * Extracts a column from the current location in the file (the
-     * columns most recently returned by the {@code iterator.next()}
-     * method).
-     *
-     * @param index the index of the column to extract.
-     *
-     * @return the field with the specified (or {@code null} if this
-     * reader is processing a ragged file and the current line does
-     * not contain the column).
-     */
-    public String column(int index) {
-        if (columns == null)
-            throw new IllegalStateException("The iterator has not advanced to the first line.");
-
-        if (columns.size() > index)
-            return columns.get(index);
-        else
-            return null;
+    public String columnFor(String columnKey) {
+        return columnAt(requireColumn(columnKey));
     }
 
     /**

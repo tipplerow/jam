@@ -61,20 +61,20 @@ public class TableReaderTest {
         assertEquals(-1, reader.findColumn("Not_Found"));
 
         assertEquals(List.of("abc", "0"), reader.next());
-        assertEquals("abc", reader.column("Key"));
-        assertEquals("0", reader.column("Value"));
+        assertEquals("abc", reader.columnFor("Key"));
+        assertEquals("0", reader.columnFor("Value"));
 
         assertEquals(List.of("def", "1"), reader.next());
-        assertEquals("def", reader.column("Key"));
-        assertEquals("1", reader.column("Value"));
+        assertEquals("def", reader.columnFor("Key"));
+        assertEquals("1", reader.columnFor("Value"));
 
         assertEquals(List.of("ghi", "2"), reader.next());
-        assertEquals("ghi", reader.column("Key"));
-        assertEquals("2", reader.column("Value"));
+        assertEquals("ghi", reader.columnFor("Key"));
+        assertEquals("2", reader.columnFor("Value"));
 
         assertFalse(reader.hasNext());
-        assertEquals("ghi", reader.column("Key"));
-        assertEquals("2", reader.column("Value"));
+        assertEquals("ghi", reader.columnFor("Key"));
+        assertEquals("2", reader.columnFor("Value"));
 
         reader.close();
     }
