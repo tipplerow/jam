@@ -38,6 +38,11 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
     private final List<String> columnKeys;
     private final Map<String, Integer> columnIndex;
 
+    // The current line and columns (returned by the most recent call
+    // to next())...
+    private String line = null;
+    private List<String> columns = null;
+
     private TableReader(LineReader reader, boolean ragged) {
         this.reader = reader;
         this.ragged = ragged;
@@ -158,6 +163,45 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
     }
 
     /**
+     * Extracts a column from the current location in the file (the
+     * columns most recently returned by the {@code iterator.next()}
+     * method).
+     *
+     * @param columnKey the key of the column to extract.
+     *
+     * @return the field index by the the specified column key (or
+     * {@code null} if this reader is processing a ragged file and
+     * the current line does not contain the column).
+     *
+     * @throws RuntimeException unless the column key is found in the
+     * header line.
+     */
+    public String column(String columnKey) {
+        return column(requireColumn(columnKey));
+    }
+
+    /**
+     * Extracts a column from the current location in the file (the
+     * columns most recently returned by the {@code iterator.next()}
+     * method).
+     *
+     * @param index the index of the column to extract.
+     *
+     * @return the field with the specified (or {@code null} if this
+     * reader is processing a ragged file and the current line does
+     * not contain the column).
+     */
+    public String column(int index) {
+        if (columns == null)
+            throw new IllegalStateException("The iterator has not advanced to the first line.");
+
+        if (columns.size() > index)
+            return columns.get(index);
+        else
+            return null;
+    }
+
+    /**
      * Returns a read-only view of the column keys.
      *
      * @return a read-only view of the column keys.
@@ -181,30 +225,6 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
             return index;
         else
             return -1;
-    }
-
-    /**
-     * Extracts a column field from a parsed data line.
-     *
-     * @param columns a parsed data line (a column list returned by
-     * the iterator {@code next()} method).
-     *
-     * @param columnKey the key of the column to extract.
-     *
-     * @return the field in the specified column (or {@code null} if
-     * this reader is processing a ragged file and the specified line
-     * does not contain the column).
-     *
-     * @throws RuntimeException unless the column key is found in the
-     * header line.
-     */
-    public String getColumn(List<String> columns, String columnKey) {
-        int index = requireColumn(columnKey);
-
-        if (columns.size() > index)
-            return columns.get(index);
-        else
-            return null;
     }
 
     /**
@@ -264,16 +284,16 @@ public final class TableReader implements Closeable, Iterable<List<String>>, Ite
      * are not allowed.
      */
     @Override public List<String> next() {
-        String line = reader.next();
-        List<String> columns = List.of(delimiter.split(line));
+        line = reader.next();
+        columns = List.of(delimiter.split(line));
 
         if (!ragged)
-            validateColumns(line, columns);
+            validateColumns();
 
         return columns;
     }
 
-    private void validateColumns(String line, List<String> columns) {
+    private void validateColumns() {
         int actual = columns.size();
         int expected = columnKeys.size();
 

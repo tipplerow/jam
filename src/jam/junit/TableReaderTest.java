@@ -61,9 +61,20 @@ public class TableReaderTest {
         assertEquals(-1, reader.findColumn("Not_Found"));
 
         assertEquals(List.of("abc", "0"), reader.next());
+        assertEquals("abc", reader.column("Key"));
+        assertEquals("0", reader.column("Value"));
+
         assertEquals(List.of("def", "1"), reader.next());
+        assertEquals("def", reader.column("Key"));
+        assertEquals("1", reader.column("Value"));
+
         assertEquals(List.of("ghi", "2"), reader.next());
+        assertEquals("ghi", reader.column("Key"));
+        assertEquals("2", reader.column("Value"));
+
         assertFalse(reader.hasNext());
+        assertEquals("ghi", reader.column("Key"));
+        assertEquals("2", reader.column("Value"));
 
         reader.close();
     }
@@ -85,17 +96,6 @@ public class TableReaderTest {
         assertEquals(List.of("ghi", "2"), lines.get(2));
 
         reader.close();
-    }
-
-    @Test public void testGetColumn() {
-        TableReader reader = TableReader.ragged("data/test/ragged_table.csv");
-        reader.close();
-
-        assertEquals("abc", reader.getColumn(List.of("abc", "1"), "Key"));
-        assertEquals("1", reader.getColumn(List.of("abc", "1"), "Value"));
-
-        assertEquals("abc", reader.getColumn(List.of("abc"), "Key"));
-        assertNull(reader.getColumn(List.of("abc"), "Value"));
     }
 
     @Test public void testRagged() {
