@@ -200,6 +200,17 @@ public final class FileUtil {
     }
 
     /**
+     * Creates a new file by building a composite file name.
+     *
+     * @param paths file name components.
+     *
+     * @return a new file with the composite file name.
+     */
+    public static File newFile(String... paths) {
+        return new File(join(paths));
+    }
+
+    /**
      * Asserts that a file exists.
      *
      * @param fileName the name of the required file.
