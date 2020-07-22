@@ -41,6 +41,16 @@ public class FileUtilTest {
         assertTrue(dir.delete());
     }
 
+    @Test public void testGetBasename() {
+        assertEquals("foo.txt", FileUtil.getBasename(new File("foo.txt")));
+        assertEquals("foo.txt", FileUtil.getBasename(new File("/var/tmp/foo.txt")));
+    }
+
+    @Test public void testGetBasenamePrefix() {
+        assertEquals("foo", FileUtil.getBasenamePrefix(new File("foo.txt")));
+        assertEquals("foo", FileUtil.getBasenamePrefix(new File("/var/tmp/foo.txt.gz")));
+    }
+
     @Test public void testGetCanonicalPath() {
         assertEquals(FileUtil.join(JamHome.NAME, "foo.txt"), FileUtil.getCanonicalPath(new File("foo.txt")));
     }

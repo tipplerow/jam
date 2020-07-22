@@ -83,6 +83,34 @@ public final class FileUtil {
     }
 
     /**
+     * Returns the basename of a file: the last name in the path
+     * sequence.
+     *
+     * @param file the file of interest.
+     *
+     * @return the basename of the specified file.
+     */
+    public static String getBasename(File file) {
+        return file.getName();
+    }
+
+    /**
+     * Returns the prefix of the basename of a file: the substring of
+     * the basename before the first dot.
+     *
+     * @param file the file of interest.
+     *
+     * @return the basename prefix of the specified file.
+     */
+    public static String getBasenamePrefix(File file) {
+        return getPrefix(getBasename(file));
+    }
+
+    private static String getPrefix(String fileName) {
+        return RegexUtil.DOT.split(fileName)[0];
+    }
+
+    /**
      * Returns the canonical path of the specified file but never
      * throws checked exceptions.
      *
@@ -119,7 +147,7 @@ public final class FileUtil {
      * throws an {@code IOException}.
      */
     public static String getCanonicalPrefix(File file) {
-        return RegexUtil.DOT.split(getCanonicalPath(file))[0];
+        return getPrefix(getCanonicalPath(file));
     }
 
     /**
