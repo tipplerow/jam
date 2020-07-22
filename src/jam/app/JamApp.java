@@ -98,7 +98,7 @@ public abstract class JamApp {
         if (propertyFiles.isEmpty())
             return ".";
         else
-            return FileUtil.getParentName(new File(propertyFiles.get(0)));
+            return FileUtil.getDirName(new File(propertyFiles.get(0)));
     }
 
     private static int resolveTrialIndex() {

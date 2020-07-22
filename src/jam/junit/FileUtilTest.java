@@ -41,14 +41,14 @@ public class FileUtilTest {
         assertTrue(dir.delete());
     }
 
-    @Test public void testGetBasename() {
-        assertEquals("foo.txt", FileUtil.getBasename(new File("foo.txt")));
-        assertEquals("foo.txt", FileUtil.getBasename(new File("/var/tmp/foo.txt")));
+    @Test public void testGetBaseName() {
+        assertEquals("foo.txt", FileUtil.getBaseName(new File("foo.txt")));
+        assertEquals("foo.txt", FileUtil.getBaseName(new File("/var/tmp/foo.txt")));
     }
 
-    @Test public void testGetBasenamePrefix() {
-        assertEquals("foo", FileUtil.getBasenamePrefix(new File("foo.txt")));
-        assertEquals("foo", FileUtil.getBasenamePrefix(new File("/var/tmp/foo.txt.gz")));
+    @Test public void testGetBaseNamePrefix() {
+        assertEquals("foo", FileUtil.getBaseNamePrefix(new File("foo.txt")));
+        assertEquals("foo", FileUtil.getBaseNamePrefix(new File("/var/tmp/foo.txt.gz")));
     }
 
     @Test public void testGetCanonicalPath() {
@@ -59,9 +59,9 @@ public class FileUtilTest {
         assertEquals(FileUtil.join(JamHome.NAME, "foo"), FileUtil.getCanonicalPrefix(new File("foo.xml.gz")));
     }
 
-    @Test public void testGetParentName() {
-        assertEquals(".", FileUtil.getParentName(new File("foo.txt")));
-        assertEquals("foo", FileUtil.getParentName(new File("foo/bar.txt")));
+    @Test public void testGetDirName() {
+        assertEquals(".", FileUtil.getDirName(new File("foo.txt")));
+        assertEquals("foo", FileUtil.getDirName(new File("foo/bar.txt")));
     }
 
     @Test public void testRequireFound() {

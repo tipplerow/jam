@@ -90,7 +90,7 @@ public final class FileUtil {
      *
      * @return the basename of the specified file.
      */
-    public static String getBasename(File file) {
+    public static String getBaseName(File file) {
         return file.getName();
     }
 
@@ -102,8 +102,8 @@ public final class FileUtil {
      *
      * @return the basename prefix of the specified file.
      */
-    public static String getBasenamePrefix(File file) {
-        return getPrefix(getBasename(file));
+    public static String getBaseNamePrefix(File file) {
+        return getPrefix(getBaseName(file));
     }
 
     private static String getPrefix(String fileName) {
@@ -162,7 +162,7 @@ public final class FileUtil {
      * @return the name of the parent directory of the specified file,
      * or {@code .} (dot) if the file does not specify a parent.
      */
-    public static String getParentName(File file) {
+    public static String getDirName(File file) {
 	String result = file.getParent();
 
 	if (result == null)
@@ -184,7 +184,7 @@ public final class FileUtil {
      * "dot" directory if the file does not specify a parent.
      */
     public static File getParentFile(File file) {
-	return new File(getParentName(file));
+	return new File(getDirName(file));
     }
 
     /**
