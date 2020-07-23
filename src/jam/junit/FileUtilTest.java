@@ -51,6 +51,14 @@ public class FileUtilTest {
         assertEquals("foo", FileUtil.getBaseNamePrefix(new File("/var/tmp/foo.txt.gz")));
     }
 
+    @Test public void testGetCanonicalFile() {
+        File localFile = new File("foo.txt");
+        File canonicalFile = FileUtil.getCanonicalFile(localFile);
+
+        assertEquals("foo.txt", localFile.getPath());
+        assertEquals(FileUtil.join(JamHome.NAME, "foo.txt"), canonicalFile.getPath());
+    }
+
     @Test public void testGetCanonicalPath() {
         assertEquals(FileUtil.join(JamHome.NAME, "foo.txt"), FileUtil.getCanonicalPath(new File("foo.txt")));
     }

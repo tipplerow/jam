@@ -111,6 +111,21 @@ public final class FileUtil {
     }
 
     /**
+     * Returns the canonical form of the specified file but never
+     * throws checked exceptions.
+     *
+     * @param file a file to examine.
+     *
+     * @return the canonical form of the specified file.
+     *
+     * @throws RuntimeException if {@code file.getCanonicalPath}
+     * throws an {@code IOException}.
+     */
+    public static File getCanonicalFile(File file) {
+        return new File(getCanonicalPath(file));
+    }
+
+    /**
      * Returns the canonical path of the specified file but never
      * throws checked exceptions.
      *
