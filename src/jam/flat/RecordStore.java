@@ -70,6 +70,21 @@ public abstract class RecordStore<V extends FlatRecord> implements Iterable<V> {
     }
 
     /**
+     * Reads all lines from a flat file, parses each line, and inserts
+     * the records into this table.
+     * table.
+     *
+     * @param reader a reader open for the the file to parse.
+     *
+     * @throws RuntimeException unless the file was successfully
+     * processed.
+     */
+    public void load(LineReader reader) {
+        for (String line : reader)
+            insert(parse(line));
+    }
+
+    /**
      * Parses a flat file and adds all of the records to this table.
      *
      * @param file the file to parse.
@@ -79,13 +94,8 @@ public abstract class RecordStore<V extends FlatRecord> implements Iterable<V> {
      */
     public void parse(File file) {
         try (LineReader reader = LineReader.open(file)) {
-            parse(reader);
+            load(reader);
         }
-    }
-
-    private void parse(LineReader reader) {
-        for (String line : reader)
-            insert(parse(line));
     }
 
     /**
