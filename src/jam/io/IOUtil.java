@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import jam.app.JamLogger;
@@ -457,7 +458,7 @@ public final class IOUtil {
      *
      * @param lines the lines to write.
      *
-     * @throws RuntimeException unless the file was read successfully.
+     * @throws RuntimeException unless the file was written successfully.
      */
     public static void writeLines(File file, boolean append, Collection<String> lines) {
         PrintWriter writer = openWriter(file, append);
@@ -494,10 +495,97 @@ public final class IOUtil {
      *
      * @param lines the lines to write.
      *
-     * @throws RuntimeException unless the file was read successfully.
+     * @throws RuntimeException unless the file was written successfully.
      */
     public static void writeLines(File file, boolean append, String... lines) {
         writeLines(file, append, Arrays.asList(lines));
+    }
+
+    /**
+     * Writes objects to a text file.
+     *
+     * @param <T> the runtime type of the object to write.
+     *
+     * @param fileName the name of the file to write.
+     *
+     * @param append whether to write at the end of the file instead
+     * of the beginning.
+     *
+     * @param objects the objects to write.
+     *
+     * @throws RuntimeException unless the file was written successfully.
+     */
+    public static <T> void writeObjects(String fileName, boolean append, Collection<T> objects) {
+        writeObjects(new File(fileName), append, objects);
+    }
+
+    /**
+     * Writes objects to a text file.
+     *
+     * @param <T> the runtime type of the object to write.
+     *
+     * @param file the file to write.
+     *
+     * @param append whether to write at the end of the file instead
+     * of the beginning.
+     *
+     * @param objects the objects to write.
+     *
+     * @throws RuntimeException unless the file was written successfully.
+     */
+    public static <T> void writeObjects(File file, boolean append, Collection<T> objects) {
+        writeObjects(file, append, objects, obj -> obj.toString());
+    }
+
+    /**
+     * Writes objects to a text file.
+     *
+     * @param <T> the runtime type of the object to write.
+     *
+     * @param fileName the name of the file to write.
+     *
+     * @param append whether to write at the end of the file instead
+     * of the beginning.
+     *
+     * @param objects the objects to write.
+     *
+     * @param toString a function to extract the string representation
+     * for each object.
+     *
+     * @throws RuntimeException unless the file was written successfully.
+     */
+    public static <T> void writeObjects(String fileName,
+                                        boolean append,
+                                        Collection<T> objects,
+                                        Function<T, String> toString) {
+        writeObjects(new File(fileName), append, objects, toString);
+    }
+
+    /**
+     * Writes objects to a text file.
+     *
+     * @param <T> the runtime type of the object to write.
+     *
+     * @param file the file to write.
+     *
+     * @param append whether to write at the end of the file instead
+     * of the beginning.
+     *
+     * @param objects the objects to write.
+     *
+     * @param toString a function to extract the string representation
+     * for each object.
+     *
+     * @throws RuntimeException unless the file was written successfully.
+     */
+    public static <T> void writeObjects(File file,
+                                        boolean append,
+                                        Collection<T> objects,
+                                        Function<T, String> toString) {
+        try (PrintWriter writer = openWriter(file, append)) {
+            for (T object : objects)
+                writer.println(toString.apply(object));
+        }
     }
 }
 

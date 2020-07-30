@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import jam.io.IOUtil;
 import jam.util.RegexUtil;
@@ -95,6 +95,21 @@ public class IOUtilTest {
         IOUtil.writeLines(tmpFile, true,  "ghi", "jkl");
 
         assertEquals(Arrays.asList("abc", "def", "ghi", "jkl"), IOUtil.readLines(tmpFile));
+    }
+
+    @Test public void testWriteObjects() {
+        File tmpFile = new File("tmp3.txt");
+        tmpFile.deleteOnExit();
+
+        List<Double> list1 = List.of(Double.valueOf(0.246), Double.valueOf(8.88));
+        List<Double> list2 = List.of(Double.valueOf(1.234), Double.valueOf(4.56));
+        List<Double> list3 = List.of(Double.valueOf(2.888), Double.valueOf(3.33));
+
+        IOUtil.writeObjects(tmpFile, false, list1, x -> String.format("%.1f", x.doubleValue()));
+        IOUtil.writeObjects(tmpFile, false, list2, x -> String.format("%.1f", x.doubleValue()));
+        IOUtil.writeObjects(tmpFile, true,  list3, x -> String.format("%.1f", x.doubleValue()));
+
+        assertEquals(List.of("1.2", "4.6", "2.9", "3.3"), IOUtil.readLines(tmpFile));
     }
 
     public static void main(String[] args) {
