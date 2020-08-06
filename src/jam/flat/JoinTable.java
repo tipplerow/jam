@@ -76,7 +76,8 @@ public abstract class JoinTable<K1, K2, V extends JoinRecord<K1, K2>> extends Re
      * specified keys.
      */
     public boolean contains(K1 primaryKey, K2 foreignKey) {
-        return containsPrimary(primaryKey) && containsForeign(foreignKey);
+        Map<K2, V> innerMap = primaryIndex.get(primaryKey);
+        return innerMap != null && innerMap.containsKey(foreignKey);
     }
 
     /**

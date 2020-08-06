@@ -106,6 +106,19 @@ public class JoinTableTest {
         table.insert("B", "beta",  2222);
         table.insert("B", "gamma", 23);
 
+        assertTrue(table.containsPrimary("A"));
+        assertTrue(table.containsPrimary("B"));
+        assertFalse(table.containsPrimary("C"));
+
+        assertTrue(table.containsForeign("alpha"));
+        assertTrue(table.containsForeign("beta"));
+        assertTrue(table.containsForeign("gamma"));
+        assertFalse(table.containsForeign("delta"));
+
+        assertTrue(table.contains("A", "alpha"));
+        assertTrue(table.contains("A", "beta"));
+        assertFalse(table.contains("A", "gamma"));
+
         assertEquals(5, table.count());
         assertEquals(2, table.countPrimary("A"));
         assertEquals(3, table.countPrimary("B"));
