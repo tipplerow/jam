@@ -10,17 +10,16 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class FTPUtilTest {
-    private static final String remoteDirName = "ftp://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/";
-    private static final String localFileName = "data/test/README.txt";
-    private static final String remoteFileName = remoteDirName + "README.txt";
+    private static final File localFile = new File("data/test/README.txt");
 
-    private static final File localFile = new File(localFileName);
+    private static final String remoteDirName = "ftp://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/";
+    private static final String remoteFileName = remoteDirName + "README.txt";
 
     @Test public void testDownload() {
         localFile.deleteOnExit();
         assertFalse(localFile.exists());
 
-        assertTrue(FTPUtil.download(localFileName, remoteFileName));
+        assertTrue(FTPUtil.download(localFile, remoteFileName));
         assertTrue(localFile.exists());
     }
 

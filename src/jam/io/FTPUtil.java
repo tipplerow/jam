@@ -21,23 +21,21 @@ public final class FTPUtil {
     /**
      * Downloads a remote file (but does not overwite an existing file).
      *
-     * @param localName the name for the local destination file.
+     * @param localFile the local destination file.
      *
      * @param remoteName the name of the remote source file.
      *
      * @return {@code true} iff the file was successfully downloaded.
      */
-    public static boolean download(String localName, String remoteName) {
+    public static boolean download(File localFile, String remoteName) {
         validateRemoteFile(remoteName);
 
-        File localFile = new File(localName);
-
         if (localFile.exists()) {
-            JamLogger.warn("Local file [%s] already exists; not downloading.", localName);
+            JamLogger.warn("Local file [%s] already exists; not downloading.", localFile);
             return false;
         }
 
-        JamProcess process = JamProcess.create("curl", "-o", localName, remoteName);
+        JamProcess process = JamProcess.create("curl", "-o", FileUtil.getCanonicalPath(localFile), remoteName);
         process.run();
 
         return localFile.exists();
