@@ -3,7 +3,11 @@ package jam.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -101,5 +105,57 @@ public final class StreamUtil {
     public static <T> void forEach(List<T> source, Consumer<? super T> action, int concurrency) {
         for (List<T> subList : ListUtil.split(source, concurrency))
             subList.parallelStream().forEach(action);
+    }
+
+    /**
+     * Collects a stream into an {@code ArrayList}.
+     *
+     * @param <T> element type for the stream.
+     *
+     * @param stream the stream to collect.
+     *
+     * @return a new {@code ArrayList} containing the stream elements.
+     */
+    public static <T> ArrayList<T> toArrayList(Stream<T> stream) {
+        return stream.collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
+     * Collects a stream into an {@code HashSet}.
+     *
+     * @param <T> element type for the stream.
+     *
+     * @param stream the stream to collect.
+     *
+     * @return a new {@code HashSet} containing the stream elements.
+     */
+    public static <T> HashSet<T> toHashSet(Stream<T> stream) {
+        return stream.collect(Collectors.toCollection(HashSet::new));
+    }
+
+    /**
+     * Collects a stream into an {@code LinkedList}.
+     *
+     * @param <T> element type for the stream.
+     *
+     * @param stream the stream to collect.
+     *
+     * @return a new {@code LinkedList} containing the stream elements.
+     */
+    public static <T> LinkedList<T> toLinkedList(Stream<T> stream) {
+        return stream.collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    /**
+     * Collects a stream into an {@code TreeSet}.
+     *
+     * @param <T> element type for the stream.
+     *
+     * @param stream the stream to collect.
+     *
+     * @return a new {@code TreeSet} containing the stream elements.
+     */
+    public static <T> TreeSet<T> toTreeSet(Stream<T> stream) {
+        return stream.collect(Collectors.toCollection(TreeSet::new));
     }
 }

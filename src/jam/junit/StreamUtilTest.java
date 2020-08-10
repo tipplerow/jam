@@ -2,7 +2,11 @@
 package jam.junit;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import jam.math.IntPair;
 import jam.util.StreamUtil;
@@ -43,6 +47,38 @@ public class StreamUtilTest {
 
     private void assertSquare(IntPair pair) {
         assertEquals(pair.first * pair.first, pair.second);
+    }
+
+    @Test public void testToArrayList() {
+        List<String> expected = List.of("abc", "def", "ghi");
+        List<String> actual   = StreamUtil.toArrayList(expected.stream());
+
+        assertEquals(expected, actual);
+        assertTrue(actual instanceof ArrayList);
+    }
+
+    @Test public void testToLinkedList() {
+        List<String> expected = List.of("abc", "def", "ghi");
+        List<String> actual   = StreamUtil.toLinkedList(expected.stream());
+
+        assertEquals(expected, actual);
+        assertTrue(actual instanceof LinkedList);
+    }
+
+    @Test public void testToHashSet() {
+        Set<String> expected = Set.of("abc", "def", "ghi");
+        Set<String> actual   = StreamUtil.toHashSet(expected.stream());
+
+        assertEquals(expected, actual);
+        assertTrue(actual instanceof HashSet);
+    }
+
+    @Test public void testToTreeSet() {
+        Set<String> expected = Set.of("abc", "def", "ghi");
+        Set<String> actual   = StreamUtil.toTreeSet(expected.stream());
+
+        assertEquals(expected, actual);
+        assertTrue(actual instanceof TreeSet);
     }
 
     public static void main(String[] args) {
