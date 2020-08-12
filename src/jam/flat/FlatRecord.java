@@ -159,6 +159,20 @@ public interface FlatRecord<K> {
     }
 
     /**
+     * Parses a local date field.
+     *
+     * @param field the field to parse.
+     *
+     * @return the local date value of the given field.
+     */
+    public static LocalDate parseDate(String field) {
+        if (isNull(field))
+            return null;
+        else
+            return LocalDate.parse(field);
+    }
+
+    /**
      * Parses a double-precision field.
      *
      * @param field the field to parse.

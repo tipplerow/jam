@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jam.flat.FlatRecord;
@@ -67,6 +68,8 @@ public class FlatRecordTest {
         assertEquals(rec1, TestRecord.parse("abc|1|1.0"));
         assertEquals(rec2, TestRecord.parse("def|2|(null)"));
         assertEquals(rec3, TestRecord.parse("(null)|3|3.0"));
+
+        assertEquals(LocalDate.of(2020, 8, 12), FlatRecord.parseDate("2020-08-12"));
     }
 
     public static void main(String[] args) {
