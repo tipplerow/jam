@@ -105,6 +105,21 @@ public class ListUtilTest {
         assertEquals(list, List.of("abc", "def", "ghi"));
     }
 
+    @Test public void testNotNull() {
+        List<String> list = new ArrayList<String>(List.of("A", "B", "C", "D", "E"));
+
+        assertEquals(List.of("A", "B", "C", "D", "E"), ListUtil.notNull(list));
+
+        list.set(0, null);
+        list.set(2, null);
+
+        assertEquals(List.of("B", "D", "E"), ListUtil.notNull(list));
+
+        list.set(4, null);
+
+        assertEquals(List.of("B", "D"), ListUtil.notNull(list));
+    }
+
     @Test public void testSelect() {
         int N = 10;
         List<Integer> list = new ArrayList<Integer>(N);

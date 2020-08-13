@@ -276,6 +276,20 @@ public final class ListUtil {
     }
 
     /**
+     * Removes {@code null} entries from a collection.
+     *
+     * @param <E> the element type.
+     *
+     * @param collection the collection to process.
+     *
+     * @return a list containing the non-{@code null} elements from
+     * the input collection.
+     */
+    public static <E> List<E> notNull(Collection<E> collection) {
+        return filter(collection, x -> x != null);
+    }
+
+    /**
      * Selects one list element at random using the global random
      * number generator.
      *
