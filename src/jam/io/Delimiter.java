@@ -113,7 +113,7 @@ public final class Delimiter {
      * leading and trailing white space removed).
      */
     public String[] split(String line) {
-        String[] fields = delimPattern.split(line);
+        String[] fields = delimPattern.split(line, -1);
 
         for (int index = 0; index < fields.length; ++index)
             fields[index] = fields[index].trim();

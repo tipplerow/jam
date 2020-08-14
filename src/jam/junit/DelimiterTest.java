@@ -25,6 +25,9 @@ public class DelimiterTest {
     }
 
     @Test public void testPipe() {
+        runOne(Delimiter.PIPE, "A|", "A", "");
+        runOne(Delimiter.PIPE, "A||", "A", "", "");
+        runOne(Delimiter.PIPE, "A||B|||C", "A", "", "B", "", "", "C");
         runOne(Delimiter.PIPE, "A|B|C|D", "A", "B", "C", "D");
         runOne(Delimiter.PIPE, "A|B\\|C|D", "A", "B|C", "D");
     }
