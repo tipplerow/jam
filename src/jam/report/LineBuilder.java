@@ -3,6 +3,7 @@ package jam.report;
 
 import java.text.DecimalFormat;
 
+import jam.io.Delimiter;
 import jam.lattice.Coord;
 import jam.vector.VectorView;
 
@@ -15,6 +16,15 @@ public final class LineBuilder {
 
     // Number of fields already added to the line...
     private int fieldCount = 0;
+
+    /**
+     * Creates a new line builder with a fixed delimiter.
+     *
+     * @param delim the field delimiter.
+     */
+    public LineBuilder(Delimiter delim) {
+        this(delim.string());
+    }
 
     /**
      * Creates a new line builder with a fixed delimiter.
