@@ -3,10 +3,8 @@ package jam.util;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.Function;
 
 import jam.lang.ObjectFactory;
@@ -14,13 +12,32 @@ import jam.lang.ObjectFactory;
 /**
  * Implements an indexed table of values with two keys.
  */
-public final class PairKeyTable<K1, K2, V> {
+public abstract class PairKeyTable<K1, K2, V> {
     private final Map<K1, Map<K2, V>> outerMap;
     private final ObjectFactory<Map<K2, V>> innerMapFactory;
 
-    private PairKeyTable(Map<K1, Map<K2, V>> outerMap, ObjectFactory<Map<K2, V>> innerMapFactory) {
+    /**
+     * Creates a new empty table.
+     *
+     * @param outerMap the map of inner maps keyed by the outer key.
+     *
+     * @param innerMapFactory the factory used to create inner maps
+     * for each outer key.
+     */
+    protected PairKeyTable(Map<K1, Map<K2, V>> outerMap, ObjectFactory<Map<K2, V>> innerMapFactory) {
         this.outerMap = outerMap;
         this.innerMapFactory = innerMapFactory;
+    }
+
+    private Map<K2, V> innerMap(K1 key1, boolean create) {
+        Map<K2, V> innerMap = outerMap.get(key1);
+
+        if (innerMap == null && create) {
+            innerMap = innerMapFactory.newInstance();
+            outerMap.put(key1, innerMap);
+        }
+
+        return innerMap;
     }
 
     /**
@@ -37,17 +54,7 @@ public final class PairKeyTable<K1, K2, V> {
      * underlying storage.
      */
     public static <K1, K2, V> PairKeyTable<K1, K2, V> hash() {
-        Map<K1, Map<K2, V>> outerMap =
-            new HashMap<K1, Map<K2, V>>();
-
-        ObjectFactory<Map<K2, V>> innerMapFactory =
-            new ObjectFactory<Map<K2, V>>() {
-                @Override public Map<K2, V> newInstance() {
-                    return new HashMap<K2, V>();
-                };
-            };
-
-        return new PairKeyTable<K1, K2, V>(outerMap, innerMapFactory);
+        return PairKeyHashTable.create();
     }
 
     /**
@@ -64,28 +71,7 @@ public final class PairKeyTable<K1, K2, V> {
      * underlying storage.
      */
     public static <K1, K2, V> PairKeyTable<K1, K2, V> tree() {
-        Map<K1, Map<K2, V>> outerMap =
-            new TreeMap<K1, Map<K2, V>>();
-
-        ObjectFactory<Map<K2, V>> innerMapFactory =
-            new ObjectFactory<Map<K2, V>>() {
-                @Override public Map<K2, V> newInstance() {
-                    return new TreeMap<K2, V>();
-                };
-            };
-
-        return new PairKeyTable<K1, K2, V>(outerMap, innerMapFactory);
-    }
-
-    private Map<K2, V> innerMap(K1 key1, boolean create) {
-        Map<K2, V> innerMap = outerMap.get(key1);
-
-        if (innerMap == null && create) {
-            innerMap = innerMapFactory.newInstance();
-            outerMap.put(key1, innerMap);
-        }
-
-        return innerMap;
+        return PairKeyTreeTable.create();
     }
 
     /**
