@@ -113,7 +113,7 @@ public final class MissenseTable {
     public int count(TumorBarcode barcode) {
         int total = 0;
 
-        for (HugoSymbol symbol : table.innerKeySet(barcode))
+        for (HugoSymbol symbol : table.viewInnerKeys(barcode))
             total += count(barcode, symbol);
 
         return total;
