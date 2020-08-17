@@ -1,8 +1,10 @@
 
 package jam.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -16,6 +18,8 @@ public abstract class PairKeyTable<K1, K2, V> {
     private final Map<K1, Map<K2, V>> outerMap;
     private final ObjectFactory<Map<K2, V>> innerMapFactory;
 
+    private int size = 0;
+
     /**
      * Creates a new empty table.
      *
@@ -25,6 +29,7 @@ public abstract class PairKeyTable<K1, K2, V> {
      * for each outer key.
      */
     protected PairKeyTable(Map<K1, Map<K2, V>> outerMap, ObjectFactory<Map<K2, V>> innerMapFactory) {
+        this.size = 0;
         this.outerMap = outerMap;
         this.innerMapFactory = innerMapFactory;
     }
@@ -38,6 +43,20 @@ public abstract class PairKeyTable<K1, K2, V> {
         }
 
         return innerMap;
+    }
+
+    private Set<K1> outerKeySet() {
+        return outerMap.keySet();
+    }
+
+    private Set<K2> innerKeySet(K1 key1) {
+        Map<K2, V> innerMap =
+            innerMap(key1, false);
+
+        if (innerMap != null)
+            return innerMap.keySet();
+        else
+            return Collections.emptySet();
     }
 
     /**
@@ -129,38 +148,12 @@ public abstract class PairKeyTable<K1, K2, V> {
     }
 
     /**
-     * Returns a {@code Set} view of the inner keys in this table for
-     * a given outer key.
+     * Identifies empty tables.
      *
-     * <p>The returned set is backed by the underlying map, so changes
-     * to the table are reflected in the set, and vice-versa.
-     *
-     * @param key1 the outer key.
-     *
-     * @return a {@code Set} view of the inner keys that share the
-     * given outer key (an empty set if this table does not contain
-     * the outer key).
+     * @return {@code true} iff this table contains no records.
      */
-    public Set<K2> innerKeySet(K1 key1) {
-        Map<K2, V> innerMap =
-            innerMap(key1, false);
-
-        if (innerMap != null)
-            return innerMap.keySet();
-        else
-            return Collections.emptySet();
-    }
-
-    /**
-     * Returns a {@code Set} view of the outer keys in this table.
-     *
-     * <p>The returned set is backed by the underlying map, so changes
-     * to the table are reflected in the set, and vice-versa.
-     *
-     * @return a {@code Set} view of the outer keys in this table.
-     */
-    public Set<K1> outerKeySet() {
-        return outerMap.keySet();
+    public boolean isEmpty() {
+        return size == 0;
     }
 
     /**
@@ -176,7 +169,12 @@ public abstract class PairKeyTable<K1, K2, V> {
      * or {@code null} if there was no previous value.
      */
     public V put(K1 key1, K2 key2, V value) {
-        return innerMap(key1, true).put(key2, value);
+        V prev = innerMap(key1, true).put(key2, value);
+
+        if (prev == null)
+            ++size;
+
+        return prev;
     }
 
     /**
@@ -194,9 +192,48 @@ public abstract class PairKeyTable<K1, K2, V> {
             innerMap(key1, false);
 
         if (innerMap != null)
-            return innerMap.remove(key2);
+            return remove(innerMap, key2);
         else
             return null;
+    }
+
+    private V remove(Map<K2, V> innerMap, K2 key2) {
+        V prev = innerMap.remove(key2);
+
+        if (prev != null)
+            --size;
+
+        return prev;
+    }
+
+    /**
+     * Returns the number of entries in this table.
+     *
+     * @return the number of entries in this table.
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Returns the values contained in this table.
+     *
+     * <p>In the {@code TreeMap} implementation, the values will be
+     * ordered by their keys (outer key first, then inner key).  In
+     * the {@code HashMap} implementation, the ordering will follow
+     * the hash codes of the keys and therefore be difficult to
+     * predict.
+     *
+     * @return the values contained in this table (ordered as
+     * described above).
+     */
+    public List<V> values() {
+        List<V> values = new ArrayList<V>();
+
+        for (Map<K2, V> innerMap : outerMap.values())
+            values.addAll(innerMap.values());
+
+        return values;
     }
 
     /**

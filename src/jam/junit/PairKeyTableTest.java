@@ -23,9 +23,9 @@ public final class PairKeyTableTest {
         runTest();
 
         // Check ordering of keys...
-        assertEquals(List.of(-2, 1), new ArrayList<Integer>(table.innerKeySet("abc")));
-        assertEquals(List.of(-3, 2, 4), new ArrayList<Integer>(table.innerKeySet("def")));
-        assertEquals(List.of("abc", "def", "ghi"), new ArrayList<String>(table.outerKeySet()));
+        assertEquals(List.of(-2, 1), new ArrayList<Integer>(table.viewInnerKeys("abc")));
+        assertEquals(List.of(-3, 2, 4), new ArrayList<Integer>(table.viewInnerKeys("def")));
+        assertEquals(List.of("abc", "def", "ghi"), new ArrayList<String>(table.viewOuterKeys()));
     }
 
     private void runTest() {
@@ -62,11 +62,11 @@ public final class PairKeyTableTest {
     }
 
     private void testKeySets() {
-        assertEquals(Set.of("abc", "def", "ghi"), table.outerKeySet());
+        assertEquals(Set.of("abc", "def", "ghi"), table.viewOuterKeys());
 
-        assertEquals(Set.of(5), table.innerKeySet("ghi"));
-        assertEquals(Set.of(1, -2), table.innerKeySet("abc"));
-        assertEquals(Set.of(2, -3, 4), table.innerKeySet("def"));
+        assertEquals(Set.of(5), table.viewInnerKeys("ghi"));
+        assertEquals(Set.of(1, -2), table.viewInnerKeys("abc"));
+        assertEquals(Set.of(2, -3, 4), table.viewInnerKeys("def"));
     }
 
     private void testRemove() {
@@ -79,8 +79,88 @@ public final class PairKeyTableTest {
         assertNull("ghi.5", table.remove("ghi", 5));
     }
 
+    @Test public void testSize() {
+        table = PairKeyTable.tree();
+
+        assertEquals(0, table.size());
+        assertTrue(table.isEmpty());
+
+        table.put("def", 2, "def.2");
+
+        assertEquals(1, table.size());
+        assertFalse(table.isEmpty());
+
+        table.put("abc", 1, "abc.1");
+
+        assertEquals(2, table.size());
+        assertFalse(table.isEmpty());
+
+        table.put("abc", 3, "abc.3");
+
+        assertEquals(3, table.size());
+        assertFalse(table.isEmpty());
+
+        table.put("abc", 1, "abc.1A");
+        table.put("def", 2, "def.2A");
+
+        assertEquals(3, table.size());
+        assertFalse(table.isEmpty());
+
+        table.remove("abc", 1);
+
+        assertEquals(2, table.size());
+        assertFalse(table.isEmpty());
+
+        table.remove("abc", 1);
+        table.remove("qed", 11);
+
+        assertEquals(2, table.size());
+        assertFalse(table.isEmpty());
+
+        table.remove("def", 2);
+        table.remove("def", 2);
+
+        assertEquals(1, table.size());
+        assertFalse(table.isEmpty());
+
+        table.remove("abc", 3);
+
+        assertEquals(0, table.size());
+        assertTrue(table.isEmpty());
+
+        table.remove("foo", 88);
+
+        assertEquals(0, table.size());
+        assertTrue(table.isEmpty());
+    }
+
+    @Test public void testValues() {
+        table = PairKeyTable.tree();
+        assertEquals(List.of(), table.values());
+
+        table.put("def", 2, "def.2");
+        assertEquals(List.of("def.2"), table.values());
+
+        table.put("abc", 1, "abc.1");
+        assertEquals(List.of("abc.1", "def.2"), table.values());
+
+        table.put("abc", 1, "abc.1A");
+        assertEquals(List.of("abc.1A", "def.2"), table.values());
+
+        table.put("abc", 3, "abc.3");
+        assertEquals(List.of("abc.1A", "abc.3", "def.2"), table.values());
+
+        table.remove("abc", 1);
+        assertEquals(List.of("abc.3", "def.2"), table.values());
+
+        table.remove("abc", 3);
+        assertEquals(List.of("def.2"), table.values());
+
+        table.remove("def", 2);
+        assertEquals(List.of(), table.values());
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.PairKeyTableTest");
     }
 }
-
