@@ -15,6 +15,7 @@ public class TOCFileTest {
 
         file.add("abc");
 
+        assertTrue(file.exists());
         assertTrue(file.contains("abc"));
         assertFalse(file.contains("def"));
 
