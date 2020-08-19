@@ -3,27 +3,34 @@ package jam.io;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import jam.lang.JamException;
 
 /**
  * Maintains a table of contents (represented by {@code String} keys)
  * in memory and in a physical file.
  */
-public class TOCFile {
+public final class TOCFile {
     private final File file;
     private final Set<String> items = new HashSet<String>();
 
-    /**
-     * Creates a new table-of-contents file with a fixed physical file
-     * path and loads the existing contents (if any) into memory.
-     *
-     * @param file the path of the underlying physical file.
-     *
-     */
-    protected TOCFile(File file) {
+    // One instance per canonical file...
+    private static final Map<File, TOCFile> instances = new HashMap<File, TOCFile>();
+
+    private TOCFile(File file) {
         this.file = file;
+
+        validate();
         loadItems();
+    }
+
+    private void validate() {
+        if (!FileUtil.isCanonicalFile(file))
+            throw JamException.runtime("Canonical files are required.");
     }
 
     private void loadItems() {
@@ -40,8 +47,16 @@ public class TOCFile {
      * @return the table-of-contents file with the specified physical
      * file.
      */
-    public static TOCFile instance(File file) {
-        return new TOCFile(file);
+    public static synchronized TOCFile instance(File file) {
+        File canonical = FileUtil.getCanonicalFile(file);
+        TOCFile instance = instances.get(canonical);
+
+        if (instance == null) {
+            instance = new TOCFile(canonical);
+            instances.put(canonical, instance);
+        }
+
+        return instance;
     }
 
     /**

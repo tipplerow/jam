@@ -8,24 +8,36 @@ import static org.junit.Assert.*;
 
 public class TOCFileTest {
     @Test public void testAll() {
-        TOCFile file = TOCFile.instance("data/test/__TOC.txt");
+        TOCFile file1 = TOCFile.instance("data/test/__TOC.txt");
+        TOCFile file2 = TOCFile.instance("data/test/__TOC.txt");
 
-        assertFalse(file.exists());
-        assertFalse(file.contains("abc"));
+        assertFalse(file1.exists());
+        assertFalse(file1.contains("abc"));
 
-        file.add("abc");
+        assertFalse(file2.exists());
+        assertFalse(file2.contains("abc"));
 
-        assertTrue(file.exists());
-        assertTrue(file.contains("abc"));
-        assertFalse(file.contains("def"));
+        file1.add("abc");
 
-        file.add("abc");
-        file.add("def");
+        assertTrue(file1.exists());
+        assertTrue(file1.contains("abc"));
+        assertFalse(file1.contains("def"));
 
-        assertTrue(file.contains("abc"));
-        assertTrue(file.contains("def"));
+        assertTrue(file2.exists());
+        assertTrue(file2.contains("abc"));
+        assertFalse(file2.contains("def"));
 
-        assertTrue(file.delete());
+        file2.add("abc");
+        file2.add("def");
+
+        assertTrue(file1.contains("abc"));
+        assertTrue(file1.contains("def"));
+
+        assertTrue(file2.contains("abc"));
+        assertTrue(file2.contains("def"));
+
+        assertTrue(file1.delete());
+        assertFalse(file2.delete());
     }
 
     public static void main(String[] args) {

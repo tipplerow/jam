@@ -72,6 +72,13 @@ public class FileUtilTest {
         assertEquals("foo", FileUtil.getDirName(new File("foo/bar.txt")));
     }
 
+    @Test public void testIsCanonicalFile() {
+        assertFalse(FileUtil.isCanonicalFile(new File("foo.txt")));
+        assertFalse(FileUtil.isCanonicalFile(new File("data/test/foo.txt")));
+        assertTrue(FileUtil.isCanonicalFile(new File("/usr/bin/syslog")));
+        assertTrue(FileUtil.isCanonicalFile(new File("/usr/bin/syslog/")));
+    }
+
     @Test public void testRequireFound() {
         FileUtil.requireFile(System.getProperty("user.home"));
     }

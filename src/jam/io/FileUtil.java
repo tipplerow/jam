@@ -203,6 +203,18 @@ public final class FileUtil {
     }
 
     /**
+     * Identifies canonical files.
+     *
+     * @param file a file to examine.
+     *
+     * @return {@code true} iff the specified file has a canonical
+     * path name.
+     */
+    public static boolean isCanonicalFile(File file) {
+        return file.equals(getCanonicalFile(file));
+    }
+
+    /**
      * Builds a composite file name by joining components with the
      * system-dependent name separator.
      *
