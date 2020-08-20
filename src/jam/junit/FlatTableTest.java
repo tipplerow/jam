@@ -81,6 +81,7 @@ public class FlatTableTest {
         TestTable table = new TestTable();
 
         assertEquals(0, table.count());
+        assertTrue(table.isEmpty());
         assertFalse(table.contains("abc"));
         assertNull(table.select("abc"));
 
@@ -93,6 +94,7 @@ public class FlatTableTest {
         table.insert("abc", 3);
 
         assertEquals(2, table.count());
+        assertFalse(table.isEmpty());
 
         assertTrue(table.contains("abc"));
         assertTrue(table.contains("def"));
@@ -110,6 +112,7 @@ public class FlatTableTest {
         table.delete("abc");
 
         assertEquals(1, table.count());
+        assertFalse(table.isEmpty());
 
         assertFalse(table.contains("abc"));
         assertTrue(table.contains("def"));

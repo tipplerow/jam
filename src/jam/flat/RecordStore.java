@@ -54,6 +54,15 @@ public abstract class RecordStore<V extends FlatRecord> implements Iterable<V> {
     }
 
     /**
+     * Identifies empty stores.
+     *
+     * @return {@code true} iff this store contains no records.
+     */
+    public boolean isEmpty() {
+        return count() == 0;
+    }
+
+    /**
      * Returns a new list containing the records in this table.  The
      * list may be modified, but those changes will not be reflected
      * in this table.
