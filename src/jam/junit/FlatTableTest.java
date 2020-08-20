@@ -3,6 +3,7 @@ package jam.junit;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import jam.flat.FlatRecord;
 import jam.flat.FlatTable;
@@ -104,6 +105,8 @@ public class FlatTableTest {
 
         assertEquals(List.of(rec22, rec13), table.select(List.of("foo", "def", "bar", "abc", "ghi")));
 
+        assertEquals(Set.of("abc", "def"), table.viewKeys());
+
         table.delete("abc");
 
         assertEquals(1, table.count());
@@ -113,6 +116,8 @@ public class FlatTableTest {
         assertFalse(table.contains("ghi"));
 
         assertEquals(List.of(rec22), table.list());
+
+        assertEquals(Set.of("def"), table.viewKeys());
     }
 
     public static void main(String[] args) {

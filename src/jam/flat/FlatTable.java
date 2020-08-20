@@ -3,10 +3,12 @@ package jam.flat;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jam.util.ReadOnlyIterator;
 
@@ -84,6 +86,15 @@ public abstract class FlatTable<K, V extends FlatRecord<K>> extends RecordStore<
         }
 
         return records;
+    }
+
+    /**
+     * Returns a read-only view of the primary keys in this table.
+     *
+     * @return a read-only view of the primary keys in this table.
+     */
+    public Set<K> viewKeys() {
+        return Collections.unmodifiableSet(records.keySet());
     }
 
     @Override public int count() {
