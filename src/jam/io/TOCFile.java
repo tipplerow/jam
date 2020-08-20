@@ -14,23 +14,15 @@ import jam.lang.JamException;
  * Maintains a table of contents (represented by {@code String} keys)
  * in memory and in a physical file.
  */
-public final class TOCFile {
-    private final File file;
+public final class TOCFile extends UniqueFile {
     private final Set<String> items = new HashSet<String>();
 
     // One instance per canonical file...
     private static final Map<File, TOCFile> instances = new HashMap<File, TOCFile>();
 
     private TOCFile(File file) {
-        this.file = file;
-
-        validate();
+        super(file);
         loadItems();
-    }
-
-    private void validate() {
-        if (!FileUtil.isCanonicalFile(file))
-            throw JamException.runtime("Canonical files are required.");
     }
 
     private void loadItems() {
@@ -99,30 +91,6 @@ public final class TOCFile {
     }
 
     /**
-     * Deletes the underlying physical file and removes the items
-     * from memory.
-     *
-     * @return {@code true} iff the file was successfully deleted.
-     */
-    public boolean delete() {
-        if (file.delete()) {
-            items.clear();
-            return true;
-        }
-        else
-            return false;
-    }
-
-    /**
-     * Determines whether the underlying physical file exists.
-     *
-     * @return {@code true} iff the underlying physical file exists.
-     */
-    public boolean exists() {
-        return file.canRead();
-    }
-
-    /**
      * Returns a read-only view of the items in this table of
      * contents.
      *
@@ -131,5 +99,14 @@ public final class TOCFile {
      */
     public Set<String> viewItems() {
         return Collections.unmodifiableSet(items);
+    }
+
+    @Override public boolean delete() {
+        if (super.delete()) {
+            items.clear();
+            return true;
+        }
+        else
+            return false;
     }
 }
