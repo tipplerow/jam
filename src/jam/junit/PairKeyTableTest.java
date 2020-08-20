@@ -2,6 +2,7 @@
 package jam.junit;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ public final class PairKeyTableTest {
         runTest();
 
         // Check ordering of keys...
+        fillTable();
         assertEquals(List.of(-2, 1), new ArrayList<Integer>(table.viewInnerKeys("abc")));
         assertEquals(List.of(-3, 2, 4), new ArrayList<Integer>(table.viewInnerKeys("def")));
         assertEquals(List.of("abc", "def", "ghi"), new ArrayList<String>(table.viewOuterKeys()));
@@ -34,6 +36,7 @@ public final class PairKeyTableTest {
         testGet();
         testKeySets();
         testRemove();
+        testRemoveOuter();
     }
 
     private void fillTable() {
@@ -77,6 +80,37 @@ public final class PairKeyTableTest {
         assertFalse(table.contains("ghi", 5));
         assertNull(table.get("ghi", 5));
         assertNull("ghi.5", table.remove("ghi", 5));
+    }
+
+    private void testRemoveOuter() {
+        fillTable();
+
+        assertTrue(table.removeOuter("foo").isEmpty());
+
+        assertEquals(6, table.size());
+        assertTrue(table.contains("abc", 1));
+        assertTrue(table.contains("abc", -2));
+
+        assertEquals(Set.of("abc.1", "abc.2"), new HashSet<String>(table.removeOuter("abc")));
+
+        assertEquals(4, table.size());
+        assertFalse(table.contains("abc", 1));
+        assertFalse(table.contains("abc", -2));
+
+        assertTrue(table.contains("ghi", 5));
+
+        assertEquals(Set.of("ghi.5"), new HashSet<String>(table.removeOuter("ghi")));
+
+        assertEquals(3, table.size());
+        assertFalse(table.contains("ghi", 5));
+        /*
+        table.put("abc",  1, "abc.1");
+        table.put("abc", -2, "abc.2");
+        table.put("def",  2, "def.2");
+        table.put("def", -3, "def.3");
+        table.put("def",  4, "def.4");
+        table.put("ghi",  5, "ghi.5");
+        */
     }
 
     @Test public void testSize() {

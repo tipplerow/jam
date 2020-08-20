@@ -207,6 +207,24 @@ public abstract class PairKeyTable<K1, K2, V> {
     }
 
     /**
+     * Removes all values with a specified outer key.
+     *
+     * @param key1 the outer key to remove.
+     *
+     * @return the removed values (empty if there were no matching
+     * values).
+     */
+    public Collection<V> removeOuter(K1 key1) {
+        Map<K2, V> innerMap = outerMap.remove(key1);
+
+        if (innerMap == null)
+            return List.of();
+
+        size -= innerMap.size();
+        return innerMap.values();
+    }
+
+    /**
      * Returns the number of entries in this table.
      *
      * @return the number of entries in this table.
