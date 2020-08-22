@@ -2,7 +2,6 @@
 package jam.junit;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,7 +10,7 @@ import jam.util.PairKeyTable;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public final class PairKeyTableTest {
+public final class PairKeyTableTest extends JamTestBase {
     private PairKeyTable<String, Integer, String> table;
 
     @Test public void testHash() {
@@ -36,7 +35,8 @@ public final class PairKeyTableTest {
         testGet();
         testKeySets();
         testRemove();
-        testRemoveOuter();
+        testRemoveOuterKey();
+        testRemoveOuterKeys();
     }
 
     private void fillTable() {
@@ -82,7 +82,7 @@ public final class PairKeyTableTest {
         assertNull("ghi.5", table.remove("ghi", 5));
     }
 
-    private void testRemoveOuter() {
+    private void testRemoveOuterKey() {
         fillTable();
 
         assertTrue(table.removeOuter("foo").isEmpty());
@@ -91,7 +91,7 @@ public final class PairKeyTableTest {
         assertTrue(table.contains("abc", 1));
         assertTrue(table.contains("abc", -2));
 
-        assertEquals(Set.of("abc.1", "abc.2"), new HashSet<String>(table.removeOuter("abc")));
+        assertCollection(Set.of("abc.1", "abc.2"), table.removeOuter("abc"));
 
         assertEquals(4, table.size());
         assertFalse(table.contains("abc", 1));
@@ -99,7 +99,7 @@ public final class PairKeyTableTest {
 
         assertTrue(table.contains("ghi", 5));
 
-        assertEquals(Set.of("ghi.5"), new HashSet<String>(table.removeOuter("ghi")));
+        assertCollection(Set.of("ghi.5"), table.removeOuter("ghi"));
 
         assertEquals(3, table.size());
         assertFalse(table.contains("ghi", 5));
@@ -111,6 +111,20 @@ public final class PairKeyTableTest {
         table.put("def",  4, "def.4");
         table.put("ghi",  5, "ghi.5");
         */
+    }
+
+    private void testRemoveOuterKeys() {
+        fillTable();
+
+        assertCollection(List.of(), table.removeOuter(List.of("foo")));
+        assertCollection(List.of("abc.1", "abc.2", "ghi.5"),
+                         table.removeOuter(Set.of("abc", "ghi", "foo", "bar", "xyz", "pdf")));
+        assertEquals(3, table.size());
+
+        fillTable();
+
+        assertCollection(List.of("def.2", "def.3", "def.4"), table.removeOuter(Set.of("def")));
+        assertEquals(3, table.size());
     }
 
     @Test public void testSize() {

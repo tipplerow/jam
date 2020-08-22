@@ -61,36 +61,36 @@ public final class ListUtil {
     }
 
     /**
-     * Concatenates lists into a single list.
+     * Concatenates collections into a single list.
      *
      * @param <V> the element type.
      *
-     * @param lists the lists to concatenate.
+     * @param collections the collections to concatenate.
      *
      * @return a new list containing all elements from the input
-     * lists, joined from left to right.
+     * collections, joined from left to right.
      */
-    public static <V> List<V> cat(Collection<List<V>> lists) {
+    public static <V> List<V> cat(Collection<Collection<V>> collections) {
         List<V> result = new ArrayList<V>();
 
-        for (List<V> list : lists)
-            result.addAll(list);
+        for (Collection<V> collection : collections)
+            result.addAll(collection);
 
         return result;
     }
 
     /**
-     * Concatenates lists into a single list.
+     * Concatenates collections into a single list.
      *
      * @param <V> the element type.
      *
-     * @param lists the lists to concatenate.
+     * @param collections the collections to concatenate.
      *
      * @return a new list containing all elements from the input
-     * lists, joined from left to right.
+     * collections, joined from left to right.
      */
-    @SafeVarargs public static <V> List<V> cat(List<V>... lists) {
-        return cat(Arrays.asList(lists));
+    @SafeVarargs public static <V> List<V> cat(Collection<V>... collections) {
+        return cat(Arrays.asList(collections));
     }
 
     /**

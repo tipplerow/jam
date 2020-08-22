@@ -2,6 +2,7 @@
 package jam.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,12 @@ public final class ListMap<K, V> extends MapWrapper<K, List<V>> {
      * mapped list.
      */
     public List<V> cat() {
-        return ListUtil.cat(values());
+        List<V> result = new ArrayList<V>();
+
+        for (Collection<V> collection : values())
+            result.addAll(collection);
+
+        return result;
     }
 
     /**

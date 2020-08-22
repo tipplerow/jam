@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import jam.lang.JamException;
@@ -161,6 +162,68 @@ public final class MapUtil {
 
         if (oldValue != null && !value.equals(oldValue))
             throw JamException.runtime("Duplicate key: [%s]", key);
+    }
+
+    /**
+     * Removes the mappings for a collection of keys.
+     *
+     * @param <K> the runtime key type.
+     *
+     * @param <V> the runtime value type.
+     *
+     * @param map the map from which to remove items.
+     *
+     * @param keys the keys of the items to remove.
+     *
+     * @return a list containing the removed items.
+     */
+    public static <K, V> List<V> removeAll(Map<K, V> map, Collection<? extends K> keys) {
+        if (keys instanceof Set)
+            return removeSet(map, (Set<? extends K>) keys);
+        else
+            return removeCollection(map, keys);
+    }
+
+    private static <K, V> List<V> removeCollection(Map<K, V> map, Collection<? extends K> keys) {
+        List<V> removed = new ArrayList<V>();
+
+        for (K key : keys) {
+            V value = map.remove(key);
+
+            if (value != null)
+                removed.add(value);
+        }
+
+        return removed;
+    }
+
+    private static <K, V> List<V> removeSet(Map<K, V> map, Set<? extends K> keys) {
+        if (keys.size() < map.size()) {
+            //
+            // Fewer target keys than map entries: iterate over the
+            // target keys...
+            //
+            return removeCollection(map, keys);
+        }
+        else {
+            //
+            // Fewer map entries than target keys: iterate over the
+            // map entries...
+            //
+            List<V> removed = new ArrayList<V>();
+            Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
+
+            while (iterator.hasNext()) {
+                Map.Entry<K, V> entry = iterator.next();
+
+                if (keys.contains(entry.getKey())) {
+                    removed.add(entry.getValue());
+                    iterator.remove();
+                }
+            }
+
+            return removed;
+        }
     }
 
     /**

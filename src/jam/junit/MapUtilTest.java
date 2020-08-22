@@ -3,11 +3,14 @@ package jam.junit;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import jam.util.MapUtil;
+import jam.util.SetUtil;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -63,6 +66,30 @@ public class MapUtilTest {
 
         MapUtil.putUnique(map, "abc", 1);
         MapUtil.putUnique(map, "abc", 2);
+    }
+
+    @Test public void testRemoveAll() {
+        Map<String, Integer> map = new HashMap<String, Integer>();
+
+        map.put("A", 1);
+        map.put("B", 2);
+        map.put("C", 3);
+        map.put("D", 4);
+        map.put("E", 5);
+        map.put("F", 6);
+        map.put("G", 7);
+        map.put("H", 8);
+        map.put("I", 9);
+
+        assertEquals(List.of(2, 5, 8), MapUtil.removeAll(map, SetUtil.newTreeSet("B", "E", "H")));
+
+        assertEquals(List.of(1, 3, 4, 6),
+                     MapUtil.removeAll(map, SetUtil.newTreeSet("A", "B", "C", "D", "E", "F", "H")));
+
+        assertEquals(List.of(),
+                     MapUtil.removeAll(map, SetUtil.newTreeSet("A", "B", "C", "D", "E", "F", "H")));
+
+        assertEquals(2, map.size());
     }
 
     @Test public void testZip() {

@@ -8,7 +8,7 @@ import jam.vector.VectorUtil;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public abstract class NumericTestBase {
+public abstract class NumericTestBase extends JamTestBase {
     private final double tolerance;
 
     static {
