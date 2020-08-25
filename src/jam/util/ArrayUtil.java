@@ -1,7 +1,6 @@
 
 package jam.util;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,12 +22,13 @@ public final class ArrayUtil {
      * arrays, joined from left to right.
      */
     @SuppressWarnings("unchecked") public static <V> V[] cat(Collection<V[]> arrays) {
-        List<List<V>> lists = new ArrayList<List<V>>();
+        List<V> elements = new ArrayList<V>();
 
         for (V[] array : arrays)
-            lists.add(Arrays.asList(array));
+            for (V element : array)
+                elements.add(element);
 
-        return (V[]) ListUtil.cat(lists).toArray();
+        return (V[]) elements.toArray();
     }
 
     /**
@@ -42,6 +42,6 @@ public final class ArrayUtil {
      * arrays, joined from left to right.
      */
     @SafeVarargs public static <V> V[] cat(V[]... arrays) {
-        return cat(Arrays.asList(arrays));
+        return cat(List.of(arrays));
     }
 }
