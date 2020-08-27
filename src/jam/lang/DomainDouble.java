@@ -88,6 +88,131 @@ public abstract class DomainDouble implements Formatted {
     }
 
     /**
+     * Executes a less-than test.
+     *
+     * @param value the value to test.
+     *
+     * @return {@code true} iff the value of this object is less than
+     * the input value by an amount greater than the default tolerance
+     * defined by the {@code DoubleComparator} class.
+     */
+    public boolean LT(double value) {
+        return DoubleComparator.DEFAULT.LT(this.value, value);
+    }
+
+    /**
+     * Executes a less-than test.
+     *
+     * @param that the value to test.
+     *
+     * @return {@code true} iff the value of this object is less than
+     * the input value by an amount greater than the default tolerance
+     * defined by the {@code DoubleComparator} class.
+     *
+     * @throws RuntimeException unless the input value is a member of
+     * the same class as this value.
+     */
+    public boolean LT(DomainDouble that) {
+        validateClass(that);
+        return LT(that.value);
+    }
+
+    private void validateClass(DomainDouble that) {
+        if (!this.getClass().equals(that.getClass()))
+            throw JamException.runtime("Runtime class mismatch.");
+    }
+
+    /**
+     * Executes a less-than-or-equal-to test.
+     *
+     * @param value the value to test.
+     *
+     * @return {@code true} iff the value of this object is less than
+     * or equal to the input value within the default tolerance in the
+     * {@code DoubleComparator} class.
+     */
+    public boolean LE(double value) {
+        return DoubleComparator.DEFAULT.LE(this.value, value);
+    }
+
+    /**
+     * Executes a less-than-or-equal-to test.
+     *
+     * @param that the value to test.
+     *
+     * @return {@code true} iff the value of this object is less than
+     * or equal to the input value within the default tolerance in the
+     * {@code DoubleComparator} class.
+     *
+     * @throws RuntimeException unless the input value is a member of
+     * the same class as this value.
+     */
+    public boolean LE(DomainDouble that) {
+        validateClass(that);
+        return LE(that.value);
+    }
+
+    /**
+     * Executes a greater-than-or-equal-to test.
+     *
+     * @param value the value to test.
+     *
+     * @return {@code true} iff the value of this object is greater
+     * than or equal to the input value within the default tolerance
+     * defined by the {@code DoubleComparator} class.
+     */
+    public boolean GE(double value) {
+        return DoubleComparator.DEFAULT.GE(this.value, value);
+    }
+
+    /**
+     * Executes a greater-than test.
+     *
+     * @param that the value to test.
+     *
+     * @return {@code true} iff the value of this object is greater
+     * than or equal to the input value within the default tolerance
+     * defined by the {@code DoubleComparator} class.
+     *
+     * @throws RuntimeException unless the input value is a member of
+     * the same class as this value.
+     */
+    public boolean GE(DomainDouble that) {
+        validateClass(that);
+        return GE(that.value);
+    }
+
+    /**
+     * Executes a greater-than test.
+     *
+     * @param value the value to test.
+     *
+     * @return {@code true} iff the value of this object is greater than
+     * the input value by an amount greater than the default tolerance
+     * defined by the {@code DoubleComparator} class.
+     */
+    public boolean GT(double value) {
+        return DoubleComparator.DEFAULT.GT(this.value, value);
+    }
+
+    /**
+     * Executes a greater-than test.
+     *
+     * @param that the value to test.
+     *
+     * @return {@code true} iff the value of this object is greater than
+     * the input value by an amount greater than the default tolerance
+     * defined by the {@code DoubleComparator} class.
+     *
+     * @throws RuntimeException unless the input value is a member of
+     * the same class as this value.
+     */
+    public boolean GT(DomainDouble that) {
+        validateClass(that);
+        return GT(that.value);
+    }
+
+    /**
      * Tests for equality with a bare {@code double} value.
      *
      * @param value the value to test.
