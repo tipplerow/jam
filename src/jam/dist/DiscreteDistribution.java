@@ -97,7 +97,7 @@ public interface DiscreteDistribution {
      */
     public default IntRange medianRange() {
         double median = median();
-        return new IntRange((int) Math.floor(median), (int) Math.ceil(median));
+        return IntRange.instance((int) Math.floor(median), (int) Math.ceil(median));
     }
 
     /**
@@ -188,7 +188,7 @@ public interface DiscreteDistribution {
         lower = Math.max(lower, support().lower());
         upper = Math.min(upper, support().upper());
         
-        return new IntRange(lower, upper);
+        return IntRange.instance(lower, upper);
     }
 
     /**

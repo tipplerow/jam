@@ -125,7 +125,7 @@ public abstract class PoissonDistribution extends AbstractDiscreteDistribution {
             upper = (int) Math.ceil(mean + 8.0 * stdev());
         }
 
-        return new IntRange(lower, upper);
+        return IntRange.instance(lower, upper);
     }
 
     @Override public double pdf(int k) {

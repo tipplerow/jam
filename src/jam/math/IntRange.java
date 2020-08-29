@@ -13,45 +13,51 @@ public final class IntRange implements Iterable<Integer> {
     private final int lower;
     private final int upper;
 
+    private IntRange(int lower, int upper) {
+        validate(lower, upper);
+
+        this.lower = lower;
+        this.upper = upper;
+    }
+
     /**
      * A globally sharable range containing all integers.
      */
-    public static IntRange ALL = new IntRange(Integer.MIN_VALUE, Integer.MAX_VALUE);
+    public static IntRange ALL = instance(Integer.MIN_VALUE, Integer.MAX_VALUE);
     
     /**
      * A globally sharable range containing all non-negative integers.
      */
-    public static IntRange NON_NEGATIVE = new IntRange(0, Integer.MAX_VALUE);
+    public static IntRange NON_NEGATIVE = instance(0, Integer.MAX_VALUE);
     
     /**
      * A globally sharable range containing all positive integers.
      */
-    public static IntRange POSITIVE = new IntRange(1, Integer.MAX_VALUE);
+    public static IntRange POSITIVE = instance(1, Integer.MAX_VALUE);
     
     /**
      * A globally sharable range containing all negative integers.
      */
-    public static IntRange NEGATIVE = new IntRange(Integer.MIN_VALUE, -1);
+    public static IntRange NEGATIVE = instance(Integer.MIN_VALUE, -1);
     
     /**
      * A globally sharable range containing all non-positive integers.
      */
-    public static IntRange NON_POSITIVE = new IntRange(Integer.MIN_VALUE, 0);
+    public static IntRange NON_POSITIVE = instance(Integer.MIN_VALUE, 0);
     
     /**
-     * Creates the new closed integer range {@code [lower, upper]}.
+     * Returns the closed integer range {@code [lower, upper]}.
      *
      * @param lower the first integer to be contained in the range.
      *
      * @param upper the last integer to be contained in the range.
      *
+     * @return the closed integer range {@code [lower, upper]}.
+     *
      * @throws IllegalArgumentException unless {@code upper >= lower}.
      */
-    public IntRange(int lower, int upper) {
-        validate(lower, upper);
-
-        this.lower = lower;
-        this.upper = upper;
+    public static IntRange instance(int lower, int upper) {
+        return new IntRange(lower, upper);
     }
 
     /**
@@ -80,7 +86,7 @@ public final class IntRange implements Iterable<Integer> {
         int lower = Integer.parseInt(fields[0].trim());
         int upper = Integer.parseInt(fields[1].trim());
 
-        return new IntRange(lower, upper);
+        return instance(lower, upper);
     }
 
     private static void invalidFormat(String s) {
@@ -197,7 +203,8 @@ public final class IntRange implements Iterable<Integer> {
     }
 
     private boolean equalsRange(IntRange that) {
-        return this.lower == that.lower && this.upper == that.upper;
+        return this.lower == that.lower
+            && this.upper == that.upper;
     }
 
     @Override public int hashCode() {

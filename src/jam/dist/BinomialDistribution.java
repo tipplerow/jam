@@ -182,7 +182,7 @@ public abstract class BinomialDistribution extends AbstractDiscreteDistribution 
      * the specified trial count.
      */
     public static IntRange support(int trialCount) {
-        return new IntRange(0, trialCount);
+        return IntRange.instance(0, trialCount);
     }
 
     /**
@@ -211,7 +211,7 @@ public abstract class BinomialDistribution extends AbstractDiscreteDistribution 
         int lower = Math.max(0,          (int) Math.floor(mean - width * stdev));
         int upper = Math.min(trialCount, (int) Math.ceil( mean + width * stdev));
 
-        return new IntRange(lower, upper);
+        return IntRange.instance(lower, upper);
     }
 
     @Override public double pdf(int k) {
@@ -239,7 +239,7 @@ public abstract class BinomialDistribution extends AbstractDiscreteDistribution 
     }
 
     @Override public IntRange medianRange() {
-        return new IntRange((int) Math.floor(mean()), (int) Math.ceil(mean()));
+        return IntRange.instance((int) Math.floor(mean()), (int) Math.ceil(mean()));
     }
 
     @Override public double variance() {

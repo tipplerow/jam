@@ -65,7 +65,7 @@ public final class DiscretePDF extends DiscreteDistributionFunction {
      * @return the discrete distribution function.
      */
     public static DiscretePDF create(int lower, double[] PDF) {
-        IntRange support = new IntRange(lower, lower + PDF.length - 1);
+        IntRange support = IntRange.instance(lower, lower + PDF.length - 1);
         double[] values  = VectorUtil.copy(PDF); // Defensive copy
 
         return new DiscretePDF(support, values);
@@ -131,7 +131,7 @@ public final class DiscretePDF extends DiscreteDistributionFunction {
         int lower = Collections.min(counts.elementSet());
         int upper = Collections.max(counts.elementSet());
 
-        IntRange support = new IntRange(lower, upper);
+        IntRange support = IntRange.instance(lower, upper);
         double[] values  = new double[support.size()];
 
         for (int observation : support)

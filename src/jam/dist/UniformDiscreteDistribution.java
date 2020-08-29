@@ -28,7 +28,7 @@ public final class UniformDiscreteDistribution extends AbstractDiscreteDistribut
         this.lower = lower;
         this.upper = upper;
 
-        this.support = new IntRange(lower, upper - 1);
+        this.support = IntRange.instance(lower, upper - 1);
 
         if (support.size() < 1)
             throw new IllegalArgumentException("Invalid support range.");
@@ -81,7 +81,7 @@ public final class UniformDiscreteDistribution extends AbstractDiscreteDistribut
     }
 
     @Override public IntRange medianRange() {
-        return new IntRange((int) Math.floor(mean()), (int) Math.ceil(mean()));
+        return IntRange.instance((int) Math.floor(mean()), (int) Math.ceil(mean()));
     }
 
     @Override public IntRange support() {

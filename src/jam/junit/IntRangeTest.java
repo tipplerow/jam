@@ -21,7 +21,7 @@ public class IntRangeTest {
     }
 
     @Test public void testBasic() {
-        IntRange range = new IntRange(-10, 20);
+        IntRange range = IntRange.instance(-10, 20);
 
         assertEquals(-10, range.lower());
         assertEquals( 20, range.upper());
@@ -34,7 +34,7 @@ public class IntRangeTest {
     }
 
     @Test public void testContainsDouble() {
-        IntRange range = new IntRange(-10, 20);
+        IntRange range = IntRange.instance(-10, 20);
 
         assertFalse(range.containsDouble(-99.0));
         assertFalse(range.containsDouble(-10.000001));
@@ -47,14 +47,14 @@ public class IntRangeTest {
 
     @Test(expected = RuntimeException.class)
     public void testInvalid() {
-        IntRange range = new IntRange(1, 0);
+        IntRange range = IntRange.instance(1, 0);
     }
 
     @Test public void testEquals() {
-        IntRange r1 = new IntRange(-5, 20);
-        IntRange r2 = new IntRange(-5, 20);
-        IntRange r3 = new IntRange(-5, 10);
-        IntRange r4 = new IntRange(15, 20);
+        IntRange r1 = IntRange.instance(-5, 20);
+        IntRange r2 = IntRange.instance(-5, 20);
+        IntRange r3 = IntRange.instance(-5, 10);
+        IntRange r4 = IntRange.instance(15, 20);
 
         assertTrue(r1.equals(r1));
         assertTrue(r1.equals(r2));
@@ -63,10 +63,10 @@ public class IntRangeTest {
     }
 
     @Test public void testHashCode() {
-        IntRange r1 = new IntRange(-5, 20);
-        IntRange r2 = new IntRange(-5, 20);
-        IntRange r3 = new IntRange(-5, 10);
-        IntRange r4 = new IntRange(15, 20);
+        IntRange r1 = IntRange.instance(-5, 20);
+        IntRange r2 = IntRange.instance(-5, 20);
+        IntRange r3 = IntRange.instance(-5, 10);
+        IntRange r4 = IntRange.instance(15, 20);
 
         assertTrue(r1.hashCode() == r2.hashCode());
         assertTrue(r1.hashCode() != r3.hashCode());
@@ -74,7 +74,7 @@ public class IntRangeTest {
     }
 
     @Test public void testIterator() {
-        IntRange range = new IntRange(5, 7);
+        IntRange range = IntRange.instance(5, 7);
         Iterator<Integer> iter = range.iterator();
         
         assertTrue(iter.hasNext());
@@ -91,7 +91,7 @@ public class IntRangeTest {
 
     @Test(expected = RuntimeException.class)
     public void testIteratorRemove() {
-        IntRange range = new IntRange(5, 7);
+        IntRange range = IntRange.instance(5, 7);
         Iterator<Integer> iter = range.iterator();
 
         iter.next();
@@ -100,7 +100,7 @@ public class IntRangeTest {
 
     @Test(expected = NoSuchElementException.class)
     public void testIteratorNoSuch() {
-        IntRange range = new IntRange(5, 6);
+        IntRange range = IntRange.instance(5, 6);
         Iterator<Integer> iter = range.iterator();
 
         iter.next();
