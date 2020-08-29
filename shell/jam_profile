@@ -1,0 +1,18 @@
+########################################################################
+# Environment variables required to compile and run JAM applications.
+########################################################################
+
+if [ -z "${GITHUB_ROOT}" ]
+then
+    echo "Environment variable GITHUB_ROOT is not set; exiting."
+    exit 1
+fi
+
+# GitHub project directory
+export JAM_HOME=${GITHUB_ROOT}/jam
+
+# Directory for temporary files...
+if [ -d ${HOME}/tmp ]
+then
+    export JAM_TMPDIR=${HOME}/tmp
+fi
