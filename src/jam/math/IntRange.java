@@ -1,6 +1,7 @@
 
 package jam.math;
 
+import java.util.Comparator;
 import java.util.Iterator;
 
 import jam.lang.JamException;
@@ -44,6 +45,21 @@ public final class IntRange implements Iterable<Integer> {
      * A globally sharable range containing all non-positive integers.
      */
     public static IntRange NON_POSITIVE = instance(Integer.MIN_VALUE, 0);
+
+    /**
+     * A comparator that orders integer ranges by their lower bound
+     * first, upper bound second (when the lower bounds are equal).
+     */
+    public static Comparator<IntRange> BOUND_COMPARATOR = new Comparator<IntRange>() {
+            @Override public int compare(IntRange range1, IntRange range2) {
+                int lowerCmp = Integer.compare(range1.lower, range2.lower);
+
+                if (lowerCmp != 0)
+                    return lowerCmp;
+                else
+                    return Integer.compare(range1.upper, range2.upper);
+            }
+        };
     
     /**
      * Returns the closed integer range {@code [lower, upper]}.

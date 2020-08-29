@@ -1,6 +1,7 @@
 
 package jam.junit;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -31,6 +32,46 @@ public class IntRangeTest {
         assertTrue( range.contains(-10));
         assertTrue( range.contains( 20));
         assertFalse(range.contains( 21));
+    }
+
+    @Test public void testBoundComparator() {
+        IntRange r1 = IntRange.instance( 1,  5);
+        IntRange r2 = IntRange.instance(10, 50);
+        IntRange r3 = IntRange.instance(20, 40);
+        IntRange r4 = IntRange.instance(20, 60);
+        IntRange r5 = IntRange.instance(70, 90);
+
+        Comparator<IntRange> cmp = IntRange.BOUND_COMPARATOR;
+
+        assertTrue(cmp.compare(r1, r1) == 0);
+        assertTrue(cmp.compare(r1, r2)  < 0);
+        assertTrue(cmp.compare(r1, r3)  < 0);
+        assertTrue(cmp.compare(r1, r4)  < 0);
+        assertTrue(cmp.compare(r1, r5)  < 0);
+
+        assertTrue(cmp.compare(r2, r1)  > 0);
+        assertTrue(cmp.compare(r2, r2) == 0);
+        assertTrue(cmp.compare(r2, r3)  < 0);
+        assertTrue(cmp.compare(r2, r4)  < 0);
+        assertTrue(cmp.compare(r2, r5)  < 0);
+
+        assertTrue(cmp.compare(r3, r1)  > 0);
+        assertTrue(cmp.compare(r3, r2)  > 0);
+        assertTrue(cmp.compare(r3, r3) == 0);
+        assertTrue(cmp.compare(r3, r4)  < 0);
+        assertTrue(cmp.compare(r3, r5)  < 0);
+
+        assertTrue(cmp.compare(r4, r1)  > 0);
+        assertTrue(cmp.compare(r4, r2)  > 0);
+        assertTrue(cmp.compare(r4, r3)  > 0);
+        assertTrue(cmp.compare(r4, r4) == 0);
+        assertTrue(cmp.compare(r4, r5)  < 0);
+
+        assertTrue(cmp.compare(r5, r1)  > 0);
+        assertTrue(cmp.compare(r5, r2)  > 0);
+        assertTrue(cmp.compare(r5, r3)  > 0);
+        assertTrue(cmp.compare(r5, r4)  > 0);
+        assertTrue(cmp.compare(r5, r5) == 0);
     }
 
     @Test public void testContainsDouble() {
