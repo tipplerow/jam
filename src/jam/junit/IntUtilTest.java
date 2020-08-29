@@ -6,10 +6,10 @@ import java.util.List;
 
 import com.google.common.collect.Multiset;
 
+import jam.io.Delimiter;
 import jam.math.DoubleUtil;
 import jam.math.IntUtil;
 import jam.math.StatUtil;
-import jam.util.RegexUtil;
 import jam.vector.VectorUtil;
 import jam.vector.VectorView;
 
@@ -117,14 +117,14 @@ public class IntUtilTest extends NumericTestBase {
     }
 
     @Test public void testParseIntArray() {
-        int[] actual   = IntUtil.parseIntArray("1, 2, 3", RegexUtil.COMMA);
+        int[] actual   = IntUtil.parseIntArray("1, 2, 3", Delimiter.COMMA);
         int[] expected = new int[] { 1, 2, 3 };
 
         assertTrue(Arrays.equals(actual, expected));
     }
 
     @Test public void testParseIntList() {
-        List<Integer> actual   = IntUtil.parseIntList("1, 2, 3", RegexUtil.COMMA);
+        List<Integer> actual   = IntUtil.parseIntList("1, 2, 3", Delimiter.COMMA);
         List<Integer> expected = List.of(1, 2, 3);
 
         assertEquals(actual, expected);

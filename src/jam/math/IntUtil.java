@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+
+import jam.io.Delimiter;
 
 /**
  * Provides static utility methods operating on integers.
@@ -228,15 +229,15 @@ public final class IntUtil {
      *
      * @param string the delimited string to parse.
      *
-     * @param pattern the element delimiter.
+     * @param delimiter the element delimiter.
      *
      * @return the integer array represented by the given string.
      *
      * @throws RuntimeException unless the string is properly
      * formatted.
      */
-    public static int[] parseIntArray(String string, Pattern pattern) {
-        String[] fields = pattern.split(string);
+    public static int[] parseIntArray(String string, Delimiter delimiter) {
+        String[] fields = delimiter.split(string);
         int[] elements = new int[fields.length];
 
         for (int index = 0; index < fields.length; index++)
@@ -250,15 +251,15 @@ public final class IntUtil {
      *
      * @param string the delimited string to parse.
      *
-     * @param pattern the element delimiter.
+     * @param delimiter the element delimiter.
      *
      * @return the integer list represented by the given string.
      *
      * @throws RuntimeException unless the string is properly
      * formatted.
      */
-    public static List<Integer> parseIntList(String string, Pattern pattern) {
-        String[] fields = pattern.split(string);
+    public static List<Integer> parseIntList(String string, Delimiter delimiter) {
+        String[] fields = delimiter.split(string);
         List<Integer> elements = new ArrayList<Integer>(fields.length);
 
         for (String field : fields)
