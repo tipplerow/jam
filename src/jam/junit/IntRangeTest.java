@@ -239,6 +239,21 @@ public class IntRangeTest {
         IntRange.parse("[1, 2, 3]");
     }
 
+    @Test public void testShift() {
+        IntRange range1 = IntRange.instance(5, 15);
+        IntRange range2 = range1.shift(300);
+        IntRange range3 = range1.shift(-30);
+
+        assertEquals( 5, range1.lower());
+        assertEquals(15, range1.upper());
+
+        assertEquals(305, range2.lower());
+        assertEquals(315, range2.upper());
+
+        assertEquals(-25, range3.lower());
+        assertEquals(-15, range3.upper());
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.junit.IntRangeTest");
     }

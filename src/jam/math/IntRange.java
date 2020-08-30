@@ -161,6 +161,19 @@ public final class IntRange implements Iterable<Integer> {
     }
 
     /**
+     * Shifts the lower and upper bounds of this range by the same
+     * quantity and returns the result in a new range object; this
+     * object is unchanged.
+     *
+     * @param shift the amount by which to shift the bounds.
+     *
+     * @return a new range with bounds {@code [lower() + shift, upper() + shift]}.
+     */
+    public IntRange shift(int shift) {
+        return instance(lower + shift, upper + shift);
+    }
+
+    /**
      * Returns the number of integers contained in this range.
      *
      * @return the number of integers contained in this range.
