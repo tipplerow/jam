@@ -70,7 +70,7 @@ public final class ListUtil {
      * @return a new list containing all elements from the input
      * collections, joined from left to right.
      */
-    public static <V> List<V> cat(Collection<Collection<V>> collections) {
+    public static <V> List<V> cat(Collection<? extends Collection<V>> collections) {
         List<V> result = new ArrayList<V>();
 
         for (Collection<V> collection : collections)
