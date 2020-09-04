@@ -29,7 +29,7 @@ public final class Percentile extends DomainDouble implements Comparable<Percent
     /**
      * Creates a new percentile rank.
      *
-     * @param value the percentile of the event occurring.
+     * @param value the percentile rank.
      *
      * @throws RuntimeException unless the percentile is valid.
      */
