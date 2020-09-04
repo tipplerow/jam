@@ -258,7 +258,7 @@ public abstract class PairKeyTable<K1, K2, V> {
      * <p>In the {@code TreeMap} implementation, the values will be
      * ordered by their keys (outer key first, then inner key).  In
      * the {@code HashMap} implementation, the ordering will follow
-     * the hash codes of the keys and therefore be difficult to
+     * the hash codes of the keys and will therefore be difficult to
      * predict.
      *
      * @return the values contained in this table (ordered as

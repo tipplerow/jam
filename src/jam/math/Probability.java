@@ -484,7 +484,7 @@ public final class Probability extends DomainDouble implements Comparable<Probab
      * the valid range {@code [0.0, 1.0]}.
      */
     public static void validate(double value) {
-        if (!DoubleRange.FRACTIONAL.contains(value))
+        if (!RANGE.contains(value))
             throw new IllegalArgumentException("Invalid probability.");
     }
 
