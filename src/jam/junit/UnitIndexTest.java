@@ -77,6 +77,11 @@ public class UnitIndexTest {
         assertEquals(88, u88.getUnitIndex());
     }
 
+    @Test public void testParse() {
+        assertEquals(UnitIndex.instance(33), UnitIndex.parse("33"));
+        assertEquals(UnitIndex.instance(88), UnitIndex.parse("  88  "));
+    }
+
     @Test public void testSet() {
         String[] array = new String[] { "A", "B", "C", "D", "E" };
         List<String> list = new ArrayList<String>(List.of("A", "B", "C", "D", "E"));

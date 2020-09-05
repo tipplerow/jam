@@ -52,6 +52,21 @@ public final class UnitIndex implements Comparable<UnitIndex> {
     }
 
     /**
+     * Returns the unit-offset index encoded in a string.
+     *
+     * @param s the string to parse.
+     *
+     * @return the unit-offset index encoded in the specified
+     * string.
+     *
+     * @throws RuntimeException unless the string is a properly
+     * formatted integer.
+     */
+    public static UnitIndex parse(String s) {
+        return instance(Integer.parseInt(s.trim()));
+    }
+
+    /**
      * Extracts the array element with the index corresponding to
      * this position.
      *
