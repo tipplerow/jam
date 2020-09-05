@@ -117,6 +117,30 @@ public final class UnitIndex implements Comparable<UnitIndex> {
     }
 
     /**
+     * Identifies arrays that contain an element with this index.
+     *
+     * @param array the array to examine.
+     *
+     * @return {@code true} iff the specified array contains an
+     * element with this index.
+     */
+    public boolean isIndexOf(Object[] array) {
+        return unitIndex <= array.length;
+    }
+
+    /**
+     * Identifies lists that contain an element with this index.
+     *
+     * @param list the list to examine.
+     *
+     * @return {@code true} iff the specified list contains an
+     * element with this index.
+     */
+    public boolean isIndexOf(List<?> list) {
+        return unitIndex <= list.size();
+    }
+
+    /**
      * Replaces the element at this position in an array with the
      * specified element.
      *

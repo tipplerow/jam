@@ -77,6 +77,17 @@ public class UnitIndexTest {
         assertEquals(88, u88.getUnitIndex());
     }
 
+    @Test public void testIsIndexOf() {
+        String[] array = new String[] { "A", "B", "C", "D", "E" };
+        List<String> list = List.of("A", "B", "C", "D", "E");
+
+        assertTrue(UnitIndex.instance(5).isIndexOf(array));
+        assertTrue(UnitIndex.instance(5).isIndexOf(list));
+
+        assertFalse(UnitIndex.instance(6).isIndexOf(array));
+        assertFalse(UnitIndex.instance(6).isIndexOf(list));
+    }
+
     @Test public void testParse() {
         assertEquals(UnitIndex.instance(33), UnitIndex.parse("33"));
         assertEquals(UnitIndex.instance(88), UnitIndex.parse("  88  "));
