@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import jam.math.UnitIndex;
@@ -73,6 +75,24 @@ public class UnitIndexTest {
 
         assertEquals(87, u88.getListIndex());
         assertEquals(88, u88.getUnitIndex());
+    }
+
+    @Test public void testSet() {
+        String[] array = new String[] { "A", "B", "C", "D", "E" };
+        List<String> list = new ArrayList<String>(List.of("A", "B", "C", "D", "E"));
+
+        UnitIndex u1 = UnitIndex.instance(1);
+        UnitIndex u5 = UnitIndex.instance(5);
+
+        u1.set(array, "Q");
+        u5.set(array, "P");
+
+        assertEquals(List.of("Q", "B", "C", "D", "P"), Arrays.asList(array));
+
+        assertEquals("A", u1.set(list, "Q"));
+        assertEquals("E", u5.set(list, "P"));
+
+        assertEquals(List.of("Q", "B", "C", "D", "P"), list);
     }
 
     @Test(expected = RuntimeException.class)

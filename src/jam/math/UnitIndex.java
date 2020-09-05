@@ -55,14 +55,14 @@ public final class UnitIndex implements Comparable<UnitIndex> {
      * Extracts the array element with the index corresponding to
      * this position.
      *
-     * @param <V> the runtime type for the array elements.
+     * @param <E> the runtime type for the array elements.
      *
      * @param array the array of elements on which to operate.
      *
      * @return the array element with the index corresponding to
      * this position.
      */
-    public <V> V get(V[] array) {
+    public <E> E get(E[] array) {
         return array[unitIndex - 1];
     }
 
@@ -70,14 +70,14 @@ public final class UnitIndex implements Comparable<UnitIndex> {
      * Extracts the list element with the index corresponding to
      * this position.
      *
-     * @param <V> the runtime type for the list elements.
+     * @param <E> the runtime type for the list elements.
      *
      * @param list the list of elements on which to operate.
      *
      * @return the list element with the index corresponding to
      * this position.
      */
-    public <V> V get(List<V> list) {
+    public <E> E get(List<E> list) {
         return list.get(unitIndex - 1);
     }
 
@@ -99,6 +99,41 @@ public final class UnitIndex implements Comparable<UnitIndex> {
      */
     public int getUnitIndex() {
         return unitIndex;
+    }
+
+    /**
+     * Replaces the element at this position in an array with the
+     * specified element.
+     *
+     * @param <E> the runtime type for the array elements.
+     *
+     * @param array the array of elements on which to operate.
+     *
+     * @param element the element to assign.
+     *
+     * @throws RuntimeException if this position is out of range.
+     */
+    public <E> void set(E[] array, E element) {
+        array[unitIndex - 1] = element;
+    }
+
+    /**
+     * Replaces the element at this position in a list with the
+     * specified element.
+     *
+     * @param <E> the runtime type for the list elements.
+     *
+     * @param list the list of elements on which to operate.
+     *
+     * @param element the element to assign.
+     *
+     * @return the element previously at this location.
+     *
+     * @throws RuntimeException if the list is immutable or this
+     * position if out of range.
+     */
+    public <E> E set(List<E> list, E element) {
+        return list.set(unitIndex - 1, element);
     }
 
     /**
