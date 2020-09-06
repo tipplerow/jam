@@ -80,6 +80,18 @@ public final class UnitIndexRange {
     }
 
     /**
+     * Returns the closed unit-offset range with lower index equal to
+     * {@code 1} and upper bound (and size) equal to {@code size}.
+     *
+     * @param size the size of the range.
+     *
+     * @return the unit-offset range {@code [1, size]}.
+     */
+    public static UnitIndexRange first(int size) {
+        return instance(1, size);
+    }
+
+    /**
      * Returns the closed unit-offset index range with a fixed upper
      * bound and size.
      *
@@ -149,6 +161,20 @@ public final class UnitIndexRange {
     }
 
     /**
+     * Tests the bounds of this range for equality.
+     *
+     * @param lower the lower unit-offset index to test.
+     *
+     * @param upper the upper unit-offset index to test.
+     *
+     * @return {@code true} the unit-offset lower and upper bounds of
+     * this range match the input values.
+     */
+    public boolean equals(int lower, int upper) {
+        return range.equals(lower, upper);
+    }
+
+    /**
      * Returns a description of this range formatted as {@code [lower, upper]}.
      *
      * @return a description of this range.
@@ -167,12 +193,17 @@ public final class UnitIndexRange {
     }
 
     /**
-     * Returns the last unit-offset index contained in this range.
+     * Shifts the lower and upper bounds of this range by the same
+     * quantity and returns the result in a new range object; this
+     * object is unchanged.
      *
-     * @return the last unit-offset index contained in this range.
+     * @param shift the amount by which to shift the bounds.
+     *
+     * @return a new unit-index range with shifted bounds 
+     * {@code [lower().plus(shift), upper().plus(shift)]}.
      */
-    public UnitIndex upper() {
-	return upper;
+    public UnitIndexRange shift(int shift) {
+        return instance(lower.plus(shift), upper.plus(shift));
     }
 
     /**
@@ -182,6 +213,15 @@ public final class UnitIndexRange {
      */
     public int size() {
 	return range.size();
+    }
+
+    /**
+     * Returns the last unit-offset index contained in this range.
+     *
+     * @return the last unit-offset index contained in this range.
+     */
+    public UnitIndex upper() {
+	return upper;
     }
 
     /**

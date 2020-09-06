@@ -39,6 +39,20 @@ public final class UnitIndex implements Comparable<UnitIndex> {
     public static final IntRange RANGE = IntRange.POSITIVE;
 
     /**
+     * The unit-offset index equal to {@code 1}.
+     */
+    public static final UnitIndex FIRST = instance(1);
+
+    /**
+     * Returns the unit-offset index equal to {@code 1}.
+     *
+     * @return the unit-offset index equal to {@code 1}.
+     */
+    public static UnitIndex first() {
+        return FIRST;
+    }
+
+    /**
      * Returns the unit-offset index at a fixed location.
      *
      * @param unitIndex the unit-offset index.

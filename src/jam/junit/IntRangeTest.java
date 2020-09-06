@@ -101,6 +101,14 @@ public class IntRangeTest {
         assertTrue(r1.equals(r2));
         assertFalse(r1.equals(r3));
         assertFalse(r1.equals(r4));
+
+        assertTrue(r1.equals(-5, 20));
+        assertTrue(r2.equals(-5, 20));
+        assertTrue(r3.equals(-5, 10));
+        assertTrue(r4.equals(15, 20));
+
+        assertFalse(r1.equals(-6, 20));
+        assertFalse(r1.equals(-5, 21));
     }
 
     @Test public void testHashCode() {

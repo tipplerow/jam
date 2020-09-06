@@ -47,6 +47,11 @@ public class UnitIndexTest {
         assertTrue(u2.equals(u2));
     }
 
+    @Test public void testFirst() {
+        assertEquals(0, UnitIndex.first().getListIndex());
+        assertEquals(1, UnitIndex.first().getUnitIndex());
+    }
+
     @Test public void testGet() {
         String[] array = new String[] { "A", "B", "C", "D", "E" };
         List<String> list = List.of("A", "B", "C", "D", "E");

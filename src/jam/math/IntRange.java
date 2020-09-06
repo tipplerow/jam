@@ -134,6 +134,20 @@ public final class IntRange implements Iterable<Integer> {
     }
 
     /**
+     * Tests the bounds of this range for equality.
+     *
+     * @param lower the lower bound to test.
+     *
+     * @param upper the upper bound to test.
+     *
+     * @return {@code true} the lower and upper bounds of this range
+     * match the input values.
+     */
+    public boolean equals(int lower, int upper) {
+        return this.lower == lower && this.upper == upper;
+    }
+
+    /**
      * Returns a description of this range formatted as {@code [lower, upper]}.
      *
      * @return a description of this range.
