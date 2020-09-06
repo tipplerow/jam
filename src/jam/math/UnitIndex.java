@@ -202,6 +202,22 @@ public final class UnitIndex implements Comparable<UnitIndex> {
     }
 
     /**
+     * Subtracts an amount from this index and returns the result in a
+     * new index object; this index is unchanged.
+     *
+     * @param subtrahend the amount to subtract from this index.
+     *
+     * @return a new index object with the index decremented by the
+     * specified ammount.
+     *
+     * @throws RuntimeException if the resulting unit index is not
+     * positive.
+     */
+    public UnitIndex minus(int subtrahend) {
+        return plus(-subtrahend);
+    }
+
+    /**
      * Returns the unit index that is one greater than this index;
      * this index is unchanged.
      *
@@ -209,6 +225,22 @@ public final class UnitIndex implements Comparable<UnitIndex> {
      */
     public UnitIndex next() {
         return instance(unitIndex + 1);
+    }
+
+    /**
+     * Adds an amount to this index and returns the result in a new
+     * index object; this index is unchanged.
+     *
+     * @param addend the amount to add to this index.
+     *
+     * @return a new index object with the index incremented by the
+     * specified ammount.
+     *
+     * @throws RuntimeException if the resulting unit index is not
+     * positive.
+     */
+    public UnitIndex plus(int addend) {
+        return instance(unitIndex + addend);
     }
 
     /**

@@ -114,6 +114,21 @@ public class UnitIndexTest {
         assertFalse(UnitIndex.instance(6).isIndexOf(list));
     }
 
+    @Test public void testMinus() {
+        UnitIndex u7 = UnitIndex.instance(7);
+        UnitIndex u2 = u7.minus(5);
+        UnitIndex u9 = u7.minus(-2);
+        
+        assertEquals(7, u7.getUnitIndex());
+        assertEquals(2, u2.getUnitIndex());
+        assertEquals(9, u9.getUnitIndex());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testMinusInvalid() {
+        UnitIndex.instance(10).minus(20);
+    }
+
     @Test public void testNext() {
         UnitIndex base  = UnitIndex.instance(7);
         UnitIndex next1 = base.next();
@@ -127,6 +142,21 @@ public class UnitIndexTest {
     @Test public void testParse() {
         assertEquals(UnitIndex.instance(33), UnitIndex.parse("33"));
         assertEquals(UnitIndex.instance(88), UnitIndex.parse("  88  "));
+    }
+
+    @Test public void testPlus() {
+        UnitIndex u7 = UnitIndex.instance(7);
+        UnitIndex u2 = u7.plus(-5);
+        UnitIndex u9 = u7.plus(2);
+        
+        assertEquals(7, u7.getUnitIndex());
+        assertEquals(2, u2.getUnitIndex());
+        assertEquals(9, u9.getUnitIndex());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testPlusInvalid() {
+        UnitIndex.instance(10).plus(-20);
     }
 
     @Test public void testPrev() {
