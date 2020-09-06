@@ -67,6 +67,67 @@ public final class UnitIndex implements Comparable<UnitIndex> {
     }
 
     /**
+     * Determines whether this index is less than another.
+     *
+     * @param that the index to compare to this index.
+     *
+     * @return {@code true} iff this index is less than the input
+     * index.
+     */
+    public boolean LT(UnitIndex that) {
+        return this.unitIndex < that.unitIndex;
+    }
+
+    /**
+     * Determines whether this index is less than or equal to another.
+     *
+     * @param that the index to compare to this index.
+     *
+     * @return {@code true} iff this index is less than or equal to
+     * the input index.
+     */
+    public boolean LE(UnitIndex that) {
+        return this.unitIndex <= that.unitIndex;
+    }
+
+    /**
+     * Determines whether this index is equal to another.
+     *
+     * @param that the index to compare to this index.
+     *
+     * @return {@code true} iff this index is equal to the input
+     * index.
+     */
+    public boolean EQ(UnitIndex that) {
+        return this.unitIndex == that.unitIndex;
+    }
+
+    /**
+     * Determines whether this index is greater than or equal to
+     * another.
+     *
+     * @param that the index to compare to this index.
+     *
+     * @return {@code true} iff this index is greater than or equal to
+     * the input index.
+     */
+    public boolean GE(UnitIndex that) {
+        return this.unitIndex >= that.unitIndex;
+    }
+
+    /**
+     * Determines whether this index is greater than another.
+     *
+     * @param that the index to compare to this index.
+     *
+     * @return {@code true} iff this index is greater than the input
+     * index.
+     */
+    public boolean GT(UnitIndex that) {
+        return this.unitIndex > that.unitIndex;
+    }
+
+    /**
      * Extracts the array element with the index corresponding to
      * this position.
      *
@@ -138,6 +199,29 @@ public final class UnitIndex implements Comparable<UnitIndex> {
      */
     public boolean isIndexOf(List<?> list) {
         return unitIndex <= list.size();
+    }
+
+    /**
+     * Returns the unit index that is one greater than this index;
+     * this index is unchanged.
+     *
+     * @return the unit index that is one greater than this index.
+     */
+    public UnitIndex next() {
+        return instance(unitIndex + 1);
+    }
+
+    /**
+     * Returns the unit index that is one less than this index;
+     * this index is unchanged.
+     *
+     * @return the unit index that is one less than this index.
+     *
+     * @throws RuntimeException if this is the lowest unit index
+     * ({@code 1}).
+     */
+    public UnitIndex prev() {
+        return instance(unitIndex - 1);
     }
 
     /**

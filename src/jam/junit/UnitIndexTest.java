@@ -77,6 +77,32 @@ public class UnitIndexTest {
         assertEquals(88, u88.getUnitIndex());
     }
 
+    @Test public void testInequalities() {
+        UnitIndex u10 = UnitIndex.instance(10);
+        UnitIndex u20 = UnitIndex.instance(20);
+        UnitIndex u30 = UnitIndex.instance(30);
+
+        assertFalse(u20.LT(u10));
+        assertFalse(u20.LT(u20));
+        assertTrue( u20.LT(u30));
+
+        assertFalse(u20.LE(u10));
+        assertTrue( u20.LE(u20));
+        assertTrue( u20.LE(u30));
+
+        assertFalse(u20.EQ(u10));
+        assertTrue( u20.EQ(u20));
+        assertFalse(u20.EQ(u30));
+
+        assertTrue( u20.GE(u10));
+        assertTrue( u20.GE(u20));
+        assertFalse(u20.GE(u30));
+
+        assertTrue( u20.GT(u10));
+        assertFalse(u20.GT(u20));
+        assertFalse(u20.GT(u30));
+    }
+
     @Test public void testIsIndexOf() {
         String[] array = new String[] { "A", "B", "C", "D", "E" };
         List<String> list = List.of("A", "B", "C", "D", "E");
@@ -88,9 +114,34 @@ public class UnitIndexTest {
         assertFalse(UnitIndex.instance(6).isIndexOf(list));
     }
 
+    @Test public void testNext() {
+        UnitIndex base  = UnitIndex.instance(7);
+        UnitIndex next1 = base.next();
+        UnitIndex next2 = next1.next();
+
+        assertEquals(7, base.getUnitIndex());
+        assertEquals(8, next1.getUnitIndex());
+        assertEquals(9, next2.getUnitIndex());
+    }
+
     @Test public void testParse() {
         assertEquals(UnitIndex.instance(33), UnitIndex.parse("33"));
         assertEquals(UnitIndex.instance(88), UnitIndex.parse("  88  "));
+    }
+
+    @Test public void testPrev() {
+        UnitIndex base  = UnitIndex.instance(7);
+        UnitIndex prev1 = base.prev();
+        UnitIndex prev2 = prev1.prev();
+
+        assertEquals(7, base.getUnitIndex());
+        assertEquals(6, prev1.getUnitIndex());
+        assertEquals(5, prev2.getUnitIndex());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testPrevInvalid() {
+        UnitIndex.instance(1).prev();
     }
 
     @Test public void testSet() {
