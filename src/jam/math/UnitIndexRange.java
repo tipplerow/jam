@@ -80,6 +80,36 @@ public final class UnitIndexRange {
     }
 
     /**
+     * Returns the closed unit-offset index range with a fixed upper
+     * bound and size.
+     *
+     * @param upper the upper bound of the desired range.
+     *
+     * @param size the size of the desired range.
+     *
+     * @return the closed unit-offset index range with the specified
+     * upper bound and size.
+     */
+    public static UnitIndexRange backward(UnitIndex upper, int size) {
+        return instance(upper.minus(size - 1), upper);
+    }
+
+    /**
+     * Returns the closed unit-offset index range with a fixed lower
+     * bound and size.
+     *
+     * @param lower the lower bound of the desired range.
+     *
+     * @param size the size of the desired range.
+     *
+     * @return the closed unit-offset index range with the specified
+     * lower bound and size.
+     */
+    public static UnitIndexRange forward(UnitIndex lower, int size) {
+        return instance(lower, lower.plus(size - 1));
+    }
+
+    /**
      * Creates an integer range from a formatted string.
      *
      * @param s a string formatted as {@code [lower, upper]}.

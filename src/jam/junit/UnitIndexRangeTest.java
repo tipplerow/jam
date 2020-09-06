@@ -10,6 +10,17 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class UnitIndexRangeTest {
+    @Test public void testBackward() {
+        UnitIndex lower = UnitIndex.instance(10);
+        UnitIndex upper = UnitIndex.instance(20);
+
+        UnitIndexRange range = UnitIndexRange.backward(upper, 11);
+
+        assertEquals(11, range.size());
+        assertEquals(lower, range.lower());
+        assertEquals(upper, range.upper());
+    }
+
     @Test public void testBasic() {
         UnitIndexRange range = UnitIndexRange.instance(1, 20);
 
@@ -74,6 +85,17 @@ public class UnitIndexRangeTest {
         assertTrue(r1.equals(r2));
         assertFalse(r1.equals(r3));
         assertFalse(r1.equals(r4));
+    }
+
+    @Test public void testForward() {
+        UnitIndex lower = UnitIndex.instance(10);
+        UnitIndex upper = UnitIndex.instance(20);
+
+        UnitIndexRange range = UnitIndexRange.forward(lower, 11);
+
+        assertEquals(11, range.size());
+        assertEquals(lower, range.lower());
+        assertEquals(upper, range.upper());
     }
 
     @Test public void testHashCode() {
