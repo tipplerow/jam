@@ -103,6 +103,12 @@ public class UnitIndexTest {
         assertFalse(u20.GT(u30));
     }
 
+    @Test public void testIsFirst() {
+        assertTrue(UnitIndex.instance(1).isFirst());
+        assertFalse(UnitIndex.instance(2).isFirst());
+        assertFalse(UnitIndex.instance(222).isFirst());
+    }
+
     @Test public void testIsIndexOf() {
         String[] array = new String[] { "A", "B", "C", "D", "E" };
         List<String> list = List.of("A", "B", "C", "D", "E");

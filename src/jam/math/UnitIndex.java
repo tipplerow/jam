@@ -178,6 +178,15 @@ public final class UnitIndex implements Comparable<UnitIndex> {
     }
 
     /**
+     * Identifies indexes equal to {@code 1}.
+     *
+     * @return {@code true} iff the unit index is equal to {@code 1}.
+     */
+    public boolean isFirst() {
+        return unitIndex == 1;
+    }
+
+    /**
      * Identifies arrays that contain an element with this index.
      *
      * @param array the array to examine.
