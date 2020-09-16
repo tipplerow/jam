@@ -216,7 +216,7 @@ public class CollectionUtilTest extends NumericTestBase {
         strings.addAll(List.of("A", "B", "B", "C", "C", "C", "D", "D", "D", "D"));
 
         for (int trial = 0; trial < 100000; ++trial)
-            sampled.add(CollectionUtil.sampleOne(strings));
+            sampled.add(CollectionUtil.sampleOne(strings, random()));
 
         assertEquals(0.1, MultisetUtil.frequency(sampled, "A"), 0.002);
         assertEquals(0.2, MultisetUtil.frequency(sampled, "B"), 0.002);
