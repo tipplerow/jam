@@ -39,7 +39,7 @@ public final class SetUtil {
      * Clones a set without knowing its runtime type.
      *
      * <p>The set must be an instance of a subclass defined in the
-     * {@link java.util} package.
+     * {@code java.util} package.
      *
      * @param <E> the element type.
      *
@@ -48,7 +48,7 @@ public final class SetUtil {
      * @return a shallow copy of the input set.
      *
      * @throws IllegalArgumentException unless the set is an instance
-     * of a subclass defined in the {@link java.util} package.
+     * of a subclass defined in the {@code java.util} package.
      */
     @SuppressWarnings("unchecked")
     public static <E> Set<E> clone(Set<E> set) {
