@@ -4,8 +4,6 @@ package jam.io;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
-
 import jam.app.JamLogger;
 import jam.lang.JamException;
 import jam.util.RegexUtil;
@@ -223,7 +221,7 @@ public final class FileUtil {
      * @return the composite file name.
      */
     public static String join(String... paths) {
-        return StringUtils.join(paths, File.separator);
+        return String.join(File.separator, paths);
     }
 
     /**
