@@ -39,6 +39,11 @@ dependencies {
     testImplementation 'junit:junit:4.13'
 }
 
+java {
+     withJavadocJar()
+     withSourcesJar()
+}
+
 test {
     testLogging {
         showStandardStreams = false
