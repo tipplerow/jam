@@ -9,13 +9,13 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'maven-publish'
 }
 
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
-    mavenCentral()
 }
 
 dependencies {
@@ -47,5 +47,23 @@ java {
 test {
     testLogging {
         showStandardStreams = false
+    }
+}
+
+group = 'com.tipplerow'
+version = '1.0'
+
+publishing {
+    publications {
+        JamMaven(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'JamMaven'
+            url = "file://${System.getProperty('user.home')}/repo"
+        }
     }
 }
