@@ -8,7 +8,7 @@ import java.util.Set;
  * Represents a numeric vector where elements are accessed by keys
  * (fixed at the time of creation) in addition to integer indexes.
  *
- * @param K the runtime time of the element keys.
+ * @param <K> the runtime time of the element keys.
  */
 public interface DataVector<K> {
     /**

@@ -15,9 +15,9 @@ import jam.vector.JamVector;
  * Loads a data matrix from an input file in <em>dense matrix</em>
  * format.
  *
- * @param R the runtime type of the row keys.
+ * @param <R> the runtime type of the row keys.
  *
- * @param C the runtime type of the column keys.
+ * @param <C> the runtime type of the column keys.
  */
 public abstract class DenseDataMatrixLoader<R, C> extends DataMatrixLoader<R, C> {
     private TableReader reader;

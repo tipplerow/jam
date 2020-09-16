@@ -10,9 +10,9 @@ import java.util.Set;
  * Provides the means to decorate a map with additional methods while
  * maintaining the standard {@code #java.util.Map} interface.
  *
- * @param K the type of keys maintained by this map.
+ * @param <K> the type of keys maintained by this map.
  *
- * @param V the type of values maintained by this map.
+ * @param <V> the type of values maintained by this map.
  */
 public abstract class MapWrapper<K, V> extends AbstractMap<K, V> {
     /**

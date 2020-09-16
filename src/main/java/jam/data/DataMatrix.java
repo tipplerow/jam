@@ -9,9 +9,9 @@ import java.util.Set;
  * column keys (fixed at the time of creation) in addition to integer
  * indexes.
  *
- * @param R the runtime type of the row keys.
+ * @param <R> the runtime type of the row keys.
  *
- * @param C the runtime type of the column keys.
+ * @param <C> the runtime type of the column keys.
  */
 public interface DataMatrix<R,C> {
     /**

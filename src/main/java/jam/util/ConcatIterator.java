@@ -12,7 +12,7 @@ import java.util.Queue;
  * Implements an iterator that provides a concatenated view of
  * multiple collections and iterates over them seamlessly as one.
  *
- * @param E the type of object stored in the collections.
+ * @param <E> the type of object stored in the collections.
  */
 public final class ConcatIterator<E> implements Iterator<E> {
     // The active iterator...

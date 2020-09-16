@@ -17,7 +17,7 @@ import jam.lang.ObjectUtil;
  * <p>A {@code FixedList} is immutable: the length of the list and its
  * components are fixed and cannot be changed.
  *
- * @param E the type of elements contained in the list.
+ * @param <E> the type of elements contained in the list.
  */
 public abstract class FixedList<E> extends AbstractList<E> implements RandomAccess {
 

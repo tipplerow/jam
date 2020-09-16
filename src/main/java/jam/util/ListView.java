@@ -14,7 +14,7 @@ import java.util.RandomAccess;
  * return type (in place of {@code Collections.unmodifiableList}) to
  * explicit mark the list as unmodifiable.
  *
- * @param E the type of elements contained in the list.
+ * @param <E> the type of elements contained in the list.
  */
 public final class ListView<E> extends AbstractList<E> implements RandomAccess {
     private final List<E> elements;

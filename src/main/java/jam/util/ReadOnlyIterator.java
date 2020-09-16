@@ -8,7 +8,7 @@ import java.util.Iterator;
  * Implements a read-only iterator whose {@code remove()} method
  * throws an {@code UnsupportedOperationException}.
  *
- * @param E the type of object stored in the collection.
+ * @param <E> the type of object stored in the collection.
  */
 public final class ReadOnlyIterator<E> implements Iterator<E> {
     private final Iterator<E> iterator;

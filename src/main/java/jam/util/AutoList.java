@@ -21,7 +21,7 @@ import jam.lang.ObjectFactory;
  * by the default constructor for its class.  The behavior is fixed by
  * the constructor method used to create the {@code AutoList}.
  *
- * @param E the type of elements contained in the list.
+ * @param <E> the type of elements contained in the list.
  */
 public final class AutoList<E> extends AbstractList<E> implements RandomAccess {
     private final ObjectFactory<E> factory;

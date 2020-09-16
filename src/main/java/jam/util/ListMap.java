@@ -12,9 +12,9 @@ import java.util.TreeMap;
  * Provides a map containing {@link ArrayList} values, which are
  * created on demand by the first call to {@code list(key)}.
  *
- * @param K the type of keys maintained by this map.
+ * @param <K> the type of keys maintained by this map.
  *
- * @param V the type of values maintained by the mapped lists.
+ * @param <V> the type of values maintained by the mapped lists.
  */
 public final class ListMap<K, V> extends MapWrapper<K, List<V>> {
     private ListMap(Map<K, List<V>> map) {

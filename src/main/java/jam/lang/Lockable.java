@@ -16,7 +16,7 @@ package jam.lang;
  * created, e.g., for computational results created on-demand via lazy
  * initialization.
  *
- * @param E the type of lockable object.
+ * @param <E> the type of lockable object.
  */
 public final class Lockable<E> {
     private E value;

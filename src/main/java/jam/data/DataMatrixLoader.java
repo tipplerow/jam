@@ -6,9 +6,9 @@ import java.io.File;
 /**
  * Reads a data matrix from an input file.
  *
- * @param R the runtime type of the row keys.
+ * @param <R> the runtime type of the row keys.
  *
- * @param C the runtime type of the column keys.
+ * @param <C> the runtime type of the column keys.
  */
 public abstract class DataMatrixLoader<R, C> {
     /**

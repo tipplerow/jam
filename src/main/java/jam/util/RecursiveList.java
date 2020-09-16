@@ -15,7 +15,7 @@ import java.util.List;
  * cannot be modified in any manner other than the automatic addition
  * of elements via recursive computation.
  *
- * @param E the type of elements contained in the list.
+ * @param <E> the type of elements contained in the list.
  */
 public abstract class RecursiveList<E> extends AbstractList<E> {
     private final List<E> elements = new ArrayList<E>();
