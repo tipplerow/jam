@@ -34,11 +34,27 @@ public final class RandomWalk {
      * at the origin.
      */
     public static JamVector[] ideal(int N) {
+        return ideal(N, JamRandom.global());
+    }
+
+    /**
+     * Generates an ideal random walk on a cubic lattice with single
+     * nearest-neighbor steps.  (Each step has unit length, and the
+     * walker may visit the same location any number of times.)
+     *
+     * @param N the number of steps in the walk.
+     *
+     * @param random the random number source.
+     *
+     * @return an array of coordinates in the order visited, starting
+     * at the origin.
+     */
+    public static JamVector[] ideal(int N, JamRandom random) {
         JamVector[] coords = new JamVector[N];
         coords[0] = JamVector.valueOf(0.0, 0.0, 0.0);
 
         for (int k = 1; k < N; ++k)
-            coords[k] = coords[k - 1].plus(idealStep(JamRandom.global()));
+            coords[k] = coords[k - 1].plus(idealStep(random));
 
         return coords;
     }

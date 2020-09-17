@@ -139,7 +139,7 @@ public class VectorMomentTest extends NumericTestBase {
     @Test public void testRandomWalk() {
         for (int trial = 0; trial < 5; ++trial) {
             int N = 10000;
-            VectorMoment mom = VectorMoment.compute(RandomWalk.ideal(N));
+            VectorMoment mom = VectorMoment.compute(RandomWalk.ideal(N, random()));
 
             double asphericity   = mom.asphericity() / N;
             double acylindricity = mom.acylindricity() / N;
