@@ -12,10 +12,8 @@ import org.apache.logging.log4j.LogManager;
 public final class JamLogger {
     private static Logger logger = null;
 
+    private static final String CONFIGURATION_ENV_NAME = "LOG4J_CONF";
     private static final String CONFIGURATION_PROPERTY_NAME = "log4j.configurationFile";
-    private static final String DEFAULT_CONFIGURATION_FILE  = "conf/log4j.xml";
-
-    public static enum Level { FATAL, ERROR, WARN, INFO, DEBUG, SILENT };
 
     // Prevent instantiation
     private JamLogger() {}
@@ -26,19 +24,15 @@ public final class JamLogger {
     }
 
     private static void configure() {
-	//
-	// Note that we do not use JamProperties to handle this
-	// because it uses the logger...
-	//
-	String configFile = System.getProperty(CONFIGURATION_PROPERTY_NAME);
+	String configFile = System.getenv(CONFIGURATION_ENV_NAME);
 
-	if (configFile == null) {
-	    System.setProperty(CONFIGURATION_PROPERTY_NAME, DEFAULT_CONFIGURATION_FILE);
-	}
-	else {
-	    System.out.println("Configuration file: " + configFile);
-	}
+	if (configFile != null)
+	    System.setProperty(CONFIGURATION_PROPERTY_NAME, configFile);
+	else
+	    System.out.println("Using default log4j configuration...");
     }
+
+    public static enum Level { FATAL, ERROR, WARN, INFO, DEBUG, SILENT };
 
     public static void fatal(Object message) {
         logger.fatal(message);

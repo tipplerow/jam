@@ -11,6 +11,12 @@ fi
 # GitHub project directory
 export JAM_HOME=${GITHUB_ROOT}/jam
 
+# Log4J configuration file
+if [ -z "${LOG4J_CONF}" ]
+then
+    export LOG4J_CONF=${JAM_HOME}/conf/log4j.xml
+fi
+
 # Directory for temporary files...
 if [ -d ${HOME}/tmp ]
 then
