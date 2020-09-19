@@ -1,5 +1,6 @@
 ########################################################################
 # Shell aliases for JAM project development.
 ########################################################################
-alias jam="cd ${JAM_HOME}/src/main/java/jam"
+alias j="cd ${JAM_HOME}"
+alias js="cd ${JAM_HOME}/src/main/java/jam"
 alias jt="cd ${JAM_HOME}/src/test/java/jam"
