@@ -58,5 +58,35 @@ public final class JamSystem {
 
         return Integer.valueOf(output.get(0));
     }
-}
 
+    /**
+     * Determines whether the JVM is running on a Linux operating
+     * system.
+     *
+     * @return {@code true} iff the JVM is running on a Linux
+     * operating system.
+     */
+    public static boolean isLinux() {
+        return uname().equals("Linux");
+    }
+
+    /**
+     * Determines whether the JVM is running on a Mac OSX operating
+     * system.
+     *
+     * @return {@code true} iff the JVM is running on a Mac OSX
+     * operating system.
+     */
+    public static boolean isMacOS() {
+        return uname().equals("Darwin");
+    }
+
+    /**
+     * Returns the operating system name.
+     *
+     * @return the operating system name.
+     */
+    public static String uname() {
+        return ProcessRunner.run("uname").get(0);
+    }
+}
