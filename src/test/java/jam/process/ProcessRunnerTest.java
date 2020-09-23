@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 public class ProcessRunnerTest {
     @Test public void testRun() {
-        assertTrue(ProcessRunner.run("ls").contains("build.xml"));
+        assertTrue(ProcessRunner.run("ls").contains("build.gradle"));
         assertEquals(201, ProcessRunner.run("cat", "LICENSE").size());
     }
 

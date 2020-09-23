@@ -11,7 +11,7 @@ public class JamProcessTest {
         JamProcess process = JamProcess.run("ls");
 
         assertTrue(process.success());
-        assertTrue(process.stdout().contains("build.xml"));
+        assertTrue(process.stdout().contains("build.gradle"));
         assertTrue(process.stderr().isEmpty());
 
         process = JamProcess.run("cat", "foo");

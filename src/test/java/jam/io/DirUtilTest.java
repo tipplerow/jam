@@ -23,9 +23,9 @@ public class DirUtilTest {
     public void testOnDemandExistingFile() {
         //
         // This test should be run from the top-level "jam" directory,
-        // which must contain the "build.xml" file...
+        // which must contain the "build.gradle" file...
         //
-        File file = new File(System.getProperty("user.dir"), "build.xml");
+        File file = new File(System.getProperty("user.dir"), "build.gradle");
 
         assertTrue(file.isFile());
         DirUtil.onDemand(file);
