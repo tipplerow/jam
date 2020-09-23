@@ -31,6 +31,15 @@ public class HTMLDocumentTest {
         assertTrue(tables.get(0).hasClass("calls"));
     }
 
+    @Test public void testSelect() {
+        assertEquals(2, document.select("table").size());
+    }
+
+    @Test public void testSelectUnique() {
+        HTMLElement element = document.selectUnique("span[data-reactid=50]");
+        assertEquals(25.89, element.getDouble(), 0.01);
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.html.HTMLDocumentTest");
     }

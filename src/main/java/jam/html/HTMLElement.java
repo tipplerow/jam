@@ -12,6 +12,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import jam.lang.JamException;
+import jam.math.DoubleUtil;
+import jam.math.IntUtil;
 import jam.util.ListUtil;
 
 /**
@@ -80,6 +82,30 @@ public class HTMLElement {
     }
 
     /**
+     * Returns the double-precision value of this element.
+     *
+     * @return the double-precision value of this element.
+     *
+     * @throws RuntimeException unless this element contains a
+     * properly formatted {@code double} value.
+     */
+    public double getDouble() {
+        return DoubleUtil.parseDouble(getText());
+    }
+
+    /**
+     * Returns the integer value of this element.
+     *
+     * @return the integern value of this element.
+     *
+     * @throws RuntimeException unless this element contains a
+     * properly formatted {@code int} value.
+     */
+    public int getInt() {
+        return IntUtil.parseInt(getText());
+    }
+
+    /**
      * Returns the tag name of this element.
      *
      * @return the tag name of this element.
@@ -108,6 +134,38 @@ public class HTMLElement {
      */
     public boolean hasClass(String className) {
         return element.hasClass(className);
+    }
+
+    /**
+     * Finds elements that match a CSS query; matching elements may
+     * include this element or any element below.
+     *
+     * @param cssQuery a CSS query to execute.
+     *
+     * @return the elements that match the CSS query.
+     */
+    public List<HTMLElement> select(String cssQuery) {
+        return ListUtil.apply(element.select(cssQuery), element -> new HTMLElement(element));
+    }
+
+    /**
+     * Finds a unique element that matches a CSS query; the matching
+     * element may be this element or any element below.
+     *
+     * @param cssQuery a CSS query to execute.
+     *
+     * @return the unique element that matches the CSS query.
+     *
+     * @throws RuntimeException unless the query matches exactly one
+     * element.
+     */
+    public HTMLElement selectUnique(String cssQuery) {
+        List<HTMLElement> matches = select(cssQuery);
+
+        if (matches.size() == 1)
+            return matches.get(0);
+        else
+            throw JamException.runtime("Found [%d] elements matching query [%s].", matches.size(), cssQuery);
     }
 
     /**
