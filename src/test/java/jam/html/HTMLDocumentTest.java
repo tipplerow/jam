@@ -33,17 +33,24 @@ public class HTMLDocumentTest {
 
     @Test public void testSelect() {
         assertEquals(2, document.select("table").size());
-
-        assertEquals(1, document.select("table.calls").size());
-        assertEquals(1, document.select("table.puts").size());
     }
 
-    @Test public void testSelectUnique() {
+    @Test public void testSelectTagAttr() {
         HTMLElement element = document.selectUnique("span[data-reactid=50]");
         assertEquals(25.89, element.getDouble(), 0.01);
 
-        element = document.selectUnique("span", "data-reactid", "50");
+        element = document.selectUniqueTagAttr("span", "data-reactid", "50");
         assertEquals(25.89, element.getDouble(), 0.01);
+    }
+
+    @Test public void testSelectTagClass() {
+        assertEquals(1, document.select("table.calls").size());
+        assertEquals(1, document.select("table.puts").size());
+        assertEquals(0, document.select("table.foo").size());
+
+        assertEquals(1, document.selectTagClass("table", "calls").size());
+        assertEquals(1, document.selectTagClass("table", "puts").size());
+        assertEquals(0, document.selectTagClass("table", "foo").size());
     }
 
     public static void main(String[] args) {

@@ -162,12 +162,32 @@ public class HTMLElement {
      * @return the elements that match the specified tag name,
      * attribute name, and attribute value.
      */
-    public List<HTMLElement> select(String tagName, String attrName, String attrValue) {
-        return select(formatQuery(tagName, attrName, attrValue));
+    public List<HTMLElement> selectTagAttr(String tagName, String attrName, String attrValue) {
+        return select(formatTagAttrQuery(tagName, attrName, attrValue));
     }
 
-    private static String formatQuery(String tagName, String attrName, String attrValue) {
+    private static String formatTagAttrQuery(String tagName, String attrName, String attrValue) {
         return String.format("%s[%s=%s]", tagName, attrName, attrValue);
+    }
+
+    /**
+     * Finds elements with a particular tag name and class; the
+     * matching elements may include this element or any element
+     * below.
+     *
+     * @param tagName the element tag name to match.
+     *
+     * @param className the class name to match.
+     *
+     * @return the elements that match the specified tag and class
+     * names.
+     */
+    public List<HTMLElement> selectTagClass(String tagName, String className) {
+        return select(formatTagClassQuery(tagName, className));
+    }
+
+    private static String formatTagClassQuery(String tagName, String className) {
+        return String.format("%s.%s", tagName, className);
     }
 
     /**
@@ -207,8 +227,26 @@ public class HTMLElement {
      * @throws RuntimeException unless the query matches exactly one
      * element.
      */
-    public HTMLElement selectUnique(String tagName, String attrName, String attrValue) {
-        return selectUnique(formatQuery(tagName, attrName, attrValue));
+    public HTMLElement selectUniqueTagAttr(String tagName, String attrName, String attrValue) {
+        return selectUnique(formatTagAttrQuery(tagName, attrName, attrValue));
+    }
+
+    /**
+     * Finds a unique element with a particular tag name and class;
+     * the matching element may be this element or any element below.
+     *
+     * @param tagName the element tag name to match.
+     *
+     * @param className the class name to match.
+     *
+     * @return the unique element that matches the specified tag and
+     * class name.
+     *
+     * @throws RuntimeException unless the query matches exactly one
+     * element.
+     */
+    public HTMLElement selectUniqueTagClass(String tagName, String className) {
+        return selectUnique(formatTagClassQuery(tagName, className));
     }
 
     /**
