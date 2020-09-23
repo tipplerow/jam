@@ -33,6 +33,9 @@ public class HTMLDocumentTest {
 
     @Test public void testSelect() {
         assertEquals(2, document.select("table").size());
+
+        assertEquals(1, document.select("table.calls").size());
+        assertEquals(1, document.select("table.puts").size());
     }
 
     @Test public void testSelectUnique() {
