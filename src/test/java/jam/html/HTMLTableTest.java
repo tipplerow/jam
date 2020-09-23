@@ -10,8 +10,8 @@ public class HTMLTableTest {
     private static final File vxxFile = new File("data/test/VXX_options.html");
     private static final HTMLDocument document = HTMLDocument.parse(vxxFile);
 
-    private static final HTMLTable puts = document.findTable("puts");
-    private static final HTMLTable calls = document.findTable("calls");
+    private static final HTMLTable puts = HTMLTable.create(document.selectUniqueTagClass("table", "puts"));
+    private static final HTMLTable calls = HTMLTable.create(document.selectUniqueTagClass("table", "calls"));
 
     @Test public void testRowCount() {
         assertEquals(64, calls.countRows());

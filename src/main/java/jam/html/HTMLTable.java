@@ -40,6 +40,20 @@ public final class HTMLTable extends HTMLElement {
     public static final String TAG_NAME = "table";
 
     /**
+     * Returns the HTML table represented by a particular element.
+     *
+     * @param element an HTML {@code table} element.
+     *
+     * @return the HTML table represented by the specified element.
+     *
+     * @throws RuntimeException unless the element encodes an HTML
+     * table.
+     */
+    public static HTMLTable create(HTMLElement element) {
+        return new HTMLTable(element.element);
+    }
+
+    /**
      * Returns the number of rows in the body of this table.
      *
      * @return the number of rows in the body of this table.
