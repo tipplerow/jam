@@ -114,6 +114,12 @@ public class IntUtilTest extends NumericTestBase {
         }
     }
 
+    @Test public void testParseInt() {
+        assertEquals(1000000, IntUtil.parseInt("1E6"));
+        assertEquals(1000000, IntUtil.parseInt("1,000,000"));
+        assertEquals(1234567, IntUtil.parseInt("1,234,567"));
+    }
+
     @Test public void testParseIntArray() {
         int[] actual   = IntUtil.parseIntArray("1, 2, 3", Delimiter.COMMA);
         int[] expected = new int[] { 1, 2, 3 };

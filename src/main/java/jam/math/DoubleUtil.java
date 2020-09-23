@@ -1,6 +1,7 @@
 
 package jam.math;
 
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 
 /**
@@ -39,6 +40,20 @@ public final class DoubleUtil {
      * One-half of the square root of three.
      */
     public static final double HALF_SQRT3 = 0.5 * Math.sqrt(3.0);
+
+    /**
+     * The character used to separate a decimal number into groups of
+     * thousands.
+     */
+    public static final char THOUSANDS_SEPARATOR_CHAR =
+        DecimalFormatSymbols.getInstance().getGroupingSeparator();
+
+    /**
+     * The string used to separate a decimal number into groups of
+     * thousands.
+     */
+    public static final String THOUSANDS_SEPARATOR_STRING =
+        String.valueOf(THOUSANDS_SEPARATOR_CHAR);
 
     /**
      * Determines whether a string represents a floating-point value.
@@ -190,7 +205,19 @@ public final class DoubleUtil {
      * or a properly formatted floating-point value.
      */
     public static double parseDouble(String s) {
-        return s.equals("NA") ? Double.NaN : Double.parseDouble(s);
+        if (s.equals("NA"))
+            return Double.NaN;
+
+        try {
+            return Double.parseDouble(s);
+        }
+        catch (NumberFormatException ex) {
+            return Double.parseDouble(removeThousandsSeparator(s));
+        }
+    }
+
+    private static String removeThousandsSeparator(String s) {
+        return s.replace(THOUSANDS_SEPARATOR_STRING, "");
     }
 
     /**

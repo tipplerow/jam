@@ -99,6 +99,7 @@ public class DoubleUtilTest extends NumericTestBase {
 
     @Test public void testParseDouble() {
         assertTrue(Double.isNaN(DoubleUtil.parseDouble("NA")));
+        assertDouble(1234567.89, DoubleUtil.parseDouble("1,234,567.89"));
     }
 
     @Test public void testRatio() {

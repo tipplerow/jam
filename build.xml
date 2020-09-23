@@ -1,4 +1,0 @@
-<project name="jam" basedir="." default="compile">
-  <import file="conf/build_common.xml"/>
-  <import file="conf/classpath_build.xml"/>
-</project>
