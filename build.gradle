@@ -32,6 +32,7 @@ dependencies {
     implementation 'commons-net:commons-net:3.6'
     implementation 'org.apache.logging.log4j:log4j-core:2.13.3'
     implementation 'org.postgresql:postgresql:42.2.16'
+    implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'org.xerial:sqlite-jdbc:3.32.3.2'
 
     // Use JUnit test framework
@@ -55,7 +56,7 @@ javadoc {
 
 test {
     testLogging {
-        showStandardStreams = false
+        showStandardStreams = true
     }
 
     maxParallelForks = 8
