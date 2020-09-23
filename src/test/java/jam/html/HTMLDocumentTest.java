@@ -38,6 +38,9 @@ public class HTMLDocumentTest {
     @Test public void testSelectUnique() {
         HTMLElement element = document.selectUnique("span[data-reactid=50]");
         assertEquals(25.89, element.getDouble(), 0.01);
+
+        element = document.selectUnique("span", "data-reactid", "50");
+        assertEquals(25.89, element.getDouble(), 0.01);
     }
 
     public static void main(String[] args) {

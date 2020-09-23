@@ -149,6 +149,28 @@ public class HTMLElement {
     }
 
     /**
+     * Finds elements with a particular tag name, attribute name, and
+     * attribute value; the matching elements may include this element
+     * or any element below.
+     *
+     * @param tagName the element tag name to match.
+     *
+     * @param attrName the attribute name to examine.
+     *
+     * @param attrValue the attribute value to match.
+     *
+     * @return the elements that match the specified tag name,
+     * attribute name, and attribute value.
+     */
+    public List<HTMLElement> select(String tagName, String attrName, String attrValue) {
+        return select(formatQuery(tagName, attrName, attrValue));
+    }
+
+    private static String formatQuery(String tagName, String attrName, String attrValue) {
+        return String.format("%s[%s=%s]", tagName, attrName, attrValue);
+    }
+
+    /**
      * Finds a unique element that matches a CSS query; the matching
      * element may be this element or any element below.
      *
@@ -166,6 +188,27 @@ public class HTMLElement {
             return matches.get(0);
         else
             throw JamException.runtime("Found [%d] elements matching query [%s].", matches.size(), cssQuery);
+    }
+
+    /**
+     * Finds a unique element with a particular tag name, attribute
+     * name, and attribute value; the matching element may be this
+     * element or any element below.
+     *
+     * @param tagName the element tag name to match.
+     *
+     * @param attrName the attribute name to examine.
+     *
+     * @param attrValue the attribute value to match.
+     *
+     * @return the unique element that matches the specified tag name,
+     * attribute name, and attribute value.
+     *
+     * @throws RuntimeException unless the query matches exactly one
+     * element.
+     */
+    public HTMLElement selectUnique(String tagName, String attrName, String attrValue) {
+        return selectUnique(formatQuery(tagName, attrName, attrValue));
     }
 
     /**
