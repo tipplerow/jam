@@ -86,6 +86,11 @@ public class SQLColumnTest {
         assertEquals(hasIndex, column.hasIndex());
     }
 
+    @Test public void testSerial() {
+        SQLColumn serial = SQLColumn.serial("key");
+        assertEquals("key SERIAL PRIMARY KEY", serial.join());
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.sql.SQLColumnTest");
     }

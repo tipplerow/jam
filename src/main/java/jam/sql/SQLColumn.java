@@ -59,6 +59,18 @@ public final class SQLColumn {
     }
 
     /**
+     * Creates a new serial (auto-increment) column as the primary key
+     * for a table.
+     *
+     * @param name the name for the serial key column.
+     *
+     * @return the SQL column meta-data.
+     */
+    public static SQLColumn serial(String name) {
+        return create(name, "SERIAL").primaryKey();
+    }
+
+    /**
      * Extracts the names from a list of columns.
      *
      * @param columns the table columns.
@@ -251,5 +263,9 @@ public final class SQLColumn {
      */
     public boolean hasIndex() {
         return qualifiers.contains(Qualifier.WITH_INDEX);
+    }
+
+    @Override public String toString() {
+        return "SQLColumn(" + join() + ")";
     }
 }
