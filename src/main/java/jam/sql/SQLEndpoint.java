@@ -3,6 +3,8 @@ package jam.sql;
 
 import java.util.List;
 
+import jam.app.JamEnv;
+
 /**
  * Encapsulates the information required to create a database
  * connection.
@@ -43,6 +45,21 @@ public final class SQLEndpoint {
                                      String username,
                                      String password) {
         return new SQLEndpoint(hostname, port, database, username, password);
+    }
+
+    /**
+     * Returns the endpoint for the PostgreSQL test database.
+     *
+     * @return the endpoint for the PostgreSQL test database.
+     */
+    public static SQLEndpoint testPostgreSQL() {
+        int port = Integer.parseInt(JamEnv.getOptional("JAM_TEST_SQL_PORT", "5432"));
+        String hostname = JamEnv.getOptional("JAM_TEST_SQL_HOSTNAME", "localhost");
+        String database = JamEnv.getOptional("JAM_TEST_SQL_DATABASE", "jam_test");
+        String username = JamEnv.getOptional("JAM_TEST_SQL_USERNAME", "jam_test");
+        String password = JamEnv.getOptional("JAM_TEST_SQL_PASSWORD", "traffic_not_strawberry");
+
+        return create(hostname, port, database, username, password);
     }
 
     /**

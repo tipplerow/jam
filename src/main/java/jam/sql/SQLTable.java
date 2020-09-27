@@ -338,6 +338,19 @@ public abstract class SQLTable {
     }
 
     /**
+     * Deletes all records from this table.
+     *
+     * @throws SQLException if any SQL errors occur.
+     */
+    public void clear() {
+        db().executeUpdate(formatClear());
+    }
+
+    private String formatClear() {
+        return String.format("DELETE FROM %s", getTableName());
+    }
+
+    /**
      * Returns the number of columns in this table.
      *
      * @return the number of columns in this table.
@@ -395,6 +408,20 @@ public abstract class SQLTable {
     }
 
     /**
+     * Executes a SQL query against this table.
+     *
+     * <p>To avoid resource leaks, the query result must be closed
+     * after the result set has been processed.
+     *
+     * @param queryStr the SQL query to execute.
+     *
+     * @throws RuntimeException if any SQL errors occur.
+     */
+    public QueryResult query(String queryStr) throws SQLException {
+        return QueryResult.create(getConnection(), queryStr, false);
+    }
+
+    /**
      * Creates this table in the database unless it already exists.
      *
      * @throws RuntimeException if the table does not already exist
@@ -402,5 +429,25 @@ public abstract class SQLTable {
      */
     public synchronized void require() {
         getSchema().createTable(db);
+    }
+
+    /**
+     * Returns a result set containing all of the records in this
+     * table.
+     *
+     * <p>To avoid resource leaks, the query result must be closed
+     * after the result set has been processed.
+     *
+     * @return a result set containing all of the records in this
+     * table.
+     *
+     * @throws RuntimeException if any SQL errors occur.
+     */
+    public QueryResult selectAll() throws SQLException {
+        return query(formatSelectAll());
+    }
+
+    private String formatSelectAll() {
+        return String.format("SELECT * FROM %s", getTableName());
     }
 }

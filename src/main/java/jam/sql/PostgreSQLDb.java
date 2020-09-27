@@ -46,7 +46,7 @@ public final class PostgreSQLDb extends SQLDb {
      * @return the {@code PostgreSQL} database manager with the
      * specified endpoint.
      */
-    public static PostgreSQLDb instance(SQLEndpoint endpoint) {
+    public static synchronized PostgreSQLDb instance(SQLEndpoint endpoint) {
         PostgreSQLDb instance = instances.get(endpoint);
 
         if (instance == null) {
@@ -55,6 +55,15 @@ public final class PostgreSQLDb extends SQLDb {
         }
 
         return instance;
+    }
+
+    /**
+     * Returns the PostgreSQL testing database.
+     *
+     * @return the PostgreSQL testing database.
+     */
+    public static PostgreSQLDb test() {
+        return instance(SQLEndpoint.testPostgreSQL());
     }
 
     /**
