@@ -175,6 +175,18 @@ public interface TableProcessor {
     }
 
     /**
+     * Wraps a {@code SQLException} in a {@code RuntimeException}.
+     *
+     * @param ex the {@code SQLException} to wrap.
+     *
+     * @return the {@code RuntimeException} with the specified
+     * {@code SQLException} as the cause.
+     */
+    public default RuntimeException runtimeEx(SQLException ex) {
+        return JamException.runtime(ex);
+    }
+
+    /**
      * Assigns a possibly {@code null} date as a parameter in a
      * prepared statement.
      *
@@ -298,5 +310,15 @@ public interface TableProcessor {
             statement.setObject(index, value);
         else
             statement.setNull(index, Types.OTHER);
+    }
+
+    /**
+     * Wraps a {@code SQLException} in a {@code RuntimeException} and
+     * throws the exception.
+     *
+     * @param ex the {@code SQLException} to wrap.
+     */
+    public default void throwRuntime(SQLException ex) {
+        throw runtimeEx(ex);
     }
 }
