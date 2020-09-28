@@ -8,6 +8,7 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jam.lang.DomainDouble;
 import jam.lang.JamException;
 import jam.lang.KeyedObject;
 import jam.util.EnumUtil;
@@ -192,6 +193,25 @@ public interface TableProcessor {
             statement.setObject(index, value);
         else
             statement.setNull(index, Types.OTHER);
+    }
+
+    /**
+     * Assigns a {@code DomainDouble} value to a parameter in a
+     * prepared statement.
+     *
+     * @param statement an open prepared statement.
+     *
+     * @param index the (1-based) index of the parameter to assign.
+     *
+     * @param value the (possibly {@code null}) value to assign.
+     *
+     * @throws SQLException if any errors occur.
+     */
+    public default void setDomainDouble(PreparedStatement statement, int index, DomainDouble value) throws SQLException {
+        if (value != null)
+            statement.setDouble(index, value.doubleValue());
+        else
+            statement.setNull(index, Types.DOUBLE);
     }
 
     /**
