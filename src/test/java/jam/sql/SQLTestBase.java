@@ -85,7 +85,7 @@ public abstract class SQLTestBase {
         }
     }
 
-    public static final class TestTable extends SQLKeyTable<String, TestRecord> {
+    public static final class TestTable extends SQLKeyTable<String, TestRecord> implements TableProcessor {
         public TestTable(SQLDb db) {
             super(db);
         }
