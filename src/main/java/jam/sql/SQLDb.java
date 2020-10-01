@@ -54,6 +54,13 @@ public abstract class SQLDb {
     }
 
     /**
+     * Returns the enumerated database engine type.
+     *
+     * @return the enumerated database engine type.
+     */
+    public abstract SQLEngine getEngineType();
+
+    /**
      * Opens a new database connection.
      *
      * @return a new open database connection.
@@ -72,6 +79,53 @@ public abstract class SQLDb {
      * the specified name.
      */
     protected abstract String countTableNamesQuery(String tableName);
+
+    /**
+     * Commits pending transactions on a connection (unless the
+     * connection is in auto-commit mode).
+     *
+     * @param connection an open database connection.
+     *
+     * @throws RuntimeException if the pending transactions cannot be
+     * committed.
+     */
+    public static void commit(Connection connection) {
+        try {
+            if (!connection.getAutoCommit())
+                connection.commit();
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+    }
+
+    /**
+     * Returns the result of a {@code SELECT COUNT} query.
+     *
+     * @param resultSet the result set returned by the query.
+     *
+     * @return the result of the {@code SELECT COUNT} query.
+     *
+     * @throws RuntimeException if the result set inspection fails.
+     */
+    public static int getCount(ResultSet resultSet) {
+        int result = 0;
+
+        try {
+            if (!resultSet.next())
+                throw JamException.runtime("No result set rows.");
+
+            result = resultSet.getInt(1);
+
+            if (resultSet.next())
+                throw JamException.runtime("Multiple result set rows.");
+        }
+        catch (SQLException ex) {
+            throw JamException.runtime(ex);
+        }
+
+        return result;
+    }
 
     /**
      * Imports a collection of records into a database table.
@@ -122,25 +176,6 @@ public abstract class SQLDb {
     private static String formatBulkImport(String tableName, String fileName, char delimiter, String nullString) {
         return String.format("COPY %s FROM '%s' WITH DELIMITER '%c' NULL '%s'",
                              tableName, fileName, delimiter, nullString);
-    }
-
-    /**
-     * Commits pending transactions on a connection (unless the
-     * connection is in auto-commit mode).
-     *
-     * @param connection an open database connection.
-     *
-     * @throws RuntimeException if the pending transactions cannot be
-     * committed.
-     */
-    public static void commit(Connection connection) {
-        try {
-            if (!connection.getAutoCommit())
-                connection.commit();
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
     }
 
     /**
@@ -335,34 +370,6 @@ public abstract class SQLDb {
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
-    }
-
-    /**
-     * Returns the result of a {@code SELECT COUNT} query.
-     *
-     * @param resultSet the result set returned by the query.
-     *
-     * @return the result of the {@code SELECT COUNT} query.
-     *
-     * @throws RuntimeException if the result set inspection fails.
-     */
-    public static int getCount(ResultSet resultSet) {
-        int result = 0;
-
-        try {
-            if (!resultSet.next())
-                throw JamException.runtime("No result set rows.");
-
-            result = resultSet.getInt(1);
-
-            if (resultSet.next())
-                throw JamException.runtime("Multiple result set rows.");
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-
-        return result;
     }
 
     /**

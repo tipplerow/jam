@@ -96,7 +96,7 @@ public final class SQLSchema {
      * @throws RuntimeException if any database errors occur.
      */
     public void createTable(SQLDb db) {
-        db.executeUpdate(formatCreateTable());
+        db.executeUpdate(formatCreateTable(db.getEngineType()));
 
         for (String createIndexCommand : formatCreateIndex())
             db.executeUpdate(createIndexCommand);
@@ -105,13 +105,15 @@ public final class SQLSchema {
     /**
      * Constructs the {@code CREATE TABLE} command for this schema.
      *
+     * @param engine the database engine that will create the table.
+     *
      * @return the {@code CREATE TABLE} command for this schema.
      */
-    public String formatCreateTable() {
+    public String formatCreateTable(SQLEngine engine) {
         LineBuilder builder = new LineBuilder(", ");
 
         for (SQLColumn column : columns)
-            builder.append(column.join());
+            builder.append(column.join(engine));
 
         if (hasCompositeKey())
             builder.append(formatCompositeKeyConstraint());

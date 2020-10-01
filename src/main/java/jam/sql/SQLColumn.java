@@ -14,7 +14,7 @@ import jam.util.ListUtil;
  */
 public final class SQLColumn {
     private final String name;
-    private final String type;
+    private final SQLType type;
     private final Set<Qualifier> qualifiers;
 
     private enum Qualifier {
@@ -39,7 +39,7 @@ public final class SQLColumn {
         }
     }
 
-    private SQLColumn(String name, String type, Set<Qualifier> qualifiers) {
+    private SQLColumn(String name, SQLType type, Set<Qualifier> qualifiers) {
         this.name = name;
         this.type = type;
         this.qualifiers = qualifiers;
@@ -54,7 +54,7 @@ public final class SQLColumn {
      *
      * @return the SQL column meta-data.
      */
-    public static SQLColumn create(String name, String type) {
+    public static SQLColumn create(String name, SQLType type) {
         return new SQLColumn(name, type, EnumSet.noneOf(Qualifier.class));
     }
 
@@ -67,7 +67,7 @@ public final class SQLColumn {
      * @return the SQL column meta-data.
      */
     public static SQLColumn serial(String name) {
-        return create(name, "SERIAL").primaryKey();
+        return create(name, SQLType.SERIAL).primaryKey();
     }
 
     /**
@@ -95,14 +95,16 @@ public final class SQLColumn {
      * Joins the name, data type, and qualifiers for this column into
      * a single schema string.
      *
-     * @return a single string that describes the name, data type, and
-     * qualifiers for this column.
+     * @param engine the database engine that will create the table.
+     *
+     * @return a single schema string that describes the name, data
+     * type, and qualifiers for this column.
      */
-    public String join() {
+    public String join(SQLEngine engine) {
         LineBuilder builder = new LineBuilder(" ");
 
         builder.append(name);
-        builder.append(type);
+        builder.append(type.schemaType(engine));
 
         for (Qualifier qualifier : qualifiers)
             if (qualifier.isColumnConstraint())
@@ -212,8 +214,18 @@ public final class SQLColumn {
      *
      * @return the type of this column.
      */
-    public String getType() {
+    public SQLType getType() {
         return type;
+    }
+
+    /**
+     * Identifies primary and composite key columns.
+     *
+     * @return {@code true} iff this column is the primary key or a
+     * component of the composite key for its table.
+     */
+    public boolean isKey() {
+        return isPrimaryKey() || isCompositeKey();
     }
 
     /**
@@ -257,6 +269,16 @@ public final class SQLColumn {
     }
 
     /**
+     * Identifies serial (auto-increment) columns.
+     *
+     * @return {@code true} iff this column is a serial
+     * (auto-increment) column.
+     */
+    public boolean isSerial() {
+        return type.equals(SQLType.SERIAL);
+    }
+
+    /**
      * Identifies indexed (but not unique) columns.
      *
      * @return {@code true} iff this column has a table index.
@@ -266,6 +288,6 @@ public final class SQLColumn {
     }
 
     @Override public String toString() {
-        return "SQLColumn(" + join() + ")";
+        return "SQLColumn(" + join(SQLEngine.POSTGRES) + ")";
     }
 }

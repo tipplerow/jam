@@ -188,6 +188,10 @@ public final class PostgreSQLDb extends SQLDb {
         return String.format("select count(*) from pg_roles where rolname = '%s'", username);
     }
 
+    @Override public SQLEngine getEngineType() {
+        return SQLEngine.POSTGRES;
+    }
+
     @Override public Connection openConnection() {
         String url = formatURL();
         JamLogger.info("Connecting [%s]...", url);

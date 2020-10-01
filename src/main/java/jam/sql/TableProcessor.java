@@ -311,14 +311,4 @@ public interface TableProcessor {
         else
             statement.setNull(index, Types.OTHER);
     }
-
-    /**
-     * Wraps a {@code SQLException} in a {@code RuntimeException} and
-     * throws the exception.
-     *
-     * @param ex the {@code SQLException} to wrap.
-     */
-    public default void throwRuntime(SQLException ex) {
-        throw runtimeEx(ex);
-    }
 }

@@ -85,6 +85,10 @@ public final class SQLiteDb extends SQLDb {
         return dbURL;
     }
 
+    @Override public SQLEngine getEngineType() {
+        return SQLEngine.SQLITE;
+    }
+
     @Override public Connection openConnection() {
         try {
             return DriverManager.getConnection(dbURL);

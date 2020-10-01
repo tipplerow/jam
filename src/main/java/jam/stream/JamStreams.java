@@ -1,5 +1,5 @@
 
-package jam.util;
+package jam.stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +18,8 @@ import java.util.stream.Stream;
 /**
  * Provides utility methods operating on streams.
  */
-public final class StreamUtil {
-    private StreamUtil() {}
+public final class JamStreams {
+    private JamStreams() {}
 
     /**
      * Applies a function (or lambda expression) to each element of a
