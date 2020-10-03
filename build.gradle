@@ -39,6 +39,10 @@ dependencies {
     testImplementation 'junit:junit:4.13'
 }
 
+compileJava {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
 java {
      withJavadocJar()
      withSourcesJar()
