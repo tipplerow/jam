@@ -50,9 +50,6 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
     protected SQLTable(SQLDb db, SQLSchema schema) {
         this.db = db;
         this.schema = schema;
-
-        // Create the database table unless it already exists...
-        db.createTable(schema);
     }
 
     private void commit() throws SQLException {
@@ -255,6 +252,7 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
     protected synchronized Connection getConnection() throws SQLException {
         if (connection == null) {
             JamLogger.info("Opening connection for table [%s]...", schema.getTableName());
+            db.createTable(schema); // Create the database table unless it already exists...
             connection = db.openConnection();
             connection.setAutoCommit(false);
         }
@@ -325,6 +323,7 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
             if (connection != null) {
                 JamLogger.info("Closing connection for table [%s]...", schema.getTableName());
                 connection.close();
+                connection = null;
             }
         }
         catch (SQLException ex) {
@@ -438,8 +437,7 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
             return false;
         }
 
-        assert result == 1;
-        return true;
+        return (result == 1);
     }
 
     /**
@@ -512,8 +510,7 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
             return false;
         }
 
-        assert result == 1;
-        return true;
+        return (result == 1);
     }
 
     /**
@@ -623,8 +620,7 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
             return false;
         }
 
-        assert result == 1;
-        return true;
+        return (result == 1);
     }
 
     /**

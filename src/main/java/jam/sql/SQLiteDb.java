@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jam.app.JamLogger;
+import jam.app.JamEnv;
 import jam.io.FileUtil;
 import jam.lang.JamException;
 
@@ -65,6 +66,19 @@ public final class SQLiteDb extends SQLDb {
         }
 
         return instance;
+    }
+
+    /**
+     * Returns the {@code SQLite} testing database.
+     *
+     * @return the {@code SQLite} testing database.
+     */
+    public static SQLiteDb test() {
+        return instance(getTestDbFile());
+    }
+
+    private static String getTestDbFile() {
+        return FileUtil.join(JamEnv.getRequired("JAM_HOME"), "data", "test", "sqlite_test.db");
     }
 
     /**

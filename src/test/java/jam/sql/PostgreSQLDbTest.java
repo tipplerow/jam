@@ -23,15 +23,7 @@ public final class PostgreSQLDbTest {
         else
             return null;
     }
-    /*
-    @Test public void testCreateDropTable() {
-        if (db == null)
-            return;
 
-        TestTable table = new TestTable(db, "test_create_drop");
-        table.drop();
-    }
-    */
     @Test public void testBulkCopy() throws SQLException {
         if (db == null)
             return;
@@ -65,16 +57,6 @@ public final class PostgreSQLDbTest {
         PostgreSQLDb db = createDb();
         db.createEnum("my_enum", Foo.class);
         db.executeUpdate("DROP TYPE my_enum");
-    }
-
-    @Test public void testUserExists() {
-        if (!canConnect)
-            return;
-
-        PostgreSQLDb db = createDb();
-
-        assertTrue(db.userExists(JamEnv.getRequired("USER")));
-        assertFalse(db.userExists("no such user"));
     }
     */
     public static void main(String[] args) {
