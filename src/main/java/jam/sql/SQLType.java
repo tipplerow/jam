@@ -272,6 +272,14 @@ public abstract class SQLType {
         @Override public int typeCode() {
             return Types.VARCHAR;
         }
+
+        @Override public boolean equals(Object obj) {
+            return (obj instanceof VarCharType) && equalsType((VarCharType) obj);
+        }
+
+        private boolean equalsType(VarCharType that) {
+            return this.length == that.length;
+        }
     }
 
     private static final class TimeStampType extends SQLType {

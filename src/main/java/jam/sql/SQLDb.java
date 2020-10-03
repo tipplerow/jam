@@ -70,84 +70,26 @@ public abstract class SQLDb {
     public abstract Connection openConnection();
 
     /**
-     * Formats the query required to count the number of tables with
-     * a given name (used to determine whether the table exists).
-     *
-     * @param tableName the name of the database table.
-     *
-     * @return the query required to count the number of tables with
-     * the specified name.
-     */
-    protected abstract String countTableNamesQuery(String tableName);
-
-    /**
-     * Commits pending transactions on a connection (unless the
-     * connection is in auto-commit mode).
-     *
-     * @param connection an open database connection.
-     *
-     * @throws RuntimeException if the pending transactions cannot be
-     * committed.
-     */
-    public static void commit(Connection connection) {
-        try {
-            if (!connection.getAutoCommit())
-                connection.commit();
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-    }
-
-    /**
-     * Returns the result of a {@code SELECT COUNT} query.
-     *
-     * @param resultSet the result set returned by the query.
-     *
-     * @return the result of the {@code SELECT COUNT} query.
-     *
-     * @throws RuntimeException if the result set inspection fails.
-     */
-    public static int getCount(ResultSet resultSet) {
-        int result = 0;
-
-        try {
-            if (!resultSet.next())
-                throw JamException.runtime("No result set rows.");
-
-            result = resultSet.getInt(1);
-
-            if (resultSet.next())
-                throw JamException.runtime("Multiple result set rows.");
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-
-        return result;
-    }
-
-    /**
-     * Imports a collection of records into a database table.
+     * Imports a collection of records into a database table by
+     * writing the records to a flat file and using a bulk copy
+     * command.
      *
      * @param tableName the name of the table to update.
      *
      * @param records the records to import.
      *
-     * @return the success or failure of the bulk copy.
+     * @throws RuntimeException if the bulk copy fails.
      */
-    public boolean bulkCopy(String tableName, Collection<? extends BulkRecord> records) {
+    public void bulkCopy(String tableName, Collection<? extends BulkRecord> records) {
         File bulkFile = null;
 
         try {
             bulkFile = File.createTempFile("bulk_", ".psv", JamEnv.tmpdir());
             BulkRecord.writeBulkFile(bulkFile, records);
-            bulkImport(tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER_CHAR, BulkRecord.NULL_STRING);
-            return true;
+            bulkCopy(tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER_CHAR, BulkRecord.NULL_STRING);
         }
         catch (Exception ex) {
-            JamLogger.error(ex.getMessage());
-            return false;
+            throw JamException.runtime(ex);
         }
         finally {
             if (bulkFile != null)
@@ -169,11 +111,11 @@ public abstract class SQLDb {
      *
      * @throws RuntimeException if the update cannot be executed.
      */
-    public void bulkImport(String tableName, String fileName, char delimiter, String nullString) {
-        executeUpdate(formatBulkImport(tableName, fileName, delimiter, nullString));
+    public void bulkCopy(String tableName, String fileName, char delimiter, String nullString) {
+        executeUpdate(formatBulkCopy(tableName, fileName, delimiter, nullString));
     }
 
-    private static String formatBulkImport(String tableName, String fileName, char delimiter, String nullString) {
+    private static String formatBulkCopy(String tableName, String fileName, char delimiter, String nullString) {
         return String.format("COPY %s FROM '%s' WITH DELIMITER '%c' NULL '%s'",
                              tableName, fileName, delimiter, nullString);
     }
@@ -212,62 +154,18 @@ public abstract class SQLDb {
     }
 
     /**
-     * Creates an index on an existing database table.
+     * Creates the table and indexes described by a schema (unless the
+     * table already exists).
      *
-     * @param tableName the name of the existing table.
+     * @param schema the schema for the new database table.
      *
-     * @param columnName the name of the column to be indexed.
+     * @throws RuntimeException if any database errors occur.
      */
-    public void createIndex(String tableName, String columnName) {
-        executeUpdate(formatCreateIndex(tableName, columnName));
-    }
+    public void createTable(SQLSchema schema) {
+        executeUpdate(schema.formatCreateTable(getEngineType()));
 
-    private static String formatCreateIndex(String tableName, String columnName) {
-        return String.format("CREATE INDEX IF NOT EXISTS %s_%s_idx ON %s(%s)",
-                             tableName, columnName, tableName, columnName);
-    }
-
-    /**
-     * Creates a new database table unless it already exists.
-     *
-     * @param tableName the name of the database table.
-     *
-     * @param columns meta-data for each column in the table.
-     *
-     * @throws RuntimeException if the table cannot be created.
-     */
-    public void createTable(String tableName, SQLColumn... columns) {
-        createTable(tableName, List.of(columns));
-    }
-
-    /**
-     * Creates a new database table unless it already exists.
-     *
-     * @param tableName the name of the database table.
-     *
-     * @param columns meta-data for each column in the table.
-     *
-     * @throws RuntimeException if the table cannot be created.
-     */
-    public void createTable(String tableName, List<SQLColumn> columns) {
-        SQLSchema.create(tableName, columns).createTable(this);
-    }
-
-    /**
-     * Creates a new database table unless it already exists.
-     *
-     * @param tableName the name of the database table.
-     *
-     * @param tableSchema the schema for the new database table.
-     *
-     * @throws RuntimeException if the table cannot be created.
-     */
-    public void createTable(String tableName, String tableSchema) {
-        executeUpdate(createTableUpdate(tableName, tableSchema));
-    }
-
-    private static String createTableUpdate(String tableName, String tableSchema) {
-        return String.format("CREATE TABLE IF NOT EXISTS %s (%s)", tableName, tableSchema);
+        for (String createIndexCommand : schema.formatCreateIndex())
+            executeUpdate(createIndexCommand);
     }
 
     /**
@@ -278,139 +176,31 @@ public abstract class SQLDb {
      * @throws RuntimeException if the table cannot be deleted.
      */
     public void dropTable(String tableName) {
-        executeUpdate(dropTableUpdate(tableName));
+        executeUpdate(formatDropTable(tableName));
     }
 
-    private static String dropTableUpdate(String tableName) {
+    private static String formatDropTable(String tableName) {
         return String.format("DROP TABLE IF EXISTS %s", tableName);
-    }
-
-    /**
-     * Executes a database query.
-     *
-     * <p>The database resources must be released after the result
-     * set has been processed by calling {@code queryResult.close()}.
-     *
-     * @param queryStr the SQL query to execute.
-     *
-     * @return the result set containing the query results.
-     *
-     * @throws RuntimeException if the query cannot be executed.
-     */
-    public QueryResult executeQuery(String queryStr) {
-        return QueryResult.create(getConnection(), queryStr, false);
-    }
-
-    /**
-     * Executes a query using an existing open statement.
-     *
-     * <p>The result set should be closed after it has been processed.
-     *
-     * @param statement an open statement.
-     *
-     * @param queryStr the SQL query to execute.
-     *
-     * @return the result set containing the query results.
-     *
-     * @throws RuntimeException if the query cannot be executed.
-     */
-    public ResultSet executeQuery(Statement statement, String queryStr) {
-        logQuery(queryStr);
-
-        try {
-            return statement.executeQuery(queryStr);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
     }
 
     /**
      * Executes and commits an atomic update command.
      *
-     * @param updateStr the SQL update to execute.
+     * @param sql the SQL update to execute.
      *
      * @return the SQL result code.
      *
      * @throws RuntimeException if the update cannot be executed.
      */
-    public int executeUpdate(String updateStr) {
+    public int executeUpdate(String sql) {
+        logUpdate(sql);
+
         try (Statement statement = getConnection().createStatement()) {
-            return executeUpdate(statement, updateStr, true);
+            return statement.executeUpdate(sql);
         }
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
-    }
-
-    /**
-     * Executes an update command using an open statement.
-     *
-     * @param statement an open statement.
-     *
-     * @param updateStr the SQL update to execute.
-     *
-     * @param commit whether to commit the update.
-     *
-     * @return the SQL result code.
-     *
-     * @throws RuntimeException if the update cannot be executed.
-     */
-    public int executeUpdate(Statement statement, String updateStr, boolean commit) {
-        logUpdate(updateStr);
-
-        try {
-            int result = statement.executeUpdate(updateStr);
-
-            if (commit)
-                commit(statement.getConnection());
-
-            return result;
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-    }
-
-    /**
-     * Opens a new database connection and sets the auto-commit flag.
-     *
-     * @param autoCommit the auto-commit flag.
-     *
-     * @return a new open database connection.
-     *
-     * @throws RuntimeException if the connection cannot be opened.
-     */
-    public Connection openConnection(boolean autoCommit) {
-        Connection connection = openConnection();
-
-        try {
-            connection.setAutoCommit(autoCommit);
-        }
-        catch (SQLException ex) {
-            throw JamException.runtime(ex);
-        }
-
-        return connection;
-    }
-
-    /**
-     * Determines whether a database table already exists.
-     *
-     * @param tableName the name of the database table.
-     *
-     * @return {@code true} iff the table already exists.
-     */
-    public boolean tableExists(String tableName) {
-        String queryStr = countTableNamesQuery(tableName);
-
-        try (QueryResult queryResult = executeQuery(queryStr)) {
-            return tableExists(queryResult.getResultSet());
-        }
-    }
-
-    private static boolean tableExists(ResultSet resultSet) {
-        return getCount(resultSet) == 1;
     }
 
     /**

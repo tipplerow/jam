@@ -68,6 +68,16 @@ public final class SQLiteDb extends SQLDb {
     }
 
     /**
+     * Deletes the persistenet database file (if it exists).
+     */
+    public void deleteDbFile() {
+        File fileObj = new File(dbFile);
+
+        if (fileObj.exists())
+            fileObj.delete();
+    }
+
+    /**
      * Returns the name of the persistenet database file.
      *
      * @return the name of the persistent database file.
@@ -85,10 +95,22 @@ public final class SQLiteDb extends SQLDb {
         return dbURL;
     }
 
+    /**
+     * Returns the {@code SQLITE} database engine type.
+     *
+     * @return the {@code SQLITE} database engine type.
+     */
     @Override public SQLEngine getEngineType() {
         return SQLEngine.SQLITE;
     }
 
+    /**
+     * Opens a new database connection.
+     *
+     * @return a new open database connection.
+     *
+     * @throws RuntimeException if the connection cannot be opened.
+     */
     @Override public Connection openConnection() {
         try {
             return DriverManager.getConnection(dbURL);
@@ -96,9 +118,5 @@ public final class SQLiteDb extends SQLDb {
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
-    }
-
-    @Override protected String countTableNamesQuery(String tableName) {
-        return String.format("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = '%s'", tableName);
     }
 }

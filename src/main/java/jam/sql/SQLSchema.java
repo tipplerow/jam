@@ -8,58 +8,68 @@ import java.util.List;
 import jam.lang.JamException;
 import jam.report.LineBuilder;
 import jam.util.FixedList;
+import jam.stream.JamStreams;
 
 /**
  * Builds the schema of a SQL table from its individual columns.
  */
 public final class SQLSchema {
     private final String tableName;
-    private final List<SQLColumn> columns;
+    private final boolean hasPrimaryKey;
+    private final boolean hasCompositeKey;
+    private final List<SQLColumn> allColumns;
+    private final List<SQLColumn> keyColumns;
+    private final List<SQLColumn> dataColumns;
 
     private SQLSchema(String tableName, List<SQLColumn> columns) {
         this.tableName = tableName;
-        this.columns = Collections.unmodifiableList(new ArrayList<SQLColumn>(columns));
 
-        validateColumns();
+        this.allColumns = Collections.unmodifiableList(new ArrayList<SQLColumn>(columns));
+        this.keyColumns = JamStreams.filter(columns, column -> column.isKey());
+        this.dataColumns = JamStreams.filter(columns, column -> !column.isKey());
+        
+        this.hasPrimaryKey = hasPrimaryKey(keyColumns);
+        this.hasCompositeKey = hasCompositeKey(keyColumns);
+
+        validate();
     }
 
-    private void validateColumns() {
-        int primaryKeyCount = countPrimaryKeys();
+    private static boolean hasPrimaryKey(List<SQLColumn> columns) {
+        int keyCount = (int) JamStreams.count(columns, column -> column.isPrimaryKey());
 
-        if (primaryKeyCount == 0)
-            validateCompositeKeys();
-        else if (primaryKeyCount > 1)
+        switch (keyCount) {
+        case 0:
+            return false;
+
+        case 1:
+            return true;
+
+        default:
             throw JamException.runtime("Duplicate primary keys.");
+        }
     }
 
-    private int countPrimaryKeys() {
-        int keyCount = 0;
+    private boolean hasCompositeKey(List<SQLColumn> columns) {
+        int keyCount = (int) JamStreams.count(columns, column -> column.isCompositeKey());
 
-        for (SQLColumn column : columns)
-            if (column.isPrimaryKey())
-                ++keyCount;
+        switch (keyCount) {
+        case 0:
+            return false;
 
-        return keyCount;
-    }
-
-    private void validateCompositeKeys() {
-        //
-        // Either zero or two or more composite keys are allowed...
-        //
-        int compositeKeyCount = countCompositeKeys();
-
-        if (compositeKeyCount == 1)
+        case 1:
             throw JamException.runtime("Only one composite key was defined.");
+
+        default:
+            return true;
+        }
     }
 
-    private int countCompositeKeys() {
-        int keyCount = 0;
+    private void validate() {
+        if (allColumns.isEmpty())
+            throw JamException.runtime("No columns were defined.");
 
-        for (SQLColumn column : columns)
-            if (column.isCompositeKey())
-                ++keyCount;
-
-        return keyCount;
+        if (hasPrimaryKey && hasCompositeKey)
+            throw JamException.runtime("Both a primary and composite key were defined.");
     }
 
     /**
@@ -89,20 +99,6 @@ public final class SQLSchema {
     }
 
     /**
-     * Creates the table and indexes described by this schema.
-     *
-     * @param db the database that will house the table.
-     *
-     * @throws RuntimeException if any database errors occur.
-     */
-    public void createTable(SQLDb db) {
-        db.executeUpdate(formatCreateTable(db.getEngineType()));
-
-        for (String createIndexCommand : formatCreateIndex())
-            db.executeUpdate(createIndexCommand);
-    }
-
-    /**
      * Constructs the {@code CREATE TABLE} command for this schema.
      *
      * @param engine the database engine that will create the table.
@@ -112,7 +108,7 @@ public final class SQLSchema {
     public String formatCreateTable(SQLEngine engine) {
         LineBuilder builder = new LineBuilder(", ");
 
-        for (SQLColumn column : columns)
+        for (SQLColumn column : allColumns)
             builder.append(column.join(engine));
 
         if (hasCompositeKey())
@@ -128,7 +124,7 @@ public final class SQLSchema {
     private String joinCompositeKeys() {
         LineBuilder builder = new LineBuilder(", ");
 
-        for (SQLColumn column : columns)
+        for (SQLColumn column : keyColumns)
             if (column.isCompositeKey())
                 builder.append(column.getName());
 
@@ -143,7 +139,7 @@ public final class SQLSchema {
     public List<String> formatCreateIndex() {
         List<String> commands = new ArrayList<String>();
 
-        for (SQLColumn column : columns)
+        for (SQLColumn column : allColumns)
             if (column.hasIndex())
                 commands.add(String.format("CREATE INDEX IF NOT EXISTS %s_%s_idx ON %s (%s)",
                                            tableName, column.getName(), tableName, column.getName()));
@@ -152,12 +148,75 @@ public final class SQLSchema {
     }
 
     /**
+     * Returns the meta-data for all columns in this schema.
+     *
+     * @return the meta-data for all columns in this schema.
+     */
+    public int countColumns() {
+        return allColumns.size();
+    }
+
+    /**
+     * Returns the meta-data for the key columns in this schema.
+     *
+     * @return the meta-data for the key columns in this schema.
+     */
+    public int countKeyColumns() {
+        return keyColumns.size();
+    }
+
+    /**
+     * Returns the meta-data for the data columns in this schema.
+     *
+     * @return the meta-data for the data columns in this schema.
+     */
+    public int countDataColumns() {
+        return dataColumns.size();
+    }
+
+    /**
+     * Returns the meta-data for all columns in this schema.
+     *
+     * @return the meta-data for all columns in this schema.
+     */
+    public List<SQLColumn> getColumns() {
+        return allColumns;
+    }
+
+    /**
+     * Returns the meta-data for the key columns in this schema.
+     *
+     * @return the meta-data for the key columns in this schema.
+     */
+    public List<SQLColumn> getKeyColumns() {
+        return keyColumns;
+    }
+
+    /**
+     * Returns the meta-data for the data columns in this schema.
+     *
+     * @return the meta-data for the data columns in this schema.
+     */
+    public List<SQLColumn> getDataColumns() {
+        return dataColumns;
+    }
+
+    /**
+     * Returns the name of the table defined by this schema.
+     *
+     * @return the name of the table defined by this schema.
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
      * Identifies tables with a composite key.
      *
      * @return {@code true} iff this schema has a composite key.
      */
     public boolean hasCompositeKey() {
-        return countCompositeKeys() > 1;
+        return hasCompositeKey;
     }
 
     /**
@@ -166,6 +225,6 @@ public final class SQLSchema {
      * @return {@code true} iff this schema has a single primary key.
      */
     public boolean hasPrimaryKey() {
-        return countPrimaryKeys() == 1;
+        return hasPrimaryKey;
     }
 }

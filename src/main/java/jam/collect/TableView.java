@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jam.lang.JamException;
+import jam.stream.JamStreams;
 
 /**
  * Provides a read-only view of records indexed by a key.
@@ -43,6 +44,18 @@ public interface TableView<K, V> {
      */
     public default boolean contains(K key) {
         return select(key) != null;
+    }
+
+    /**
+     * Identifies keys contained in this table.
+     *
+     * @param keys the key to search for.
+     *
+     * @return a list where element {@code k} is {@code true} iff
+     * this table contains a record with key {@code keys.get(k)}.
+     */
+    public default List<Boolean> contains(List<K> keys) {
+        return JamStreams.apply(keys, key -> contains(key));
     }
 
     /**

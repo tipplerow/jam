@@ -1,6 +1,8 @@
 
 package jam.sql;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -59,6 +61,41 @@ public final class SQLColumn {
     }
 
     /**
+     * Creates a new SQL {@code DATE} column with a given name.
+     *
+     * @param name the column name.
+     *
+     * @return a new SQL {@code DATE} column with the specified name.
+     */
+    public static SQLColumn ofDate(String name) {
+        return create(name, SQLType.DATE);
+    }
+
+    /**
+     * Creates a new SQL {@code DOUBLE PRECISION} column with a
+     * given name.
+     *
+     * @param name the column name.
+     *
+     * @return a new SQL {@code DOUBLE PRECISION} column with the
+     * specified name.
+     */
+    public static SQLColumn ofDouble(String name) {
+        return create(name, SQLType.DOUBLE);
+    }
+
+    /**
+     * Creates a new SQL {@code INTEGER} column with a given name.
+     *
+     * @param name the column name.
+     *
+     * @return a new SQL {@code INTEGER} column with the specified name.
+     */
+    public static SQLColumn ofInteger(String name) {
+        return create(name, SQLType.INTEGER);
+    }
+
+    /**
      * Creates a new serial (auto-increment) column as the primary key
      * for a table.
      *
@@ -66,8 +103,35 @@ public final class SQLColumn {
      *
      * @return the SQL column meta-data.
      */
-    public static SQLColumn serial(String name) {
+    public static SQLColumn ofSerial(String name) {
         return create(name, SQLType.SERIAL).primaryKey();
+    }
+
+    /**
+     * Creates a new SQL {@code TIMESTAMP} column with a given name.
+     *
+     * @param name the column name.
+     *
+     * @return a new SQL {@code TIMESTAMP} column with the specified
+     * name.
+     */
+    public static SQLColumn ofTimeStamp(String name) {
+        return create(name, SQLType.TIME_STAMP);
+    }
+
+    /**
+     * Creates a new SQL {@code VARCHAR} column with a given name and
+     * maximum length.
+     *
+     * @param name the name for the column.
+     *
+     * @param length the maximum length for the column.
+     *
+     * @return a new SQL {@code VARCHAR} column with the specified
+     * name and maximum length.
+     */
+    public static SQLColumn ofVarChar(String name, int length) {
+        return create(name, SQLType.varChar(length));
     }
 
     /**
@@ -285,6 +349,25 @@ public final class SQLColumn {
      */
     public boolean hasIndex() {
         return qualifiers.contains(Qualifier.WITH_INDEX);
+    }
+
+    /**
+     * Assigns a value to a parameter in a prepared statement.
+     *
+     * @param statement the prepared statement to set.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first parameter is 1, the second is 2, ...).
+     *
+     * @param value the parameter value to assign.
+     *
+     * @throws SQLException if any SQL errors occur.
+     *
+     * @throws ClassCastException unless the parameter value has a
+     * runtime type that is consistent with this column type.
+     */
+    public void set(PreparedStatement statement, int index, Object value) throws SQLException {
+        type.set(statement, index, value);
     }
 
     @Override public String toString() {

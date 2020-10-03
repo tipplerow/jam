@@ -1,5 +1,5 @@
 
-package jam.util;
+package jam.stream;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,13 +13,13 @@ import jam.math.IntPair;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class StreamUtilTest {
+public class JamStreamsTest {
     @Test public void testApply() {
         int sampleSize = 100000;
         int concurrency = 10;
 
         List<Integer> source = createSource(sampleSize);
-        List<IntPair> result = StreamUtil.apply(source, x -> IntPair.of(x, x * x), concurrency);
+        List<IntPair> result = JamStreams.apply(source, x -> IntPair.of(x, x * x));
 
         assertSquare(result.get(0));
         assertSquare(result.get(sampleSize - 1));
@@ -29,7 +29,7 @@ public class StreamUtilTest {
         int sampleSize = 100000;
 
         List<Integer> source = createSource(sampleSize);
-        List<IntPair> result = StreamUtil.applyParallel(source, x -> IntPair.of(x, x * x));
+        List<IntPair> result = JamStreams.applyParallel(source, x -> IntPair.of(x, x * x));
 
         assertSquare(result.get(0));
         assertSquare(result.get(sampleSize - 1));
@@ -50,7 +50,7 @@ public class StreamUtilTest {
 
     @Test public void testToArrayList() {
         List<String> expected = List.of("abc", "def", "ghi");
-        List<String> actual   = StreamUtil.toArrayList(expected.stream());
+        List<String> actual   = JamStreams.toArrayList(expected.stream());
 
         assertEquals(expected, actual);
         assertTrue(actual instanceof ArrayList);
@@ -58,7 +58,7 @@ public class StreamUtilTest {
 
     @Test public void testToLinkedList() {
         List<String> expected = List.of("abc", "def", "ghi");
-        List<String> actual   = StreamUtil.toLinkedList(expected.stream());
+        List<String> actual   = JamStreams.toLinkedList(expected.stream());
 
         assertEquals(expected, actual);
         assertTrue(actual instanceof LinkedList);
@@ -66,7 +66,7 @@ public class StreamUtilTest {
 
     @Test public void testToHashSet() {
         Set<String> expected = Set.of("abc", "def", "ghi");
-        Set<String> actual   = StreamUtil.toHashSet(expected.stream());
+        Set<String> actual   = JamStreams.toHashSet(expected.stream());
 
         assertEquals(expected, actual);
         assertTrue(actual instanceof HashSet);
@@ -74,13 +74,13 @@ public class StreamUtilTest {
 
     @Test public void testToTreeSet() {
         Set<String> expected = Set.of("abc", "def", "ghi");
-        Set<String> actual   = StreamUtil.toTreeSet(expected.stream());
+        Set<String> actual   = JamStreams.toTreeSet(expected.stream());
 
         assertEquals(expected, actual);
         assertTrue(actual instanceof TreeSet);
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.util.StreamUtilTest");
+        org.junit.runner.JUnitCore.main("jam.stream.JamStreamsTest");
     }
 }

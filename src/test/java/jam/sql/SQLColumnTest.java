@@ -5,46 +5,48 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class SQLColumnTest {
+    private static final SQLEngine engine = SQLEngine.POSTGRES;
+
     @Test public void testCreate() {
-        SQLColumn column = SQLColumn.create("pmid", "integer");
+        SQLColumn column = SQLColumn.ofInteger("pmid");
 
         assertEquals("pmid", column.getName());
-        assertEquals("integer", column.getType());
+        assertEquals(SQLType.INTEGER, column.getType());
     }
 
     @Test public void testJoin() {
-        assertEquals("pmid integer", SQLColumn.create("pmid", "integer").join());
-        assertEquals("pmid integer UNIQUE", SQLColumn.create("pmid", "integer").unique().join());
+        assertEquals("pmid INTEGER", SQLColumn.ofInteger("pmid").join(engine));
+        assertEquals("pmid INTEGER UNIQUE", SQLColumn.ofInteger("pmid").unique().join(engine));
     }
 
     @Test public void testNotNull() {
-        assertEquals("pmid integer NOT NULL", SQLColumn.create("pmid", "integer").notNull().join());
+        assertEquals("pmid INTEGER NOT NULL", SQLColumn.ofInteger("pmid").notNull().join(engine));
     }
 
     @Test public void testPrimaryKey() {
-        assertEquals("pmid integer PRIMARY KEY", SQLColumn.create("pmid", "integer").primaryKey().join());
+        assertEquals("pmid INTEGER PRIMARY KEY", SQLColumn.ofInteger("pmid").primaryKey().join(engine));
     }
 
     @Test public void testWithIndex() {
-        assertEquals("pmid integer", SQLColumn.create("pmid", "integer").withIndex().join());
-        assertEquals("pmid integer NOT NULL", SQLColumn.create("pmid", "integer").withIndex().notNull().join());
+        assertEquals("pmid INTEGER", SQLColumn.ofInteger("pmid").withIndex().join(engine));
+        assertEquals("pmid INTEGER NOT NULL", SQLColumn.ofInteger("pmid").withIndex().notNull().join(engine));
     }
 
     @Test public void testImmutability() {
-        SQLColumn column = SQLColumn.create("pmid", "integer");
+        SQLColumn column = SQLColumn.ofInteger("pmid");
 
         column.primaryKey();
-        assertEquals("pmid integer", column.join());
+        assertEquals("pmid INTEGER", column.join(engine));
 
         column.unique();
-        assertEquals("pmid integer", column.join());
+        assertEquals("pmid INTEGER", column.join(engine));
 
         column.notNull();
-        assertEquals("pmid integer", column.join());
+        assertEquals("pmid INTEGER", column.join(engine));
     }
 
     @Test public void testQualifiers() {
-        SQLColumn base = SQLColumn.create("pmid", "integer");
+        SQLColumn base = SQLColumn.ofInteger("pmid");
         assertQualifiers(base, false, false, false, false, false);
 
         SQLColumn compkey = base.compositeKey();
@@ -87,8 +89,8 @@ public class SQLColumnTest {
     }
 
     @Test public void testSerial() {
-        SQLColumn serial = SQLColumn.serial("key");
-        assertEquals("key SERIAL PRIMARY KEY", serial.join());
+        SQLColumn serial = SQLColumn.ofSerial("key");
+        assertEquals("key SERIAL PRIMARY KEY", serial.join(engine));
     }
 
     public static void main(String[] args) {

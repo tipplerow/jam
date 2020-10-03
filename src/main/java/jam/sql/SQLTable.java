@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import jam.app.JamLogger;
 import jam.collect.JamTable;
@@ -32,37 +33,120 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
     protected final SQLDb db;
 
     /**
+     * The schema that defines the database table structure.
+     */
+    protected final SQLSchema schema;
+
+    /**
      * Creates a new table with a fixed database manager.
      *
      * @param db the manager for the database containing the table.
      *
+     * @param schema the schema that defines the table structure.
+     *
      * @throws RuntimeException unless the table contains at least one
      * key column.
      */
-    protected SQLTable(SQLDb db) {
+    protected SQLTable(SQLDb db, SQLSchema schema) {
         this.db = db;
+        this.schema = schema;
+
+        // Create the database table unless it already exists...
+        db.createTable(schema);
     }
 
-    private String formatDelete(String columnName) {
-        return String.format("DELETE FROM %s WHERE %s = ?", getTableName(), columnName);
+    private void commit() throws SQLException {
+        Connection connection = getConnection();
+        
+        if (!connection.getAutoCommit())
+            connection.commit();
+    }
+
+    private Statement createStatement() throws SQLException {
+        return getConnection().createStatement();
+    }
+
+    private boolean executeContainsKey(PreparedStatement statement, K key) throws SQLException {
+        setKey(statement, key, 1);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            resultSet.next();
+            return resultSet.getInt(1) > 0;
+        }
+    }
+
+    private List<Boolean> executeContainsKeys(PreparedStatement statement, Collection<K> keys) throws SQLException {
+        List<Boolean> contains = new ArrayList<Boolean>(keys.size());
+
+        for (K key : keys)
+            contains.add(executeContainsKey(statement, key));
+
+        return contains;
+    }
+
+    private <T> void executeBatch(PreparedStatement statement, Collection<T> collection, Consumer<? super T> setter) throws SQLException {
+        for (T object : collection) {
+            setter.accept(object);
+            statement.addBatch();
+        }
+
+        statement.executeBatch();
+        commit();
+    }
+
+    private List<V> executeSelectAll(Statement statement) throws SQLException {
+        String sql = formatSelectAll();
+
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            List<V> records = new ArrayList<V>();
+
+            while (resultSet.next())
+                records.add(getRecord(resultSet));
+
+            return records;
+        }
+    }
+
+    private int executeSelectCount(Statement statement) throws SQLException {
+        String sql = formatSelectCount();
+
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            resultSet.next();
+            return resultSet.getInt(1);
+        }
+    }
+
+    private V executeSelectKey(PreparedStatement statement, K key) throws SQLException {
+        setKey(statement, key, 1);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next())
+                return getRecord(resultSet);
+            else
+                return null;
+        }
+    }
+
+    private String formatContainsKey() {
+        return String.format("SELECT COUNT(*) FROM %s %s", schema.getTableName(), formatWhere(schema.getKeyColumns()));
     }
 
     private String formatDeleteAll() {
-        return String.format("DELETE FROM %s", getTableName());
+        return String.format("DELETE FROM %s", schema.getTableName());
     }
 
     private String formatDeleteKey() {
-        return String.format("DELETE FROM %s %s", getTableName(), formatWhere(getKeyColumns()));
+        return String.format("DELETE FROM %s %s", schema.getTableName(), formatWhere(schema.getKeyColumns()));
     }
 
     private String formatInsert() {
-        return String.format("INSERT INTO %s VALUES(%s)", getTableName(), formatInsertParameters());
+        return String.format("INSERT INTO %s VALUES(%s)", schema.getTableName(), formatInsertParameters());
     }
 
     private String formatInsertParameters() {
         LineBuilder builder = new LineBuilder(", ");
 
-        for (SQLColumn column : getColumns())
+        for (SQLColumn column : schema.getColumns())
             if (column.isSerial())
                 builder.append("DEFAULT");
             else
@@ -71,27 +155,22 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
         return builder.toString();
     }
 
-    private String formatSelect(String columnName) {
-        return String.format("SELECT * FROM %s WHERE %s = ?", getTableName(), columnName);
-    }
-
     private String formatSelectAll() {
-        return String.format("SELECT * FROM %s", getTableName());
+        return String.format("SELECT * FROM %s", schema.getTableName());
     }
 
     private String formatSelectCount() {
-        return String.format("SELECT COUNT(*) FROM %s", getTableName());
-    }
-
-    private String formatSelectCount(String columnName, String columnValue) {
-        return String.format("SELECT COUNT(*) FROM %s WHERE %s = '%s'", getTableName(), columnName, columnValue);
+        return String.format("SELECT COUNT(*) FROM %s", schema.getTableName());
     }
 
     private String formatSelectKey() {
-        return String.format("SELECT * FROM %s %s", getTableName(), formatWhere(getKeyColumns()));
+        return String.format("SELECT * FROM %s %s", schema.getTableName(), formatWhere(schema.getKeyColumns()));
     }
 
     private static String formatWhere(List<SQLColumn> columns) {
+        if (columns.isEmpty())
+            throw JamException.runtime("No columns for a WHERE clause.");
+
         LineBuilder builder = new LineBuilder(" AND ");
 
         for (SQLColumn column : columns)
@@ -100,15 +179,69 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
         return "WHERE " + builder.toString();
     }
 
-    /**
-     * Commits any outstanding transactions on the open database
-     * connection.
-     *
-     * @throws SQLException unless the connection is open and the
-     * commit succeeds.
-     */
-    protected void commit() throws SQLException {
-        getConnection().commit();
+    private String formatUpdate() {
+        return String.format("UPDATE %s %s %s",
+                             schema.getTableName(),
+                             formatSet(schema.getDataColumns()),
+                             formatWhere(schema.getKeyColumns()));
+    }
+
+    private String formatSet(List<SQLColumn> columns) {
+        if (columns.isEmpty())
+            throw JamException.runtime("No columns for a SET clause.");
+
+        LineBuilder builder = new LineBuilder(", ");
+
+        for (SQLColumn column : columns)
+            builder.append(String.format("%s = ?", column.getName()));
+
+        return "SET " + builder.toString();
+    }
+
+    private PreparedStatement prepareContainsKey() throws SQLException {
+        return prepareStatement(formatContainsKey());
+    }
+
+    private PreparedStatement prepareDeleteKey() throws SQLException {
+        return prepareStatement(formatDeleteKey());
+    }
+
+    private PreparedStatement prepareInsert() throws SQLException {
+        return prepareStatement(formatInsert());
+    }
+
+    private PreparedStatement prepareSelectKey() throws SQLException {
+        return prepareStatement(formatSelectKey());
+    }
+
+    private PreparedStatement prepareUpdate() throws SQLException {
+        return prepareStatement(formatUpdate());
+    }
+
+    private PreparedStatement prepareStatement(String sql) throws SQLException {
+        return getConnection().prepareStatement(sql);
+    }
+
+    private void rollback(Connection connection) throws SQLException {
+        JamLogger.warn("Rolling back transaction...");
+
+        try {
+            connection.rollback();
+        }
+        catch (SQLException ex) {
+            JamLogger.warn("Failed to rollback update transaction!");
+            JamLogger.warn(ex);
+        }
+    }
+
+    private void setInsert(PreparedStatement statement, V record) throws SQLException {
+        setKey(statement, getKey(record), 1);
+        setData(statement, record, 1 + schema.countKeyColumns());
+    }
+
+    private void setUpdate(PreparedStatement statement, V record) throws SQLException {
+        setData(statement, record, 1);
+        setKey(statement, getKey(record), 1 + schema.countDataColumns());
     }
 
     /**
@@ -121,86 +254,13 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      */
     protected synchronized Connection getConnection() throws SQLException {
         if (connection == null) {
+            JamLogger.info("Opening connection for table [%s]...", schema.getTableName());
             connection = db.openConnection();
             connection.setAutoCommit(false);
         }
 
         return connection;
     }
-
-    /**
-     * Creates a new statement using the open database connection.
-     *
-     * @return the new statement.
-     *
-     * @throws SQLException if any database errors occur.
-     */
-    protected Statement createStatement() throws SQLException {
-        return getConnection().createStatement();
-    }
-
-    /**
-     * Prepares the insert statement using the open database
-     * connection.
-     *
-     * @return the new prepared statement.
-     *
-     * @throws SQLException if any database errors occur.
-     */
-    protected PreparedStatement prepareInsert() throws SQLException {
-        return prepareStatement(formatInsert());
-    }
-
-    /**
-     * Prepares the select-by-key statement using the open database
-     * connection.
-     *
-     * @return the new prepared statement.
-     *
-     * @throws SQLException if any database errors occur.
-     */
-    protected PreparedStatement prepareSelectKey() throws SQLException {
-        return prepareStatement(formatSelectKey());
-    }
-
-    /**
-     * Prepares a statement using the open database connection.
-     *
-     * @param sql the statement text.
-     *
-     * @return the new prepared statement.
-     *
-     * @throws SQLException if any database errors occur.
-     */
-    protected PreparedStatement prepareStatement(String sql) throws SQLException {
-        return getConnection().prepareStatement(sql);
-    }
-
-    /**
-     * Rolls back the latest database transaction.
-     *
-     * @param connection the open database connection.
-     *
-     * @throws SQLException if the rollback fails.
-     */
-    protected void rollback(Connection connection) throws SQLException {
-        JamLogger.warn("Failed to update database table!");
-
-        try {
-            connection.rollback();
-        }
-        catch (SQLException ex) {
-            JamLogger.warn("Failed to rollback update transaction!");
-            JamLogger.warn(ex);
-        }
-    }
-
-    /**
-     * Returns the column meta-data (ordered from left to right).
-     *
-     * @return the column meta-data (ordered from left to right).
-     */
-    public abstract List<SQLColumn> getColumns();
 
     /**
      * Returns the record stored in the current row of a result set
@@ -215,48 +275,63 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
     public abstract V getRecord(ResultSet resultSet) throws SQLException;
 
     /**
-     * Returns the name of the database table.
+     * Assigns a record key to a prepared statement (to be used to
+     * select and delete matching records).
      *
-     * @return the name of the database table.
-     */
-    public abstract String getTableName();
-
-    /**
-     * Assigns each field in a record key to its corresponding column
-     * in a prepared statement (to be used in select queries).
+     * <p>The key fields should be assigned to parameter positions
+     * {@code index, index + 1, ..., index + N}, where {@code N} is
+     * the number of key fields in the record (usually just 1, but
+     * may be 2 or more for composite keys or join tables).
      *
      * @param statement a prepared statement with one parameter for
      * each key column in this table [in the order defined by the
-     * method {@code getColumns()}].
+     * method {@code SQLSchema::getKeyColumns()}].
      *
-     * @param record the record to assign to the statement.
+     * @param key the record key to assign to the statement.
+     *
+     * @param index the index of the first key field in the prepared
+     * statement.
      *
      * @throws SQLException if any SQL errors occur.
      */
-    public abstract void setKey(PreparedStatement statement, K key) throws SQLException;
+    public abstract void setKey(PreparedStatement statement, K key, int index) throws SQLException;
 
     /**
-     * Assigns each field in a record to its corresponding column in a
-     * prepared statement (to be used to insert the record into this
-     * table).
+     * Assigns each data field in a record to its corresponding column
+     * in a prepared statement (to be used to insert or update the
+     * record into this table).
+     *
+     * <p>The key fields should be assigned to parameter positions
+     * {@code index, index + 1, ..., index + N}, where {@code N} is
+     * the number of data fields in the record.
      *
      * @param statement a prepared statement with one parameter for
-     * each column in this table [in the order defined by the method
-     * {@code getColumns()}].
+     * each data column in this table [in the order defined by the
+     * method {@code SQLSchema::getDataColumns()}].
      *
      * @param record the record to assign to the statement.
      *
      * @throws SQLException if any SQL errors occur.
      */
-    public abstract void setRecord(PreparedStatement statement, V row) throws SQLException;
+    public abstract void setData(PreparedStatement statement, V record, int index) throws SQLException;
 
     /**
-     * Returns the number of columns in this table.
+     * Drops this table from the database.
      *
-     * @return the number of columns in this table.
+     * @throws RuntimeException if any SQL errors occur.
      */
-    public int countColumns() {
-        return getColumns().size();
+    public void drop() {
+        try {
+            if (connection != null) {
+                JamLogger.info("Closing connection for table [%s]...", schema.getTableName());
+                connection.close();
+            }
+        }
+        catch (SQLException ex) {
+            throw runtimeEx(ex);
+        }
+
+        db.dropTable(schema.getTableName());
     }
 
     /**
@@ -264,261 +339,52 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      *
      * @return the database that contains this table.
      */
-    public SQLDb db() {
+    public SQLDb getDB() {
         return db;
     }
 
     /**
-     * Deletes rows for which a particular column matches a target
-     * value.
+     * Returns the schema that defines the structure of this table.
      *
-     * @param columnName the name of the column to match on.
-     *
-     * @param targetValues the column values to match.
-     *
-     * @throws RuntimeException if this table does not contain a
-     * column with the specified name or if any SQL errors occur.
-     */
-    /*
-    public void delete(String columnName, Collection<String> targetValues) {
-        String sql = formatDelete(columnName);
-
-        try (PreparedStatement statement = prepareStatement(sql)) {
-            for (String target : targetValues) {
-                statement.setString(1, target);
-                statement.addBatch();
-            }
-
-            statement.executeBatch();
-            commit();
-        }
-        catch (SQLException ex) {
-            throw runtimeEx(ex);
-        }
-    }
-    */
-
-    /**
-     * Determines whether this table exists in the database.
-     *
-     * @return {@code true} iff this table exists in the database.
-     */
-    public synchronized boolean exists() {
-        return db.tableExists(getTableName());
-    }
-
-    /**
-     * Returns the unit-offset index (left-most column = 1) of the
-     * column with a given name.
-     *
-     * @param columnName the name of the indexed column.
-     *
-     * @return the unit-offset index (left-most column = 1) of the
-     * column with the specified name (or {@code 0} if there is no
-     * matching column).
-     */
-    public int getColumnIndex(String columnName) {
-        for (int index = 1; index <= countColumns(); ++index)
-            if (getColumnName(index).equals(columnName))
-                return index;
-
-        return 0;
-    }
-
-    /**
-     * Returns the name of an indexed column <em>with the first column
-     * having index 1</em> (as in a {@code ResultSet}).
-     *
-     * @param index the unit-offset index (first column = 1).
-     *
-     * @return the name of the indexed column.
-     */
-    public String getColumnName(int index) {
-        return getColumns().get(index - 1).getName();
-    }
-
-    /**
-     * Returns the names of the columns (in order from left to right).
-     *
-     * @return the names of the columns (in order from left to right).
-     */
-    public List<String> getColumnNames() {
-        return SQLColumn.getNames(getColumns());
-    }
-
-    /**
-     * Returns the result of a {@code SELECT COUNT(*)} query and
-     * closes the result set.
-     *
-     * @return the result of a {@code SELECT COUNT(*)} query.
-     */
-    public int getCount(ResultSet resultSet) throws SQLException {
-        try {
-            resultSet.next();
-            return resultSet.getInt(1);
-        }
-        finally {
-            resultSet.close();
-        }
-    }
-
-    /**
-     * Returns the meta-data for the key columns in this table.
-     *
-     * @return the meta-data for the key columns in this table.
-     *
-     * @throws RuntimeException unless this table contains at least
-     * one key column.
-     */
-    public List<SQLColumn> getKeyColumns() {
-        List<SQLColumn> keyColumns =
-            JamStreams.filter(getColumns(), column -> column.isKey());
-
-        if (keyColumns.isEmpty())
-            throw JamException.runtime("No key columns for table [%s].", getTableName());
-        else
-            return keyColumns;
-    }
-
-    /**
-     * Returns all records remaining in a result set produced by a
-     * {@code SELECT} query and closes the result set.
-     *
-     * @param resultSet an active result set, which is closed upon
-     * completion.
-     *
-     * @return a list containing all remaining records stored in the
-     * specified result set.
-     *
-     * @throws SQLException if any SQL errors occur.
-     */
-    public List<V> getRecords(ResultSet resultSet) throws SQLException {
-        List<V> rows = new ArrayList<V>();
-
-        try {
-            while (resultSet.next())
-                rows.add(getRecord(resultSet));
-
-            return rows;
-        }
-        finally {
-            resultSet.close();
-        }
-    }
-
-    /**
-     * Returns the table schema.
-     *
-     * @return the table schema.
+     * @return the schema that defines the structure of this table.
      */
     public SQLSchema getSchema() {
-        return SQLSchema.create(getTableName(), getColumns());
+        return schema;
     }
 
     /**
-     * Returns the single record stored in a result set produced by
-     * a {@code SELECT} query and closes the result set.
+     * Identifies keys contained in this table.
      *
-     * @param resultSet an active result set.
+     * @param key the key to search for.
      *
-     * @return the single record stored in the result set (or
-     * {@code null} if the result set is empty).
-     *
-     * @throws SQLException if any SQL errors occur.
+     * @return {@code true} iff this table contains a record with the
+     * specified key.
      */
-    public V getSingle(ResultSet resultSet) throws SQLException {
-        try {
-            if (resultSet.next())
-                return getRecord(resultSet);
-            else
-                return null;
-        }
-        finally {
-            resultSet.close();
-        }
-    }
-
-    /**
-     * Executes a SQL query against this table.
-     *
-     * <p>To avoid resource leaks, the query result must be closed
-     * after the result set has been processed.
-     *
-     * @param queryStr the SQL query to execute.
-     *
-     * @throws RuntimeException if any SQL errors occur.
-     */
-    public QueryResult query(String queryStr) throws SQLException {
-        return QueryResult.create(getConnection(), queryStr, false);
-    }
-
-    /**
-     * Creates this table in the database unless it already exists.
-     *
-     * @throws RuntimeException if the table does not already exist
-     * and cannot be created.
-     */
-    public synchronized void require() {
-        getSchema().createTable(db);
-    }
-
-    /**
-     * Selects rows for which a particular column matches a target
-     * value.
-     *
-     * @param columnName the name of the column to match on.
-     *
-     * @param targetValues the column values to match.
-     *
-     * @return all rows matching the the specified target values.
-     *
-     * @throws RuntimeException if this table does not contain a
-     * column with the specified name or if any SQL errors occur.
-     */
-    /*
-    public List<V> select(String columnName, Collection<String> targetValues) {
-        String sql = formatSelect(columnName);
-
-        try (PreparedStatement statement = prepareStatement(sql)) {
-            List<V> rows = new ArrayList<V>();
-
-            for (String target : targetValues) {
-                statement.setString(1, target);
-                
-                ResultSet resultSet = statement.executeQuery();
-                V record = getSingle(resultSet);
-
-                if (record != null)
-                    rows.add(record);
-            }
-
-            return rows;
+    @Override public boolean contains(K key) {
+        try (PreparedStatement statement = prepareContainsKey()) {
+            return executeContainsKey(statement, key);
         }
         catch (SQLException ex) {
             throw runtimeEx(ex);
         }
     }
-    */
 
     /**
-     * Returns the number of rows containing a target value in a named
-     * column.
+     * Identifies keys contained in this table.
      *
-     * @param columnName the column name to examine.
+     * @param keys the key to search for.
      *
-     * @param targetValue the target value to match.
-     *
-     * @return the number of rows containing the specified target
-     * value in the named column.
-     *
-     * @throws RuntimeException if any SQL errors occur.
+     * @return a list where element {@code k} is {@code true} iff
+     * this table contains a record with key {@code keys.get(k)}.
      */
-    /*
-    public int selectCount(String columnName, String targetValue) {
-        return selectCount(formatSelectCount(columnName, targetValue));
+    @Override public List<Boolean> contains(List<K> keys) {
+        try (PreparedStatement statement = prepareContainsKey()) {
+            return executeContainsKeys(statement, keys);
+        }
+        catch (SQLException ex) {
+            throw runtimeEx(ex);
+        }
     }
-
-    */
 
     /**
      * Returns the number of rows in this table.
@@ -528,10 +394,8 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      * @throws RuntimeException if any SQL errors occur.
      */
     @Override public int count() {
-        String sql = formatSelectCount();
-
         try (Statement statement = createStatement()) {
-            return getCount(statement.executeQuery(sql));
+            return executeSelectCount(statement);
         }
         catch (SQLException ex) {
             throw runtimeEx(ex);
@@ -563,36 +427,32 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      */
     @Override public boolean delete(K key) {
         int result = 0;
-        String sql = formatDeleteKey();
 
-        try (PreparedStatement statement = prepareStatement(sql)) {
-            setKey(statement, key);
+        try (PreparedStatement statement = prepareDeleteKey()) {
+            setKey(statement, key, 1);
             result = statement.executeUpdate();
             commit();
         }
         catch (SQLException ex) {
-            throw runtimeEx(ex);
+            JamLogger.warn(ex);
+            return false;
         }
 
-        return result == 1;
+        assert result == 1;
+        return true;
     }
 
     /**
-     * Deletes the records indexed by collection of keys.
+     * Deletes the records indexed by a collection of keys.
      *
      * @param keys the keys of the records to delete.
      *
-     * @return a list containing the records matching the specified key.
-     * The matching records are returned in the same order as their keys
-     * appear in the input collection, except that {@code null} values
-     * are omitted.
+     * @throws RuntimeException if any SQL errors occur.
      */
     @Override public void delete(Collection<K> keys) {
-        String sql = formatDeleteKey();
-
-        try (PreparedStatement statement = prepareStatement(sql)) {
+        try (PreparedStatement statement = prepareDeleteKey()) {
             for (K key : keys) {
-                setKey(statement, key);
+                setKey(statement, key, 1);
                 statement.addBatch();
             }
 
@@ -605,27 +465,55 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
     }
 
     /**
+     * Imports a collection of bulk records into this table by writing
+     * the records to a flat file and executing a bulk copy.
+     *
+     * @param records the records to import.
+     *
+     * @throws RuntimeException if the bulk copy fails.
+     */
+    public void copy(Collection<? extends BulkRecord> records) {
+        db.bulkCopy(schema.getTableName(), records);
+    }
+
+    /**
+     * Copies rows from a delimited file (with no header line).
+     *
+     * @param fileName the name of a delimited file containing the
+     * rows to be added (with no header line).
+     *
+     * @param delimiter the column delimiter in the flat file.
+     *
+     * @param nullString the SQL {@code NULL} identifier in the flat file.
+     *
+     * @throws RuntimeException if the update cannot be executed.
+     */
+    public void copy(String fileName, char delimiter, String nullString) {
+        db.bulkCopy(schema.getTableName(), fileName, delimiter, nullString);
+    }
+
+    /**
      * Inserts a record into this table.
      *
      * @param record the record to insert.
      *
      * @return {@code true} iff the insert succeeded.
-     *
-     * @throws RuntimeException if any SQL errors occur.
      */
     @Override public boolean insert(V record) {
         int result = 0;
 
         try (PreparedStatement statement = prepareInsert()) {
-            setRecord(statement, record);
+            setInsert(statement, record);
             result = statement.executeUpdate();
             commit();
         }
         catch (SQLException ex) {
-            throw runtimeEx(ex);
+            JamLogger.warn(ex);
+            return false;
         }
 
-        return result == 1;
+        assert result == 1;
+        return true;
     }
 
     /**
@@ -633,12 +521,12 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      *
      * @param records the records to insert.
      *
-     * @throws RuntimeException if any SQL errors occur.
+     * @throws RuntimeException if any inserts fail.
      */
     @Override public void insert(Collection<V> records) {
         try (PreparedStatement statement = prepareInsert()) {
             for (V record : records) {
-                setRecord(statement, record);
+                setInsert(statement, record);
                 statement.addBatch();
             }
 
@@ -660,10 +548,8 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      * @throws RuntimeException if any SQL errors occur.
      */
     @Override public List<V> select() {
-        String sql = formatSelectAll();
-
         try (Statement statement = createStatement()) {
-            return getRecords(statement.executeQuery(sql));
+            return executeSelectAll(statement);
         }
         catch (SQLException ex) {
             throw runtimeEx(ex);
@@ -680,8 +566,7 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      */
     @Override public V select(K key) {
         try (PreparedStatement statement = prepareSelectKey()) {
-            setKey(statement, key);
-            return getSingle(statement.executeQuery());
+            return executeSelectKey(statement, key);
         }
         catch (SQLException ex) {
             throw runtimeEx(ex);
@@ -699,21 +584,126 @@ public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
      * are omitted.
      */
     @Override public List<V> select(Collection<K> keys) {
-        List<V> records = new ArrayList<V>(keys.size());
-
         try (PreparedStatement statement = prepareSelectKey()) {
+            List<V> records = new ArrayList<V>(keys.size());
+
             for (K key : keys) {
-                setKey(statement, key);
-                V record = getSingle(statement.executeQuery());
+                V record = executeSelectKey(statement, key);
 
                 if (record != null)
                     records.add(record);
             }
+
+            return records;
         }
         catch (SQLException ex) {
             throw runtimeEx(ex);
         }
+    }
 
-        return records;
+    /**
+     * Updates an existing record in this table; this operation will
+     * fail unless this table already contains a record with the same
+     * key.
+     *
+     * @param record the record to update.
+     *
+     * @return {@code true} iff the record was successfully updated.
+     */
+    @Override public boolean update(V record) {
+        int result = 0;
+
+        try (PreparedStatement statement = prepareUpdate()) {
+            setUpdate(statement, record);
+            result = statement.executeUpdate();
+            commit();
+        }
+        catch (SQLException ex) {
+            JamLogger.warn(ex);
+            return false;
+        }
+
+        assert result == 1;
+        return true;
+    }
+
+    /**
+     * Updates existing records in this table.
+     *
+     * @param records the records to update.
+     *
+     * @throw RuntimeException if any of the updates fail.
+     */
+    @Override public void update(Collection<V> records) {
+        try (PreparedStatement statement = prepareUpdate()) {
+            for (V record : records) {
+                setUpdate(statement, record);
+                statement.addBatch();
+            }
+
+            JamLogger.info("Executing batch update...");
+            statement.executeBatch();
+            commit();
+            JamLogger.info("Committed batch update.");
+        }
+        catch (SQLException ex) {
+            throw runtimeEx(ex);
+        }
+    }
+
+    /**
+     * Inserts a new record or updates an existing record in this
+     * table; this operation should always succeed.
+     *
+     * @param record the record to insert or update.
+     *
+     * @throws RuntimeException if any SQL errors occur.
+     */
+    @Override public void upsert(V record) {
+        if (contains(getKey(record)))
+            update(record);
+        else
+            insert(record);
+    }
+
+    /**
+     * Inserts new records or updates existing records in this table.
+     *
+     * @param records the records to insert or update.
+     *
+     * @throws RuntimeException if any SQL errors occur.
+     */
+    @Override public void upsert(Collection<V> records) {
+        //
+        // More efficient to process the records in batch
+        // statements...
+        //
+        List<V> recList = new ArrayList<V>(records);
+        List<K> keyList = JamStreams.apply(recList, rec -> getKey(rec));
+        List<Boolean> contains = contains(keyList);
+
+        try (PreparedStatement insertStatement = prepareInsert();
+             PreparedStatement updateStatement = prepareUpdate()) {
+
+            for (int recIndex = 0; recIndex < recList.size(); ++recIndex) {
+                if (contains.get(recIndex)) {
+                    setUpdate(updateStatement, recList.get(recIndex));
+                    updateStatement.addBatch();
+                }
+                else {
+                    setInsert(insertStatement, recList.get(recIndex));
+                    insertStatement.addBatch();
+                }
+            }
+
+            JamLogger.info("Executing batch insert/update...");
+            insertStatement.executeBatch();
+            updateStatement.executeBatch();
+            commit();
+            JamLogger.info("Committed batch insert/update.");
+        }
+        catch (SQLException ex) {
+            throw runtimeEx(ex);
+        }
     }
 }

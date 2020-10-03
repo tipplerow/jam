@@ -133,6 +133,23 @@ public interface TableProcessor {
      *
      * @param resultSet an open result set.
      *
+     * @param columnIndex the column index (the first is 1, second is 2, ...).
+     *
+     * @return the {@code String} value in the specified column of the
+     * result set.
+     *
+     * @throws SQLException if the column label is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public default String getString(ResultSet resultSet, int columnIndex) throws SQLException {
+        return resultSet.getString(columnIndex);
+    }
+
+    /**
+     * Retrieves a {@code String} value from a result set.
+     *
+     * @param resultSet an open result set.
+     *
      * @param columnLabel the column label.
      *
      * @return the {@code String} value in the specified column of the
@@ -143,6 +160,23 @@ public interface TableProcessor {
      */
     public default String getString(ResultSet resultSet, String columnLabel) throws SQLException {
         return resultSet.getString(columnLabel);
+    }
+
+    /**
+     * Retrieves a {@code LocalDateTime} value from a result set.
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnIndex the column index (the first is 1, second is 2, ...).
+     *
+     * @return the {@code LocalDateTime} value in the specified column
+     * of the result set.
+     *
+     * @throws SQLException if the column label is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public default LocalDateTime getTimeStamp(ResultSet resultSet, int columnIndex) throws SQLException {
+        return resultSet.getObject(columnIndex, LocalDateTime.class);
     }
 
     /**

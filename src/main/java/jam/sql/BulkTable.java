@@ -32,6 +32,7 @@ public interface BulkTable<V extends BulkRecord> {
      * @return whether the bulk import was successful.
      */
     public default boolean insert(Collection<V> records) {
-        return db().bulkCopy(getTableName(), records);
+        db().bulkCopy(getTableName(), records);
+        return true;
     }
 }

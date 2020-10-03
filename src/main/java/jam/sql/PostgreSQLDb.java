@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 import jam.app.JamEnv;
 import jam.app.JamLogger;
@@ -82,25 +81,28 @@ public final class PostgreSQLDb extends SQLDb {
     }
 
     /**
-     * Imports a collection of records into a database table using the
-     * {@code psql \copy} command.
+     * Copies rows from a delimited file (with no header line)
+     * using the {@code psql \copy} command.
      *
-     * <p>This method is required in places of {@code bulkImport()} on
-     * AWS-managed servers where superuser roles cannot be granted).
+     * <p>This override is required in place of the {@code COPY}
+     * command on AWS-managed servers where superuser roles cannot
+     * be granted).
      *
-     * @param tableName the name of the table to update.
+     * @param tableName the name of the table to populate.
      *
-     * @param records the records to import.
+     * @param fileName the name of a delimited file containing the
+     * rows to be added (with no header line).
      *
-     * @return the success or failure of the bulk copy.
+     * @param delimiter the column delimiter in the flat file.
+     *
+     * @param nullString the SQL {@code NULL} identifier in the flat file.
+     *
+     * @throws RuntimeException if the update cannot be executed.
      */
-    @Override public boolean bulkCopy(String tableName, Collection<? extends BulkRecord> records) {
-        File bulkFile = null;
+    @Override public void bulkCopy(String tableName, String fileName, char delimiter, String nullString) {
+        File bulkFile = new File(fileName);
 
         try {
-            bulkFile = File.createTempFile("bulk_", ".psv", JamEnv.tmpdir());
-            BulkRecord.writeBulkFile(bulkFile, records);
-
             JamProcess process =
                 JamProcess.create("psql",
                                   "-h", endpoint.getHostname(),
@@ -111,40 +113,15 @@ public final class PostgreSQLDb extends SQLDb {
 
             process.setenv("PGPASSWORD", endpoint.getPassword());
             process.run();
-
-            return process.success();
         }
         catch (Exception ex) {
-            JamLogger.error(ex.getMessage());
-            return false;
-        }
-        finally {
-            if (bulkFile != null)
-                bulkFile.delete();
+            throw JamException.runtime(ex);
         }
     }
 
     private static String formatBulkCopy(String tableName, File bulkFile) throws IOException {
         return String.format("\\copy %s from '%s' with DELIMITER '%c' NULL '%s'",
                              tableName, bulkFile.getCanonicalPath(), BulkRecord.DELIMITER_CHAR, BulkRecord.NULL_STRING);
-    }
-
-    /**
-     * Creates a new database user.
-     *
-     * @param username the name of the user to create.
-     *
-     * @param password the login password for the user.
-     *
-     * @throws RuntimeException if the user already exists.
-     */
-    public void createUser(String username, String password) {
-        String updateStr = createUserUpdate(username, password);
-        executeUpdate(updateStr);
-    }
-
-    private static String createUserUpdate(String username, String password) {
-        return String.format("create role %s login password '%s'", username, password);
     }
 
     /**
@@ -170,28 +147,21 @@ public final class PostgreSQLDb extends SQLDb {
     }
 
     /**
-     * Determines whether a database user exists.
+     * Returns the {@code POSTGRES} database engine type.
      *
-     * @param username the name of the user in question.
-     *
-     * @return {@code true} iff a user with the given name exists.
+     * @return the {@code POSTGRES} database engine type.
      */
-    public boolean userExists(String username) {
-        String queryStr = countUserQuery(username);
-
-        try (QueryResult queryResult = executeQuery(queryStr)) {
-            return getCount(queryResult.getResultSet()) == 1;
-        }
-    }
-
-    private static String countUserQuery(String username) {
-        return String.format("select count(*) from pg_roles where rolname = '%s'", username);
-    }
-
     @Override public SQLEngine getEngineType() {
         return SQLEngine.POSTGRES;
     }
 
+    /**
+     * Opens a new database connection.
+     *
+     * @return a new open database connection.
+     *
+     * @throws RuntimeException if the connection cannot be opened.
+     */
     @Override public Connection openConnection() {
         String url = formatURL();
         JamLogger.info("Connecting [%s]...", url);
@@ -204,11 +174,5 @@ public final class PostgreSQLDb extends SQLDb {
         catch (SQLException ex) {
             throw JamException.runtime(ex);
         }
-    }
-
-    @Override protected String countTableNamesQuery(String tableName) {
-        return String.format("select count(*)"
-                             + " from information_schema.tables"
-                             + " where table_schema = 'public' and table_name = '%s'", tableName);
     }
 }

@@ -79,6 +79,40 @@ public final class JamStreams {
     }
 
     /**
+     * Counts the number of stream elements that match a predicate.
+     *
+     * @param <V> the runtime element type.
+     *
+     * @param stream the stream to be filtered.
+     *
+     * @param predicate the predicate to apply to each element in the
+     * stream.
+     *
+     * @return the number of stream elements for which the predicate
+     * evaluates to {@code true}.
+     */
+    public static <V> long count(Stream<V> stream, Predicate<? super V> predicate) {
+        return stream.filter(predicate).count();
+    }
+
+    /**
+     * Counts the number of collection elements that match a predicate.
+     *
+     * @param <V> the runtime element type.
+     *
+     * @param collection the collection to be filtered.
+     *
+     * @param predicate the predicate to apply to each element in the
+     * collection.
+     *
+     * @return the number of collection elements for which the predicate
+     * evaluates to {@code true}.
+     */
+    public static <V> long count(Collection<V> collection, Predicate<? super V> predicate) {
+        return count(collection.stream(), predicate);
+    }
+
+    /**
      * Removes elements of a stream that do not pass a filter
      * predicate.
      *
@@ -126,7 +160,8 @@ public final class JamStreams {
      * in the collection.
      *
      * @return a list containing only elements for which the predicate
-     * evaluates to {@code true}.
+     * evaluates to {@code true} (in in indeterminate order, because
+     * the collection is processed in parallel).
      */
     public static <V> List<V> filterParallel(Collection<V> collection, Predicate<? super V> predicate) {
         return filter(collection.parallelStream(), predicate);
