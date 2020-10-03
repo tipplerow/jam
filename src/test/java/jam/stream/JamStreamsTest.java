@@ -15,8 +15,7 @@ import static org.junit.Assert.*;
 
 public class JamStreamsTest {
     @Test public void testApply() {
-        int sampleSize = 100000;
-        int concurrency = 10;
+        int sampleSize = 10000;
 
         List<Integer> source = createSource(sampleSize);
         List<IntPair> result = JamStreams.apply(source, x -> IntPair.of(x, x * x));
@@ -46,6 +45,21 @@ public class JamStreamsTest {
 
     private void assertSquare(IntPair pair) {
         assertEquals(pair.first * pair.first, pair.second);
+    }
+
+    @Test public void testCount() {
+        int N = 10;
+        List<Integer> source = createSource(N);
+
+        assertEquals(N / 2, JamStreams.count(source, x -> x %2 == 0));
+    }
+
+    @Test public void testFilter() {
+        int N = 10;
+        List<Integer> source = createSource(N);
+        List<Integer> result = JamStreams.filter(source, x -> x %2 == 0);
+
+        assertEquals(List.of(0, 2, 4, 6, 8), result);
     }
 
     @Test public void testToArrayList() {
