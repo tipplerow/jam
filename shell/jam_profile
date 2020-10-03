@@ -22,3 +22,10 @@ if [ -d ${HOME}/tmp ]
 then
     export JAM_TMPDIR=${HOME}/tmp
 fi
+
+# PostgreSQL test database parameters
+export JAM_TEST_SQL_HOSTNAME=localhost
+export JAM_TEST_SQL_PORT=5432
+export JAM_TEST_SQL_DATABASE=jam_test
+export JAM_TEST_SQL_USERNAME=jam_test
+export JAM_TEST_SQL_PASSWORD=traffic_not_strawberry
