@@ -1,6 +1,7 @@
 
 package jam.collect;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.*;
@@ -23,6 +24,15 @@ public abstract class JamTableTestBase {
     public static final String key4 = rec4.key;
     public static final String key5 = rec5.key;
 
+    public static final List<String> keys = List.of(key1, key2, key3, key4, key5);
+
+    private void assertSelect(JamTable<String, TestRecord> table, List<String> keys, List<TestRecord> expected) {
+        //
+        // The in-memory tables backed by maps will return collections rather than lists...
+        //
+        assertEquals(expected, new ArrayList<TestRecord>(table.select(keys)));
+    }
+
     public void runDeleteTest(JamTable<String, TestRecord> table) {
         // Start with a populated table...
         table.delete();
@@ -41,8 +51,8 @@ public abstract class JamTableTestBase {
         assertEquals(rec4, table.select(key4));
         assertEquals(rec5, table.select(key5));
 
-        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.select());
         assertEquals(List.of(rec1, rec3, rec5), table.select(List.of(key1, key3, key5)));
+        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.select(keys));
 
         // Delete two records...
         assertTrue(table.delete(key3));
@@ -64,7 +74,7 @@ public abstract class JamTableTestBase {
         assertNull(table.select(key4));
         assertEquals(rec5, table.select(key5));
 
-        assertEquals(List.of(rec1, rec2, rec5), table.select());
+        assertEquals(List.of(rec1, rec2, rec5), table.select(keys));
         assertEquals(List.of(rec1, rec5), table.select(List.of(key1, key3, key5)));
 
         // Delete the remaining records...
@@ -83,8 +93,8 @@ public abstract class JamTableTestBase {
         assertNull(table.select(key4));
         assertNull(table.select(key5));
 
-        assertEquals(List.of(), table.select());
-        assertEquals(List.of(), table.select(List.of(key1, key3, key5)));
+        assertTrue(table.select().isEmpty());
+        assertTrue(table.select(List.of(key1, key3, key5)).isEmpty());
     }
 
     public void runInsertTest(JamTable<String, TestRecord> table) {
@@ -104,8 +114,8 @@ public abstract class JamTableTestBase {
         assertNull(table.select(key4));
         assertNull(table.select(key5));
 
-        assertEquals(List.of(), table.select());
-        assertEquals(List.of(), table.select(List.of(key1, key3, key5)));
+        assertTrue(table.select().isEmpty());
+        assertTrue(table.select(List.of(key1, key3, key5)).isEmpty());
 
         // Add the first two records...
         assertTrue(table.insert(rec1));
@@ -124,7 +134,7 @@ public abstract class JamTableTestBase {
         assertNull(table.select(key4));
         assertNull(table.select(key5));
 
-        assertEquals(List.of(rec1, rec2), table.select());
+        assertEquals(List.of(rec1, rec2), table.select(keys));
         assertEquals(List.of(rec1), table.select(List.of(key1, key3, key5)));
 
         // Add the remaining records...
@@ -143,7 +153,7 @@ public abstract class JamTableTestBase {
         assertEquals(rec4, table.select(key4));
         assertEquals(rec5, table.select(key5));
 
-        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.select());
+        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.select(keys));
         assertEquals(List.of(rec1, rec3, rec5), table.select(List.of(key1, key3, key5)));
     }
 
@@ -164,8 +174,8 @@ public abstract class JamTableTestBase {
         assertNull(table.select(key4));
         assertNull(table.select(key5));
 
-        assertEquals(List.of(), table.select());
-        assertEquals(List.of(), table.select(List.of(key1, key3, key5)));
+        assertTrue(table.select().isEmpty());
+        assertTrue(table.select(List.of(key1, key3, key5)).isEmpty());
 
         // Update a missing record...
         assertFalse(table.update(rec1));
@@ -188,7 +198,7 @@ public abstract class JamTableTestBase {
         assertEquals(rec4, table.select(key4));
         assertEquals(rec5, table.select(key5));
 
-        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.select());
+        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.select(keys));
         assertEquals(List.of(rec1, rec3, rec5), table.select(List.of(key1, key3, key5)));
 
         // Update with three new records...
@@ -228,8 +238,8 @@ public abstract class JamTableTestBase {
         assertNull(table.select(key4));
         assertNull(table.select(key5));
 
-        assertEquals(List.of(), table.select());
-        assertEquals(List.of(), table.select(List.of(key1, key2, key3, key4, key5)));
+        assertTrue(table.select().isEmpty());
+        assertTrue(table.select(List.of(key1, key2, key3, key4, key5)).isEmpty());
 
         // Upsert two missing records...
         table.upsert(rec1);
