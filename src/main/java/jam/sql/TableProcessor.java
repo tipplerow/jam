@@ -13,22 +13,6 @@ import jam.lang.JamException;
 import jam.lang.KeyedObject;
 import jam.util.EnumUtil;
 
-final class TableHelper {
-    static LocalDate getDate(Object obj) {
-        if (obj != null)
-            return (LocalDate) obj;
-        else
-            return null;
-    }
-
-    static double getDouble(Object obj) {
-        if (obj != null)
-            return ((Double) obj).doubleValue();
-        else
-            return Double.NaN;
-    }
-}
-
 /**
  * Provides helper methods to extract objects from result sets and
  * assign objects to prepared statements.
@@ -48,7 +32,7 @@ public interface TableProcessor {
      * database error occurs; or if called on a closed result set.
      */
     public default LocalDate getDate(ResultSet resultSet, int columnIndex) throws SQLException {
-        return TableHelper.getDate(resultSet.getObject(columnIndex, LocalDate.class));
+        return resultSet.getObject(columnIndex, LocalDate.class);
     }
 
     /**
@@ -65,7 +49,7 @@ public interface TableProcessor {
      * database error occurs; or if called on a closed result set.
      */
     public default LocalDate getDate(ResultSet resultSet, String columnLabel) throws SQLException {
-        return TableHelper.getDate(resultSet.getObject(columnLabel, LocalDate.class));
+        return resultSet.getObject(columnLabel, LocalDate.class);
     }
 
     /**
@@ -84,7 +68,12 @@ public interface TableProcessor {
      * database error occurs; or if called on a closed result set.
      */
     public default double getDouble(ResultSet resultSet, int columnIndex) throws SQLException {
-        return TableHelper.getDouble(resultSet.getObject(columnIndex));
+        Object obj = resultSet.getObject(columnIndex);
+
+        if (obj != null)
+            return ((Double) obj).doubleValue();
+        else
+            return Double.NaN;
     }
 
     /**
@@ -103,7 +92,7 @@ public interface TableProcessor {
      * database error occurs; or if called on a closed result set.
      */
     public default double getDouble(ResultSet resultSet, String columnLabel) throws SQLException {
-        return TableHelper.getDouble(resultSet.getObject(columnLabel));
+        return getDouble(resultSet, resultSet.findColumn(columnLabel));
     }
 
     /**
