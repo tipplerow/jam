@@ -25,25 +25,9 @@ public final class PostgreSQLDbTest {
     }
 
     @Test public void testBulkCopy() throws SQLException {
-        if (db == null)
-            return;
-
-        TestTable table = new TestTable(db, "test_bulk_copy");
-        table.delete();
-        
-        String fileName   = FileUtil.join(JamEnv.getRequired("JAM_HOME"), "data", "test", "bulk_insert.psv");
-        char   delimiter  = BulkRecord.DELIMITER_CHAR;
-        String nullString = BulkRecord.NULL_STRING;
-
-        table.copy(fileName, delimiter, nullString);
-        List<TestRecord> records = table.select();
-
-        assertEquals(List.of(TestRecord.REC1,
-                             TestRecord.REC2,
-                             TestRecord.REC3,
-                             TestRecord.REC4,
-                             TestRecord.REC5), records);
-        table.drop();
+        //
+        // This is now tested in SQLTableTest...
+        //
     }
     /*
     private static enum Foo {

@@ -1,5 +1,5 @@
 
-package jam.sql;
+package jam.collect;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import jam.lang.ObjectUtil;
 import jam.math.DoubleComparator;
 
-final class TestRecord {
+public final class TestRecord {
     public final String key;
     public final int ival;
     public final double dval;

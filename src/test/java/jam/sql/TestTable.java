@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jam.collect.TestRecord;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
