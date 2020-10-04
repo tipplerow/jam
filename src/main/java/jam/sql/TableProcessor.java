@@ -164,7 +164,7 @@ public interface TableProcessor {
      * @throws SQLException if the column index is not valid; if a
      * database error occurs; or if called on a closed result set.
      */
-    public default double getInt(ResultSet resultSet, String columnLabel, int nullValue) throws SQLException {
+    public default int getInt(ResultSet resultSet, String columnLabel, int nullValue) throws SQLException {
         return getInt(resultSet, resultSet.findColumn(columnLabel), nullValue);
     }
 
