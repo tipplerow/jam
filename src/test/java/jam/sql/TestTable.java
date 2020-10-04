@@ -38,8 +38,8 @@ final class TestTable extends SQLTable<String, TestRecord> {
     }
 
     @Override public TestRecord getRecord(ResultSet resultSet) throws SQLException {
-        String key = resultSet.getString(1);
-        int    ival = resultSet.getInt(2);
+        String key = getString(resultSet, 1);
+        int    ival = getInt(resultSet, 2, 0);
         double dval = getDouble(resultSet, 3);
         LocalDate date = getDate(resultSet, 4);
         LocalDateTime time = getTimeStamp(resultSet, 5);
@@ -57,13 +57,4 @@ final class TestTable extends SQLTable<String, TestRecord> {
         DATE_COLUMN.set(statement, index + 2, record.date);
         TIME_COLUMN.set(statement, index + 3, record.time);
     }
-    /*
-    @Override public void setRecord(PreparedStatement statement, TestRecord record) throws SQLException {
-        KEY_COLUMN.set( statement, 1, record.key);
-        IVAL_COLUMN.set(statement, 2, record.ival);
-        DVAL_COLUMN.set(statement, 3, record.dval);
-        DATE_COLUMN.set(statement, 4, record.date);
-        TIME_COLUMN.set(statement, 5, record.time);
-    }
-    */
 }

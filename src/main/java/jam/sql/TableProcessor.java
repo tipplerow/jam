@@ -55,7 +55,7 @@ public interface TableProcessor {
     /**
      * Retrieves a {@code double} value from a result set, converting
      * database {@code NULL} values to {@code Double.NaN} (instead of
-     * {@code 0.0} like the default behavior of {@code SQLite}).
+     * {@code 0.0} like the default behavior of the result set.
      *
      * @param resultSet an open result set.
      *
@@ -115,6 +115,57 @@ public interface TableProcessor {
                                                  Class<E>  enumClass,
                                                  String    columnLabel) throws SQLException {
         return EnumUtil.valueOf(enumClass, getString(resultSet, columnLabel));
+    }
+
+    /**
+     * Retrieves an {@code int} value from a result set, converting
+     * database {@code NULL} values to a user-defined value (instead
+     * of {@code 0} like the default behavior of the result set.
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnIndex the column index (the first is 1, second is 2, ...).
+     *
+     * @param nullValue the value to return for database {@code NULL}
+     * columns.
+     *
+     * @return the {@code int} value in the specified column of the
+     * result set, or {@code nullValue} for database {@code NULL}
+     * columns.
+     *
+     * @throws SQLException if the column index is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public default int getInt(ResultSet resultSet, int columnIndex, int nullValue) throws SQLException {
+        Object obj = resultSet.getObject(columnIndex);
+
+        if (obj != null)
+            return ((Integer) obj).intValue();
+        else
+            return nullValue;
+    }
+
+    /**
+     * Retrieves an {@code int} value from a result set, converting
+     * database {@code NULL} values to a user-defined value (instead
+     * of {@code 0} like the default behavior of the result set.
+     *
+     * @param resultSet an open result set.
+     *
+     * @param columnLabel the column label.
+     *
+     * @param nullValue the value to return for database {@code NULL}
+     * columns.
+     *
+     * @return the {@code int} value in the specified column of the
+     * result set, or {@code nullValue} for database {@code NULL}
+     * columns.
+     *
+     * @throws SQLException if the column index is not valid; if a
+     * database error occurs; or if called on a closed result set.
+     */
+    public default double getInt(ResultSet resultSet, String columnLabel, int nullValue) throws SQLException {
+        return getInt(resultSet, resultSet.findColumn(columnLabel), nullValue);
     }
 
     /**
