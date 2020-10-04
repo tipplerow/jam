@@ -18,11 +18,11 @@ final class TestTable extends SQLTable<String, TestRecord> {
         super(db, schema(name));
     }
 
-    static SQLColumn KEY_COLUMN = SQLColumn.ofVarChar("key", 255).primaryKey();
-    static SQLColumn IVAL_COLUMN = SQLColumn.ofInteger("ival");
-    static SQLColumn DVAL_COLUMN = SQLColumn.ofDouble("dval");
-    static SQLColumn DATE_COLUMN = SQLColumn.ofDate("date");
-    static SQLColumn TIME_COLUMN = SQLColumn.ofTimeStamp("time");
+    static SQLColumn KEY_COLUMN  = SQLType.TEXT.column("key").primaryKey();
+    static SQLColumn IVAL_COLUMN = SQLType.INTEGER.column("ival");
+    static SQLColumn DVAL_COLUMN = SQLType.DOUBLE.column("dval");
+    static SQLColumn DATE_COLUMN = SQLType.DATE.column("date");
+    static SQLColumn TIME_COLUMN = SQLType.TIME_STAMP.column("time");
 
     static SQLSchema schema(String name) {
         return SQLSchema.create(name,

@@ -26,6 +26,11 @@ public abstract class SQLType {
     public static final SQLType DATE = new DateType();
 
     /**
+     * A SQL type for subclasses of {@code DomainDouble}.
+     */
+    public static final SQLType DOMAIN_DOUBLE = new DomainDoubleType();
+
+    /**
      * The SQL {@code DOUBLE PRECISION} type.
      */
     public static final SQLType DOUBLE = new DoubleType();
@@ -36,9 +41,19 @@ public abstract class SQLType {
     public static final SQLType INTEGER = new IntegerType();
 
     /**
+     * A SQL type for subclasses of {@code KeyedObject<String>}.
+     */
+    public static final SQLType KEYED_OBJECT = new KeyedObjectType();
+
+    /**
      * The {@code SERIAL} or {@code AUTO_INCREMENT} type.
      */
     public static final SQLType SERIAL = new SerialType();
+
+    /**
+     * The PostgreSQL {@code TEXT} type.
+     */
+    public static final SQLType TEXT = new TextType();
 
     /**
      * The SQL {@code TIMESTAMP} type.
@@ -95,6 +110,17 @@ public abstract class SQLType {
     public abstract int typeCode();
 
     /**
+     * Creates a SQL column of this type.
+     *
+     * @param name the column name.
+     *
+     * @return a SQL column of this type with the specified name.
+     */
+    public SQLColumn column(String name) {
+        return SQLColumn.create(name, this);
+    }
+
+    /**
      * Assigns a possibly non-finite value to a parameter in a
      * prepared statement; non-finite values are replaced with
      * SQL {@code NULL}.
@@ -112,7 +138,22 @@ public abstract class SQLType {
         if (Double.isFinite(value))
             statement.setDouble(index, value);
         else
-            statement.setNull(index, Types.DOUBLE);
+            setNull(statement, index);
+    }
+
+    /**
+     * Assigns a {@code null} value to a parameter in a prepared
+     * statement.
+     *
+     * @param statement the prepared statement to set.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first parameter is 1, the second is 2, ...).
+     *
+     * @throws SQLException if any SQL errors occur.
+     */
+    protected void setNull(PreparedStatement statement, int index) throws SQLException {
+        statement.setNull(index, typeCode());
     }
 
     /**
@@ -132,7 +173,30 @@ public abstract class SQLType {
         if (value != null)
             statement.setObject(index, value);
         else
-            statement.setNull(index, typeCode());
+            setNull(statement, index);
+    }
+
+    /**
+     * Assigns a possibly {@code null} string to a parameter in a
+     * prepared statement.
+     *
+     * @param statement the prepared statement to set.
+     *
+     * @param index the index of the parameter in the statement (the
+     * first parameter is 1, the second is 2, ...).
+     *
+     * @param value the parameter value to assign.
+     *
+     * @throws SQLException if any SQL errors occur.
+     *
+     * @throws ClassCastException if the input value is not
+     * {@code null} and not a string.
+     */
+    protected void setString(PreparedStatement statement, int index, Object value) throws SQLException {
+        if (value != null)
+            statement.setString(index, (String) value);
+        else
+            setNull(statement, index);
     }
 
     private static final class BooleanType extends SQLType {
@@ -144,7 +208,7 @@ public abstract class SQLType {
             if (value != null)
                 statement.setBoolean(index, ((Boolean) value).booleanValue());
             else
-                statement.setNull(index, Types.BOOLEAN);
+                setNull(statement, index);
         }
 
         @Override public int typeCode() {
@@ -166,24 +230,16 @@ public abstract class SQLType {
         }
     }
 
-    private static final class DomainDoubleType extends SQLType {
-        @Override public String schemaType(SQLEngine engine) {
-            return "DOUBLE PRECISION";
-        }
-
+    private static final class DomainDoubleType extends DoubleType {
         @Override public void set(PreparedStatement statement, int index, Object value) throws SQLException {
             if (value != null)
                 setDouble(statement, index, ((DomainDouble) value).doubleValue());
             else
-                statement.setNull(index, Types.DOUBLE);
-        }
-
-        @Override public int typeCode() {
-            return Types.DOUBLE;
+                setNull(statement, index);
         }
     }
 
-    private static final class DoubleType extends SQLType {
+    private static class DoubleType extends SQLType {
         @Override public String schemaType(SQLEngine engine) {
             return "DOUBLE PRECISION";
         }
@@ -192,7 +248,7 @@ public abstract class SQLType {
             if (value != null)
                 setDouble(statement, index, ((Double) value).doubleValue());
             else
-                statement.setNull(index, Types.DOUBLE);
+                setNull(statement, index);
         }
 
         @Override public int typeCode() {
@@ -209,7 +265,7 @@ public abstract class SQLType {
             if (value != null)
                 statement.setInt(index, ((Integer) value).intValue());
             else
-                statement.setNull(index, Types.INTEGER);
+                setNull(statement, index);
         }
 
         @Override public int typeCode() {
@@ -217,17 +273,13 @@ public abstract class SQLType {
         }
     }
 
-    private static final class KeyedObjectType extends VarCharType {
-        private KeyedObjectType(int length) {
-            super(length);
-        }
-
+    private static final class KeyedObjectType extends TextType {
         @SuppressWarnings("unchecked")
         @Override public void set(PreparedStatement statement, int index, Object value) throws SQLException {
             if (value != null)
-                statement.setString(index, ((KeyedObject<String>) value).getKey());
+                setString(statement, index, ((KeyedObject<String>) value).getKey());
             else
-                statement.setNull(index, Types.VARCHAR);
+                setNull(statement, index);
         }
     }
 
@@ -263,10 +315,7 @@ public abstract class SQLType {
         }
 
         @Override public void set(PreparedStatement statement, int index, Object value) throws SQLException {
-            if (value != null)
-                statement.setString(index, (String) value);
-            else
-                statement.setNull(index, Types.VARCHAR);
+            setString(statement, index, value);
         }
 
         @Override public int typeCode() {
@@ -293,6 +342,20 @@ public abstract class SQLType {
 
         @Override public int typeCode() {
             return Types.OTHER;
+        }
+    }
+
+    private static class TextType extends SQLType {
+        @Override public String schemaType(SQLEngine engine) {
+            return "TEXT";
+        }
+
+        @Override public void set(PreparedStatement statement, int index, Object value) throws SQLException {
+            setString(statement, index, value);
+        }
+
+        @Override public int typeCode() {
+            return Types.VARCHAR;
         }
     }
 }
