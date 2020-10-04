@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import jam.lang.JamException;
 import jam.stream.JamStreams;
@@ -161,5 +162,17 @@ public interface TableView<K, V> {
         }
 
         return records;
+    }
+
+    /**
+     * Returns the records that pass a given filter.
+     *
+     * @param predicate the filter function to apply to all records.
+     *
+     * @return a collection containing the records contained in this
+     * view that pass the specified filter (in no particular order).
+     */
+    public default Collection<V> select(Predicate<V> predicate) {
+        return JamStreams.filterParallel(select(), predicate);
     }
 }

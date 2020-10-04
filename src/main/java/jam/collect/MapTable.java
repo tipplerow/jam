@@ -233,9 +233,8 @@ public class MapTable<K, V> implements JamTable<K, V> {
         backMap.put(getKey(record), record);
     }
 
-    @SuppressWarnings("unchecked")
     @Override public boolean equals(Object obj) {
-        return (obj instanceof MapView) && equalsView((MapView<K, V>) obj);
+        throw new UnsupportedOperationException("Use TableView::equalsView for equality tests.");
     }
 
     @Override public int hashCode() {

@@ -2,6 +2,7 @@
 package jam.collect;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.*;
@@ -31,6 +32,13 @@ public abstract class JamTableTestBase {
         // The in-memory tables backed by maps will return collections rather than lists...
         //
         assertEquals(expected, new ArrayList<TestRecord>(table.select(keys)));
+    }
+
+    private void assertEqualCollections(Collection<TestRecord> expected, Collection<TestRecord> actual) {
+        MapTable<String, TestRecord> expTable = MapTable.hash(expected, record -> record.key);
+        MapTable<String, TestRecord> actTable = MapTable.hash(actual,   record -> record.key);
+
+        assertTrue(expTable.equalsView(actTable));
     }
 
     public void runDeleteTest(JamTable<String, TestRecord> table) {
@@ -296,5 +304,14 @@ public abstract class JamTableTestBase {
         assertEquals(rec5,  table.select(key5));
 
         assertEquals(List.of(rec1B, rec2, rec3B, rec4B, rec5), table.select(List.of(key1, key2, key3, key4, key5)));
+    }
+
+    public void runSelectFilterTest(JamTable<String, TestRecord> table) {
+        // Start with a populated table...
+        table.delete();
+        table.insert(List.of(rec1, rec2, rec3, rec4, rec5));
+        assertEquals(5, table.count());
+
+        assertEqualCollections(List.of(rec2, rec3, rec4), table.select(rec -> rec.dval > 2.0));
     }
 }

@@ -52,8 +52,11 @@ public final class MapView<K, V> implements TableView<K, V> {
         return map.get(key);
     }
 
+    @Override public boolean equals(Object obj) {
+        throw new UnsupportedOperationException("Use TableView::equalsView for equality tests.");
+    }
+
     @Override public String toString() {
         return map.toString();
     }
 }
-

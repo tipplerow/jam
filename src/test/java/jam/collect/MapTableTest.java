@@ -33,6 +33,11 @@ public final class MapTableTest extends JamTableTestBase {
         runUpsertTest(tree());
     }
 
+    @Test public void testSelectFilter() {
+        runSelectFilterTest(hash());
+        runSelectFilterTest(tree());
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.collect.MapTableTest");
     }
