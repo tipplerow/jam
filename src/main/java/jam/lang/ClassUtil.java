@@ -18,4 +18,18 @@ public final class ClassUtil {
     public static boolean isa(Class<?> subClass, Class<?> superClass) {
         return superClass.isAssignableFrom(subClass);
     }
+
+    /**
+     * Identifies objects that implement an interface.
+     *
+     * @param object an object to examine.
+     *
+     * @param interfaceClass the interface class.
+     *
+     * @return {@code true} iff the specified object implements the
+     * specified interface.
+     */
+    public static boolean implements_(Object object, Class<?> interfaceClass) {
+        return object != null && interfaceClass.isInterface() && interfaceClass.isAssignableFrom(object.getClass());
+    }
 }
