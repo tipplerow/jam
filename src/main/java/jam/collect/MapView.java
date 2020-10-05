@@ -9,10 +9,19 @@ import java.util.Set;
  * Implements the {@code TableView} interface with storage provided by
  * an in-memory map.
  */
-public final class MapView<K, V> implements TableView<K, V> {
-    private final Map<K, V> map;
+public class MapView<K, V> implements TableView<K, V> {
+    /**
+     * The underlying map storage.
+     */
+    protected final Map<K, V> map;
 
-    private MapView(Map<K, V> map) {
+    /**
+     * Creates a new view over an underlying map.
+     *
+     * @param map the underlying map (changes to the map will be
+     * reflected in the view).
+     */
+    protected MapView(Map<K, V> map) {
         this.map = map;
     }
 
