@@ -52,10 +52,21 @@ public final class MapView<K, V> implements TableView<K, V> {
         return map.get(key);
     }
 
+    /**
+     * Throws an {@code UnsupportedOperationException}: use
+     * {@code equalsView} for equality tests.
+     *
+     * @throws UnsupportedOperationException in all cases.
+     */
     @Override public boolean equals(Object obj) {
         throw new UnsupportedOperationException("Use TableView::equalsView for equality tests.");
     }
 
+    /**
+     * Returns a string containing every mapping in this view.
+     *
+     * @return a string containing every mapping in this view.
+     */
     @Override public String toString() {
         return map.toString();
     }

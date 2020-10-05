@@ -72,15 +72,6 @@ public interface JamTable<K, V> extends TableView<K, V> {
     }
 
     /**
-     * Returns a read-only view of the keys in this table.
-     *
-     * @return a read-only view of the keys in this table.
-     */
-    @Override public default Set<K> keys() {
-        return JamStreams.toHashSet(select().stream().map(record -> getKey(record)));
-    }
-
-    /**
      * Updates an existing record in this table; this operation will
      * fail unless this table already contains a record with the same
      * key.
@@ -124,5 +115,9 @@ public interface JamTable<K, V> extends TableView<K, V> {
      */
     public default void upsert(Collection<V> records) {
         records.forEach(record -> upsert(record));
+    }
+
+    @Override public default Set<K> keys() {
+        return JamStreams.toHashSet(select().stream().map(record -> getKey(record)));
     }
 }

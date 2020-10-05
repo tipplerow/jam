@@ -32,7 +32,7 @@ public class MapTable<K, V> implements JamTable<K, V> {
      *
      * @param keyFunc a function to extract keys from records.
      */
-    protected MapTable(Map<K, V> backMap, Function<V, K> keyFunc) {
+    public MapTable(Map<K, V> backMap, Function<V, K> keyFunc) {
         this.backMap = backMap;
         this.keyFunc = keyFunc;
     }
@@ -105,65 +105,26 @@ public class MapTable<K, V> implements JamTable<K, V> {
         return new MapTable<K, V>(JamMaps.tree(records, keyFunc), keyFunc);
     }
 
-    /**
-     * Identifies keys contained in this table.
-     *
-     * @param key the key to search for.
-     *
-     * @return {@code true} iff this table contains a record with the
-     * specified key.
-     */
     @Override public boolean contains(K key) {
         return backMap.containsKey(key);
     }
 
-    /**
-     * Returns the number of records in this table.
-     *
-     * @return the number of records in this table.
-     */
     @Override public int count() {
         return backMap.size();
     }
 
-    /**
-     * Deletes all records from this table.
-     */
     @Override public void delete() {
         backMap.clear();
     }
 
-    /**
-     * Deletes the record indexed by a given key (a no-op if there is
-     * no matching record).
-     *
-     * @param key the key of the record to delete.
-     *
-     * @return {@code true} iff the matching record was deleted.
-     */
     @Override public boolean delete(K key) {
         return backMap.remove(key) != null;
     }
 
-    /**
-     * Extracts the key field from a record.
-     *
-     * @param record a record to examine.
-     *
-     * @return the key field for the specified record.
-     */
     @Override public K getKey(V record) {
         return keyFunc.apply(record);
     }
 
-    /**
-     * Inserts a new record into this table; this operation will fail
-     * if this table already contains a record with the same key.
-     *
-     * @param record the record to insert.
-     *
-     * @return {@code true} iff the record was successfully inserted.
-     */
     @Override public boolean insert(V record) {
         K key = getKey(record);
 
@@ -174,45 +135,18 @@ public class MapTable<K, V> implements JamTable<K, V> {
         return true;
     }
 
-    /**
-     * Returns a read-only view of the keys in this table.
-     *
-     * @return a read-only view of the keys in this table.
-     */
     @Override public Set<K> keys() {
         return Collections.unmodifiableSet(backMap.keySet());
     }
 
-    /**
-     * Returns all records in this table.
-     *
-     * @return all records in this table.
-     */
     @Override public Collection<V> select() {
         return Collections.unmodifiableCollection(backMap.values());
     }
 
-    /**
-     * Returns the record indexed by a given key.
-     *
-     * @param key the key of the record to select.
-     *
-     * @return the record with the specified key (or
-     * {@code null} if there is no matching record).
-     */
     @Override public V select(K key) {
         return backMap.get(key);
     }
 
-    /**
-     * Updates an existing record in this table; this operation will
-     * fail unless this table already contains a record with the same
-     * key.
-     *
-     * @param record the record to update.
-     *
-     * @return {@code true} iff the record was successfully updated.
-     */
     @Override public boolean update(V record) {
         K key = getKey(record);
 
@@ -223,24 +157,35 @@ public class MapTable<K, V> implements JamTable<K, V> {
         return true;
     }
 
-    /**
-     * Inserts a new record or updates an existing record in this
-     * table; this operation should always succeed.
-     *
-     * @param record the record to insert or update.
-     */
     @Override public void upsert(V record) {
         backMap.put(getKey(record), record);
     }
 
+    /**
+     * Throws an {@code UnsupportedOperationException}: use
+     * {@code equalsView} for equality tests.
+     *
+     * @throws UnsupportedOperationException in all cases.
+     */
     @Override public boolean equals(Object obj) {
         throw new UnsupportedOperationException("Use TableView::equalsView for equality tests.");
     }
 
+    /**
+     * Throws an {@code UnsupportedOperationException}: tables are not
+     * suitable as hash keys.
+     *
+     * @throws UnsupportedOperationException in all cases.
+     */
     @Override public int hashCode() {
         throw new UnsupportedOperationException("Views are not suitable for hash keys.");
     }
 
+    /**
+     * Returns a string containing every mapping in this table.
+     *
+     * @return a string containing every mapping in this table.
+     */
     @Override public String toString() {
         return backMap.toString();
     }
