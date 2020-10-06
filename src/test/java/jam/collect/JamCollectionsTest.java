@@ -47,6 +47,12 @@ public final class JamCollectionsTest {
         assertFalse(JamCollections.equalsContents(List.of("A", "B", "C"), List.of("A", "B", "C", "D")));
     }
 
+    @Test public void testPeek() {
+        assertNull(JamCollections.peek(List.of()));
+        assertEquals("abc", JamCollections.peek(List.of("abc")));
+        assertEquals("abc", JamCollections.peek(List.of("abc", "def", "ghi")));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.collect.JamCollectionsTest");
     }

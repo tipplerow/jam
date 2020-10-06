@@ -3,6 +3,7 @@ package jam.collect;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import jam.lang.ClassUtil;
@@ -51,6 +52,26 @@ public final class JamCollections {
         }
 
         return set.containsAll(col);
+    }
+
+    /**
+     * Peeks at the first item in a collection; the collection is
+     * unchanged.
+     *
+     * @param <V> the type of object contained in the collection.
+     *
+     * @param collection the collection to examine.
+     *
+     * @return the first element returned by the collection iterator
+     * (or {@code null} if the collection is empty).
+     */
+    public static <V> V peek(Collection<V> collection) {
+        Iterator<V> iterator = collection.iterator();
+
+        if (iterator.hasNext())
+            return iterator.next();
+        else
+            return null;
     }
 }
 
