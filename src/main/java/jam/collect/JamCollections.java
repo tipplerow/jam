@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import jam.lang.ClassUtil;
+import jam.lang.ObjectUtil;
 
 /**
  * Provides utility methods operating on collections.
@@ -52,6 +53,41 @@ public final class JamCollections {
         }
 
         return set.containsAll(col);
+    }
+
+    /**
+     * Determines whether two collections contain exactly the same
+     * items in exactly the same order (returned by their iterators).
+     *
+     * @param <V> the runtime time common to both collections.
+     *
+     * @param col1 the first collection to examine.
+     *
+     * @param col2 the second collection to examine.
+     *
+     * @return {@code true} iff the specified collections contain
+     * exactly the same items in exactly the same order (returned
+     * by their iterators).
+     */
+    public static <V> boolean equalsOrdered(Collection<? extends V> col1,
+                                            Collection<? extends V> col2) {
+        if (col1.size() != col2.size())
+            return false;
+
+        Iterator<? extends V> iter1 = col1.iterator();
+        Iterator<? extends V> iter2 = col2.iterator();
+
+        while (iter1.hasNext()) {
+            assert iter2.hasNext();
+
+            V item1 = iter1.next();
+            V item2 = iter2.next();
+
+            if (!ObjectUtil.equals(item1, item2))
+                return false;
+        }
+
+        return true;
     }
 
     /**

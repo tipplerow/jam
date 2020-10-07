@@ -47,6 +47,31 @@ public final class JamCollectionsTest {
         assertFalse(JamCollections.equalsContents(List.of("A", "B", "C"), List.of("A", "B", "C", "D")));
     }
 
+    @Test public void testEqualsOrdered() {
+        Set<String> col1 = new TreeSet<String>();
+        List<String> col2 = new ArrayList<String>();
+        List<String> col3 = new LinkedList<String>();
+
+        col1.addAll(List.of("A", "B", "C", "D"));
+        col2.addAll(List.of("A", "B", "C", "D"));
+        col3.addAll(List.of("C", "D", "A", "B"));
+
+        assertTrue(JamCollections.equalsOrdered(col1, col1));
+        assertTrue(JamCollections.equalsOrdered(col1, col2));
+        assertFalse(JamCollections.equalsOrdered(col1, col3));
+
+        assertTrue(JamCollections.equalsOrdered(col2, col1));
+        assertTrue(JamCollections.equalsOrdered(col2, col2));
+        assertFalse(JamCollections.equalsOrdered(col2, col3));
+
+        assertFalse(JamCollections.equalsOrdered(col3, col1));
+        assertFalse(JamCollections.equalsOrdered(col3, col2));
+        assertTrue(JamCollections.equalsOrdered(col3, col3));
+
+        assertFalse(JamCollections.equalsOrdered(List.of("A", "B", "C"), List.of("A", "B")));
+        assertFalse(JamCollections.equalsOrdered(List.of("A", "B", "C"), List.of("A", "B", "C", "D")));
+    }
+
     @Test public void testPeek() {
         assertNull(JamCollections.peek(List.of()));
         assertEquals("abc", JamCollections.peek(List.of("abc")));
