@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
- * Implementats the {@code JamTable} interface using a map for the
+ * Implements the {@code JamTable} interface using a map for the
  * underlying storage.
  */
 public class MapTable<K, V> implements JamTable<K, V> {
