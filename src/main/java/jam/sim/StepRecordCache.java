@@ -12,7 +12,7 @@ import java.util.Map;
 import jam.util.AutoList;
 import jam.util.ConcatIterator;
 import jam.util.MapFactory;
-import jam.util.ReadOnlyIterator;
+import jam.collect.ReadOnlyIterator;
 
 /**
  * Maintains a cache of step records keyed by trial index and time

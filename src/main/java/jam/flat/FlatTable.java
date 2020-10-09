@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jam.util.ReadOnlyIterator;
+import jam.collect.ReadOnlyIterator;
 
 /**
  * Provides an indexed table of unique flat-file records.

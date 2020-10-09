@@ -1,5 +1,5 @@
 
-package jam.util;
+package jam.collect;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -51,6 +51,11 @@ public final class ReadOnlyIterator<E> implements Iterator<E> {
         return iterator.next();
     }
 
+    /**
+     * Throws an {@code UnsupportedOperationException} always.
+     *
+     * @throws UnsupportedOperationException always.
+     */
     @Override public void remove() {
         throw new UnsupportedOperationException();
     }

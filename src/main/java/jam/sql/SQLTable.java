@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import jam.app.JamLogger;
-import jam.collect.JamTable;
+import jam.collect.MapTable;
 import jam.lang.JamException;
 import jam.report.LineBuilder;
 import jam.stream.JamStreams;
@@ -24,7 +24,7 @@ import jam.stream.JamStreams;
  *
  * @param <V> the runtime type for the table records.
  */
-public abstract class SQLTable<K, V> implements JamTable<K, V>, TableProcessor {
+public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
     private Connection connection = null;
 
     /**

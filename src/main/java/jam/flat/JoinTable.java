@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import jam.util.ConcatIterator;
-import jam.util.ReadOnlyIterator;
+import jam.collect.ReadOnlyIterator;
 
 /**
  * Provides a many-to-many mapping table.

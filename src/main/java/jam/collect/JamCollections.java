@@ -19,7 +19,7 @@ public final class JamCollections {
      * Determines whether two collections contain exactly the same
      * items regardless of order or the underlying collection type.
      *
-     * @param <V> the runtime time common to both collections.
+     * @param <V> the runtime type common to both collections.
      *
      * @param col1 the first collection to examine.
      *
@@ -59,7 +59,7 @@ public final class JamCollections {
      * Determines whether two collections contain exactly the same
      * items in exactly the same order (returned by their iterators).
      *
-     * @param <V> the runtime time common to both collections.
+     * @param <V> the runtime type common to both collections.
      *
      * @param col1 the first collection to examine.
      *
