@@ -58,6 +58,10 @@ public final class TestRecord {
             && DoubleComparator.DEFAULT.EQ(this.dval, that.dval);
     }
 
+    @Override public int hashCode() {
+        return key.hashCode();
+    }
+
     @Override public String toString() {
         return String.format("TestRecord(key = '%s', ival = %d, dval = %.4f, date = '%s', time = '%s')",
                              key, ival, dval, date, time);

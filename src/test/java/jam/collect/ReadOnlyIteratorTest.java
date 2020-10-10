@@ -1,5 +1,5 @@
 
-package jam.util;
+package jam.collect;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,6 +47,6 @@ public class ReadOnlyIteratorTest {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.util.ReadOnlyIteratorTest");
+        org.junit.runner.JUnitCore.main("jam.collect.ReadOnlyIteratorTest");
     }
 }

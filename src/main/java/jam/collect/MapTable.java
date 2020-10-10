@@ -16,7 +16,7 @@ import java.util.function.Function;
  *
  * @param <V> the runtime type of the table records.
  */
-public interface MapTable<K, V> extends MapView<K, V>, RecordStore<K, V> {
+public interface MapTable<K, V> extends MapView<K, V>, RecordStore<V> {
     /**
      * Creates a new empty map table backed by a {@code HashMap}.
      *

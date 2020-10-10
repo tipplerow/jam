@@ -37,6 +37,10 @@ final class TestTable extends SQLTable<String, TestRecord> {
         return record.key;
     }
 
+    @Override public String getKey(ResultSet resultSet) throws SQLException {
+        return getString(resultSet, 1);
+    }
+
     @Override public TestRecord getRecord(ResultSet resultSet) throws SQLException {
         String key = getString(resultSet, 1);
         int    ival = getInt(resultSet, 2, 0);

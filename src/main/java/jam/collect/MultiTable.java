@@ -15,7 +15,7 @@ import com.google.common.collect.SetMultimap;
  *
  * @param <V> the runtime type of the table records.
  */
-public interface MultiTable<K, V> extends MultiView<K, V>, RecordStore<K, V> {
+public interface MultiTable<K, V> extends MultiView<K, V>, RecordStore<V> {
     /**
      * Creates a new empty map table backed by a {@code HashMap}.
      *

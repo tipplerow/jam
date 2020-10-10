@@ -137,12 +137,27 @@ public final class SQLColumn {
     /**
      * Extracts the names from a list of columns.
      *
-     * @param columns the table columns.
+     * @param columns a list of columns to process.
      *
      * @return the names of the given columns (in the same order).
      */
     public static List<String> getNames(List<SQLColumn> columns) {
         return ListUtil.apply(columns, x -> x.getName());
+    }
+
+    /**
+     * Joins the names from a list of columns with a separator string.
+     *
+     * @param columns a list of columns to process.
+     *
+     * @param separator the string to separate the column names.
+     *
+     * @return a single string containing the names of the given
+     * columns (in the same order as the list) separated by the
+     * specified string.
+     */
+    public static String join(List<SQLColumn> columns, String separator) {
+        return String.join(separator, getNames(columns));
     }
 
     private SQLColumn add(Qualifier... qualifierList) {
