@@ -34,7 +34,7 @@ public final class SQLTableTest extends MapTableTestBase {
         assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), records);
         table.drop();
     }
-    /*
+
     @Test public void testDelete() {
         if (!PostgreSQLDb.isInstalled())
             return;
@@ -45,36 +45,16 @@ public final class SQLTableTest extends MapTableTestBase {
         table.drop();
     }
 
-    @Test public void testInsert() {
+    @Test public void testStore() {
         if (!PostgreSQLDb.isInstalled())
             return;
 
-        TestTable table = new TestTable(postgres, "test_insert");
+        TestTable table = new TestTable(postgres, "test_store");
 
-        runInsertTest(table);
+        runStoreTest(table);
         table.drop();
     }
 
-    @Test public void testUpdate() {
-        if (!PostgreSQLDb.isInstalled())
-            return;
-
-        TestTable table = new TestTable(postgres, "test_update");
-
-        runUpdateTest(table);
-        table.drop();
-    }
-
-    @Test public void testUpsert() {
-        if (!PostgreSQLDb.isInstalled())
-            return;
-
-        TestTable table = new TestTable(postgres, "test_upsert");
-
-        runUpsertTest(table);
-        table.drop();
-    }
-    */
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.sql.SQLTableTest");
     }

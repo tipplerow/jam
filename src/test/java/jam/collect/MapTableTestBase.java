@@ -40,7 +40,7 @@ public abstract class MapTableTestBase {
 
         assertTrue(expTable.equalsView(actTable));
     }
-    /*
+
     public void runDeleteTest(MapTable<String, TestRecord> table) {
         // Start with a populated table...
         table.delete();
@@ -57,18 +57,13 @@ public abstract class MapTableTestBase {
         assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.fetch(keys));
 
         // Delete two records...
-        assertTrue(table.delete(key3));
-        assertTrue(table.delete(key4));
+        assertTrue(table.delete(rec3));
+        assertTrue(table.delete(rec4));
 
-        assertFalse(table.delete(key3));
-        assertFalse(table.delete(key4));
+        assertFalse(table.delete(rec3));
+        assertFalse(table.delete(rec4));
 
         assertEquals(3, table.count());
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertFalse(table.contains(key3));
-        assertFalse(table.contains(key4));
-        assertTrue(table.contains(key5));
 
         assertEquals(rec1, table.fetch(key1));
         assertEquals(rec2, table.fetch(key2));
@@ -80,14 +75,8 @@ public abstract class MapTableTestBase {
         assertEquals(List.of(rec1, rec5), table.fetch(List.of(key1, key3, key5)));
 
         // Delete the remaining records...
-        table.delete(List.of(key1, key2, key3, key4, key5));
+        table.delete(List.of(rec1, rec2, rec3, rec4, rec5));
         assertEquals(0, table.count());
-
-        assertFalse(table.contains(key1));
-        assertFalse(table.contains(key2));
-        assertFalse(table.contains(key3));
-        assertFalse(table.contains(key4));
-        assertFalse(table.contains(key5));
 
         assertNull(table.fetch(key1));
         assertNull(table.fetch(key2));
@@ -99,140 +88,10 @@ public abstract class MapTableTestBase {
         assertTrue(table.fetch(List.of(key1, key3, key5)).isEmpty());
     }
 
-    public void runInsertTest(MapTable<String, TestRecord> table) {
+    public void runStoreTest(MapTable<String, TestRecord> table) {
         // Start with an empty table...
         table.delete();
         assertEquals(0, table.count());
-
-        assertFalse(table.contains(key1));
-        assertFalse(table.contains(key2));
-        assertFalse(table.contains(key3));
-        assertFalse(table.contains(key4));
-        assertFalse(table.contains(key5));
-
-        assertNull(table.fetch(key1));
-        assertNull(table.fetch(key2));
-        assertNull(table.fetch(key3));
-        assertNull(table.fetch(key4));
-        assertNull(table.fetch(key5));
-
-        assertTrue(table.fetch().isEmpty());
-        assertTrue(table.fetch(List.of(key1, key3, key5)).isEmpty());
-
-        // Add the first two records...
-        assertTrue(table.insert(rec1));
-        assertTrue(table.insert(rec2));
-        assertEquals(2, table.count());
-
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertFalse(table.contains(key3));
-        assertFalse(table.contains(key4));
-        assertFalse(table.contains(key5));
-
-        assertEquals(rec1, table.fetch(key1));
-        assertEquals(rec2, table.fetch(key2));
-        assertNull(table.fetch(key3));
-        assertNull(table.fetch(key4));
-        assertNull(table.fetch(key5));
-
-        assertEquals(List.of(rec1, rec2), table.fetch(keys));
-        assertEquals(List.of(rec1), table.fetch(List.of(key1, key3, key5)));
-
-        // Add the remaining records...
-        table.insert(List.of(rec3, rec4, rec5));
-        assertEquals(5, table.count());
-
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertTrue(table.contains(key3));
-        assertTrue(table.contains(key4));
-        assertTrue(table.contains(key5));
-
-        assertEquals(rec1, table.fetch(key1));
-        assertEquals(rec2, table.fetch(key2));
-        assertEquals(rec3, table.fetch(key3));
-        assertEquals(rec4, table.fetch(key4));
-        assertEquals(rec5, table.fetch(key5));
-
-        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.fetch(keys));
-        assertEquals(List.of(rec1, rec3, rec5), table.fetch(List.of(key1, key3, key5)));
-    }
-
-    public void runUpdateTest(MapTable<String, TestRecord> table) {
-        // Start with an empty table...
-        table.delete();
-        assertEquals(0, table.count());
-
-        assertFalse(table.contains(key1));
-        assertFalse(table.contains(key2));
-        assertFalse(table.contains(key3));
-        assertFalse(table.contains(key4));
-        assertFalse(table.contains(key5));
-
-        assertNull(table.fetch(key1));
-        assertNull(table.fetch(key2));
-        assertNull(table.fetch(key3));
-        assertNull(table.fetch(key4));
-        assertNull(table.fetch(key5));
-
-        assertTrue(table.fetch().isEmpty());
-        assertTrue(table.fetch(List.of(key1, key3, key5)).isEmpty());
-
-        // Update a missing record...
-        assertFalse(table.update(rec1));
-        assertFalse(table.update(rec1));
-        assertEquals(0, table.count());
-
-        // Add all records...
-        table.insert(List.of(rec1, rec2, rec3, rec4, rec5));
-        assertEquals(5, table.count());
-
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertTrue(table.contains(key3));
-        assertTrue(table.contains(key4));
-        assertTrue(table.contains(key5));
-
-        assertEquals(rec1, table.fetch(key1));
-        assertEquals(rec2, table.fetch(key2));
-        assertEquals(rec3, table.fetch(key3));
-        assertEquals(rec4, table.fetch(key4));
-        assertEquals(rec5, table.fetch(key5));
-
-        assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.fetch(keys));
-        assertEquals(List.of(rec1, rec3, rec5), table.fetch(List.of(key1, key3, key5)));
-
-        // Update with three new records...
-        assertTrue(table.update(rec1B));
-        table.update(List.of(rec3B, rec4B));
-        assertEquals(5, table.count());
-
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertTrue(table.contains(key3));
-        assertTrue(table.contains(key4));
-        assertTrue(table.contains(key5));
-
-        assertEquals(rec1B, table.fetch(key1));
-        assertEquals(rec2,  table.fetch(key2));
-        assertEquals(rec3B, table.fetch(key3));
-        assertEquals(rec4B, table.fetch(key4));
-        assertEquals(rec5,  table.fetch(key5));
-
-        assertEquals(List.of(rec1B, rec2, rec3B, rec4B, rec5), table.fetch(List.of(key1, key2, key3, key4, key5)));
-    }
-
-    public void runUpsertTest(MapTable<String, TestRecord> table) {
-        // Start with an empty table...
-        table.delete();
-        assertEquals(0, table.count());
-
-        assertFalse(table.contains(key1));
-        assertFalse(table.contains(key2));
-        assertFalse(table.contains(key3));
-        assertFalse(table.contains(key4));
-        assertFalse(table.contains(key5));
 
         assertNull(table.fetch(key1));
         assertNull(table.fetch(key2));
@@ -243,16 +102,10 @@ public abstract class MapTableTestBase {
         assertTrue(table.fetch().isEmpty());
         assertTrue(table.fetch(List.of(key1, key2, key3, key4, key5)).isEmpty());
 
-        // Upsert two missing records...
-        table.upsert(rec1);
-        table.upsert(rec2);
+        // Store two missing records...
+        table.store(rec1);
+        table.store(rec2);
         assertEquals(2, table.count());
-
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertFalse(table.contains(key3));
-        assertFalse(table.contains(key4));
-        assertFalse(table.contains(key5));
 
         assertEquals(rec1, table.fetch(key1));
         assertEquals(rec2, table.fetch(key2));
@@ -262,15 +115,9 @@ public abstract class MapTableTestBase {
 
         assertEquals(List.of(rec1, rec2), table.fetch(List.of(key1, key2, key3, key4, key5)));
 
-        // Upsert the remaining original records...
-        table.upsert(List.of(rec3, rec4, rec5));
+        // Store the remaining original records...
+        table.store(List.of(rec3, rec4, rec5));
         assertEquals(5, table.count());
-
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertTrue(table.contains(key3));
-        assertTrue(table.contains(key4));
-        assertTrue(table.contains(key5));
 
         assertEquals(rec1, table.fetch(key1));
         assertEquals(rec2, table.fetch(key2));
@@ -280,16 +127,10 @@ public abstract class MapTableTestBase {
 
         assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), table.fetch(List.of(key1, key2, key3, key4, key5)));
 
-        // Upsert three new records...
-        table.upsert(rec1B);
-        table.upsert(List.of(rec3B, rec4B));
+        // Store three new records...
+        table.store(rec1B);
+        table.store(List.of(rec3B, rec4B));
         assertEquals(5, table.count());
-
-        assertTrue(table.contains(key1));
-        assertTrue(table.contains(key2));
-        assertTrue(table.contains(key3));
-        assertTrue(table.contains(key4));
-        assertTrue(table.contains(key5));
 
         assertEquals(rec1B, table.fetch(key1));
         assertEquals(rec2,  table.fetch(key2));
@@ -303,10 +144,9 @@ public abstract class MapTableTestBase {
     public void runFetchFilterTest(MapTable<String, TestRecord> table) {
         // Start with a populated table...
         table.delete();
-        table.insert(List.of(rec1, rec2, rec3, rec4, rec5));
+        table.store(List.of(rec1, rec2, rec3, rec4, rec5));
         assertEquals(5, table.count());
 
         assertEqualCollections(List.of(rec2, rec3, rec4), table.fetch(rec -> rec.dval > 2.0));
     }
-    */
 }
