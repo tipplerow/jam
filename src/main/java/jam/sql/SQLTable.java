@@ -155,11 +155,11 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
     }
 
     private String formatSelect(String what) {
-        return String.format("SELECT % FROM %s", what, schema.getTableName());
+        return String.format("SELECT %s FROM %s", what, schema.getTableName());
     }
 
     private String formatSelect(String what, String where) {
-        return String.format("SELECT % FROM %s WHERE %s", what, schema.getTableName(), where);
+        return String.format("SELECT %s FROM %s WHERE %s", what, schema.getTableName(), where);
     }
 
     private String formatSelectAllKeys() {
