@@ -36,7 +36,7 @@ public interface MapView<K, V> extends RecordView<K, V> {
      * @return a view backed by a {@code HashMap}.
      */
     public static <K, V> MapView<K, V> hash(Collection<V> records, Function<V, K> keyFunc) {
-        return MapCache.hash(records, keyFunc);
+        return HashMapTable.create(records, keyFunc);
     }
 
     /**
@@ -54,7 +54,7 @@ public interface MapView<K, V> extends RecordView<K, V> {
      * @return a view backed by a {@code TreeMap}.
      */
     public static <K, V> MapView<K, V> tree(Collection<V> records, Function<V, K> keyFunc) {
-        return MapCache.tree(records, keyFunc);
+        return TreeMapTable.create(records, keyFunc);
     }
 
     /**

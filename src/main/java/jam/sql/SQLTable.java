@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import jam.app.JamLogger;
+import jam.collect.JamLists;
 import jam.collect.MapTable;
 import jam.lang.JamException;
 import jam.report.LineBuilder;
@@ -652,7 +653,7 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
      *
      * @throws RuntimeException if any SQL errors occur.
      */
-    @Override public void delete(Collection<V> records) {
+    @Override public void delete(Iterable<V> records) {
         try (PreparedStatement statement = prepareDeleteKey()) {
             for (V record : records) {
                 setKey(statement, getKey(record), 1);
@@ -768,12 +769,12 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
      *
      * @throws RuntimeException if any SQL errors occur.
      */
-    @Override public void store(Collection<V> records) {
+    @Override public void store(Iterable<V> records) {
         //
         // More efficient to process the records in batch
         // statements...
         //
-        List<V> recList = new ArrayList<V>(records);
+        List<V> recList = JamLists.arrayList(records);
         List<K> keyList = JamStreams.apply(recList, rec -> getKey(rec));
         List<Boolean> contains = containsKeys(keyList);
 

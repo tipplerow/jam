@@ -1,10 +1,6 @@
 
 package jam.collect;
 
-import java.util.Collection;
-
-import jam.lang.JamException;
-
 /**
  * Defines a common interface for containers that store records
  * (either in memory or in a persistent medium).
@@ -31,7 +27,7 @@ public interface RecordStore<V> {
      *
      * @param records the records to delete.
      */
-    public default void delete(Collection<V> records) {
+    public default void delete(Iterable<V> records) {
         records.forEach(record -> delete(record));
     }
 
@@ -49,7 +45,7 @@ public interface RecordStore<V> {
      *
      * @param records the records to store (insert or update).
      */
-    public default void store(Collection<V> records) {
+    public default void store(Iterable<V> records) {
         records.forEach(record -> store(record));
     }
 }
