@@ -3,7 +3,6 @@ package jam.collect;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +35,7 @@ public interface MapView<K, V> extends RecordView<K, V> {
      * @return a view backed by a {@code HashMap}.
      */
     public static <K, V> MapView<K, V> hash(Collection<V> records, Function<V, K> keyFunc) {
-        return HashMapTable.create(records, keyFunc);
+        return HashMapView.create(records, keyFunc);
     }
 
     /**
@@ -54,7 +53,7 @@ public interface MapView<K, V> extends RecordView<K, V> {
      * @return a view backed by a {@code TreeMap}.
      */
     public static <K, V> MapView<K, V> tree(Collection<V> records, Function<V, K> keyFunc) {
-        return TreeMapTable.create(records, keyFunc);
+        return TreeMapView.create(records, keyFunc);
     }
 
     /**
@@ -95,8 +94,8 @@ public interface MapView<K, V> extends RecordView<K, V> {
             return false;
 
         for (K key : thisKeys) {
-            V thisValue = this.fetch(key);
-            V thatValue = that.fetch(key);
+            V thisValue = this.select(key);
+            V thatValue = that.select(key);
 
             if (!ObjectUtil.equals(thisValue, thatValue))
                 return false;
@@ -106,26 +105,49 @@ public interface MapView<K, V> extends RecordView<K, V> {
     }
 
     /**
-     * Retrieves the record indexed by a given key.
+     * Retrieves the unique record indexed by a given key.
      *
-     * @param key the key of the record to fetch.
+     * @param key the key of the record to select.
      *
      * @return the record with the specified key (or
      * {@code null} if there is no matching record).
      */
-    public abstract V fetch(K key);
+    public abstract V select(K key);
+
+    /**
+     * Retrieves the records indexed by collection of keys.
+     *
+     * @param keys the keys of the records to select.
+     *
+     * @return a list containing the records matching the specified keys.
+     * The matching records are returned in the same order as their keys
+     * appear in the input collection, except that {@code null} values
+     * are omitted.
+     */
+    public default List<V> select(Collection<K> keys) {
+        List<V> records = new ArrayList<V>(keys.size());
+
+        for (K key : keys) {
+            V record = select(key);
+
+            if (record != null)
+                records.add(record);
+        }
+
+        return records;
+    }
 
     /**
      * Retrieves the record indexed by a given key.
      *
-     * @param key the key of the record to fetch.
+     * @param key the key of the record to select.
      *
      * @return the record with the specified key.
      *
      * @throws RuntimeException if there is no matching record.
      */
     public default V require(K key) {
-        V record = fetch(key);
+        V record = select(key);
 
         if (record != null)
             return record;
@@ -136,11 +158,11 @@ public interface MapView<K, V> extends RecordView<K, V> {
     /**
      * Returns the records indexed by a collection of keys.
      *
-     * @param keys the keys of the records to fetch.
+     * @param keys the keys of the records to select.
      *
      * @return the list of size {@code n} where {@code n} is the size
      * of the input collection and {@code list.get(k)} is the record
-     * fetched for the {@code k}th key returned by the key collection
+     * selected for the {@code k}th key returned by the key collection
      * iterator.
      *
      * @throws RuntimeException unless all records are present in this
@@ -151,19 +173,6 @@ public interface MapView<K, V> extends RecordView<K, V> {
 
         for (K key : keys)
             records.add(require(key));
-
-        return records;
-    }
-
-    @Override public default Collection<V> fetch(Collection<K> keys) {
-        Collection<V> records = new ArrayList<V>(keys.size());
-
-        for (K key : keys) {
-            V record = fetch(key);
-
-            if (record != null)
-                records.add(record);
-        }
 
         return records;
     }

@@ -50,7 +50,31 @@ public abstract class AbstractMapTable<K, V> extends AbstractMapView<K, V> imple
         return backMap.remove(getKey(record)) != null;
     }
 
+    @Override public boolean insert(V record) {
+        K key = getKey(record);
+
+        if (backMap.containsKey(key)) {
+            return false;
+        }
+        else {
+            backMap.put(key, record);
+            return true;
+        }
+    }
+
     @Override public void store(V record) {
         backMap.put(getKey(record), record);
+    }
+
+    @Override public boolean update(V record) {
+        K key = getKey(record);
+
+        if (backMap.containsKey(key)) {
+            backMap.put(key, record);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

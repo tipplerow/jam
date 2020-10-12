@@ -32,6 +32,26 @@ public interface RecordStore<V> {
     }
 
     /**
+     * Inserts new records into this store; existing records will not
+     * be updated.
+     *
+     * @param record the record to insert.
+     *
+     * @return {@code true} iff the operation succeeded.
+     */
+    public abstract boolean insert(V record);
+
+    /**
+     * Inserts records into this store; existing records will be not
+     * be updated.
+     *
+     * @param records the records to insert.
+     */
+    public default void insert(Iterable<V> records) {
+        records.forEach(record -> insert(record));
+    }
+
+    /**
      * Stores a record in this store: new records will be inserted,
      * existing records will be updated.
      *
@@ -47,5 +67,25 @@ public interface RecordStore<V> {
      */
     public default void store(Iterable<V> records) {
         records.forEach(record -> store(record));
+    }
+
+    /**
+     * Updates an existing record in this store; a new record will not
+     * be inserted.
+     *
+     * @param record the record to update.
+     *
+     * @return {@code true} iff the operation succeeded.
+     */
+    public abstract boolean update(V record);
+
+    /**
+     * Updates existing records in this store; new records will be not
+     * be inserted.
+     *
+     * @param records the records to update.
+     */
+    public default void update(Iterable<V> records) {
+        records.forEach(record -> update(record));
     }
 }

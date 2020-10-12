@@ -18,7 +18,7 @@ public final class HashMapTableTest extends MapTableTestBase {
     }
 
     @Test public void testSelectFilter() {
-        runFetchFilterTest(newTable());
+        runSelectFilterTest(newTable());
     }
 
     public static void main(String[] args) {

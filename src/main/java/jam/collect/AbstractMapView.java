@@ -29,20 +29,24 @@ public abstract class AbstractMapView<K, V> implements MapView<K, V> {
         this.backMap = backMap;
     }
 
+    @Override public boolean contains(K key) {
+        return backMap.containsKey(key);
+    }
+
     @Override public int count() {
         return backMap.size();
     }
 
-    @Override public Collection<V> fetch() {
+    @Override public Set<K> keys() {
+        return Collections.unmodifiableSet(backMap.keySet());
+    }
+
+    @Override public Collection<V> select() {
         return Collections.unmodifiableCollection(backMap.values());
     }
 
-    @Override public V fetch(K key) {
+    @Override public V select(K key) {
         return backMap.get(key);
-    }
-
-    @Override public Set<K> keys() {
-        return Collections.unmodifiableSet(backMap.keySet());
     }
 
     /**

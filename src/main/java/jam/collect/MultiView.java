@@ -55,8 +55,8 @@ public interface MultiView<K, V> extends RecordView<K, V> {
             return false;
 
         for (K key : thisKeys) {
-            Collection<V> thisValues = this.fetch(key);
-            Collection<V> thatValues = that.fetch(key);
+            Collection<V> thisValues = this.select(key);
+            Collection<V> thatValues = that.select(key);
 
             if (!JamCollections.equalsContents(thisValues, thatValues))
                 return false;
@@ -68,55 +68,16 @@ public interface MultiView<K, V> extends RecordView<K, V> {
     /**
      * Returns the records indexed by a given key.
      *
-     * @param key the key of the records to fetch.
+     * @param key the key of the records to select.
      *
      * @return the records with the specified key (or an empty
      * collection if there are no matching records).
      */
-    public abstract Collection<V> fetch(K key);
-
-    @Override public default Collection<V> fetch(Collection<K> keys) {
-        Collection<V> records = new ArrayList<V>();
-
-        for (K key : keys)
-            records.addAll(fetch(key));
-
-        return records;
-    }
+    public abstract Collection<V> select(K key);
 }
 
-final class MultiWrapper<K, V> implements MultiView<K, V> {
-    private final SetMultimap<K, V> map;
-
+final class MultiWrapper<K, V> extends AbstractMultiView<K, V> {
     MultiWrapper(SetMultimap<K, V> map) {
-        this.map = map;
-    }
-
-    @Override public int count() {
-        return map.size();
-    }
-
-    @Override public Collection<V> fetch() {
-        return Collections.unmodifiableCollection(map.values());
-    }
-
-    @Override public Set<V> fetch(K key) {
-        return Collections.unmodifiableSet(map.get(key));
-    }
-
-    @Override public Set<K> keys() {
-        return Collections.unmodifiableSet(map.keySet());
-    }
-
-    @Override public boolean equals(Object obj) {
-        throw new UnsupportedOperationException("Use MultiView::equalsView for equality tests.");
-    }
-
-    @Override public int hashCode() {
-        throw new UnsupportedOperationException("Views are not suitable for hash keys.");
-    }
-
-    @Override public String toString() {
-        return map.toString();
+        super(map);
     }
 }

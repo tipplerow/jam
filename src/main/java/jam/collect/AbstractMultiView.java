@@ -30,20 +30,24 @@ public abstract class AbstractMultiView<K, V> implements MultiView<K, V> {
         this.backMap = backMap;
     }
 
+    @Override public boolean contains(K key) {
+        return backMap.containsKey(key);
+    }
+
     @Override public int count() {
         return backMap.size();
     }
 
-    @Override public Collection<V> fetch() {
+    @Override public Set<K> keys() {
+        return Collections.unmodifiableSet(backMap.keySet());
+    }
+
+    @Override public Collection<V> select() {
         return Collections.unmodifiableCollection(backMap.values());
     }
 
-    @Override public Set<V> fetch(K key) {
+    @Override public Set<V> select(K key) {
         return Collections.unmodifiableSet(backMap.get(key));
-    }
-
-    @Override public Set<K> keys() {
-        return Collections.unmodifiableSet(backMap.keySet());
     }
 
     /**

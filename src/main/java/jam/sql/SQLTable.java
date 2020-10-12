@@ -437,29 +437,12 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
     /**
      * Identifies keys contained in this table.
      *
-     * @param key the key to search for.
-     *
-     * @return {@code true} iff this table contains a record with the
-     * specified key.
-     */
-    public boolean containsKey(K key) {
-        try (PreparedStatement statement = prepareContainsKey()) {
-            return executeContainsKey(statement, key);
-        }
-        catch (SQLException ex) {
-            throw runtimeEx(ex);
-        }
-    }
-
-    /**
-     * Identifies keys contained in this table.
-     *
      * @param keys the key to search for.
      *
      * @return a list where element {@code k} is {@code true} iff
      * this table contains a record with key {@code keys.get(k)}.
      */
-    public List<Boolean> containsKeys(List<K> keys) {
+    public List<Boolean> contains(List<K> keys) {
         try (PreparedStatement statement = prepareContainsKey()) {
             return executeContainsKeys(statement, keys);
         }
@@ -496,109 +479,15 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
         db.bulkCopy(schema.getTableName(), fileName, delimiter, nullString);
     }
 
-    /**
-     * Inserts a record into this table.
-     *
-     * @param record the record to insert.
-     *
-     * @return {@code true} iff the insert succeeded.
-     */
-    public boolean insert(V record) {
-        int result = 0;
-
-        try (PreparedStatement statement = prepareInsert()) {
-            setInsert(statement, record);
-            result = statement.executeUpdate();
-            commit();
-        }
-        catch (SQLException ex) {
-            JamLogger.warn(ex);
-            return false;
-        }
-
-        return (result == 1);
-    }
-
-    /**
-     * Inserts records into this table.
-     *
-     * @param records the records to insert.
-     *
-     * @throws RuntimeException if any inserts fail.
-     */
-    public void insert(Collection<V> records) {
-        try (PreparedStatement statement = prepareInsert()) {
-            for (V record : records) {
-                setInsert(statement, record);
-                statement.addBatch();
-            }
-
-            JamLogger.info("Executing batch insert...");
-            statement.executeBatch();
-            commit();
-            JamLogger.info("Committed!");
+    @Override public boolean contains(K key) {
+        try (PreparedStatement statement = prepareContainsKey()) {
+            return executeContainsKey(statement, key);
         }
         catch (SQLException ex) {
             throw runtimeEx(ex);
         }
     }
 
-    /**
-     * Updates an existing record in this table; this operation will
-     * fail unless this table already contains a record with the same
-     * key.
-     *
-     * @param record the record to update.
-     *
-     * @return {@code true} iff the record was successfully updated.
-     */
-    public boolean update(V record) {
-        int result = 0;
-
-        try (PreparedStatement statement = prepareUpdate()) {
-            setUpdate(statement, record);
-            result = statement.executeUpdate();
-            commit();
-        }
-        catch (SQLException ex) {
-            JamLogger.warn(ex);
-            return false;
-        }
-
-        return (result == 1);
-    }
-
-    /**
-     * Updates existing records in this table.
-     *
-     * @param records the records to update.
-     *
-     * @throw RuntimeException if any of the updates fail.
-     */
-    public void update(Collection<V> records) {
-        try (PreparedStatement statement = prepareUpdate()) {
-            for (V record : records) {
-                setUpdate(statement, record);
-                statement.addBatch();
-            }
-
-            JamLogger.info("Executing batch update...");
-            statement.executeBatch();
-            commit();
-            JamLogger.info("Committed!");
-        }
-        catch (SQLException ex) {
-            throw runtimeEx(ex);
-        }
-    }
-
-    /**
-     * Returns the number of rows in this table.
-     *
-     * @return the number of rows in this table.
-     *
-     * @throws RuntimeException if any SQL errors occur.
-     */
     @Override public int count() {
         try (Statement statement = createStatement()) {
             return executeSelectCount(statement);
@@ -608,11 +497,6 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
         }
     }
 
-    /**
-     * Deletes all rows from this table.
-     *
-     * @throws RuntimeException if any SQL errors occur.
-     */
     @Override public void delete() {
         try (Statement statement = createStatement()) {
             statement.executeUpdate(formatDeleteAll());
@@ -670,14 +554,49 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
         }
     }
 
-    /**
-     * Retrieves all rows from this table.
-     *
-     * @return a list containing every row in this table.
-     *
-     * @throws RuntimeException if any SQL errors occur.
-     */
-    @Override public List<V> fetch() {
+    @Override public boolean insert(V record) {
+        int result = 0;
+
+        try (PreparedStatement statement = prepareInsert()) {
+            setInsert(statement, record);
+            result = statement.executeUpdate();
+            commit();
+        }
+        catch (SQLException ex) {
+            JamLogger.warn(ex);
+            return false;
+        }
+
+        return (result == 1);
+    }
+
+    @Override public void insert(Iterable<V> records) {
+        try (PreparedStatement statement = prepareInsert()) {
+            for (V record : records) {
+                setInsert(statement, record);
+                statement.addBatch();
+            }
+
+            JamLogger.info("Executing batch insert...");
+            statement.executeBatch();
+            commit();
+            JamLogger.info("Committed!");
+        }
+        catch (SQLException ex) {
+            throw runtimeEx(ex);
+        }
+    }
+
+    @Override public Set<K> keys() {
+        try (Statement statement = createStatement()) {
+            return executeSelectAllKeys(statement);
+        }
+        catch (SQLException ex) {
+            throw runtimeEx(ex);
+        }
+    }
+
+    @Override public List<V> select() {
         try (Statement statement = createStatement()) {
             return executeSelectAllRecords(statement);
         }
@@ -686,15 +605,7 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
         }
     }
 
-    /**
-     * Retrieves the record indexed by a given key.
-     *
-     * @param key the key of the record to select.
-     *
-     * @return the record with the specified key (or
-     * {@code null} if there is no matching record).
-     */
-    @Override public V fetch(K key) {
+    @Override public V select(K key) {
         try (PreparedStatement statement = prepareSelectRecordByKey()) {
             return executeSelectRecordByKey(statement, key);
         }
@@ -703,17 +614,7 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
         }
     }
 
-    /**
-     * Retrieves the records indexed by collection of keys.
-     *
-     * @param keys the keys of the records to select.
-     *
-     * @return a list containing the records matching the specified key.
-     * The matching records are returned in the same order as their keys
-     * appear in the input collection, except that {@code null} values
-     * are omitted.
-     */
-    @Override public List<V> fetch(Collection<K> keys) {
+    @Override public List<V> select(Collection<K> keys) {
         try (PreparedStatement statement = prepareSelectRecordByKey()) {
             List<V> records = new ArrayList<V>(keys.size());
 
@@ -731,44 +632,13 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
         }
     }
 
-    /**
-     * Returns the keys of all records in this table.
-     *
-     * @return a new set containing the keys of all records in this
-     * table.
-     */
-    @Override public Set<K> keys() {
-        try (Statement statement = createStatement()) {
-            return executeSelectAllKeys(statement);
-        }
-        catch (SQLException ex) {
-            throw runtimeEx(ex);
-        }
-        //return JamStreams.toHashSet(fetch().stream().map(record -> getKey(record)));
-    }
-
-    /**
-     * Inserts a new record or updates an existing record in this
-     * table; this operation should always succeed.
-     *
-     * @param record the record to insert or update.
-     *
-     * @throws RuntimeException if any SQL errors occur.
-     */
     @Override public void store(V record) {
-        if (containsKey(getKey(record)))
+        if (contains(getKey(record)))
             update(record);
         else
             insert(record);
     }
 
-    /**
-     * Inserts new records or updates existing records in this table.
-     *
-     * @param records the records to insert or update.
-     *
-     * @throws RuntimeException if any SQL errors occur.
-     */
     @Override public void store(Iterable<V> records) {
         //
         // More efficient to process the records in batch
@@ -776,7 +646,7 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
         //
         List<V> recList = JamLists.arrayList(records);
         List<K> keyList = JamStreams.apply(recList, rec -> getKey(rec));
-        List<Boolean> contains = containsKeys(keyList);
+        List<Boolean> contains = contains(keyList);
 
         try (PreparedStatement insertStatement = prepareInsert();
              PreparedStatement updateStatement = prepareUpdate()) {
@@ -795,6 +665,39 @@ public abstract class SQLTable<K, V> implements MapTable<K, V>, TableProcessor {
             JamLogger.info("Executing batch insert/update...");
             insertStatement.executeBatch();
             updateStatement.executeBatch();
+            commit();
+            JamLogger.info("Committed!");
+        }
+        catch (SQLException ex) {
+            throw runtimeEx(ex);
+        }
+    }
+
+    @Override public boolean update(V record) {
+        int result = 0;
+
+        try (PreparedStatement statement = prepareUpdate()) {
+            setUpdate(statement, record);
+            result = statement.executeUpdate();
+            commit();
+        }
+        catch (SQLException ex) {
+            JamLogger.warn(ex);
+            return false;
+        }
+
+        return (result == 1);
+    }
+
+    @Override public void update(Iterable<V> records) {
+        try (PreparedStatement statement = prepareUpdate()) {
+            for (V record : records) {
+                setUpdate(statement, record);
+                statement.addBatch();
+            }
+
+            JamLogger.info("Executing batch update...");
+            statement.executeBatch();
             commit();
             JamLogger.info("Committed!");
         }

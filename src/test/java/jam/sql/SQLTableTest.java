@@ -29,7 +29,7 @@ public final class SQLTableTest extends MapTableTestBase {
         String nullString = BulkRecord.NULL_STRING;
 
         table.copy(fileName, delimiter, nullString);
-        List<TestRecord> records = table.fetch();
+        List<TestRecord> records = table.select();
 
         assertEquals(List.of(rec1, rec2, rec3, rec4, rec5), records);
         table.drop();

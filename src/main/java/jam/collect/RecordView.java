@@ -18,6 +18,18 @@ import jam.stream.JamStreams;
  */
 public interface RecordView<K, V> extends Iterable<V> {
     /**
+     * Identifies record keys contained in this view.
+     *
+     * @return key the key to search for.
+     *
+     * @return {@code true} iff the specified key maps to at least one
+     * record in this view.
+     */
+    public default boolean contains(K key) {
+        return keys().contains(key);
+    }
+
+    /**
      * Counts the number of records in this view.
      *
      * @return the number of records in this view.
@@ -30,17 +42,7 @@ public interface RecordView<K, V> extends Iterable<V> {
      * @return an unmodifiable collection containing every record in
      * this view (in no particular order).
      */
-    public abstract Collection<V> fetch();
-
-    /**
-     * Retrieves the records indexed by collection of keys.
-     *
-     * @param keys the keys of the records to select.
-     *
-     * @return an unmodifiable collection containing the records that
-     * match the specified keys (in no particular order).
-     */
-    public abstract Collection<V> fetch(Collection<K> keys);
+    public abstract Collection<V> select();
 
     /**
      * Retrieves the records in this view that pass a given filter.
@@ -50,8 +52,8 @@ public interface RecordView<K, V> extends Iterable<V> {
      * @return an unmodifiable collection containing the records that
      * pass the specified filter (in no particular order).
      */
-    public default Collection<V> fetch(Predicate<V> predicate) {
-        return JamStreams.filterParallel(fetch(), predicate);
+    public default Collection<V> select(Predicate<V> predicate) {
+        return JamStreams.filterParallel(select(), predicate);
     }
 
     /**
@@ -63,6 +65,6 @@ public interface RecordView<K, V> extends Iterable<V> {
     public abstract Set<K> keys();
 
     @Override public default Iterator<V> iterator() {
-        return ReadOnlyIterator.create(fetch());
+        return ReadOnlyIterator.create(select());
     }
 }
