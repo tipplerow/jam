@@ -169,38 +169,8 @@ public interface MapView<K, V> extends RecordView<K, V> {
     }
 }
 
-final class MapWrapper<K, V> implements MapView<K, V> {
-    private final Map<K, V> map;
-
+final class MapWrapper<K, V> extends AbstractMapView<K, V> {
     MapWrapper(Map<K, V> map) {
-        this.map = map;
-    }
-
-    @Override public int count() {
-        return map.size();
-    }
-
-    @Override public Collection<V> fetch() {
-        return Collections.unmodifiableCollection(map.values());
-    }
-
-    @Override public V fetch(K key) {
-        return map.get(key);
-    }
-
-    @Override public Set<K> keys() {
-        return Collections.unmodifiableSet(map.keySet());
-    }
-
-    @Override public boolean equals(Object obj) {
-        throw new UnsupportedOperationException("Use MapView::equalsView for equality tests.");
-    }
-
-    @Override public int hashCode() {
-        throw new UnsupportedOperationException("Views are not suitable for hash keys.");
-    }
-
-    @Override public String toString() {
-        return map.toString();
+        super(map);
     }
 }
