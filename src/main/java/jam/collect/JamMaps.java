@@ -1,7 +1,6 @@
 
 package jam.collect;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,7 +25,7 @@ public final class JamMaps {
      *
      * @param keyFunc a function to generate keys for each value.
      */
-    public static <K, V> void fill(Map<K, V> map, Collection<V> values, Function<V, K> keyFunc) {
+    public static <K, V> void fill(Map<K, V> map, Iterable<V> values, Function<V, K> keyFunc) {
         for (V value : values)
             map.put(keyFunc.apply(value), value);
     }
@@ -46,8 +45,8 @@ public final class JamMaps {
      * @return a new hash map filled with the supplied values and
      * mapped with the given key function.
      */
-    public static <K, V> HashMap<K, V> hash(Collection<V> values, Function<V, K> keyFunc) {
-        HashMap<K, V> map = new HashMap<K, V>(values.size());
+    public static <K, V> HashMap<K, V> hash(Iterable<V> values, Function<V, K> keyFunc) {
+        HashMap<K, V> map = new HashMap<K, V>();
         fill(map, values, keyFunc);
         return map;
     }
@@ -67,7 +66,7 @@ public final class JamMaps {
      * @return a new tree map filled with the supplied values and
      * mapped with the given key function.
      */
-    public static <K, V> TreeMap<K, V> tree(Collection<V> values, Function<V, K> keyFunc) {
+    public static <K, V> TreeMap<K, V> tree(Iterable<V> values, Function<V, K> keyFunc) {
         TreeMap<K, V> map = new TreeMap<K, V>();
         fill(map, values, keyFunc);
         return map;

@@ -25,6 +25,17 @@ public class HashMapView<K, V> extends AbstractMapView<K, V> {
     /**
      * Creates a new view populated by a collection of records.
      *
+     * @param records the initial contents of the view.
+     *
+     * @param keyFunc a function to generate keys for the records.
+     */
+    protected HashMapView(Iterable<V> records, Function<V, K> keyFunc) {
+        super(JamMaps.hash(records, keyFunc));
+    }
+
+    /**
+     * Creates a new view populated by a collection of records.
+     *
      * @param <K> the runtime type for the record keys.
      *
      * @param <V> the runtime type for the record values.
