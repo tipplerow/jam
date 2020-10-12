@@ -3,6 +3,7 @@ package jam.collect;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import com.google.common.collect.SetMultimap;
@@ -29,7 +30,7 @@ public interface MultiView<K, V> extends RecordView<K, V> {
      * @return a multimap view backed by a copy of the specified map.
      */
     public static <K, V> MultiView<K, V> wrap(SetMultimap<K, V> map) {
-        return MultiWrapper.wrap(map);
+        return new MultiWrapper<K, V>(map);
     }
 
     /**
@@ -81,5 +82,41 @@ public interface MultiView<K, V> extends RecordView<K, V> {
             records.addAll(fetch(key));
 
         return records;
+    }
+}
+
+final class MultiWrapper<K, V> implements MultiView<K, V> {
+    private final SetMultimap<K, V> map;
+
+    MultiWrapper(SetMultimap<K, V> map) {
+        this.map = map;
+    }
+
+    @Override public int count() {
+        return map.size();
+    }
+
+    @Override public Collection<V> fetch() {
+        return Collections.unmodifiableCollection(map.values());
+    }
+
+    @Override public Set<V> fetch(K key) {
+        return Collections.unmodifiableSet(map.get(key));
+    }
+
+    @Override public Set<K> keys() {
+        return Collections.unmodifiableSet(map.keySet());
+    }
+
+    @Override public boolean equals(Object obj) {
+        throw new UnsupportedOperationException("Use MultiView::equalsView for equality tests.");
+    }
+
+    @Override public int hashCode() {
+        throw new UnsupportedOperationException("Views are not suitable for hash keys.");
+    }
+
+    @Override public String toString() {
+        return map.toString();
     }
 }

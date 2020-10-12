@@ -3,9 +3,11 @@ package jam.collect;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import jam.lang.JamException;
 import jam.lang.ObjectUtil;
@@ -20,6 +22,42 @@ import jam.lang.ObjectUtil;
  */
 public interface MapView<K, V> extends RecordView<K, V> {
     /**
+     * Creates a map view backed by a {@code HashMap}.
+     *
+     * @param <K> the runtime type for the record keys.
+     *
+     * @param <V> the runtime type for the record values.
+     *
+     * @param records the records to view.
+     *
+     * @param keyFunc a function to extract keys from the
+     * records.
+     *
+     * @return a view backed by a {@code HashMap}.
+     */
+    public static <K, V> MapView<K, V> hash(Collection<V> records, Function<V, K> keyFunc) {
+        return MapCache.hash(records, keyFunc);
+    }
+
+    /**
+     * Creates a map view backed by a {@code TreeMap}.
+     *
+     * @param <K> the runtime type for the record keys.
+     *
+     * @param <V> the runtime type for the record values.
+     *
+     * @param records the records to view.
+     *
+     * @param keyFunc a function to extract keys from the
+     * records.
+     *
+     * @return a view backed by a {@code TreeMap}.
+     */
+    public static <K, V> MapView<K, V> tree(Collection<V> records, Function<V, K> keyFunc) {
+        return MapCache.tree(records, keyFunc);
+    }
+
+    /**
      * Wraps a map in a view; subsequent changes to the
      * underlying map will be reflected in the view.
      *
@@ -32,7 +70,7 @@ public interface MapView<K, V> extends RecordView<K, V> {
      * @return a map view backed by a copy of the specified map.
      */
     public static <K, V> MapView<K, V> wrap(Map<K, V> map) {
-        return MapWrapper.wrap(map);
+        return new MapWrapper<K, V>(map);
     }
 
     /**
@@ -128,5 +166,41 @@ public interface MapView<K, V> extends RecordView<K, V> {
         }
 
         return records;
+    }
+}
+
+final class MapWrapper<K, V> implements MapView<K, V> {
+    private final Map<K, V> map;
+
+    MapWrapper(Map<K, V> map) {
+        this.map = map;
+    }
+
+    @Override public int count() {
+        return map.size();
+    }
+
+    @Override public Collection<V> fetch() {
+        return Collections.unmodifiableCollection(map.values());
+    }
+
+    @Override public V fetch(K key) {
+        return map.get(key);
+    }
+
+    @Override public Set<K> keys() {
+        return Collections.unmodifiableSet(map.keySet());
+    }
+
+    @Override public boolean equals(Object obj) {
+        throw new UnsupportedOperationException("Use MapView::equalsView for equality tests.");
+    }
+
+    @Override public int hashCode() {
+        throw new UnsupportedOperationException("Views are not suitable for hash keys.");
+    }
+
+    @Override public String toString() {
+        return map.toString();
     }
 }
