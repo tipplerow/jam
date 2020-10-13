@@ -39,6 +39,24 @@ public interface MapView<K, V> extends RecordView<K, V> {
     }
 
     /**
+     * Creates a map view backed by a {@code LinkedHashMap}.
+     *
+     * @param <K> the runtime type for the record keys.
+     *
+     * @param <V> the runtime type for the record values.
+     *
+     * @param records the records to view.
+     *
+     * @param keyFunc a function to extract keys from the
+     * records.
+     *
+     * @return a view backed by a {@code HashMap}.
+     */
+    public static <K, V> MapView<K, V> linkedHash(Collection<V> records, Function<V, K> keyFunc) {
+        return LinkedHashMapView.create(records, keyFunc);
+    }
+
+    /**
      * Creates a map view backed by a {@code TreeMap}.
      *
      * @param <K> the runtime type for the record keys.
