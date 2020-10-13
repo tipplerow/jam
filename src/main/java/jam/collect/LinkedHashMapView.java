@@ -30,7 +30,7 @@ public class LinkedHashMapView<K, V> extends HashMapView<K, V> {
      * @param keyFunc a function to generate keys for the records.
      */
     protected LinkedHashMapView(Iterable<V> records, Function<V, K> keyFunc) {
-        super(records, keyFunc);
+        super(JamMaps.linkedHash(records, keyFunc));
     }
 
     /**

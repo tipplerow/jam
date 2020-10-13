@@ -2,6 +2,7 @@
 package jam.collect;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -47,6 +48,27 @@ public final class JamMaps {
      */
     public static <K, V> HashMap<K, V> hash(Iterable<V> values, Function<V, K> keyFunc) {
         HashMap<K, V> map = new HashMap<K, V>();
+        fill(map, values, keyFunc);
+        return map;
+    }
+
+    /**
+     * Creates a new linked hash map and uses a key-generating
+     * function to fill the new map.
+     *
+     * @param <K> the runtime type for the map keys.
+     *
+     * @param <V> the runtime type for the map values.
+     *
+     * @param values the values to add to the map.
+     *
+     * @param keyFunc a function to generate keys for each value.
+     *
+     * @return a new linked hash map filled with the supplied values
+     * and mapped with the given key function.
+     */
+    public static <K, V> HashMap<K, V> linkedHash(Iterable<V> values, Function<V, K> keyFunc) {
+        LinkedHashMap<K, V> map = new LinkedHashMap<K, V>();
         fill(map, values, keyFunc);
         return map;
     }
