@@ -79,7 +79,7 @@ publishing {
     repositories {
         maven {
             name = 'JamMaven'
-            url = "file://${System.getProperty('user.home')}/repo"
+            url = "file://${System.getenv('TIPPLEROW_REPO_DIR')}"
         }
     }
 }
