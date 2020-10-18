@@ -5,6 +5,7 @@
 AddJar()
 {
     RequireFile $1
+    echo "Adding" $1 "to CLASSPATH..."
 
     if [ -z "$CLASSPATH" ]
     then
