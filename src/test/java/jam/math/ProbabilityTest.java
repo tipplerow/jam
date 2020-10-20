@@ -145,6 +145,7 @@ public class ProbabilityTest extends NumericTestBase {
         Probability p3 = Probability.valueOf(0.5);
 
         // Want to make sure that the OBJECT is returned as the maximum...
+        assertNull(Probability.max());
         assertTrue(p1 == Probability.max(p1));
         assertTrue(p2 == Probability.max(p1, p2));
         assertTrue(p3 == Probability.max(p1, p2, p3));
@@ -156,6 +157,7 @@ public class ProbabilityTest extends NumericTestBase {
         Probability p3 = Probability.valueOf(0.5);
 
         // Want to make sure that the OBJECT is returned as the minimum...
+        assertNull(Probability.min());
         assertTrue(p3 == Probability.min(p3));
         assertTrue(p2 == Probability.min(p2, p3));
         assertTrue(p1 == Probability.min(p1, p2, p3));

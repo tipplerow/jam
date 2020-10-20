@@ -250,28 +250,6 @@ public final class Probability extends DomainDouble implements Comparable<Probab
     }
 
     /**
-     * Returns the maximum probability in a sequence of probabilities.
-     *
-     * @param values the probabilities to compare.
-     *
-     * @return the maximum probability in the input sequence.
-     */
-    public static Probability max(Probability... values) {
-        return Collections.max(Arrays.asList(values));
-    }
-
-    /**
-     * Returns the minimum probability in a sequence of probabilities.
-     *
-     * @param values the probabilities to compare.
-     *
-     * @return the minimum probability in the input sequence.
-     */
-    public static Probability min(Probability... values) {
-        return Collections.min(Arrays.asList(values));
-    }
-
-    /**
      * Computes the probability that none of the events represented by
      * this probability occur in a series of independent trials.
      *

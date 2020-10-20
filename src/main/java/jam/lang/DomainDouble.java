@@ -2,6 +2,7 @@
 package jam.lang;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 import jam.math.DoubleComparator;
 import jam.math.DoubleRange;
@@ -85,6 +86,72 @@ public abstract class DomainDouble implements Formatted {
             values[index] = domainDoubles[index].value;
         
         return values;
+    }
+
+    /**
+     * Finds the maximum value in a sequence of {@code DomainDouble}
+     * values.
+     *
+     * @param values the objects to examine.
+     *
+     * @return an object having the maximum value in the input
+     * sequence.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends DomainDouble> T max(T... values) {
+        return max(List.of(values));
+    }
+
+    /**
+     * Finds the maximum value in a sequence of {@code DomainDouble}
+     * values.
+     *
+     * @param values the objects to examine.
+     *
+     * @return an object having the maximum value in the input
+     * sequence.
+     */
+    public static <T extends DomainDouble> T max(Iterable<T> values) {
+        T result = null;
+
+        for (T value : values)
+            if (result == null || value.doubleValue() > result.doubleValue())
+                result = value;
+
+        return result;
+    }
+
+    /**
+     * Finds the minimum value in a sequence of {@code DomainDouble}
+     * values.
+     *
+     * @param values the objects to examine.
+     *
+     * @return an object having the minimum value in the input
+     * sequence.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends DomainDouble> T min(T... values) {
+        return min(List.of(values));
+    }
+
+    /**
+     * Finds the minimum value in a sequence of {@code DomainDouble}
+     * values.
+     *
+     * @param values the objects to examine.
+     *
+     * @return an object having the minimum value in the input
+     * sequence.
+     */
+    public static <T extends DomainDouble> T min(Iterable<T> values) {
+        T result = null;
+
+        for (T value : values)
+            if (result == null || value.doubleValue() < result.doubleValue())
+                result = value;
+
+        return result;
     }
 
     /**
