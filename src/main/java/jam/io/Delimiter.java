@@ -42,6 +42,11 @@ public final class Delimiter {
     public static Delimiter COMMA = new Delimiter(",");
 
     /**
+     * A hyphen delimiter.
+     */
+    public static Delimiter HYPHEN = new Delimiter("-");
+
+    /**
      * The pipe delimiter for PSV files.
      */
     public static Delimiter PIPE = new Delimiter("|");

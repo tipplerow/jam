@@ -24,6 +24,10 @@ public class DelimiterTest {
         runOne(Delimiter.COMMA, "A,B\\,C,D", "A", "B,C", "D");
     }
 
+    @Test public void testHyphen() {
+        runOne(Delimiter.HYPHEN, "A-B-C", "A", "B", "C");
+    }
+
     @Test public void testPipe() {
         runOne(Delimiter.PIPE, "A|", "A", "");
         runOne(Delimiter.PIPE, "A||", "A", "", "");
