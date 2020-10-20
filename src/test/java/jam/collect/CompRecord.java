@@ -26,6 +26,6 @@ public final class CompRecord {
 
     @Override public String toString() {
         return String.format("CompRecord(name = '%s', date = '%s', ival = %d)",
-                             key.name, key.date, ival);
+                             key.getName(), key.getDate(), ival);
     }
 }
