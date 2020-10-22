@@ -1,6 +1,7 @@
 
 package jam.time;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import org.junit.*;
@@ -44,6 +45,18 @@ public class DateUtilTest {
         assertEquals(TUE, DateUtil.next(MON));
     }
 
+    @Test public void testNextDayOfWeek() {
+        LocalDate SAT1 = SAT;
+        LocalDate SAT2 = SAT.plusDays(7);
+        
+        assertEquals(SAT1, DateUtil.nextDayOfWeek(WED, DayOfWeek.SATURDAY));
+        assertEquals(SAT1, DateUtil.nextDayOfWeek(THU, DayOfWeek.SATURDAY));
+        assertEquals(SAT1, DateUtil.nextDayOfWeek(FRI, DayOfWeek.SATURDAY));
+        assertEquals(SAT2, DateUtil.nextDayOfWeek(SAT, DayOfWeek.SATURDAY));
+        assertEquals(SAT2, DateUtil.nextDayOfWeek(SUN, DayOfWeek.SATURDAY));
+        assertEquals(SAT2, DateUtil.nextDayOfWeek(MON, DayOfWeek.SATURDAY));
+        assertEquals(SAT2, DateUtil.nextDayOfWeek(TUE, DayOfWeek.SATURDAY));
+    }
 
     @Test public void testNextWeekday() {
         assertEquals(THU, DateUtil.nextWeekday(WED));
@@ -52,6 +65,19 @@ public class DateUtilTest {
         assertEquals(MON, DateUtil.nextWeekday(SAT));
         assertEquals(MON, DateUtil.nextWeekday(SUN));
         assertEquals(TUE, DateUtil.nextWeekday(MON));
+    }
+
+    @Test public void testOnOrNextDayOfWeek() {
+        LocalDate SAT1 = SAT;
+        LocalDate SAT2 = SAT.plusDays(7);
+        
+        assertEquals(SAT1, DateUtil.onOrNext(WED, DayOfWeek.SATURDAY));
+        assertEquals(SAT1, DateUtil.onOrNext(THU, DayOfWeek.SATURDAY));
+        assertEquals(SAT1, DateUtil.onOrNext(FRI, DayOfWeek.SATURDAY));
+        assertEquals(SAT1, DateUtil.onOrNext(SAT, DayOfWeek.SATURDAY));
+        assertEquals(SAT2, DateUtil.onOrNext(SUN, DayOfWeek.SATURDAY));
+        assertEquals(SAT2, DateUtil.onOrNext(MON, DayOfWeek.SATURDAY));
+        assertEquals(SAT2, DateUtil.onOrNext(TUE, DayOfWeek.SATURDAY));
     }
 
     @Test public void testPrev() {

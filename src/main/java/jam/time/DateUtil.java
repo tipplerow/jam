@@ -51,6 +51,26 @@ public final class DateUtil {
     }
 
     /**
+     * Returns the earliest date after a given date having a specified
+     * day of the week. This method <em>always</em> advances the input
+     * date.
+     *
+     * @param date the date to advance.
+     *
+     * @param dow the desired day of the week.
+     *
+     * @return the earliest date after the given date having the specified
+     * day of the week.
+     */
+    public static LocalDate nextDayOfWeek(LocalDate date, DayOfWeek dow) {
+        do {
+            date = next(date);
+        } while (!date.getDayOfWeek().equals(dow));
+
+        return date;
+    }
+
+    /**
      * Returns the next weekday after a given date.
      *
      * @param date the date to advance.
@@ -68,6 +88,27 @@ public final class DateUtil {
         default:
             return date.plusDays(1);
         }
+    }
+
+    /**
+     * Returns the earliest date on or after a given date that falls
+     * on a specified day of the week.  This method will not advance
+     * the input date if it already falls on the desired day of the
+     * week.
+     *
+     * @param date the date to advance (if necessary).
+     *
+     * @param dow the desired day of the week.
+     *
+     * @return either the input date, if it falls on the desired day
+     * of the week, or the earliest date after the input date that
+     * falls on the desired day of the week.
+     */
+    public static LocalDate onOrNext(LocalDate date, DayOfWeek dow) {
+        while (!date.getDayOfWeek().equals(dow))
+            date = next(date);
+
+        return date;
     }
 
     /**
