@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import jam.math.JamRandom;
+import jam.util.ListUtil;
+
 /**
  * Provides utility methods operating on lists.
  */
@@ -47,5 +50,35 @@ public final class JamLists {
      */
     public static <E> List<E> linkedList(Iterable<E> items) {
         return addAll(new LinkedList<E>(), items);
+    }
+
+    /**
+     * Copies a sequence of items into an {@code ArrayList} and then
+     * randomly shuffles the items.
+     *
+     * @param items the items to populate the list.
+     *
+     * @return an {@code ArrayList} containing the elements in the
+     * specified iteration shuffled into a random order.
+     */
+    public static <E> List<E> shuffle(Iterable<E> items) {
+        return shuffle(items, JamRandom.global());
+    }
+
+    /**
+     * Copies a sequence of items into an {@code ArrayList} and then
+     * randomly shuffles the items.
+     *
+     * @param items the items to populate the list.
+     *
+     * @param random the random number source.
+     *
+     * @return an {@code ArrayList} containing the elements in the
+     * specified iteration shuffled into a random order.
+     */
+    public static <E> List<E> shuffle(Iterable<E> items, JamRandom random) {
+        List<E> list = arrayList(items);
+        ListUtil.shuffle(list, random);
+        return list;
     }
 }
