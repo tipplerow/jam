@@ -1,6 +1,8 @@
 
 package jam.junit;
 
+import java.util.List;
+
 import jam.math.JamRandom;
 import jam.math.RandomSequence;
 import jam.vector.VectorUtil;
@@ -34,6 +36,13 @@ public abstract class NumericTestBase extends JamTestBase {
 
     public void assertDouble(double[] expected, double[] actual) {
         assertTrue(VectorUtil.equals(expected, actual, tolerance));
+    }
+
+    public void assertDouble(List<Double> expected, List<Double> actual) {
+        assertEquals(expected.size(), actual.size());
+
+        for (int index = 0; index < expected.size(); ++index)
+            assertDouble(expected.get(index), actual.get(index));
     }
 
     public JamRandom random() {
