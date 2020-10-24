@@ -1,6 +1,7 @@
 
 package jam.math;
 
+import java.util.Iterator;
 import java.util.List;
 
 import jam.junit.NumericTestBase;
@@ -18,6 +19,17 @@ public class RegularSequenceTest extends NumericTestBase {
         assertDouble(0.5, seq1.step());
         assertDouble(new double[] { 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0 }, seq1.toArray());
         assertDouble(List.of(2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0), seq1.toList());
+
+        Iterator<Double> iterator = seq1.iterator();
+
+        assertDouble(2.0, iterator.next());
+        assertDouble(2.5, iterator.next());
+        assertDouble(3.0, iterator.next());
+        assertDouble(3.5, iterator.next());
+        assertDouble(4.0, iterator.next());
+        assertDouble(4.5, iterator.next());
+        assertDouble(5.0, iterator.next());
+        assertFalse(iterator.hasNext());
     }
 
     public static void main(String[] args) {

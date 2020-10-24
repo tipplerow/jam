@@ -2,15 +2,17 @@
 package jam.math;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import jam.collect.ReadOnlyIterator;
 import jam.lang.JamException;
 
 /**
  * Defines a regularly spaced sequence of floating-point values with
  * identical intervals between each point in the sequence.
  */
-public final class RegularSequence {
+public final class RegularSequence implements Iterable<Double> {
     private final int size;
     private final double first;
     private final double last;
@@ -123,5 +125,9 @@ public final class RegularSequence {
             points.add(first + index * step);
 
         return points;
+    }
+
+    @Override public Iterator<Double> iterator() {
+        return ReadOnlyIterator.create(toList());
     }
 }
