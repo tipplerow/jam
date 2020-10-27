@@ -216,23 +216,36 @@ public final class FileUtil {
      * Builds a composite file name by joining components with the
      * system-dependent name separator.
      *
-     * @param paths file name components.
+     * @param dirName the first directory in the composite path.
+     *
+     * @param pathNames the subdirectories and final base name in
+     * the composite path.
      *
      * @return the composite file name.
      */
-    public static String join(String... paths) {
-        return String.join(File.separator, paths);
+    public static String join(String dirName, String... pathNames) {
+        StringBuilder builder = new StringBuilder(dirName);
+
+        for (String pathName : pathNames) {
+            builder.append(File.separator);
+            builder.append(pathName);
+        }
+
+        return builder.toString();
     }
 
     /**
      * Creates a new file by building a composite file name.
      *
-     * @param paths file name components.
+     * @param dirName the first directory in the composite path.
+     *
+     * @param pathNames the subdirectories and final base name in
+     * the composite path.
      *
      * @return a new file with the composite file name.
      */
-    public static File newFile(String... paths) {
-        return new File(join(paths));
+    public static File newFile(String dirName, String... pathNames) {
+        return new File(join(dirName, pathNames));
     }
 
     /**
