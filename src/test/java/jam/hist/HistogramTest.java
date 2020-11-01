@@ -6,8 +6,8 @@ import java.util.List;
 import jam.dist.NormalDistribution;
 import jam.junit.NumericTestBase;
 import jam.math.DoubleRange;
+import jam.math.JamUnivariateFunction;
 import jam.math.Point2D;
-import jam.math.UnivariateFunction;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -66,8 +66,8 @@ public class HistogramTest extends NumericTestBase {
         double[]  obs  = NormalDistribution.STANDARD.sample(random(), 1000000);
         Histogram hist = Histogram.compute(-4.0, 4.0, 16, obs);
 
-        UnivariateFunction cdf = hist.getCDF();
-        UnivariateFunction pdf = hist.getPDF();
+        JamUnivariateFunction cdf = hist.getCDF();
+        JamUnivariateFunction pdf = hist.getPDF();
 
         for (double x = -5.0; x <= 5.0; x += 0.1) {
             double actual   = cdf.evaluate(x);

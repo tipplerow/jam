@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import jam.math.DoubleRange;
 import jam.math.Point2D;
-import jam.math.UnivariateFunction;
+import jam.math.JamUnivariateFunction;
 import jam.math.SplineFunction;
 import jam.util.ListUtil;
 import jam.vector.VectorUtil;
@@ -20,8 +20,8 @@ public final class Histogram {
 
     // On-demand calculation of the cumulative distribution and
     // density functions...
-    private UnivariateFunction cdf = null;
-    private UnivariateFunction pdf = null;
+    private JamUnivariateFunction cdf = null;
+    private JamUnivariateFunction pdf = null;
 
     private Histogram(List<Bin> bins) {
         Bin.freeze(bins);
@@ -306,14 +306,14 @@ public final class Histogram {
      * @return the cumulative distribution function described by this
      * histogram.
      */
-    public UnivariateFunction getCDF() {
+    public JamUnivariateFunction getCDF() {
         if (cdf == null)
             cdf = computeCDF();
 
         return cdf;
     }
 
-    private UnivariateFunction computeCDF() {
+    private JamUnivariateFunction computeCDF() {
         List<Point2D> knots = new ArrayList<Point2D>(bins.size() + 3);
 
         double x = bins.get(0).getRange().getUpperBound();
@@ -360,14 +360,14 @@ public final class Histogram {
      * @return the probability density function described by this
      * histogram.
      */
-    public UnivariateFunction getPDF() {
+    public JamUnivariateFunction getPDF() {
         if (pdf == null)
             pdf = computePDF();
 
         return pdf;
     }
 
-    private UnivariateFunction computePDF() {
+    private JamUnivariateFunction computePDF() {
         List<Point2D> knots = new ArrayList<Point2D>(bins.size() + 4);
 
         // Let "m0" and "w0" be the midpoint and width of the first

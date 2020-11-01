@@ -1,11 +1,15 @@
 
 package jam.math;
 
+import java.util.function.DoubleFunction;
+
+import org.apache.commons.math3.analysis.UnivariateFunction;
+
 /**
  * Represents a real-valued function of a single floating-point
  * argument.
  */
-public interface UnivariateFunction {
+public interface JamUnivariateFunction extends UnivariateFunction {
     /**
      * Evaluates this function at the specified location.
      *
@@ -27,4 +31,28 @@ public interface UnivariateFunction {
      * continuous range.
      */
     public abstract DoubleRange range();
+
+    public static JamUnivariateFunction lambda(DoubleFunction<Double> function) {
+        return new LambdaFunction(function);
+    }
+
+    @Override public default double value(double x) {
+        return evaluate(x);
+    }
+}
+
+final class LambdaFunction implements JamUnivariateFunction {
+    private final DoubleFunction<Double> function;
+
+    LambdaFunction(DoubleFunction<Double> function) {
+        this.function = function;
+    }
+
+    @Override public double evaluate(double x) {
+        return function.apply(x);
+    }
+
+    @Override public DoubleRange range() {
+        return DoubleRange.INFINITE;
+    }
 }

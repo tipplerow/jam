@@ -4,7 +4,7 @@ package jam.math;
 /**
  * Provides standard argument checking for univariate functions.
  */
-public abstract class AbstractUnivariateFunction implements UnivariateFunction {
+public abstract class AbstractUnivariateFunction implements JamUnivariateFunction {
     /**
      * Evaluates this function at the specified location, which is
      * guaranteed to be in the valid range.
