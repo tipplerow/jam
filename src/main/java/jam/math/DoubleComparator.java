@@ -246,6 +246,27 @@ public final class DoubleComparator implements Comparator<Double> {
         return compare(x, y) > 0;
     }
 
+    /**
+     * Returns the sign of a floating-point value.
+     *
+     * @param x the value to examine.
+     *
+     * @return {@code -1} if the input value is negative (in excess
+     * of the comparison tolerance), {@code 0} if the input value is
+     * equal to zero (within the comparison tolerance), or {@code +1}
+     * if the input value is positive (in excess of the comparison
+     * tolerance).
+     */
+    public int sign(double x) {
+        if (isNegative(x))
+            return -1;
+
+        if (isPositive(x))
+            return 1;
+
+        return 0;
+    }
+
     @Override public int compare(Double x, Double y) {
         return compare(x.doubleValue(), y.doubleValue(), tolerance);
     }

@@ -369,6 +369,19 @@ public abstract class DomainDouble implements Formatted {
         return DoubleComparator.DEFAULT.isZero(value);
     }
 
+    /**
+     * Returns the sign of this value.
+     *
+     * @return {@code -1} if this is a negative value (in excess of
+     * the default comparison tolerance), {@code 0} if this value is
+     * equal to zero (within the default comparison tolerance), or
+     * {@code +1} if this value is positive (in excess of the default
+     * comparison tolerance).
+     */
+    public int sign() {
+        return DoubleComparator.DEFAULT.sign(value);
+    }
+
     @Override public String format() {
         return Double.toString(value);
     }

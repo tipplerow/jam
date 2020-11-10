@@ -240,6 +240,18 @@ public class DoubleComparatorTest {
         assertTrue(comparator.GT(y, x));
     }
 
+    @Test public void testSign() {
+        DoubleComparator comparator = new DoubleComparator(0.0001);
+
+        assertEquals(-1, comparator.sign(-1.0));
+        assertEquals(-1, comparator.sign(-0.0002));
+        assertEquals( 0, comparator.sign(-0.000001));
+        assertEquals( 0, comparator.sign( 0.0));
+        assertEquals( 0, comparator.sign( 0.000001));
+        assertEquals( 1, comparator.sign( 0.0002));
+        assertEquals( 1, comparator.sign( 1.0));
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.math.DoubleComparatorTest");
     }

@@ -24,6 +24,12 @@ final class DD2 extends DomainDouble {
     }
 }
 
+final class DD3 extends DomainDouble {
+    public DD3(double value) {
+        super(value, DoubleRange.INFINITE);
+    }
+}
+
 public class DomainDoubleTest {
     @Test public void testAsVectorView() {
         DD1[] array = new DD1[] { new DD1(1.0), new DD1(2.0), new DD1(3.0) };
@@ -208,6 +214,16 @@ public class DomainDoubleTest {
     public void testHashCode() {
         DD1 dd1 = new DD1(1.0);
         dd1.hashCode();
+    }
+
+    @Test public void testSign() {
+        DD3 x1 = new DD3(-0.000001);
+        DD3 x2 = new DD3( 0.0);
+        DD3 x3 = new DD3( 0.000001);
+
+        assertEquals(-1, x1.sign());
+        assertEquals( 0, x2.sign());
+        assertEquals( 1, x3.sign());
     }
 
     public static void main(String[] args) {
