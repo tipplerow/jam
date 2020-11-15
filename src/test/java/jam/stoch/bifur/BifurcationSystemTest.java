@@ -66,6 +66,6 @@ public class BifurcationSystemTest extends NumericTestBase {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("jam.time.BifurcationSystemTest");
+        org.junit.runner.JUnitCore.main("jam.stoch.bifur.BifurcationSystemTest");
     }
 }

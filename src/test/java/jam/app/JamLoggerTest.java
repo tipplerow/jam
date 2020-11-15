@@ -17,6 +17,6 @@ public class JamLoggerTest {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("tip.junit.JamLoggerTest");
+        org.junit.runner.JUnitCore.main("jam.app.JamLoggerTest");
     }
 }
