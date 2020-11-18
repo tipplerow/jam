@@ -55,23 +55,9 @@ public final class BifurcationSystem implements StochSystem<BifurcationPath> {
         List<BifurcationPath> paths = new ArrayList<BifurcationPath>(pathCount);
         
         for (int pathIndex = 0; pathIndex < pathCount; ++pathIndex)
-            paths.add(BifurcationPath.create(source, unitRates[pathIndex]));
+            paths.add(BifurcationPath.create(pathIndex, source, unitRates[pathIndex]));
 
         return Collections.unmodifiableList(paths);
-    }
-
-    /**
-     * Returns an indexed pathway in this bifurcation system.
-     *
-     * @param index the index of the transition pathway.
-     *
-     * @return the transition pathway with the specified index.
-     *
-     * @throws IllegalArgumentException unless the index is in the
-     * valid range {@code [0, size())}.
-     */
-    public BifurcationPath getPath(int index) {
-        return paths.get(index);
     }
 
     /**
@@ -85,7 +71,7 @@ public final class BifurcationSystem implements StochSystem<BifurcationPath> {
      * valid range {@code [0, size())}.
      */
     public BifurcationSink getSink(int index) {
-        return getPath(index).getSink();
+        return getProcess(index).getSink();
     }
 
     /**
@@ -94,14 +80,22 @@ public final class BifurcationSystem implements StochSystem<BifurcationPath> {
      * @return the common source state for this bifurcation system.
      */
     public BifurcationSource getSource() {
-        return getPath(0).getSource();
+        return getProcess(0).getSource();
     }
 
-    @Override public int processCount() {
+    @Override public int countProcesses() {
         return paths.size();
     }
 
-    @Override public Collection<BifurcationPath> update(StochEvent<BifurcationPath> event) {
+    @Override public BifurcationPath getProcess(int index) {
+        return paths.get(index);
+    }
+
+    @Override public List<BifurcationPath> listProcesses() {
+        return paths;
+    }
+
+    @Override public Collection<BifurcationPath> processEvent(StochEvent<BifurcationPath> event) {
         // The sink updates its population and the population of the
         // source...
         event.getProcess().getSink().update();
@@ -109,10 +103,6 @@ public final class BifurcationSystem implements StochSystem<BifurcationPath> {
         // All sinks share the same source, and the source population
         // decreases by one member as a result of the event, so all
         // rates are changed...
-        return paths;
-    }
-
-    @Override public Collection<BifurcationPath> viewProcesses() {
         return paths;
     }
 }

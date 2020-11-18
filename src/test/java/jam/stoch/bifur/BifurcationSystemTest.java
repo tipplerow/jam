@@ -16,7 +16,7 @@ public class BifurcationSystemTest extends NumericTestBase {
     }
 
     private void assertPopulation(BifurcationSystem system, int sourcePop, int... sinkPops) {
-        assertEquals(system.processCount(), sinkPops.length);
+        assertEquals(system.countProcesses(), sinkPops.length);
         assertEquals(sourcePop, system.getSource().getPopulation());
 
         for (int index = 0; index < sinkPops.length; ++ index)
@@ -24,10 +24,10 @@ public class BifurcationSystemTest extends NumericTestBase {
     }
 
     private void assertRates(BifurcationSystem system, double... rates) {
-        assertEquals(system.processCount(), rates.length);
+        assertEquals(system.countProcesses(), rates.length);
 
         for (int index = 0; index < rates.length; ++ index)
-            assertEquals(StochRate.valueOf(rates[index]), system.getPath(index).getStochRate());
+            assertEquals(StochRate.valueOf(rates[index]), system.getProcess(index).getStochRate());
     }
 
     @Test public void testAccessors() {
@@ -35,17 +35,17 @@ public class BifurcationSystemTest extends NumericTestBase {
 
         assertPopulation(system, 100, 0, 0, 0);
 
-        assertDouble(1.0, system.getPath(0).getUnitRate());
-        assertDouble(2.0, system.getPath(1).getUnitRate());
-        assertDouble(3.0, system.getPath(2).getUnitRate());
+        assertDouble(1.0, system.getProcess(0).getUnitRate());
+        assertDouble(2.0, system.getProcess(1).getUnitRate());
+        assertDouble(3.0, system.getProcess(2).getUnitRate());
     }
 
     @Test public void testEvent() {
         BifurcationSystem system = createSystem();
 
-        BifurcationPath path0 = system.getPath(0);
-        BifurcationPath path1 = system.getPath(1);
-        BifurcationPath path2 = system.getPath(2);
+        BifurcationPath path0 = system.getProcess(0);
+        BifurcationPath path1 = system.getProcess(1);
+        BifurcationPath path2 = system.getProcess(2);
 
         StochEvent<BifurcationPath> event0 = StochEvent.create(path0, StochTime.ZERO);
         StochEvent<BifurcationPath> event1 = StochEvent.create(path1, StochTime.ZERO);
@@ -54,12 +54,12 @@ public class BifurcationSystemTest extends NumericTestBase {
         assertPopulation(system, 100, 0, 0, 0);
         assertRates(system, 100.0, 200.0, 300.0);
 
-        system.update(event0);
-        system.update(event1);
-        system.update(event1);
-        system.update(event2);
-        system.update(event2);
-        system.update(event2);
+        system.processEvent(event0);
+        system.processEvent(event1);
+        system.processEvent(event1);
+        system.processEvent(event2);
+        system.processEvent(event2);
+        system.processEvent(event2);
 
         assertPopulation(system, 94, 1, 2, 3);
         assertRates(system, 94.0, 188.0, 282.0);

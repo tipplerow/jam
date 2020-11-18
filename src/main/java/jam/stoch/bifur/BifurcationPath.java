@@ -9,10 +9,12 @@ import jam.stoch.StochRate;
  * a sink occur with a fixed unit rate.
  */
 public final class BifurcationPath implements StochProc {
+    private final int index;
     private final double unitRate;
     private final BifurcationSink sink;
 
-    private BifurcationPath(BifurcationSink sink, double unitRate) {
+    private BifurcationPath(int index, BifurcationSink sink, double unitRate) {
+        this.index = index;
         this.sink = sink;
         this.unitRate = unitRate;
     }
@@ -22,6 +24,8 @@ public final class BifurcationPath implements StochProc {
      * transition rate; a new sink state is also created as the
      * destination state for the pathway.
      *
+     * @param index the ordinal index for the pathway.
+     *
      * @param source the origination (source) state for the pathway.
      *
      * @param unitRate the unit rate constant for events on the path.
@@ -29,8 +33,8 @@ public final class BifurcationPath implements StochProc {
      * @return a new bifurcation pathway with the specified source
      * state and transition rate and a newly created sink state.
      */
-    public static BifurcationPath create(BifurcationSource source, double unitRate) {
-        return new BifurcationPath(BifurcationSink.create(source), unitRate);
+    public static BifurcationPath create(int index, BifurcationSource source, double unitRate) {
+        return new BifurcationPath(index, BifurcationSink.create(source), unitRate);
     }
 
     /**
@@ -58,6 +62,10 @@ public final class BifurcationPath implements StochProc {
      */
     public double getUnitRate() {
         return unitRate;
+    }
+
+    @Override public int getIndex() {
+        return index;
     }
 
     @Override public StochRate getStochRate() {

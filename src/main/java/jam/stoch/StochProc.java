@@ -32,6 +32,13 @@ public interface StochProc {
         };
 
     /**
+     * Returns a unique ordinal index for this process.
+     *
+     * @return a unique ordinal index for this process.
+     */
+    public abstract int getIndex();
+
+    /**
      * Returns the instantaneous rate of this process.
      *
      * @return the instantaneous rate of this process.
