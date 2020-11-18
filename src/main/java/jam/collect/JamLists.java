@@ -81,4 +81,23 @@ public final class JamLists {
         ListUtil.shuffle(list, random);
         return list;
     }
+
+    /**
+     * Swaps the location of two elements in a list.
+     *
+     * @param list the list on which to operate.
+     *
+     * @param ind1 the index of the first element to swap.
+     *
+     * @param ind2 the index of the second element to swap.
+     *
+     * @throws IndexOutOfBoundsException unless both indexes are
+     * valid.
+     */
+    public static <E> void swap(List<E> list, int ind1, int ind2) {
+        E tmp = list.get(ind1);
+
+        list.set(ind1, list.get(ind2));
+        list.set(ind2, tmp);
+    }
 }

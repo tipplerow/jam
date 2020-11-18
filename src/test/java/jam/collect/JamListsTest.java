@@ -21,6 +21,28 @@ public final class JamListsTest {
         assertEquals(List.of("A", "B", "C"), JamLists.linkedList(iterable()));
     }
 
+    @Test public void testSwap() {
+        List<String> list = new ArrayList<String>(List.of("A" ,"B", "C", "D"));
+
+        JamLists.swap(list, 1, 3);
+        assertEquals(List.of("A" ,"D", "C", "B"), list);
+
+        JamLists.swap(list, 1, 3);
+        assertEquals(List.of("A" ,"B", "C", "D"), list);
+
+        JamLists.swap(list, 3, 1);
+        assertEquals(List.of("A" ,"D", "C", "B"), list);
+
+        JamLists.swap(list, 3, 1);
+        assertEquals(List.of("A" ,"B", "C", "D"), list);
+
+        JamLists.swap(list, 0, 1);
+        assertEquals(List.of("B" ,"A", "C", "D"), list);
+
+        JamLists.swap(list, 3, 0);
+        assertEquals(List.of("D" ,"A", "C", "B"), list);
+    }
+
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main("jam.collect.JamListsTest");
     }
