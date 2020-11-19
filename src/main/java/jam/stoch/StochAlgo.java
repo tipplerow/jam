@@ -60,7 +60,7 @@ public abstract class StochAlgo<P extends StochProc> {
      * and updating the instantaneous process rates in the underlying
      * stochastic system.
      */
-    protected void advance() {
+    public void advance() {
         ++eventCount;
         event = nextEvent();
 
