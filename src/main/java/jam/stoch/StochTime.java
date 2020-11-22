@@ -23,6 +23,11 @@ public final class StochTime extends DomainDouble implements Comparable<StochTim
     public static final StochTime ZERO = valueOf(0.0);
 
     /**
+     * A globally sharable instance representing the end of time.
+     */
+    public static final StochTime INFINITY = valueOf(Double.POSITIVE_INFINITY);
+
+    /**
      * Creates a new time from a floating-point value.
      *
      * @param value the stochastic time.

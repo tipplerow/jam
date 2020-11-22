@@ -109,7 +109,10 @@ public final class StochRate extends DomainDouble implements Comparable<StochRat
      * occurrence of a stochastic process with this rate.
      */
     public StochTime sampleTime(StochTime prevTime, JamRandom random) {
-        return prevTime.plus(sampleInterval(random));
+        if (isZero())
+            return StochTime.INFINITY;
+        else
+            return prevTime.plus(sampleInterval(random));
     }
 
     @Override public int compareTo(StochRate that) {

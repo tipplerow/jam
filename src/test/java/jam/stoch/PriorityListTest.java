@@ -37,35 +37,11 @@ public class PriorityListTest {
 
     private void createProcesses() {
         for (int index = 0; index < SLOW_COUNT; ++index)
-            procs.add(new FixedRateProc(SLOW_RATE));
+            procs.add(FixedRateProc.create(SLOW_RATE));
 
-        procs.add(new FixedRateProc(FAST_RATE1));
-        procs.add(new FixedRateProc(FAST_RATE2));
-        procs.add(new FixedRateProc(FAST_RATE3));
-    }
-
-    private static final class FixedRateProc implements StochProc {
-        private final int index;
-        private final StochRate rate;
-
-        private static final OrdinalIndex ordinalIndex = OrdinalIndex.create();
-
-        private FixedRateProc(double rate) {
-            this.rate = StochRate.valueOf(rate);
-            this.index = (int) ordinalIndex.next();
-        }
-
-        @Override public int getIndex() {
-            return index;
-        }
-
-        @Override public StochRate getStochRate() {
-            return rate;
-        }
-
-        @Override public String toString() {
-            return String.format("FixedRateProc(%d, %f)", getIndex(), rate.doubleValue());
-        }
+        procs.add(FixedRateProc.create(FAST_RATE1));
+        procs.add(FixedRateProc.create(FAST_RATE2));
+        procs.add(FixedRateProc.create(FAST_RATE3));
     }
 
     @Test public void testSelect() {
