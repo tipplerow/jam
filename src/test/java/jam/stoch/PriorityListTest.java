@@ -4,11 +4,8 @@ package jam.stoch;
 import java.util.ArrayList;
 import java.util.List;
 
-import jam.lang.OrdinalIndex;
 import jam.math.DoubleUtil;
 import jam.math.JamRandom;
-import jam.math.StatUtil;
-import jam.vector.JamVector;
 
 import org.junit.*;
 import static org.junit.Assert.*;
