@@ -33,11 +33,7 @@ public class EventQueueTest {
 
     private void createEvents() {
         for (FixedRateProc proc : procs)
-            events.add(StochEvent.create(proc, sampleTime(StochTime.ZERO)));
-    }
-
-    private StochTime sampleTime(StochTime prevTime) {
-        return StochTime.valueOf(prevTime.doubleValue() + random.nextDouble());
+            events.add(StochEvent.first(proc, random));
     }
 
     @Test public void testNext() {
@@ -54,17 +50,16 @@ public class EventQueueTest {
         System.out.println(queue);
         System.out.println();
         */
-        int actual = queue.next().getIndex();
-        int expected = events.get(0).getIndex();
+        int actualIndex = queue.nextEvent().getIndex();
+        int expectedIndex = events.get(0).getIndex();
 
-        assertEquals(expected, actual);
+        assertEquals(expectedIndex, actualIndex);
 
-        StochTime time = sampleTime(queue.next().getTime());
-        FixedRateProc proc = procs.get(actual);
-        StochEvent<FixedRateProc> event = StochEvent.create(proc, time);
+        StochEvent<FixedRateProc> actualEvent = queue.nextEvent();
+        StochEvent<FixedRateProc> updatedEvent = actualEvent.next(random);
 
-        queue.update(event);
-        events.set(0, event);
+        queue.updateEvent(updatedEvent);
+        events.set(0, updatedEvent);
         queue.validateOrder();
     }
 

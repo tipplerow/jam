@@ -35,6 +35,8 @@ public abstract class StochAlgo<P extends StochProc> {
     protected StochAlgo(JamRandom random, StochSystem<P> system) {
         this.random = random;
         this.system = system;
+
+        system.validateIndexing();
     }
 
     /**
@@ -45,15 +47,14 @@ public abstract class StochAlgo<P extends StochProc> {
     protected abstract StochEvent<P> nextEvent();
 
     /**
-     * Updates the internal state of this algorithm after an event has
-     * occurred.
+     * Updates the internal state of this algorithm after an event
+     * has occurred.
      *
-     * @param event the most recent event to occur.
-     *
-     * @param procs the stochastic processes whose rates have changed
-     * as a result of the most recent event.
+     * @param changed the stochastic processes whose rates have
+     * changed as a result of the most recent event (the event
+     * returned by the method {@code getEvent()}.
      */
-    protected abstract void processEvent(StochEvent<P> event, Collection<P> procs);
+    protected abstract void updateState(Collection<P> changed);
 
     /**
      * Advances the simulation by selecting the next stochastic event
@@ -64,8 +65,8 @@ public abstract class StochAlgo<P extends StochProc> {
         ++eventCount;
         event = nextEvent();
 
-        Collection<P> procs = system.processEvent(event);
-        processEvent(event, procs);
+        Collection<P> changed = system.processEvent(event);
+        updateState(changed);
     }
 
     /**
@@ -73,15 +74,25 @@ public abstract class StochAlgo<P extends StochProc> {
      *
      * @return the number of events that have occurred.
      */
-    public long getEventCount() {
+    public long countEvents() {
         return eventCount;
     }
 
     /**
      * Returns the most recent event that has occured.
      *
-     * @return the most recent event that has occured
-     * ({@code null} before any events have occurred).
+     * @return the most recent event that has occured ({@code null}
+     * before any events have occurred).
+     */
+    public StochEvent<P> getEvent() {
+        return event;
+    }
+
+    /**
+     * Returns the most recent process to occur.
+     *
+     * @return the most recent process to occur ({@code null} before
+     * any events have occurred).
      */
     public P getEventProcess() {
         if (event != null)

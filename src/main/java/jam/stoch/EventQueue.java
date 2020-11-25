@@ -213,12 +213,26 @@ public final class EventQueue<P extends StochProc> {
     }
 
     /**
-     * Returns the next event to occur (the event at the top of this
-     * queue) but does not remove the event or update the queue.
+     * Returns the next event for a given process in this queue (not
+     * necessarily the next event to occur in the system) but does not
+     * remove the event or update the queue.
      *
-     * @return the event at the top of this queue.
+     * @param proc the process of interest.
+     *
+     * @return the next event for the specified process.
      */
-    public StochEvent<P> next() {
+    public StochEvent<P> findEvent(P proc) {
+        return queue[point[proc.getIndex()]];
+    }
+
+    /**
+     * Returns the next event to occur in the stochastic system (the
+     * event at the top of this queue) but does not remove the event
+     * or update the queue.
+     *
+     * @return the next event to occur in the stochastic system.
+     */
+    public StochEvent<P> nextEvent() {
         return queue[ROOT_NODE];
     }
 
@@ -232,22 +246,12 @@ public final class EventQueue<P extends StochProc> {
     }
 
     /**
-     * Updates the next reaction time for an event in this queue.
-     *
-     * @param proc the process to update.
-     *
-     * @param time the next reaction time for the specified process.
-     */
-    public void update(P proc, StochTime time) {
-        update(StochEvent.create(proc, time));
-    }
-
-    /**
-     * Updates an event in this queue after its time has changed.
+     * Updates an event in this queue after the time of its next
+     * occurrence has changed.
      *
      * @param event the event to update.
      */
-    public void update(StochEvent<P> event) {
+    public void updateEvent(StochEvent<P> event) {
         int node = find(event);
         queue[node] = event;
 

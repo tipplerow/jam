@@ -39,9 +39,9 @@ public class DecaySystemTest extends NumericTestBase {
         DecayProc proc1 = system.getProcess(1);
         DecayProc proc2 = system.getProcess(2);
 
-        StochEvent<DecayProc> event0 = StochEvent.create(proc0, StochTime.ZERO);
-        StochEvent<DecayProc> event1 = StochEvent.create(proc1, StochTime.ZERO);
-        StochEvent<DecayProc> event2 = StochEvent.create(proc2, StochTime.ZERO);
+        StochEvent<DecayProc> event0 = StochEvent.mark(proc0, StochTime.ZERO);
+        StochEvent<DecayProc> event1 = StochEvent.mark(proc1, StochTime.ZERO);
+        StochEvent<DecayProc> event2 = StochEvent.mark(proc2, StochTime.ZERO);
 
         assertPopulation(system, 100, 200, 300);
         assertRates(system, 100.0, 400.0, 900.0);

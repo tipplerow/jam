@@ -37,7 +37,7 @@ public interface StochSystem<P extends StochProc> {
      * @param processList a list of processes to validate.
      *
      * @throws RuntimeException unless {@code processList.get(k).getIndex() == k}
-     * for all indexes {@code k = 0, 1, ..., processList.size()}.
+     * for all indexes {@code k = 0, 1, ..., processList.size() - 1}.
      */
     public static <P extends StochProc> void validateIndexing(List<P> processList) {
         for (int index = 0; index < processList.size(); ++index)
@@ -104,7 +104,7 @@ public interface StochSystem<P extends StochProc> {
      * Ensures that the stochastic processes are properly indexed.
      *
      * @throws RuntimeException unless {@code getProcess(k).getIndex() == k}
-     * for all indexes {@code k = 0, 1, ..., countProcesses()}.
+     * for all indexes {@code k = 0, 1, ..., countProcesses() - 1}.
      */
     public default void validateIndexing() {
         validateIndexing(listProcesses());

@@ -47,9 +47,9 @@ public class BifurcationSystemTest extends NumericTestBase {
         BifurcationPath path1 = system.getProcess(1);
         BifurcationPath path2 = system.getProcess(2);
 
-        StochEvent<BifurcationPath> event0 = StochEvent.create(path0, StochTime.ZERO);
-        StochEvent<BifurcationPath> event1 = StochEvent.create(path1, StochTime.ZERO);
-        StochEvent<BifurcationPath> event2 = StochEvent.create(path2, StochTime.ZERO);
+        StochEvent<BifurcationPath> event0 = StochEvent.mark(path0, StochTime.ZERO);
+        StochEvent<BifurcationPath> event1 = StochEvent.mark(path1, StochTime.ZERO);
+        StochEvent<BifurcationPath> event2 = StochEvent.mark(path2, StochTime.ZERO);
 
         assertPopulation(system, 100, 0, 0, 0);
         assertRates(system, 100.0, 200.0, 300.0);
