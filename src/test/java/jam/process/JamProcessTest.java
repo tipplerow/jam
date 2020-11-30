@@ -14,11 +14,11 @@ public class JamProcessTest {
         assertTrue(process.stdout().contains("build.gradle"));
         assertTrue(process.stderr().isEmpty());
 
-        process = JamProcess.run("cat", "foo");
+        process = JamProcess.run("cat", "fooxyz");
         
         assertFalse(process.success());
         assertTrue(process.stdout().isEmpty());
-        assertEquals(List.of("cat: foo: No such file or directory"), process.stderr());
+        assertEquals(List.of("cat: fooxyz: No such file or directory"), process.stderr());
         
         process = JamProcess.run("cat", "LICENSE");
 
