@@ -13,8 +13,12 @@ Miao.createMaster <- function(dirName = "../data") {
     neoByTumor <- Miao.aggregateNeoByTumor(neoDetail)
     neoByTumor <- merge(keyFrame, neoByTumor)
 
+    genoFrame <- Miao.collectGenotype(neoDetail)
+    genoFrame <- merge(keyFrame, genoFrame)
+
     master <- merge(master, mutByTumor, all = TRUE)
     master <- merge(master, neoByTumor, all = TRUE)
+    master <- merge(master, genoFrame,  all = TRUE)
 
     master$os_event  <- 1 - master$os_censor
     master$pfs_event <- 1 - master$pfs_censor
@@ -335,3 +339,23 @@ Miao.quintile <- function(x) {
 Miao.zscore <- function(x) {
     (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 }
+
+Miao.collectGenotype <- function(master, neoDetail) {
+    neoDetail$HLA <- sprintf("%s*%s", substr(neoDetail$HLA, 1, 5), substr(neoDetail$HLA, 6, 10))
+
+    genoBy <- by(neoDetail, neoDetail$Tumor_Sample_Barcode, function(x) sort(unique(x$HLA)))
+    genoFrame <- data.frame(Tumor_Sample_Barcode = names(genoBy),
+                            hlaCount = as.integer(NA),
+                            hlaList = as.character(NA))
+
+    for (k in 1:nrow(genoFrame)) {
+        genoFrame$hlaCount[k] <- length(genoBy[[k]])
+        genoFrame$hlaList[k]  <- paste(genoBy[[genoFrame$Tumor_Sample_Barcode[k]]], collapse = " ")
+    }
+
+    keyFrame  <- master[,c("patient_id", "Tumor_Sample_Barcode")]
+    genoFrame <- merge(keyFrame, genoFrame)
+    genoFrame <- genoFrame[,c("patient_id", "hlaCount", "hlaList")]
+    genoFrame
+}
+

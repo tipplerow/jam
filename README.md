@@ -7,7 +7,7 @@ A core Java library for open-source scientific computing, with an emphasis on co
 `$ git clone https://github.com/tipplerow/jam.git`  
   
 **Build the library and the API documentation**
-`$ export GITHUB_ROOT=$PWD`
+`$ export GITHUB_ROOT=$PWD`  
 `$ cd jam`  
 `$ . shell/jam_profile`  
 `$ ./gradlew clean java`  

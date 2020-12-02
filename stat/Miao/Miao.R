@@ -9,7 +9,7 @@ Miao.loadGlobal <- function() {
     mutByTumor <- merge(keyFrame, mutByTumor)
     
     neoDetail  <- read.table("Miao_SupTable10.tsv", header = TRUE, sep = "\t")
-    neoDetail  <- neoAg1[!duplicated(neoAg1[,c("Tumor_Sample_Barcode", "HLA", "pep_mut")]),]
+    neoDetail  <- neoDetail[!duplicated(neoDetail[,c("Tumor_Sample_Barcode", "HLA", "pep_mut")]),]
     neoByTumor <- Miao.aggregateNeoByTumor(neoDetail)
     neoByTumor <- merge(keyFrame, neoByTumor)
 
@@ -24,7 +24,63 @@ Miao.loadGlobal <- function() {
     master$zNAB <- Miao.zscore(log(master$count500))
     master$zHLA <- Miao.zscore(log(master$count500 / master$nonSilentCount))
 
+    master$lowTMB <- as.numeric(master$zTMB < median(master$zTMB, na.rm = TRUE))
+    master$lowNAB <- as.numeric(master$zNAB < median(master$zNAB, na.rm = TRUE))
+    master$lowHLA <- as.numeric(master$zHLA < median(master$zHLA, na.rm = TRUE))
+
     master
+}
+
+Miao.plotKR <- function(master) {
+    require(survival)
+
+    xwd <- 0.435
+    yht <- 0.45
+    cex <- 0.7
+
+    par(las = 1)
+    par(fig = c(0, xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht))
+    plot(survfit(Surv(os_days, os_censor) ~ lowTMB, data = master),
+         col = 3:4,
+         lwd = 2,
+         xlim = c(-50, 2050),
+         ylab = "Survival probability",
+         cex.lab  = cex,
+         cex.axis = 0.7)
+    legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
+           legend = c("High TMB", "Low TMB"))
+    legend(-200, 0.2, bty = "n", legend = "p = 0.00013", cex = cex)
+    
+    par(fig = c(0.5 - 0.5 * xwd, 0.5 + 0.5 * xwd, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
+    plot(survfit(Surv(os_days, os_censor) ~ lowNAB, data = master),
+         col = 3:4,
+         lwd = 2,
+         xlim = c(-50, 2050),
+         axes = FALSE,
+         cex.lab  = cex,
+         cex.axis = cex)
+    axis(1, cex.axis = cex)
+    axis(2, labels = FALSE)
+    box()
+    legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
+           legend = c("High NAL", "Low NAL"))
+    legend(-200, 0.2, bty = "n", legend = "p = 0.011", cex = cex)
+    
+    
+    par(fig = c(1.0 - xwd, 1.0, 0.5 - 0.5 * yht, 0.5 + 0.5 * yht), new = TRUE)
+    plot(survfit(Surv(os_days, os_censor) ~ lowHLA, data = master),
+         col = 3:4,
+         lwd = 2,
+         xlim = c(-50, 2050),
+         axes = FALSE,
+         cex.lab  = cex,
+         cex.axis = cex)
+    axis(1, cex.axis = cex)
+    axis(2, labels = FALSE)
+    box()
+    legend("topright", bty = "n", col = 3:4, lwd = c(2, 2), lty = c(1, 1), cex = cex,
+           legend = c("High HLA", "Low HLA"))
+    legend(-200, 0.2, bty = "n", legend = "p = 0.19", cex = cex)
 }
 
 Miao.plotQQ <- function(master) {
@@ -160,27 +216,16 @@ Miao.aggregateByAllele <- function(neoAg) {
 
 Miao.aggregateByCancerType <- function(master) {
     aggFunc <- function(slice) {
-        slice$zOS  <- Miao.zscore(log(slice$os_days))
-        slice$zPFS <- Miao.zscore(log(slice$pfs_days))
-
-        slice$zMissense  <- Miao.zscore(log(slice$missenseCount))
-        slice$zNonSilent <- Miao.zscore(log(slice$nonSilentCount))
-
-        slice$zTotalNeo <- Miao.zscore(log(slice$totalNeo))
-        slice$zCount50  <- Miao.zscore(log(slice$count50))
-        slice$zCount100 <- Miao.zscore(log(slice$count100))
-        slice$zCount250 <- Miao.zscore(log(slice$count250))
-        slice$zCount500 <- Miao.zscore(log(slice$count500))
-
-        slice$zFrac50  <- Miao.zscore(log(slice$count50  / slice$nonSilentCount))
-        slice$zFrac100 <- Miao.zscore(log(slice$count100 / slice$nonSilentCount))
-        slice$zFrac250 <- Miao.zscore(log(slice$count250 / slice$nonSilentCount))
-        slice$zFrac500 <- Miao.zscore(log(slice$count500 / slice$nonSilentCount))
-
-        slice
+        data.frame(cancer_type = slice$cancer_type,
+                   os_censor   = slice$os_censor,
+                   zOS  = Miao.zscore(log(slice$os_days)),
+                   zPFS = Miao.zscore(log(slice$pfs_days)),
+                   zTMB = Miao.zscore(log(slice$nonSilentCount)),
+                   zNAB = Miao.zscore(log(slice$count500)),
+                   zHLA = Miao.zscore(log(slice$count500 / slice$nonSilentCount)))
     }
-    
-    result <- do.call(rbind, by(master, master$cancer_type, aggFunc))
+
+    result <- do.call(rbind, by(master, list(master$cancer_type, master$os_censor), aggFunc))
     rownames(result) <- NULL
 
     result
