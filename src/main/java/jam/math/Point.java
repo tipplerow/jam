@@ -150,11 +150,11 @@ public interface Point {
     }
 
     /**
-     * Returns the {@code x}-component of this vector.
+     * Returns the {@code x}-component of this point.
      *
-     * @return the {@code x}-component of this vector.
+     * @return the {@code x}-component of this point.
      *
-     * @throws RuntimeException unless this vector has
+     * @throws RuntimeException unless this point has
      * dimension 1 or greater.
      */
     public default double x() {
@@ -162,11 +162,11 @@ public interface Point {
     }
 
     /**
-     * Returns the {@code y}-component of this vector.
+     * Returns the {@code y}-component of this point.
      *
-     * @return the {@code y}-component of this vector.
+     * @return the {@code y}-component of this point.
      *
-     * @throws RuntimeException unless this vector has
+     * @throws RuntimeException unless this point has
      * dimension 2 or greater.
      */
     public default double y() {
@@ -174,11 +174,11 @@ public interface Point {
     }
 
     /**
-     * Returns the {@code z}-component of this vector.
+     * Returns the {@code z}-component of this point.
      *
-     * @return the {@code z}-component of this vector.
+     * @return the {@code z}-component of this point.
      *
-     * @throws RuntimeException unless this vector has 
+     * @throws RuntimeException unless this point has
      * dimension 3 or greater.
      */
     public default double z() {
