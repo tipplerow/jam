@@ -21,7 +21,7 @@ import jam.util.CollectionUtil;
  * Simulates surface-limited growth on a lattice.
  */
 public final class SurfaceGrower<T> {
-    private final Lattice<T> lattice;
+    private final Population<T> population;
     private final ObjectFactory<T> factory;
     private final int targetSize;
 
@@ -31,9 +31,9 @@ public final class SurfaceGrower<T> {
     // existing occupants adjacent to site K)...
     private final Multiset<UnitIndex> openSites = HashMultiset.create();
 
-    private SurfaceGrower(Lattice<T> lattice, ObjectFactory<T> factory, int targetSize) {
-        this.lattice = lattice;
+    private SurfaceGrower(Population<T> population, ObjectFactory<T> factory, int targetSize) {
         this.factory = factory;
+        this.population = population;
         this.targetSize = targetSize;
     }
 
@@ -55,30 +55,30 @@ public final class SurfaceGrower<T> {
      *
      * @param <T> the run-time type of the lattice occupants.
      *
-     * @param lattice the lattice to fill.
+     * @param population the population to fill.
      *
      * @param factory the factory used to create new occupants.
      *
      * @param size the number of occupants to add.
      *
-     * @throws IllegalArgumentException unless the lattice is empty
+     * @throws IllegalArgumentException unless the population is empty
      * and large enough to contain the target number of occupants.
      */
-    public static <T> void grow(Lattice<T> lattice, ObjectFactory<T> factory, int size) {
+    public static <T> void grow(Population<T> population, ObjectFactory<T> factory, int size) {
         if (size < 1)
             throw new IllegalArgumentException("Target size must be positive.");
 
-        if (size > lattice.period().countSites())
+        if (size > population.lattice().countSites())
             throw new IllegalArgumentException("Target size exceeds the number of lattice sites.");
 
-        SurfaceGrower<T> grower = new SurfaceGrower<T>(lattice, factory, size);
+        SurfaceGrower<T> grower = new SurfaceGrower<T>(population, factory, size);
         grower.grow();
     }
 
     /**
      * Simulates one realization of surface-limited growth.
      *
-     * <p>This method fills the empty lattice by placing the first
+     * <p>This method fills the empty population by placing the first
      * occupant at the origin and then adding occupants at randomly
      * selected <em>expansion</em> sites (sites that are unoccupied
      * and neighbors to occupied sites).
@@ -93,15 +93,16 @@ public final class SurfaceGrower<T> {
         int dim = unitCell.dimensionality();
         Period period = Period.boxND(10000, dim);
 
-        Lattice<Integer> lattice = Lattice.create(unitCell, period);
+        Lattice lattice = Lattice.create(unitCell, period);
+        Population<Integer> population = Population.empty(lattice);
         ObjectFactory<Integer> factory = ObjectFactory.forInteger();
 
-        grow(lattice, factory, size);
+        grow(population, factory, size);
 
         PrintWriter writer = IOUtil.openWriter(OUTPUT_FILE, false);
         writer.println("cell," + Point.headerCSV(dim));
 
-        Map<Integer, Point> points = new TreeMap<Integer, Point>(lattice.mapPoints());
+        Map<Integer, Point> points = new TreeMap<Integer, Point>(population.mapPoints());
 
         for (Map.Entry<Integer, Point> entry : points.entrySet())
             writer.println(entry.getKey().toString() + "," + entry.getValue().formatCSV(DECIMAL_FORMAT));
@@ -109,20 +110,20 @@ public final class SurfaceGrower<T> {
         writer.close();
     }
 
-    private Lattice<T> grow() {
+    private Population<T> grow() {
         addFirstOccupant();
 
-        while (lattice.countOccupants() < targetSize)
+        while (population.countOccupants() < targetSize)
             addNextOccupant();
 
-        return lattice;
+        return population;
     }
 
     private void addFirstOccupant() {
         //
         // Start by placing the first occupant at the origin...
         //
-        placeOccupant(factory.newInstance(), UnitIndex.origin(lattice.dimensionality()));
+        placeOccupant(factory.newInstance(), UnitIndex.origin(population.lattice().dimensionality()));
     }
 
     private void addNextOccupant() {
@@ -130,18 +131,18 @@ public final class SurfaceGrower<T> {
     }
 
     private void placeOccupant(T occupant, UnitIndex index) {
-        if (lattice.contains(occupant))
+        if (population.contains(occupant))
             throw new IllegalStateException("Occupant is already in place.");
 
-        if (lattice.isOccupied(index))
+        if (population.isOccupied(index))
             throw new IllegalStateException("Site is already occupied.");
 
-        lattice.place(occupant, index);
+        population.place(occupant, index);
 
         openSites.setCount(index, 0);
-        openSites.addAll(lattice.unoccupiedNeighbors(index));
+        openSites.addAll(population.unoccupiedNeighbors(index));
 
-        int occupantCount = lattice.countOccupants();
+        int occupantCount = population.countOccupants();
 
         if (occupantCount % 100 == 0)
             JamLogger.info("Occupant count: [%d]...", occupantCount);
