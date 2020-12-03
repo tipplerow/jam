@@ -33,6 +33,16 @@ public abstract class AbstractPeriod implements Period {
             throw new IllegalArgumentException("Inconsistent index dimensionality.");
     }
 
+    @Override public boolean contains(UnitIndex index) {
+        validateDimensionality(index);
+
+        for (int dim = 0; dim < dimensionality(); ++dim)
+            if (!Period.contains(index.coord(dim), period(dim)))
+                return false;
+
+        return true;
+    }
+
     @Override public long countSites() {
         long count = 1;
 

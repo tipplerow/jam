@@ -31,6 +31,14 @@ public class BravaisLatticeTest {
         assertEquals(List.of(point1, point3), lattice.listNeighbors(point2));
         assertEquals(List.of(point2, point4), lattice.listNeighbors(point3));
         assertEquals(List.of(point3, point5), lattice.listNeighbors(point4));
+
+        assertFalse(lattice.contains(pointM));
+        assertTrue(lattice.contains(point0));
+        assertTrue(lattice.contains(point1));
+        assertTrue(lattice.contains(point2));
+        assertTrue(lattice.contains(point3));
+        assertTrue(lattice.contains(point4));
+        assertFalse(lattice.contains(point5));
     }
 
    @Test public void testSquare() {
@@ -77,6 +85,16 @@ public class BravaisLatticeTest {
 
         assertEquals(List.of(p00, p10, p01, p11, p02, p12), lattice.listPoints());
         assertEquals(List.of(p10, p01, p21, p12), lattice.listNeighbors(p11));
+
+        assertTrue(lattice.contains(p00));
+        assertTrue(lattice.contains(p01));
+        assertTrue(lattice.contains(p02));
+        assertTrue(lattice.contains(p10));
+        assertTrue(lattice.contains(p11));
+        assertTrue(lattice.contains(p12));
+
+        assertFalse(lattice.contains(Point.at(-1.0, 0.0)));
+        assertFalse(lattice.contains(Point.at( 0.0, 3.0)));
     }
 
     public static void main(String[] args) {

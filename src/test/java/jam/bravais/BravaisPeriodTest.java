@@ -9,6 +9,35 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class BravaisPeriodTest {
+    @Test public void testContains() {
+        assertFalse(Period.contains(-1, 5));
+        assertFalse(Period.contains( 5, 5));
+
+        assertTrue(Period.contains(0, 5));
+        assertTrue(Period.contains(1, 5));
+        assertTrue(Period.contains(2, 5));
+        assertTrue(Period.contains(3, 5));
+        assertTrue(Period.contains(4, 5));
+
+        Period p23 = Period.box(2, 3);
+
+        assertFalse(p23.contains(UnitIndex.at(-1,  0)));
+        assertFalse(p23.contains(UnitIndex.at(-1,  1)));
+        assertFalse(p23.contains(UnitIndex.at( 0, -1)));
+        assertFalse(p23.contains(UnitIndex.at( 1, -1)));
+        assertFalse(p23.contains(UnitIndex.at( 0,  3)));
+        assertFalse(p23.contains(UnitIndex.at( 1,  3)));
+        assertFalse(p23.contains(UnitIndex.at( 2,  0)));
+        assertFalse(p23.contains(UnitIndex.at( 2,  1)));
+
+        assertTrue(p23.contains(UnitIndex.at(0, 0)));
+        assertTrue(p23.contains(UnitIndex.at(0, 1)));
+        assertTrue(p23.contains(UnitIndex.at(0, 2)));
+        assertTrue(p23.contains(UnitIndex.at(1, 0)));
+        assertTrue(p23.contains(UnitIndex.at(1, 1)));
+        assertTrue(p23.contains(UnitIndex.at(1, 2)));
+    }
+
     @Test public void testCountSites() {
         assertEquals(  10, Period.box(10).countSites());
         assertEquals( 200, Period.box(10, 20).countSites());
@@ -16,7 +45,8 @@ public class BravaisPeriodTest {
     }
 
     @Test public void testEnumerate1() {
-        List<UnitIndex> images = Period.box(3).enumerate();
+        Period box = Period.box(3);
+        List<UnitIndex> images = box.enumerate();
 
         assertEquals(3, images.size());
         assertTrue(ListUtil.isSorted(images));
@@ -24,6 +54,9 @@ public class BravaisPeriodTest {
         assertUnitIndex(images.get(0), 0);
         assertUnitIndex(images.get(1), 1);
         assertUnitIndex(images.get(2), 2);
+
+        for (UnitIndex image : images)
+            assertTrue(box.contains(image));
     }
 
     private void assertUnitIndex(UnitIndex actual, int... expected) {
@@ -34,7 +67,8 @@ public class BravaisPeriodTest {
     }
 
     @Test public void testEnumerate2() {
-        List<UnitIndex> images = Period.box(2, 3).enumerate();
+        Period box = Period.box(2, 3);
+        List<UnitIndex> images = box.enumerate();
 
         assertEquals(6, images.size());
         assertTrue(ListUtil.isSorted(images));
@@ -45,10 +79,14 @@ public class BravaisPeriodTest {
         assertUnitIndex(images.get(3), 1, 1);
         assertUnitIndex(images.get(4), 0, 2);
         assertUnitIndex(images.get(5), 1, 2);
+
+        for (UnitIndex image : images)
+            assertTrue(box.contains(image));
     }
 
     @Test public void testEnumerate3() {
-        List<UnitIndex> images = Period.box(2, 3, 4).enumerate();
+        Period box = Period.box(2, 3, 4);
+        List<UnitIndex> images = box.enumerate();
 
         assertEquals(24, images.size());
         assertTrue(ListUtil.isSorted(images));
@@ -80,6 +118,9 @@ public class BravaisPeriodTest {
         assertUnitIndex(images.get(21), 1, 1, 3);
         assertUnitIndex(images.get(22), 0, 2, 3);
         assertUnitIndex(images.get(23), 1, 2, 3);
+
+        for (UnitIndex image : images)
+            assertTrue(box.contains(image));
     }
 
     @Test public void testImageOf() {

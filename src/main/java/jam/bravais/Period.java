@@ -105,6 +105,22 @@ public interface Period {
     }
 
     /**
+     * Identifies unit indexes whose absolute coordinates (not
+     * periodic images) lie within a periodic box.
+     *
+     * @param index the coordinate of an absolute unit index.
+     *
+     * @param period the lattice period.
+     *
+     * @return {@code true} iff the absolute index (not its periodic
+     * image) lies within a box with the specified period, expressed
+     * mathematically as {@code 0 <= index && index < period}.
+     */
+    public static boolean contains(int index, int period) {
+        return 0 <= index && index < period;
+    }
+
+    /**
      * Translates an absolute unit index into its periodic image.
      *
      * @param index the coordinate of an absolute unit index.
@@ -121,6 +137,17 @@ public interface Period {
 
 	return image;
     }
+
+    /**
+     * Identifies unit indexes whose absolute coordinates (not
+     * periodic images) lie within this periodic box.
+     *
+     * @param index an absolute unit index to examine.
+     *
+     * @return {@code true} iff the absolute index (not its periodic
+     * image) lies within this periodic box.
+     */
+    public abstract boolean contains(UnitIndex index);
 
     /**
      * Returns the dimensionality of this lattice period.

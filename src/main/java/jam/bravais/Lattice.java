@@ -145,6 +145,19 @@ public final class Lattice {
     }
 
     /**
+     * Identifies points whose absolute coordinates (not periodic
+     * images) lie within the primary box for this lattice.
+     *
+     * @param point the point to examine.
+     *
+     * @return {@code true} iff the point lies within the primary box
+     * (not a periodic image) of this lattice.
+     */
+    public boolean contains(Point point) {
+        return period.contains(unitCell.indexOf(point));
+    }
+
+    /**
      * Returns the number of unique (non-periodic) sites in this
      * lattice.
      *
