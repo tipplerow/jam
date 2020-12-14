@@ -2,9 +2,12 @@
 package jam.bravais;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jam.app.JamProperties;
+import jam.lang.JamException;
 import jam.math.Point;
 import jam.util.RegexUtil;
 
@@ -235,5 +238,57 @@ public final class Lattice {
             neighborPoints.add(unitCell.pointAt(neighborIndex));
 
         return neighborPoints;
+    }
+
+    /**
+     * Returns a mapping from each primary unit index on this lattice
+     * to a list of its nearest neighbors.
+     *
+     * @param coordType the desired type for the neighbor coordinates
+     * (absolute or periodic images).
+     *
+     * @return a mapping from each primary unit index on this lattice
+     * to a list of its nearest neighbors.
+     */
+    public Map<UnitIndex, List<UnitIndex>> mapIndexNeighbors(CoordType coordType) {
+        List<UnitIndex> indexes = period.enumerate();
+
+        Map<UnitIndex, List<UnitIndex>> neighborMap =
+            new HashMap<UnitIndex, List<UnitIndex>>(indexes.size());
+
+        switch (coordType) {
+        case ABSOLUTE:
+            mapAbsoluteIndexNeighbors(indexes, neighborMap);
+            break;
+
+        case IMAGE:
+            mapIndexNeighborImages(indexes, neighborMap);
+            break;
+
+        default:
+            throw JamException.runtime("Unknown coordinate type: [%s].", coordType);
+        }
+
+        return neighborMap;
+    }
+
+    private void mapAbsoluteIndexNeighbors(List<UnitIndex> indexes, Map<UnitIndex, List<UnitIndex>> neighborMap) {
+        for (UnitIndex index : indexes)
+            neighborMap.put(index, unitCell.getNeighbors(index));
+    }
+
+    private void mapIndexNeighborImages(List<UnitIndex> indexes, Map<UnitIndex, List<UnitIndex>> neighborMap) {
+        for (UnitIndex index : indexes)
+            neighborMap.put(index, listNeighborImages(index));
+    }
+
+    private List<UnitIndex> listNeighborImages(UnitIndex index) {
+        List<UnitIndex> neighborCoords = unitCell.getNeighbors(index);
+        List<UnitIndex> neighborImages = new ArrayList<UnitIndex>(neighborCoords.size());
+
+        for (UnitIndex neighborCoord : neighborCoords)
+            neighborImages.add(period.imageOf(neighborCoord));
+
+        return neighborImages;
     }
 }

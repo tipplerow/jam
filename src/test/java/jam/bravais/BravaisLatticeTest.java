@@ -2,7 +2,9 @@
 package jam.bravais;
 
 import java.util.List;
+import java.util.Map;
 
+import jam.bravais.CoordType;
 import jam.math.Point;
 
 import org.junit.*;
@@ -39,6 +41,31 @@ public class BravaisLatticeTest {
         assertTrue(lattice.contains(point3));
         assertTrue(lattice.contains(point4));
         assertFalse(lattice.contains(point5));
+
+        UnitIndex indexM = UnitIndex.at(-1);
+        UnitIndex index0 = UnitIndex.at(0);
+        UnitIndex index1 = UnitIndex.at(1);
+        UnitIndex index2 = UnitIndex.at(2);
+        UnitIndex index3 = UnitIndex.at(3);
+        UnitIndex index4 = UnitIndex.at(4);
+        UnitIndex index5 = UnitIndex.at(5);
+
+        Map<UnitIndex, List<UnitIndex>> neighbors =
+            lattice.mapIndexNeighbors(CoordType.ABSOLUTE);
+
+        assertEquals(List.of(indexM, index1), neighbors.get(index0));
+        assertEquals(List.of(index0, index2), neighbors.get(index1));
+        assertEquals(List.of(index1, index3), neighbors.get(index2));
+        assertEquals(List.of(index2, index4), neighbors.get(index3));
+        assertEquals(List.of(index3, index5), neighbors.get(index4));
+
+        neighbors = lattice.mapIndexNeighbors(CoordType.IMAGE);
+
+        assertEquals(List.of(index4, index1), neighbors.get(index0));
+        assertEquals(List.of(index0, index2), neighbors.get(index1));
+        assertEquals(List.of(index1, index3), neighbors.get(index2));
+        assertEquals(List.of(index2, index4), neighbors.get(index3));
+        assertEquals(List.of(index3, index0), neighbors.get(index4));
     }
 
    @Test public void testSquare() {
@@ -95,6 +122,25 @@ public class BravaisLatticeTest {
 
         assertFalse(lattice.contains(Point.at(-1.0, 0.0)));
         assertFalse(lattice.contains(Point.at( 0.0, 3.0)));
+
+        lattice = Lattice.parse("SQUARE; 2.5; 8, 4");
+
+        Map<UnitIndex, List<UnitIndex>> neighbors =
+            lattice.mapIndexNeighbors(CoordType.ABSOLUTE);
+
+        assertEquals(List.of(UnitIndex.at( 0, -1),
+                             UnitIndex.at(-1,  0),
+                             UnitIndex.at( 1,  0),
+                             UnitIndex.at( 0,  1)),
+                     neighbors.get(UnitIndex.at(0, 0)));
+
+        neighbors = lattice.mapIndexNeighbors(CoordType.IMAGE);
+
+        assertEquals(List.of(UnitIndex.at(0, 3),
+                             UnitIndex.at(7, 0),
+                             UnitIndex.at(1, 0),
+                             UnitIndex.at(0, 1)),
+                     neighbors.get(UnitIndex.at(0, 0)));
     }
 
     public static void main(String[] args) {
