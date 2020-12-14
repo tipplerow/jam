@@ -29,7 +29,7 @@ public class FTPUtilTest {
         assertFalse(fileNames.isEmpty());
 
         for (String fileName : fileNames)
-            assertTrue(fileName.startsWith("pubmed20n") || fileName.equals("README.txt"));
+            assertTrue(fileName.startsWith("pubmed") || fileName.equals("README.txt"));
     }
 
     public static void main(String[] args) {
