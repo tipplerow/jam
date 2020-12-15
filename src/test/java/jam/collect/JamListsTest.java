@@ -21,6 +21,34 @@ public final class JamListsTest {
         assertEquals(List.of("A", "B", "C"), JamLists.linkedList(iterable()));
     }
 
+    @Test public void testSelect() {
+        int N = 10;
+        List<Integer> list = new ArrayList<Integer>(N);
+
+        for (int k = 0; k < N; k++)
+            list.add(k);
+
+        int niter     = 1000000;
+        int expected  = niter / N;
+        int tolerance = 1000;
+
+        int[] count = new int[N];
+        
+        for (int k = 0; k < niter; k++)
+            ++count[JamLists.select(list)];
+
+        for (int k = 0; k < N; k++)
+            assertTrue(expected - tolerance < count[k] && count[k] < expected + tolerance);
+
+        list = List.of(123);
+        assertEquals(Integer.valueOf(123), JamLists.select(list));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSelectEmpty() {
+        JamLists.select(List.of());
+    }
+
     @Test public void testSwap() {
         List<String> list = new ArrayList<String>(List.of("A" ,"B", "C", "D"));
 

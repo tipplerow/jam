@@ -53,6 +53,45 @@ public final class JamLists {
     }
 
     /**
+     * Selects one list element at random using the global random
+     * number generator.
+     *
+     * @param <E> the element type.
+     *
+     * @param list the list to select from.
+     *
+     * @return an element selected at random.
+     *
+     * @throws IllegalArgumentException if the list is empty.
+     */
+    public static <E> E select(List<E> list) {
+        return select(list, JamRandom.global());
+    }
+
+    /**
+     * Selects one list element at random.
+     *
+     * @param <E> the element type.
+     *
+     * @param list the list to select from.
+     *
+     * @param random the random number source.
+     *
+     * @return an element selected at random.
+     *
+     * @throws IllegalArgumentException if the list is empty.
+     */
+    public static <E> E select(List<E> list, JamRandom random) {
+        if (list.isEmpty())
+            throw new IllegalArgumentException("Empty list.");
+
+        if (list.size() == 1)
+            return list.get(0);
+
+        return list.get(random.nextInt(list.size()));
+    }
+
+    /**
      * Copies a sequence of items into an {@code ArrayList} and then
      * randomly shuffles the items.
      *
