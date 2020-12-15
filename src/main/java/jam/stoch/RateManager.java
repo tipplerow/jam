@@ -71,7 +71,7 @@ public final class RateManager<P extends StochProc> {
         ++rateAge;
 
         for (P proc : procs) {
-            int index = proc.getIndex();
+            int index = proc.getProcIndex();
 
             double oldRate = rates.get(index);
             double newRate = system.getStochRate(index).doubleValue();

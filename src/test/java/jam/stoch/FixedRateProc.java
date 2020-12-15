@@ -21,7 +21,7 @@ final class FixedRateProc implements StochProc {
         return new FixedRateProc(rate);
     }
 
-    @Override public int getIndex() {
+    @Override public int getProcIndex() {
         return index;
     }
 
@@ -30,6 +30,6 @@ final class FixedRateProc implements StochProc {
     }
 
     @Override public String toString() {
-        return String.format("FixedRateProc(%d, %f)", getIndex(), rate.doubleValue());
+        return String.format("FixedRateProc(%d, %f)", getProcIndex(), rate.doubleValue());
     }
 }

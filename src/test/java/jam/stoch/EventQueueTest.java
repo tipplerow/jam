@@ -50,8 +50,8 @@ public class EventQueueTest {
         System.out.println(queue);
         System.out.println();
         */
-        int actualIndex = queue.nextEvent().getIndex();
-        int expectedIndex = events.get(0).getIndex();
+        int actualIndex = queue.nextEvent().getProcIndex();
+        int expectedIndex = events.get(0).getProcIndex();
 
         assertEquals(expectedIndex, actualIndex);
 

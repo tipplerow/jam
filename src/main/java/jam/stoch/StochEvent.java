@@ -185,8 +185,8 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      *
      * @return the ordinal index of the underlying stochastic process.
      */
-    public int getIndex() {
-        return proc.getIndex();
+    public int getProcIndex() {
+        return proc.getProcIndex();
     }
 
     /**
@@ -243,7 +243,7 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
         if (rateCmp != 0)
             return -rateCmp; // Higher rate first...
         else
-            return Integer.compare(this.proc.getIndex(), that.proc.getIndex());
+            return Integer.compare(this.proc.getProcIndex(), that.proc.getProcIndex());
     }
 
     @Override public boolean equals(Object obj) {

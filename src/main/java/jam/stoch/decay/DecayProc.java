@@ -98,7 +98,7 @@ public final class DecayProc implements StochProc {
         return rateConst;
     }
 
-    @Override public int getIndex() {
+    @Override public int getProcIndex() {
         return index;
     }
 

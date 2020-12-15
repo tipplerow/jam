@@ -72,7 +72,7 @@ public final class EventQueue<P extends StochProc> {
     }
 
     private void assignPoint(int node) {
-        int index = queue[node].getIndex();
+        int index = queue[node].getProcIndex();
         validateEventIndex(index);
         point[index] = node;
     }
@@ -145,7 +145,7 @@ public final class EventQueue<P extends StochProc> {
     }
 
     private int find(StochEvent<P> event) {
-        return point[event.getIndex()];
+        return point[event.getProcIndex()];
     }
 
     private void sink(int node) {
@@ -222,7 +222,7 @@ public final class EventQueue<P extends StochProc> {
      * @return the next event for the specified process.
      */
     public StochEvent<P> findEvent(P proc) {
-        return queue[point[proc.getIndex()]];
+        return queue[point[proc.getProcIndex()]];
     }
 
     /**

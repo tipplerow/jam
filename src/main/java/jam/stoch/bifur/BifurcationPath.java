@@ -64,7 +64,7 @@ public final class BifurcationPath implements StochProc {
         return unitRate;
     }
 
-    @Override public int getIndex() {
+    @Override public int getProcIndex() {
         return index;
     }
 

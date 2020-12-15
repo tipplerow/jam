@@ -51,7 +51,7 @@ public class PriorityListTest {
 
         for (int trialIndex = 0; trialIndex < trialCount; ++trialIndex) {
             FixedRateProc proc = procList.select(RANDOM, TOTAL_RATE);
-            ++eventCounts[(int) proc.getIndex()];
+            ++eventCounts[(int) proc.getProcIndex()];
         }
 
         millis = System.currentTimeMillis() - millis;
