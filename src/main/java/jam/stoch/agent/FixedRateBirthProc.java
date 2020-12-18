@@ -9,8 +9,6 @@ public final class FixedRateBirthProc<A extends StochAgent> extends BirthProc<A>
 
     private FixedRateBirthProc(A parent, A child, double rateConst) {
         super(parent, child);
-
-        validateRateConstant(rateConst);
         this.rateConst = rateConst;
     }
 

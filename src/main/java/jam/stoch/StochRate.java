@@ -6,6 +6,7 @@ import java.util.Comparator;
 
 import jam.dist.ExponentialDistribution;
 import jam.lang.DomainDouble;
+import jam.math.DoubleComparator;
 import jam.math.DoubleRange;
 import jam.math.JamRandom;
 
@@ -29,7 +30,7 @@ public final class StochRate extends DomainDouble implements Comparable<StochRat
     /**
      * A globally sharable instance representing zero rate.
      */
-    public static final StochRate ZERO = valueOf(0.0);
+    public static final StochRate ZERO = new StochRate(0.0);
 
     /**
      * A comparator that orders rates in ascending order (slowest rate
@@ -80,7 +81,10 @@ public final class StochRate extends DomainDouble implements Comparable<StochRat
      * negative.
      */
     public static StochRate valueOf(double value) {
-        return new StochRate(value);
+        if (DoubleComparator.DEFAULT.isZero(value))
+            return ZERO;
+        else
+            return new StochRate(value);
     }
 
     /**

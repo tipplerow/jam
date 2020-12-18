@@ -58,45 +58,7 @@ public final class CappedBirthProc<A extends StochAgent> extends BirthProc<A> {
         return new CappedBirthProc<A>(parent, child, capacity, baseRate, capped);
     }
 
-    /**
-     * Computes the effective rate constant for a given simulation
-     * state.
-     *
-     * @param capacity the maximum population of the capped agents.
-     *
-     * @param baseRate the first-order rate constant for the process
-     * when the capacity constraint is not binding.
-     *
-     * @param capped the stochastic agents that contribute to the
-     * population limit.
-     *
-     * @param state the current simulation state.
-     *
-     * @return the effective rate constant for the specified state.
-     */
-    public static <A extends StochAgent> double computeRateConstant(int capacity,
-                                                                    double baseRate,
-                                                                    Collection<A> capped,
-                                                                    AgentState<A> state) {
-        if (state.countAgents(capped) < capacity)
-            return baseRate;
-        else
-            return 0.0;
-    }
-
-    /**
-     * Ensures that an agent capacity is positive.
-     *
-     * @param capacity the capacity to validate.
-     *
-     * @throws RuntimeException unless the capacity is positive.
-     */
-    public static void validateCapacity(int capacity) {
-        if (capacity < 1)
-            throw JamException.runtime("Capacity must be positive.");
-    }
-
     @Override public double getRateConstant(AgentState<A> state) {
-        return computeRateConstant(capacity, baseRate, capped, state);
+        return computeCappedRateConstant(state, capped, capacity, baseRate);
     }
 }
