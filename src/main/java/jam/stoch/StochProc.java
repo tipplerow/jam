@@ -2,6 +2,9 @@
 package jam.stoch;
 
 import java.util.Comparator;
+import java.util.List;
+
+import jam.lang.JamException;
 
 /**
  * Represents a process that may occur in a stochastic simulation.
@@ -30,6 +33,22 @@ public interface StochProc {
                                                                proc2.getStochRate());
             }
         };
+
+    /**
+     * Ensures that a list of stochastic processes is arranged such that
+     * {@code procs.get(k).getProcIndex() == k} for all elements in the
+     * list.
+     *
+     * @param procs a list of processes to validate.
+     *
+     * @throws RuntimeException unless {@code procs.get(k).getProcIndex() == k}
+     * for every element in the list.
+     */
+    public static void validateList(List<? extends StochProc> procs) {
+        for (int index = 0; index < procs.size(); ++index)
+            if (procs.get(index).getProcIndex() != index)
+                throw JamException.runtime("Invalid index for process [%d].", index);
+    }
 
     /**
      * Returns a unique ordinal index for this process.
