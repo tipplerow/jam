@@ -46,12 +46,12 @@ public class DecaySystemTest extends NumericTestBase {
         assertPopulation(system, 100, 200, 300);
         assertRates(system, 100.0, 400.0, 900.0);
 
-        system.processEvent(event0);
-        system.processEvent(event1);
-        system.processEvent(event1);
-        system.processEvent(event2);
-        system.processEvent(event2);
-        system.processEvent(event2);
+        system.updateState(event0);
+        system.updateState(event1);
+        system.updateState(event1);
+        system.updateState(event2);
+        system.updateState(event2);
+        system.updateState(event2);
 
         assertPopulation(system, 99, 198, 297);
         assertRates(system, 99.0, 396.0, 891.0);

@@ -51,6 +51,9 @@ public final class DecayProc extends StochProc {
     }
 
     void decay() {
+        if (population <= 0)
+            throw JamException.runtime("Population must be non-negative.");
+
         --population;
     }
 
@@ -96,5 +99,9 @@ public final class DecayProc extends StochProc {
 
     @Override public StochRate getStochRate() {
         return StochRate.valueOf(population * rateConst);
+    }
+
+    @Override public String toString() {
+        return String.format("DecayProc(%d, %d)", getProcIndex(), population);
     }
 }

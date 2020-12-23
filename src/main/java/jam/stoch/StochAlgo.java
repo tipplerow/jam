@@ -47,8 +47,13 @@ public abstract class StochAlgo<P extends StochProc> {
     /**
      * Updates the internal state of this algorithm after an event
      * occurs.
+     *
+     * @param event the most recent event to occur.
+     *
+     * @param dependents processes whose rates have changed as a
+     * result of the event (excluding the process that occurred).
      */
-    protected abstract void updateState();
+    protected abstract void updateState(StochEvent<P> event, Collection<P> dependents);
 
     /**
      * Advances the simulation by selecting the next stochastic event
@@ -56,9 +61,11 @@ public abstract class StochAlgo<P extends StochProc> {
      * stochastic system.
      */
     public void advance() {
-        ++eventCount;
         event = nextEvent();
-        updateState();
+        eventCount++;
+
+        system.updateState(event);
+        updateState(event, system.viewDependents(event.getProcess()));
     }
 
     /**

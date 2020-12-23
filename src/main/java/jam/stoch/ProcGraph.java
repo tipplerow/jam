@@ -61,7 +61,7 @@ public final class ProcGraph<P extends StochProc> {
      *
      * @param predecessor the predecessor process to add.
      *
-     * @param sucessors the direct successors of the predecessor
+     * @param successors the direct successors of the predecessor
      * process.
      *
      * @throws RuntimeException unless the predecessor is separate and
@@ -78,7 +78,7 @@ public final class ProcGraph<P extends StochProc> {
      *
      * @param predecessor the predecessor process to add.
      *
-     * @param sucessors the direct successors of the predecessor
+     * @param successors the direct successors of the predecessor
      * process.
      *
      * @throws RuntimeException unless the predecessor is separate and

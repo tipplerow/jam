@@ -50,8 +50,8 @@ public final class RateManager<P extends StochProc> {
         return system.countProcesses() / 2;
     }
 
-    private boolean allowPartialUpdate(Collection<P> successors) {
-        return rateAge < ageThreshold && successors.size() < procThreshold;
+    private boolean allowPartialUpdate(Collection<P> dependents) {
+        return rateAge < ageThreshold && dependents.size() < procThreshold;
     }
 
     private void updateFull() {
@@ -66,12 +66,12 @@ public final class RateManager<P extends StochProc> {
         }
     }
 
-    private void updatePartial(P eventProc, Collection<P> successors) {
+    private void updatePartial(P eventProc, Collection<P> dependents) {
         ++rateAge;
         updateProc(eventProc);
 
-        for (P successor : successors)
-            updateProc(successor);
+        for (P dependent : dependents)
+            updateProc(dependent);
     }
 
     private void updateProc(P proc) {
@@ -109,12 +109,14 @@ public final class RateManager<P extends StochProc> {
      * occurs.
      *
      * @param eventProc the stochastic processes that occurred.
+     *
+     * @param dependents the stochastic processes whose rates have
+     * changed as a result of the latest event (excluding the process
+     * that occurred).
      */
-    public void updateTotalRate(P eventProc) {
-        Collection<P> successors = system.viewDependents(eventProc);
-
-        if (allowPartialUpdate(successors))
-            updatePartial(eventProc, successors);
+    public void updateTotalRate(P eventProc, Collection<P> dependents) {
+        if (allowPartialUpdate(dependents))
+            updatePartial(eventProc, dependents);
         else
             updateFull();
    }

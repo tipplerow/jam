@@ -259,8 +259,6 @@ public final class EventQueue<P extends StochProc> {
      * @return {@code true} iff the underlying heap is properly ordered.
      */
     public boolean isOrdered() {
-        JamLogger.info("Validating heap order...");
-
         for (int parent = ROOT_NODE; isParent(parent); parent++) {
             int child1 = firstChild(parent);
             int child2 = secondChild(parent);

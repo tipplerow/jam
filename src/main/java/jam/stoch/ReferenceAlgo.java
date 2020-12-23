@@ -43,7 +43,7 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
         return StochEvent.mark(nextProc(totalRate), nextTime(totalRate));
     }
 
-    @Override protected void updateState() {
+    @Override protected void updateState(StochEvent<P> event, Collection<P> dependents) {
         //
         // This algorithm does not maintain any internal state
         // variables (the total reaction rate is recomputed at

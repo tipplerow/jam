@@ -51,7 +51,7 @@ public final class DirectAlgo<P extends StochProc> extends StochAlgo<P> {
         return totalRate.sampleTime(getEventTime(), random);
     }
 
-    @Override protected void updateState() {
-        rateManager.updateTotalRate(getEventProcess());
+    @Override protected void updateState(StochEvent<P> event, Collection<P> dependents) {
+        rateManager.updateTotalRate(event.getProcess(), dependents);
     }
 }

@@ -39,12 +39,12 @@ public final class NextReactionAlgo<P extends StochProc> extends StochAlgo<P> {
         return eventQueue.nextEvent();
     }
 
-    @Override protected void updateState() {
-        eventQueue.updateEvent(getEvent());
+    @Override protected void updateState(StochEvent<P> event, Collection<P> dependents) {
+        eventQueue.updateEvent(event.next(random));
 
-        for (P successor : system.viewDependents(getEventProcess())) {
-            StochEvent<P> prevEvent = eventQueue.findEvent(successor);
-            StochEvent<P> nextEvent = prevEvent.update(getEvent(), random);
+        for (P dependent : dependents) {
+            StochEvent<P> prevEvent = eventQueue.findEvent(dependent);
+            StochEvent<P> nextEvent = prevEvent.update(event, random);
 
             eventQueue.updateEvent(nextEvent);
         }
