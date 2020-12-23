@@ -17,7 +17,7 @@ import jam.stoch.StochEvent;
  */
 public final class DecaySystem extends AbstractStochSystem<DecayProc> {
     private DecaySystem(List<DecayProc> procs) {
-        super(procs);
+        super(procs, List.of());
     }
 
     /**
@@ -48,16 +48,15 @@ public final class DecaySystem extends AbstractStochSystem<DecayProc> {
         List<DecayProc> procs = new ArrayList<DecayProc>(pops.length);
 
         for (int index = 0; index < pops.length; ++index)
-            procs.add(DecayProc.create(index, pops[index], rates[index]));
+            procs.add(DecayProc.create(pops[index], rates[index]));
 
         return procs;
     }
 
-    @Override public Collection<DecayProc> processEvent(StochEvent<DecayProc> event) {
+    @Override public void updateState(StochEvent<DecayProc> event) {
         //
         // All decay processes are independent...
         //
         event.getProcess().decay();
-        return List.of(event.getProcess());
     }
 }

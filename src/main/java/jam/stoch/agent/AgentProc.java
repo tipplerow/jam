@@ -5,8 +5,6 @@ import java.util.Collection;
 
 import com.google.common.collect.Multiset;
 
-import jam.lang.Ordinal;
-import jam.lang.OrdinalIndex;
 import jam.lang.JamException;
 import jam.math.DoubleComparator;
 import jam.stoch.StochProc;
@@ -16,11 +14,9 @@ import jam.stoch.StochRate;
  * Represents an agent-based process that may occur in a stochastic
  * simulation.
  */
-public abstract class AgentProc<A extends StochAgent> extends Ordinal implements StochProc {
+public abstract class AgentProc<A extends StochAgent> extends StochProc {
     // The instantaneous rate of this process...
     private StochRate stochRate;
-
-    private static final OrdinalIndex ordinalIndex = OrdinalIndex.create();
 
     /**
      * Creates a new agent-based process with an unknown initial rate.
@@ -37,7 +33,7 @@ public abstract class AgentProc<A extends StochAgent> extends Ordinal implements
      * @param stochRate the initial rate of the process.
      */
     protected AgentProc(StochRate stochRate) {
-        super(ordinalIndex.next());
+        super();
         this.stochRate = stochRate;
     }
 
@@ -231,10 +227,6 @@ public abstract class AgentProc<A extends StochAgent> extends Ordinal implements
      */
     public void updateRate(AgentState<A> state) {
         stochRate = computeRate(state);
-    }
-
-    @Override public int getProcIndex() {
-        return (int) getIndex();
     }
 
     @Override public StochRate getStochRate() {

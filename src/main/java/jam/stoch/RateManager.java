@@ -2,17 +2,18 @@
 package jam.stoch;
 
 import java.util.Collection;
-import java.util.List;
-
-import jam.vector.JamVector;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Efficiently maintains the total instantaneous transition rate for a
- * system of stochastic processes.
+ * <em>fixed</em> system of stochastic processes. The behavior of this
+ * class is undefined if any stochastic processes are added or removed
+ * from the system.
  */
 public final class RateManager<P extends StochProc> {
-    private final JamVector rates;
     private final StochSystem<P> system;
+    private final Map<P, StochRate> rateMap;
 
     private final int ageThreshold;
     private final int procThreshold;
@@ -23,10 +24,8 @@ public final class RateManager<P extends StochProc> {
     private static final int MAX_AGE_THRESHOLD = 1000000;
 
     private RateManager(StochSystem<P> system) {
-        system.validateIndexing();
-
-        this.rates = new JamVector(system.countProcesses());
         this.system = system;
+        this.rateMap = new HashMap<P, StochRate>();
 
         this.ageThreshold = computeAgeThreshold(system);
         this.procThreshold = computeProcThreshold(system);
@@ -51,34 +50,36 @@ public final class RateManager<P extends StochProc> {
         return system.countProcesses() / 2;
     }
 
-    private boolean allowPartialUpdate(Collection<P> procs) {
-        return rateAge < ageThreshold && procs.size() < procThreshold;
+    private boolean allowPartialUpdate(Collection<P> successors) {
+        return rateAge < ageThreshold && successors.size() < procThreshold;
     }
 
     private void updateFull() {
         rateAge = 0;
         totalRate = 0.0;
 
-        for (int index = 0; index < system.countProcesses(); ++index) {
-            double rate = system.getStochRate(index).doubleValue();
+        for (P proc : system.viewProcesses()) {
+            StochRate rate = proc.getStochRate();
 
-            totalRate += rate;
-            rates.set(index, rate);
+            rateMap.put(proc, rate);
+            totalRate += rate.doubleValue();
         }
     }
 
-    private void updatePartial(Collection<P> procs) {
+    private void updatePartial(P eventProc, Collection<P> successors) {
         ++rateAge;
+        updateProc(eventProc);
 
-        for (P proc : procs) {
-            int index = proc.getProcIndex();
+        for (P successor : successors)
+            updateProc(successor);
+    }
 
-            double oldRate = rates.get(index);
-            double newRate = system.getStochRate(index).doubleValue();
+    private void updateProc(P proc) {
+        StochRate oldRate = rateMap.get(proc);
+        StochRate newRate = proc.getStochRate();
 
-            rates.set(index, newRate);
-            totalRate += (newRate - oldRate);
-        }
+        rateMap.put(proc, newRate);
+        totalRate += (newRate.doubleValue() - oldRate.doubleValue());
     }
 
     /**
@@ -104,16 +105,16 @@ public final class RateManager<P extends StochProc> {
     }
 
     /**
-     * Updates the total instantaneous transition rate following an
-     * event that results in changes to the transition rates of some
-     * stochastic processes.
+     * Updates the total instantaneous transition rate after an event
+     * occurs.
      *
-     * @param procs the stochastic processes whose rates were changed
-     * as a result of the most recent event.
+     * @param eventProc the stochastic processes that occurred.
      */
-    public void updateTotalRate(Collection<P> procs) {
-        if (allowPartialUpdate(procs))
-            updatePartial(procs);
+    public void updateTotalRate(P eventProc) {
+        Collection<P> successors = system.viewDependents(eventProc);
+
+        if (allowPartialUpdate(successors))
+            updatePartial(eventProc, successors);
         else
             updateFull();
    }

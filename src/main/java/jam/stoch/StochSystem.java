@@ -2,7 +2,8 @@
 package jam.stoch;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import jam.lang.JamException;
 
@@ -11,39 +12,55 @@ import jam.lang.JamException;
  */
 public interface StochSystem<P extends StochProc> {
     /**
-     * Returns a read-only list of the stochastic processes that
+     * Identifies processes contained in this stochastic system.
+     *
+     * @param index the ordinal index of the process in question.
+     *
+     * @return {@code true} iff this system contains a process with
+     * the specified index.
+     */
+    public abstract boolean containsProcess(int index);
+
+    /**
+     * Accesses processes in this system by their ordinal index.
+     *
+     * @param index the ordinal index of the desired process.
+     *
+     * @return the process with the specified index.
+     *
+     * @throws RuntimeException unless this system contains a process
+     * with the specified index.
+     */
+    public abstract P getProcess(int index);
+
+    /**
+     * Returns a read-only view of the stochastic processes that
      * compose this system.
      *
-     * @return a read-only list of the stochastic processes that
+     * @return a read-only view of the stochastic processes that
      * compose this system.
      */
-    public abstract List<P> listProcesses();
+    public abstract Collection<P> viewProcesses();
+
+    /**
+     * Returns a read-only view of the processes whose rates may
+     * change after another process occurs.
+     *
+     * @param proc a process that affects the rate of other
+     * processes.
+     *
+     * @return a read-only view of the processes whose rates may
+     * change after the specified process occurs.
+     */
+    public abstract Collection<P> viewDependents(P proc);
 
     /**
      * Updates the state of this stochastic system after an event
-     * occurs and returns the processes whose rates have changed.
+     * occurs.
      *
      * @param event the most recent event to occur in this system.
-     *
-     * @return the processes whose rates have changed as a result
-     * of the specified event.
      */
-    public abstract Collection<P> processEvent(StochEvent<P> event);
-
-    /**
-     * Ensures that a list of stochastic processes are properly
-     * indexed.
-     *
-     * @param processList a list of processes to validate.
-     *
-     * @throws RuntimeException unless {@code processList.get(k).getProcIndex() == k}
-     * for all indexes {@code k = 0, 1, ..., processList.size() - 1}.
-     */
-    public static <P extends StochProc> void validateIndexing(List<P> processList) {
-        for (int index = 0; index < processList.size(); ++index)
-            if (processList.get(index).getProcIndex() != index)
-                throw JamException.runtime("Invalid index for process [%d].", index);
-    }
+    public abstract void updateState(StochEvent<P> event);
 
     /**
      * Computes the sum of the instantaneous rates of the stochastic
@@ -55,10 +72,22 @@ public interface StochSystem<P extends StochProc> {
     public default StochRate computeTotalRate() {
         double total = 0.0;
 
-        for (StochProc proc : listProcesses())
+        for (StochProc proc : viewProcesses())
             total += proc.getStochRate().doubleValue();
 
         return StochRate.valueOf(total);
+    }
+
+    /**
+     * Identifies processes contained in this stochastic system.
+     *
+     * @param proc the process in question.
+     *
+     * @return {@code true} iff this system contains the specified
+     * process.
+     */
+    public default boolean containsProcess(P proc) {
+        return containsProcess(proc.getProcIndex());
     }
 
     /**
@@ -67,21 +96,7 @@ public interface StochSystem<P extends StochProc> {
      * @return the number of stochastic processes in this system.
      */
     public default int countProcesses() {
-        return listProcesses().size();
-    }
-
-    /**
-     * Accesses processes in this system by their ordinal index.
-     *
-     * @param index the ordinal index of the desired process.
-     *
-     * @return the process with the specified index.
-     *
-     * @throws IndexOutOfBoundsException unless the index is valid:
-     * {@code 0 <= index && index < countProcesses()}.
-     */
-    public default P getProcess(int index) {
-        return listProcesses().get(index);
+        return viewProcesses().size();
     }
 
     /**
@@ -93,20 +108,26 @@ public interface StochSystem<P extends StochProc> {
      * @return the instantaneous rate of the process with the
      * specified index.
      *
-     * @throws IndexOutOfBoundsException unless the index is valid:
-     * {@code 0 <= index && index < countProcesses()}.
+     * @throws RuntimeException unless this system contains a process
+     * with the specified index.
      */
     public default StochRate getStochRate(int index) {
         return getProcess(index).getStochRate();
     }
 
     /**
-     * Ensures that the stochastic processes are properly indexed.
+     * Returns a map containing the instantaneous rate of each
+     * stochastic process in this system.
      *
-     * @throws RuntimeException unless {@code getProcess(k).getProcIndex() == k}
-     * for all indexes {@code k = 0, 1, ..., countProcesses() - 1}.
+     * @return a map containing the instantaneous rate of each
+     * stochastic process in this system.
      */
-    public default void validateIndexing() {
-        validateIndexing(listProcesses());
+    public default Map<P, StochRate> mapRates() {
+        Map<P, StochRate> rateMap = new HashMap<P, StochRate>(countProcesses());
+
+        for (P proc : viewProcesses())
+            rateMap.put(proc, proc.getStochRate());
+
+        return rateMap;
     }
 }

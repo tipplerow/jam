@@ -1,6 +1,8 @@
 
 package jam.stoch;
 
+import jam.lang.JamException;
+
 /**
  * Represents an edge in a directed dependency graph: a link between a
  * predecessor process and a successor process whose rate changes when
@@ -11,21 +13,43 @@ public final class RateLink<P extends StochProc> {
     private final P successor;
 
     private RateLink(P predecessor, P successor) {
+        validate(predecessor, successor);
         this.predecessor = predecessor;
         this.successor = successor;
     }
 
     /**
-     * Creates a new link between processs.
+     * Creates a new link between processs: when the predecessor
+     * occurs, it triggers a change in the rate of the successor
+     * process.
      *
      * @param predecessor the predecessor process.
      *
      * @param successor the successor process.
      *
      * @return the new process link for the specified processs.
+     *
+     * @throws RuntimeException if the predecessor and successor are
+     * the same process.
      */
     public static <P extends StochProc> RateLink<P> link(P predecessor, P successor) {
         return new RateLink<P>(predecessor, successor);
+    }
+
+    /**
+     * Ensures that the predecessor and successor are separate and
+     * distinct processes.
+     *
+     * @param predecessor the predecessor process.
+     *
+     * @param successor the successor process.
+     *
+     * @throws RuntimeException if the predecessor and successor are
+     * the same process.
+     */
+    public static <P extends StochProc> void validate(P predecessor, P successor) {
+        if (predecessor.equals(successor))
+            throw JamException.runtime("Linked processes must be distinct.");
     }
 
     /**

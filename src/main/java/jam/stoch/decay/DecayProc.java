@@ -9,18 +9,16 @@ import jam.stoch.StochTime;
 /**
  * Represents a first-order decay process.
  */
-public final class DecayProc implements StochProc {
-    private final int index;
+public final class DecayProc extends StochProc {
     private final int initPop;
     private final double rateConst;
 
     private int population;
 
-    private DecayProc(int index, int initPop, double rateConst) {
+    private DecayProc(int initPop, double rateConst) {
         validateInitPop(initPop);
         validateRateConst(rateConst);
 
-        this.index = index;
         this.initPop = initPop;
         this.rateConst = rateConst;
 
@@ -41,8 +39,6 @@ public final class DecayProc implements StochProc {
      * Creates a new first-order decay process with a fixed rate
      * constant.
      *
-     * @param index the ordinal index for the process.
-     *
      * @param initPop the initial population of the undecayed state.
      *
      * @param rateConst the unit rate constant for the process.
@@ -50,8 +46,8 @@ public final class DecayProc implements StochProc {
      * @return a new first-order decay process with the specified
      * parameters.
      */
-    public static DecayProc create(int index, int initPop, double rateConst) {
-        return new DecayProc(index, initPop, rateConst);
+    public static DecayProc create(int initPop, double rateConst) {
+        return new DecayProc(initPop, rateConst);
     }
 
     void decay() {
@@ -96,10 +92,6 @@ public final class DecayProc implements StochProc {
      */
     public double getRateConst() {
         return rateConst;
-    }
-
-    @Override public int getProcIndex() {
-        return index;
     }
 
     @Override public StochRate getStochRate() {

@@ -1,91 +1,80 @@
 
 package jam.stoch;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import jam.app.JamLogger;
 import jam.lang.JamException;
 
 public final class EventQueue<P extends StochProc> {
-    //
-    // Number of events held in the queue.
-    //
-    private final int size;
 
-    // Elements 1 through N of the array "queue" contain the nodes of
-    // the complete binary heap; element 0 is unused.
-    //
-    private final StochEvent<P>[] queue;
+    // The number of events held in the queue (its logical size,
+    // regardless of the physical size of the underlying array).
+    private int size;
 
-    // Element "k" of the array "point" is a pointer to the location
-    // of stochastic process with ordinal index "k" in the queue (the
-    // index of the element in the array "queue" containing the event
-    // for process "k").
-    //
-    private final int[] point;
+    // Elements 1 through "size" of the list "queue" contain the
+    // nodes of the complete binary heap; element 0 is unused.
+    private final ArrayList<StochEvent<P>> queue;
+
+    // A mapping from each stochastic process to its node: the index
+    // of the event for that process in the "queue" list...
+    private final Map<Integer, Integer> locator;
 
     // Special node indexes for the root of the heap and the "null"
     // unused queue element...
     private static final int NULL_NODE = 0;
     private static final int ROOT_NODE = 1;
 
-    @SuppressWarnings("unchecked")
-    private EventQueue(Collection<StochEvent<P>> events) {
-        this.size = events.size();
-        this.point = new int[size];
-        this.queue = new StochEvent[size + 1]; // The first element is unused...
+    private static final int DEFAULT_CAPACITY = 10;
 
-        fillQueue(events);
+    private EventQueue(int capacity, Collection<StochEvent<P>> events) {
+        this.size = 0;
+        this.queue = new ArrayList<StochEvent<P>>(capacity);
+        this.locator = new HashMap<Integer, Integer>(capacity);
 
-        initPoints();
-        assignPoints();
-        validatePoints();
+        for (StochEvent<P> event : events)
+            addEvent(event);
     }
 
-    // -------------------
-    // Constructor helpers
-    // -------------------
+    // ---------------
+    // List management
+    // ---------------
 
-    private void fillQueue(Collection<StochEvent<P>> events) {
-        int node = ROOT_NODE;
-        Iterator<StochEvent<P>> iterator = events.iterator();
-
-        while (iterator.hasNext()) {
-            queue[node] = iterator.next();
-            ++node;
-        }
-
-        Arrays.sort(queue, ROOT_NODE, queue.length);
-    }
-
-    private void initPoints() {
+    private void ensureCapacity(int node) {
         //
-        // Set all to pointers to the "null" node...
+        // To assign an object to the queue element indexed by "node",
+        // the physical queue size must be greater than "node"...
         //
-        Arrays.fill(point, NULL_NODE);
+        while (queue.size() <= node)
+            queue.add(null);
     }
 
-    private void assignPoints() {
-        for (int node = ROOT_NODE; node <= size; ++node)
-            assignPoint(node);
+    private StochEvent<P> getNode(int node) {
+        return queue.get(node);
+    }        
+
+    private int findNode(StochEvent<P> event) {
+        return findNode(event.getProcess());
     }
 
-    private void assignPoint(int node) {
-        int index = queue[node].getProcIndex();
-        validateEventIndex(index);
-        point[index] = node;
+    private int findNode(P proc) {
+        Integer pkey = proc.getProcIndex();
+        Integer node = locator.get(pkey);
+
+        if (node != null)
+            return node.intValue();
+        else
+            throw JamException.runtime("Queue does not contain process [%d].", pkey.intValue());
     }
 
-    private void validateEventIndex(int index) {
-        if (index < 0 || index >= size)
-            throw JamException.runtime("Invalid event index: [%d].", index);
-    }
-
-    private void validatePoints() {
-        for (int index = 0; index < point.length; ++index)
-            if (point[index] == NULL_NODE)
-                throw JamException.runtime("Processes must be numbered from 0 to N - 1.");
+    private void setNode(int node, StochEvent<P> event) {
+        ensureCapacity(node);
+        queue.set(node, event);
+        locator.put(event.getProcIndex(), node);
     }
 
     // ---------------
@@ -93,7 +82,7 @@ public final class EventQueue<P extends StochProc> {
     // ---------------
 
     private int compare(int node1, int node2) {
-        return queue[node1].compareTo(queue[node2]);
+        return getNode(node1).compareTo(getNode(node2));
     }
 
     private boolean isOrdered(int parent, int child) {
@@ -144,10 +133,6 @@ public final class EventQueue<P extends StochProc> {
         return !isParent(node);
     }
 
-    private int find(StochEvent<P> event) {
-        return point[event.getProcIndex()];
-    }
-
     private void sink(int node) {
         while (!isLeaf(node)) {
             int parent = node;
@@ -173,32 +158,33 @@ public final class EventQueue<P extends StochProc> {
         }
     }
 
-    private void swap(int i, int j) {
-        StochEvent<P> previ = queue[i];
-        StochEvent<P> prevj = queue[j];
+    private void swap(int j, int k) {
+        StochEvent<P> prevj = getNode(j);
+        StochEvent<P> prevk = getNode(k);
 
-        queue[i] = prevj;
-        queue[j] = previ;
-
-        assignPoint(i);
-        assignPoint(j);
+        setNode(j, prevk);
+        setNode(k, prevj);
     }
 
-    private void validateOrder(int parent, int child) {
-        if (!isOrdered(parent, child))
-            throw JamException.runtime("Heap order is violated.");
+    /**
+     * Creates an empty queue with the default capacity.
+     *
+     * @return a new empty queue with the default capacity.
+     */
+    public static <P extends StochProc> EventQueue<P> create() {
+        return create(DEFAULT_CAPACITY);
     }
 
-    void validateOrder() {
-        for (int parent = ROOT_NODE; isParent(parent); ++parent) {
-            int child1 = firstChild(parent);
-            int child2 = secondChild(parent);
-
-            validateOrder(parent, child1);
-
-            if (isNode(child2))
-                validateOrder(parent, child2);
-        }
+    /**
+     * Creates an empty queue with a given initial capacity.
+     *
+     * @param capacity the initial capacity of the queue (which will
+     * adjust as necessary as events are added and/or removed).
+     *
+     * @return a new empty queue with the specified capacity.
+     */
+    public static <P extends StochProc> EventQueue<P> create(int capacity) {
+        return new EventQueue<P>(capacity, List.of());
     }
 
     /**
@@ -209,20 +195,84 @@ public final class EventQueue<P extends StochProc> {
      * @return a new event queue containing the specified events.
      */
     public static <P extends StochProc> EventQueue<P> create(Collection<StochEvent<P>> events) {
-        return new EventQueue<P>(events);
+        return new EventQueue<P>(events.size(), events);
     }
 
     /**
-     * Returns the next event for a given process in this queue (not
-     * necessarily the next event to occur in the system) but does not
-     * remove the event or update the queue.
+     * Adds a new process and its next event to this queue.
+     *
+     * @param event the event to add.
+     *
+     * @throws RuntimeException if this queue already contains an
+     * event for the process in the input event.
+     */
+    public void addEvent(StochEvent<P> event) {
+        P proc = event.getProcess();
+
+        if (containsProc(proc))
+            throw JamException.runtime("Event queue already contains process [%d].", proc.getProcIndex());
+
+        // Increment the logical queue size, add the event at the end
+        // of the queue, and percolate upward to restore heap order...
+        size++;
+        setNode(size, event);
+        swim(size);
+
+        assert isOrdered();
+        assert containsProc(event.getProcess());
+    }
+
+    /**
+     * Identifies processes contained in this queue.
      *
      * @param proc the process of interest.
      *
-     * @return the next event for the specified process.
+     * @return {@code true} iff this queue contains an event for the
+     * specified process.
+     */
+    public boolean containsProc(P proc) {
+        return locator.containsKey(proc.getProcIndex());
+    }
+
+    /**
+     * Returns the next event to occur for a given process in this
+     * queue (not necessarily the next event to occur within the
+     * entire system) but does not remove the event or update the
+     * queue.
+     *
+     * @param proc the process of interest.
+     *
+     * @return the next event to occur for the specified process.
+     *
+     * @throws RuntimeException unless this queue contains an event
+     * for the specified process.
      */
     public StochEvent<P> findEvent(P proc) {
-        return queue[point[proc.getProcIndex()]];
+        return getNode(findNode(proc));
+    }
+
+    /**
+     * Determines whether the underlying heap is properly ordered.  It
+     * always should be, of course, and this method is provided to aid
+     * with unit testing and internal consistency checks.
+     *
+     * @return {@code true} iff the underlying heap is properly ordered.
+     */
+    public boolean isOrdered() {
+        JamLogger.info("Validating heap order...");
+
+        for (int parent = ROOT_NODE; isParent(parent); parent++) {
+            int child1 = firstChild(parent);
+            int child2 = secondChild(parent);
+
+            if (!isOrdered(parent, child1))
+                return false;
+
+            if (isNode(child2) && !isOrdered(parent, child2))
+                return false;
+        }
+
+        return true;
     }
 
     /**
@@ -233,7 +283,41 @@ public final class EventQueue<P extends StochProc> {
      * @return the next event to occur in the stochastic system.
      */
     public StochEvent<P> nextEvent() {
-        return queue[ROOT_NODE];
+        return getNode(ROOT_NODE);
+    }
+
+    /**
+     * Removes a process (and its corresponding event) from this queue.
+     *
+     * @param proc the process to remove.
+     *
+     * @throws RuntimeException unless this queue contains an event
+     * for the specified process.
+     */
+    public void removeProcess(P proc) {
+        //
+        // Swap the corresponding event with the event in the last
+        // node (at node index "size"), delete the event and the
+        // process index, decrement the logical queue size, and
+        // restore heap order.
+        //
+        int node = findNode(proc);
+        swap(node, size);
+
+        queue.set(size, null); // Help GC...
+        locator.remove(proc.getProcIndex());
+
+        --size;
+        sink(node);
+        swim(node);
+
+        if (queue.size() > 2 * size) {
+            JamLogger.info("Trimming heap size...");
+            queue.trimToSize();
+        }
+
+        assert isOrdered();
+        assert !containsProc(proc);
     }
 
     /**
@@ -249,27 +333,45 @@ public final class EventQueue<P extends StochProc> {
      * Updates an event in this queue after the time of its next
      * occurrence has changed.
      *
-     * @param event the event to update.
+     * @param event the updated event.
+     *
+     * @throws RuntimeException unless this queue contains an older
+     * event for the process in the input event.
      */
     public void updateEvent(StochEvent<P> event) {
-        int node = find(event);
-        queue[node] = event;
+        int node = findNode(event);
+        setNode(node, event);
 
         swim(node);
         sink(node);
+
+        assert isOrdered();
+        assert containsProc(event.getProcess());
+    }
+
+    /**
+     * Ensures that the underlying heap is properly ordered. It
+     * always should be, of course, and this method is provided
+     * to aid with unit testing and internal consistency checks.
+     *
+     * @throws RuntimeException unless the underlying heap is
+     * properly ordered.
+     */
+    public void validateOrder() {
+        if (!isOrdered())
+            throw JamException.runtime("Heap order is violated.");
     }
 
     @Override public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        for (int node = 1; node <= size; ++node) {
+        for (int node = 1; node <= size; node++) {
             builder.append(node);
             builder.append(": ");
-            builder.append(queue[node]);
+            builder.append(getNode(node));
             builder.append("\n");
         }
 
-        builder.append(Arrays.toString(point));
         return builder.toString();
     }
 }

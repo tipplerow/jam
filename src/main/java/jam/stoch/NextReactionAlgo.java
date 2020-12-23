@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jam.dist.ExponentialDistribution;
 import jam.math.JamRandom;
 
 /**
@@ -40,9 +39,11 @@ public final class NextReactionAlgo<P extends StochProc> extends StochAlgo<P> {
         return eventQueue.nextEvent();
     }
 
-    @Override protected void updateState(Collection<P> changed) {
-        for (P proc : changed) {
-            StochEvent<P> prevEvent = eventQueue.findEvent(proc);
+    @Override protected void updateState() {
+        eventQueue.updateEvent(getEvent());
+
+        for (P successor : system.viewDependents(getEventProcess())) {
+            StochEvent<P> prevEvent = eventQueue.findEvent(successor);
             StochEvent<P> nextEvent = prevEvent.update(getEvent(), random);
 
             eventQueue.updateEvent(nextEvent);

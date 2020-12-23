@@ -49,7 +49,7 @@ public final class PriorityList<P extends StochProc> {
      * system.
      */
     public static <P extends StochProc> PriorityList<P> create(StochSystem<P> system) {
-        return create(system.listProcesses());
+        return create(system.viewProcesses());
     }
 
     /**

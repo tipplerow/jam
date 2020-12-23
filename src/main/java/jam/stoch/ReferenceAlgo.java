@@ -43,7 +43,7 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
         return StochEvent.mark(nextProc(totalRate), nextTime(totalRate));
     }
 
-    @Override protected void updateState(Collection<P> changed) {
+    @Override protected void updateState() {
         //
         // This algorithm does not maintain any internal state
         // variables (the total reaction rate is recomputed at
@@ -59,7 +59,7 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
         double procTotal = 0.0;
         double threshold = random.nextDouble() * totalRate.doubleValue();
 
-        for (P proc : system.listProcesses()) {
+        for (P proc : system.viewProcesses()) {
             procTotal += proc.getStochRate().doubleValue();
 
             if (DoubleComparator.DEFAULT.GE(procTotal, threshold))

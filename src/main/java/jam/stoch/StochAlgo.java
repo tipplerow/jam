@@ -35,8 +35,6 @@ public abstract class StochAlgo<P extends StochProc> {
     protected StochAlgo(JamRandom random, StochSystem<P> system) {
         this.random = random;
         this.system = system;
-
-        system.validateIndexing();
     }
 
     /**
@@ -48,13 +46,9 @@ public abstract class StochAlgo<P extends StochProc> {
 
     /**
      * Updates the internal state of this algorithm after an event
-     * has occurred.
-     *
-     * @param changed the stochastic processes whose rates have
-     * changed as a result of the most recent event (the event
-     * returned by the method {@code getEvent()}.
+     * occurs.
      */
-    protected abstract void updateState(Collection<P> changed);
+    protected abstract void updateState();
 
     /**
      * Advances the simulation by selecting the next stochastic event
@@ -64,9 +58,7 @@ public abstract class StochAlgo<P extends StochProc> {
     public void advance() {
         ++eventCount;
         event = nextEvent();
-
-        Collection<P> changed = system.processEvent(event);
-        updateState(changed);
+        updateState();
     }
 
     /**

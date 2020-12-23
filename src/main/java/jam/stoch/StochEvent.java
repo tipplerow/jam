@@ -70,7 +70,7 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
         List<StochEvent<P>> events =
             new ArrayList<StochEvent<P>>(system.countProcesses());
 
-        for (P proc : system.listProcesses())
+        for (P proc : system.viewProcesses())
             events.add(StochEvent.first(proc, random));
 
         return events;
