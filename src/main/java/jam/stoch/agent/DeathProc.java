@@ -62,8 +62,4 @@ public abstract class DeathProc<A extends StochAgent> extends AgentProc<A> {
     @Override public Multiset<A> getProducts() {
         return products;
     }
-
-    @Override public void updatePopulation(AgentPopulation<A> population) {
-        population.remove(agent);
-    }
 }

@@ -19,12 +19,6 @@ public abstract class StochAlgo<P extends StochProc> {
      */
     protected final StochSystem<P> system;
 
-    // The number of events that have occurred...
-    private long eventCount = 0L;
-
-    // The most recent event to occur...
-    private StochEvent<P> event = null;
-
     /**
      * Creates a new stochastic simulation algorithm.
      *
@@ -61,54 +55,26 @@ public abstract class StochAlgo<P extends StochProc> {
      * stochastic system.
      */
     public void advance() {
-        event = nextEvent();
-        eventCount++;
-
+        StochEvent<P> event = nextEvent();
         system.updateState(event);
         updateState(event, system.viewDependents(event.getProcess()));
     }
 
     /**
-     * Returns the number of events that have occurred.
+     * Returns the random number source.
      *
-     * @return the number of events that have occurred.
+     * @return the random number source.
      */
-    public long countEvents() {
-        return eventCount;
+    public JamRandom getRandom() {
+        return random;
     }
 
     /**
-     * Returns the most recent event that has occured.
+     * Returns the stochastic system being simulated.
      *
-     * @return the most recent event that has occured ({@code null}
-     * before any events have occurred).
+     * @return the stochastic system being simulated.
      */
-    public StochEvent<P> getEvent() {
-        return event;
-    }
-
-    /**
-     * Returns the most recent process to occur.
-     *
-     * @return the most recent process to occur ({@code null} before
-     * any events have occurred).
-     */
-    public P getEventProcess() {
-        if (event != null)
-            return event.getProcess();
-        else
-            return null;
-    }
-
-    /**
-     * Returns the (absolute) time when the most recent event occurred.
-     *
-     * @return the (absolute) time when the most recent event occurred.
-     */
-    public StochTime getEventTime() {
-        if (event != null)
-            return event.getTime();
-        else
-            return StochTime.ZERO;
+    public StochSystem<P> getSystem() {
+        return system;
     }
 }

@@ -1,34 +1,29 @@
 
 package jam.stoch.agent;
 
-import java.util.List;
-
-import jam.lang.JamException;
+import jam.lang.Ordinal;
+import jam.lang.OrdinalIndex;
 
 /**
  * Represents the discrete agents in a stochastic process.
  */
-public interface StochAgent {
-    /**
-     * Returns a unique integer index for this agent.
-     *
-     * @return a unique integer index for this agent.
-     */
-    public abstract int getAgentIndex();
+public abstract class StochAgent extends Ordinal {
+    private static final OrdinalIndex ordinalIndex = OrdinalIndex.create();
 
     /**
-     * Ensures that a list of stochastic agents is arranged such that
-     * {@code agents.get(k).getAgentIndex() == k} for all elements in
-     * a list.
-     *
-     * @param agents the list to validate.
-     *
-     * @throws RuntimeException unless {@code agents.get(k).getAgentIndex() == k}
-     * for every agent in the list.
+     * Creates a new stochastic agent with a unique index that is
+     * assigned automatically.
      */
-    public static void validateList(List<? extends StochAgent> agents) {
-        for (int index = 0; index < agents.size(); ++index)
-            if (agents.get(index).getAgentIndex() != index)
-                throw JamException.runtime("Agents are not arranged in index order.");
+    protected StochAgent() {
+        super(ordinalIndex.next());
+    }
+
+    /**
+     * Returns the unique integer index for this agent.
+     *
+     * @return the unique integer index for this agent.
+     */
+    public final int getAgentIndex() {
+        return (int) getIndex();
     }
 }

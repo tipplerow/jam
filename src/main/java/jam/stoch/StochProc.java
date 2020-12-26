@@ -1,10 +1,9 @@
 
 package jam.stoch;
 
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
-import jam.lang.JamException;
 import jam.lang.Ordinal;
 import jam.lang.OrdinalIndex;
 
@@ -45,6 +44,22 @@ public abstract class StochProc extends Ordinal {
                                                                proc2.getStochRate());
             }
         };
+
+    /**
+     * Computes the total rate for a collection of stochastic processes.
+     *
+     * @param procs the stochastic processes of interest.
+     *
+     * @return the total rate taken over every input process.
+     */
+    public static StochRate computeTotalRate(Collection<? extends StochProc> procs) {
+        double totalRate = 0.0;
+
+        for (StochProc proc : procs)
+            totalRate += proc.getStochRate().doubleValue();
+
+        return StochRate.valueOf(totalRate);
+    }
 
     /**
      * Returns the instantaneous rate of this process.

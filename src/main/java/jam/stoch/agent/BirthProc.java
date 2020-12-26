@@ -27,7 +27,7 @@ public abstract class BirthProc<A extends StochAgent> extends AgentProc<A> {
     private final Multiset<A> reactants;
 
     /**
-     * Creates a new birth process with fixed parent and child agents.
+     * Creates a new birth process with a fixed parent and child.
      *
      * @param parent the parent agent for the process.
      *
@@ -38,7 +38,7 @@ public abstract class BirthProc<A extends StochAgent> extends AgentProc<A> {
     }
 
     /**
-     * Creates a new birth process with fixed parent and child agents.
+     * Creates a new birth process with a fixed parent and child.
      *
      * @param rate the initial rate of the process.
      *
@@ -80,9 +80,5 @@ public abstract class BirthProc<A extends StochAgent> extends AgentProc<A> {
 
     @Override public Multiset<A> getProducts() {
         return products;
-    }
-
-    @Override public void updatePopulation(AgentPopulation<A> population) {
-        population.add(child);
     }
 }

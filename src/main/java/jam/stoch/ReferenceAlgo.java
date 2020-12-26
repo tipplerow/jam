@@ -39,7 +39,7 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
     }
 
     @Override protected StochEvent<P> nextEvent() {
-        StochRate totalRate = system.computeTotalRate();
+        StochRate totalRate = StochProc.computeTotalRate(system.viewProcesses());
         return StochEvent.mark(nextProc(totalRate), nextTime(totalRate));
     }
 
@@ -71,7 +71,7 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
     }
 
     private StochTime nextTime(StochRate totalRate) {
-        return totalRate.sampleTime(getEventTime(), random);
+        return totalRate.sampleTime(system.lastEventTime(), random);
     }
 }
 

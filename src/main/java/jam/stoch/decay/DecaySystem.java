@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 import jam.lang.JamException;
-import jam.stoch.AbstractStochSystem;
 import jam.stoch.StochEvent;
+import jam.stoch.StochSystem;
 
 /**
  * Represents a stochastic system with a fixed number of independent
@@ -15,7 +15,7 @@ import jam.stoch.StochEvent;
  * solution and is provided primarily to test stochastic simulation
  * algorithms.
  */
-public final class DecaySystem extends AbstractStochSystem<DecayProc> {
+public final class DecaySystem extends StochSystem<DecayProc> {
     private DecaySystem(List<DecayProc> procs) {
         super(procs, List.of());
     }
@@ -53,10 +53,10 @@ public final class DecaySystem extends AbstractStochSystem<DecayProc> {
         return procs;
     }
 
-    @Override public void updateState(StochEvent<DecayProc> event) {
+    @Override public void updateState() {
         //
         // All decay processes are independent...
         //
-        event.getProcess().decay();
+        lastEventProcess().decay();
     }
 }

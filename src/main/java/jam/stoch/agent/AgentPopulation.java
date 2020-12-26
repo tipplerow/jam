@@ -23,6 +23,23 @@ public final class AgentPopulation<A extends StochAgent> {
     }
 
     /**
+     * Creates a new agent population.
+     *
+     * @param counts the initial population counts for the stochastic
+     * agents.
+     *
+     * @return a new agent population with the specified agent counts.
+     */
+    public static <A extends StochAgent> AgentPopulation<A> create(Multiset<A> counts) {
+        AgentPopulation<A> population = create();
+
+        for (Multiset.Entry<A> entry : counts.entrySet())
+            population.set(entry.getElement(), entry.getCount());
+
+        return population;
+    }
+
+    /**
      * Adds one agent to this population.
      *
      * @param agent the agent to add.

@@ -27,7 +27,7 @@ public final class FixedRateBirthProc<A extends StochAgent> extends BirthProc<A>
         return new FixedRateBirthProc<A>(parent, child, rateConst);
     }
 
-    @Override public double getRateConstant(AgentState<A> state) {
+    @Override public double getRateConstant(AgentSystem<A, ?> state) {
         return rateConst;
     }
 }

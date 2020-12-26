@@ -25,7 +25,7 @@ public final class FixedRateDeathProc<A extends StochAgent> extends DeathProc<A>
         return new FixedRateDeathProc<A>(agent, rateConst);
     }
 
-    @Override public double getRateConstant(AgentState<A> state) {
+    @Override public double getRateConstant(AgentSystem<A, ?> state) {
         return rateConst;
     }
 }
