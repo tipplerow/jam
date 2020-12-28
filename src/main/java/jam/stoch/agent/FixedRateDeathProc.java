@@ -9,6 +9,8 @@ public final class FixedRateDeathProc<A extends StochAgent> extends DeathProc<A>
 
     private FixedRateDeathProc(A agent, double rateConst) {
         super(agent);
+
+        validateRateConstant(rateConst);
         this.rateConst = rateConst;
     }
 

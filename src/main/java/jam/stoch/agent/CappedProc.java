@@ -2,7 +2,9 @@
 package jam.stoch.agent;
 
 import java.util.Set;
+
 import com.google.common.collect.Multiset;
+
 import jam.lang.JamException;
 
 /**
@@ -17,7 +19,7 @@ public final class CappedProc<A extends StochAgent> extends AgentProc<A> {
     private final AgentProc<A> baseProc;
 
     private CappedProc(AgentProc<A> baseProc, Set<A> capped, int capacity) {
-        super(null);
+        super();
 
         validateCapacity(capacity);
 
@@ -69,5 +71,9 @@ public final class CappedProc<A extends StochAgent> extends AgentProc<A> {
             return baseProc.getRateConstant(system);
         else
             return 0.0;
+    }
+
+    @Override public void updatePopulation(AgentPopulation<A> population) {
+        baseProc.updatePopulation(population);
     }
 }

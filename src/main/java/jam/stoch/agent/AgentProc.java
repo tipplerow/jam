@@ -14,7 +14,7 @@ import jam.stoch.StochRate;
 public abstract class AgentProc<A extends StochAgent> extends StochProc {
     // The instantaneous rate of this process, updated as the
     // underlying stochastic system evolves...
-    private StochRate stochRate;
+    private StochRate stochRate = null;
 
     /**
      * Creates a new agent-based process with an unknown initial rate.
@@ -22,17 +22,6 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      * to the first step in the stochastic simulation.
      */
     protected AgentProc() {
-        this(null);
-    }
-
-    /**
-     * Creates a new agent-based process with a known initial rate.
-     *
-     * @param stochRate the initial rate of the process.
-     */
-    protected AgentProc(StochRate stochRate) {
-        super();
-        this.stochRate = stochRate;
     }
 
     /**
@@ -62,15 +51,93 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
     public abstract double getRateConstant(AgentSystem<A, ?> system);
 
     /**
+     * Computes the rate of a first-order process from a rate constant
+     * and agent population.
+     *
+     * @param rateConst the first-order rate constant for the process.
+     *
+     * @param agentCount the number of instances of the reactive agent
+     * that are present.
+     *
+     * @return the rate of a first-order process with the specified rate
+     * constant and agent population.
+     */
+    public static StochRate computeRate(double rateConst, int agentCount) {
+        validateRateConstant(rateConst);
+        return StochRate.valueOf(rateConst * agentCount);
+    }
+
+    /**
+     * Computes the rate of a second-order process from a rate constant
+     * and agent populations.
+     *
+     * @param rateConst the second-order rate constant for the process.
+     *
+     * @param agent1Count the number of instances of the first reactive
+     * agent that are present.
+     *
+     * @param agent2Count the number of instances of the second reactive
+     * agent that are present.
+     *
+     * @return the rate of a second-order process with the specified rate
+     * constant and agent populations.
+     */
+    public static StochRate computeRate(double rateConst, int agent1Count, int agent2Count) {
+        validateRateConstant(rateConst);
+        return StochRate.valueOf(rateConst * agent1Count * agent2Count);
+    }
+
+    /**
+     * Computes the rate of a first-order process for a stochastic
+     * system with a given rate constant and reactive agent.
+     *
+     * @param system a stochastic system.
+     *
+     * @param rateConst the rate constant for the process.
+     *
+     * @param agent the reactive agent in the process.
+     *
+     * @return the rate of a first-order process in the specified
+     * stochastic system.
+     */
+    public static <A extends StochAgent> StochRate computeRate(AgentSystem<A, ?> system, double rateConst, A agent) {
+        return computeRate(rateConst, system.countAgent(agent));
+    }
+
+    /**
+     * Computes the rate of a second-order process for a stochastic
+     * system with a given rate constant and reactive agents.
+     *
+     * @param system a stochastic system.
+     *
+     * @param rateConst the rate constant for the process.
+     *
+     * @param agent1 the first reactive agent in the process.
+     *
+     * @param agent2 the second reactive agent in the process.
+     *
+     * @return the rate of a second-order process in the specified
+     * stochastic system.
+     */
+    public static <A extends StochAgent> StochRate computeRate(AgentSystem<A, ?> system, double rateConst, A agent1, A agent2) {
+        return computeRate(rateConst, system.countAgent(agent1), system.countAgent(agent2));
+    }
+
+
+    /**
      * Validates a rate constant.
      *
      * @param rateConst the rate constant for a stochastic process.
      *
+     * @return the specified rate constant, if it is non-negative.
+     *
      * @throws IllegalArgumentException if the rate constant is negative.
      */
-    public static void validateRateConstant(double rateConst) {
+    public static double validateRateConstant(double rateConst) {
         if (DoubleComparator.DEFAULT.isNegative(rateConst))
             throw new IllegalArgumentException("Negative rate constant.");
+        else
+            return rateConst;
     }
 
     /**
@@ -90,6 +157,21 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
             rate *= system.countAgent(reactant);
 
         return StochRate.valueOf(rate);
+    }
+
+    /**
+     * Updates the population of stochastic agents after this process
+     * occurs.
+     *
+     * @param population the population of stochastic agents prior to
+     * the occurrence of this process.
+     */
+    public void updatePopulation(AgentPopulation<A> population) {
+        for (A reactant : getReactants())
+            population.remove(reactant);
+
+        for (A product : getProducts())
+            population.add(product);
     }
 
     /**

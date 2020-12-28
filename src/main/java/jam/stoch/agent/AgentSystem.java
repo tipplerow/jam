@@ -46,87 +46,30 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
 
         this.agentPop = agentPop;
         this.agentMap = OrdinalMap.hash(agents);
+
+        initRates();
+    }
+
+    private void initRates() {
+        for (P proc : viewProcesses())
+            proc.updateRate(this);
     }
 
     /**
-     * Adds one agent to this system.
-     *
-     * @param agent the agent to add.
-     */
-    protected void addAgent(A agent) {
-        addAgent(agent, 1);
-    }
-
-    /**
-     * Adds instances of an agent to this system.
+     * Adds a new agent to this system.
      *
      * @param agent the agent to add.
      *
      * @param count the number of instances to add.
      *
-     * @throws IllegalArgumentException unless the count is positive.
-     */
-    protected void addAgent(A agent, int count) {
-        if (count < 1)
-            throw new IllegalArgumentException("Agent count must be positive.");
-
-        agentMap.add(agent);
-        agentPop.add(agent, count);
-    }
-
-    /**
-     * Removes one agent from this system.
-     *
-     * @param agent the agent to remove.
-     *
-     * @throws IllegalArgumentException unless this system contains at
-     * least one instance of the specified agent.
-     */
-    protected void removeAgent(A agent) {
-        removeAgent(agent, 1);
-    }
-
-    /**
-     * Removes one agent from this system.
-     *
-     * @param agent the agent to remove.
-     *
-     * @param count the number of instances to remove.
-     *
-     * @throws IllegalArgumentException unless this system contains at
-     * least {@code count} instances of the agent.
-     */
-    protected void removeAgent(A agent, int count) {
-        int prevCount = countAgent(agent);
-
-        if (prevCount < count)
-            throw new IllegalArgumentException("Agent count must remain non-negative.");
-
-        agentPop.remove(agent, count);
-
-        if (prevCount == count)
-            agentMap.remove(agent);
-    }
-
-    /**
-     * Assigns the population of an agent.
-     *
-     * @param agent the agent to add.
-     *
-     * @param count the number of agents to assign.
-     *
      * @throws IllegalArgumentException if the count is negative.
      */
-    protected void setCount(A agent, int count) {
+    protected void addAgent(A agent, int count) {
         if (count < 0)
             throw new IllegalArgumentException("Agent count must be non-negative.");
 
-        agentPop.set(agent, count);
-
-        if (count == 0)
-            agentMap.remove(agent);
-        else
-            agentMap.add(agent);
+        agentMap.add(agent);
+        agentPop.add(agent, count);
     }
 
     /**
@@ -225,18 +168,10 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
         P lastProc = lastEventProcess();
         Collection<P> dependents = viewDependents(lastProc);
 
-        updatePopulation(lastProc);
+        lastProc.updatePopulation(this.agentPop);
         lastProc.updateRate(this);
 
         for (P dependent : dependents)
             dependent.updateRate(this);
-    }
-
-    private void updatePopulation(P lastProc) {
-        for (A reactant : lastProc.getReactants())
-            removeAgent(reactant);
-
-        for (A product : lastProc.getProducts())
-            addAgent(product);
     }
 }

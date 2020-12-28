@@ -19,12 +19,11 @@ import jam.stoch.StochRate;
  * and child agents are identical. (2) The rate constant may change
  * through time and/or be context-dependent.
  */
-public abstract class BirthProc<A extends StochAgent> extends AgentProc<A> {
-    private final A parent;
-    private final A child;
-
-    private final Multiset<A> products;
-    private final Multiset<A> reactants;
+public abstract class BirthProc<A extends StochAgent> extends FirstOrderProc<A> {
+    /**
+     * The child agent produced by this process.
+     */
+    protected final A child;
 
     /**
      * Creates a new birth process with a fixed parent and child.
@@ -34,26 +33,8 @@ public abstract class BirthProc<A extends StochAgent> extends AgentProc<A> {
      * @param child the child agent for the process.
      */
     protected BirthProc(A parent, A child) {
-        this(null, parent, child);
-    }
-
-    /**
-     * Creates a new birth process with a fixed parent and child.
-     *
-     * @param rate the initial rate of the process.
-     *
-     * @param parent the parent agent for the process.
-     *
-     * @param child the child agent for the process.
-     */
-    protected BirthProc(StochRate rate, A parent, A child) {
-        super(rate);
-
+        super(parent);
         this.child = child;
-        this.parent = parent;
-
-        this.products = ImmutableMultiset.of(parent, child);
-        this.reactants = ImmutableMultiset.of(parent);
     }
 
     /**
@@ -62,7 +43,7 @@ public abstract class BirthProc<A extends StochAgent> extends AgentProc<A> {
      * @return the parent agent for this birth process.
      */
     public A getParent() {
-        return parent;
+        return reactant;
     }
 
     /**
@@ -74,11 +55,11 @@ public abstract class BirthProc<A extends StochAgent> extends AgentProc<A> {
         return child;
     }
 
-    @Override public Multiset<A> getReactants() {
-        return reactants;
+    @Override public Multiset<A> getProducts() {
+        return ImmutableMultiset.of(reactant, child);
     }
 
-    @Override public Multiset<A> getProducts() {
-        return products;
+    @Override public void updatePopulation(AgentPopulation<A> population) {
+        population.add(child);
     }
 }
