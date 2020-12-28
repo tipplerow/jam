@@ -69,7 +69,7 @@ public abstract class AlgoTestBase {
             algo.advance();
 
         stopwatch.stop();
-        StochTime eventTime = algo.getEventTime();
+        StochTime eventTime = system.lastEventTime();
 
         for (int index = 0; index < system.countProcesses(); ++index)
             System.out.println(system.getProcess(index).getPopulation());
