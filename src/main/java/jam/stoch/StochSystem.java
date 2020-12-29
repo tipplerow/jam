@@ -3,7 +3,7 @@ package jam.stoch;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +14,7 @@ import jam.lang.JamException;
  */
 public abstract class StochSystem<P extends StochProc> {
     private final ProcGraph<P> graph = ProcGraph.create();
-    private final Map<Integer, P> procs = new HashMap<Integer, P>();
+    private final Map<Integer, P> procs = new LinkedHashMap<Integer, P>();
 
     // The number of events that have occurred...
     private long eventCount = 0L;

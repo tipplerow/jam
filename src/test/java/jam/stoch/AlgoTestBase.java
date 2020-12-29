@@ -69,26 +69,23 @@ public abstract class AlgoTestBase {
             algo.advance();
 
         stopwatch.stop();
+
         StochTime eventTime = system.lastEventTime();
-
-        for (int index = 0; index < system.countProcesses(); ++index)
-            System.out.println(system.getProcess(index).getPopulation());
-
         assertEquals(0.359, eventTime.doubleValue(), 0.001);
 
-        for (int procIndex = 0; procIndex < system.countProcesses(); ++procIndex)
-            assertPopulation(eventTime, procIndex, 0.01);
+        for (DecayProc decayProc : system.viewProcesses())
+            assertPopulation(eventTime, decayProc, 0.01);
 
         System.out.println(eventTime);
         System.out.println(stopwatch);
     }
 
-    private void assertPopulation(StochTime eventTime, int procIndex, double tolerance) {
-        int actual = system.getProcess(procIndex).getPopulation();
-        int expected = system.getProcess(procIndex).getExpectedPopulation(eventTime);
+    private void assertPopulation(StochTime eventTime, DecayProc decayProc, double tolerance) {
+        int actual = decayProc.getPopulation();
+        int expected = decayProc.getExpectedPopulation(eventTime);
         double error = DoubleUtil.ratio(actual, expected) - 1.0;
 
-        System.out.println(String.format("%5d, %5d, %8.4f", actual, expected, error));
+        System.out.println(String.format("%5d, %5d, %5d, %8.4f", decayProc.getProcIndex(), actual, expected, error));
         assertTrue(Math.abs(error) < tolerance);
     }
 }
