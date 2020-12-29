@@ -10,7 +10,8 @@ import jam.stoch.StochRate;
  * Represents a stochastic process with a single reactant, {@code R}.
  * The process occurs at a rate {@code k * nR}, where {@code k} is the
  * instantaneous rate constant and {@code nR} is the current number of
- * instances of {@code R}.
+ * instances of {@code R}.  After the process occurs, the population of
+ * {@code R} decreases by one: {@code nR => nR - 1}.
  */
 public abstract class FirstOrderProc<A extends StochAgent> extends AgentProc<A> {
     /**

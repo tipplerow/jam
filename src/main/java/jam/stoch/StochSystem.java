@@ -178,6 +178,18 @@ public abstract class StochSystem<P extends StochProc> {
     }
 
     /**
+     * Identifies processes contained in this stochastic system.
+     *
+     * @param proc the process in question.
+     *
+     * @return {@code true} iff this system contains the specified
+     * process.
+     */
+    public boolean containsProcess(P proc) {
+        return containsProcess(proc.getProcIndex());
+    }
+
+    /**
      * Returns the number of events that have occurred.
      *
      * @return the number of events that have occurred.
@@ -295,11 +307,26 @@ public abstract class StochSystem<P extends StochProc> {
      * occurs.
      *
      * @param event the most recent event to occur in this system.
+     *
+     * @throws RuntimeException unless the event occurs after the
+     * previous event in this system and this system contains the
+     * process that occurred.
      */
     public void updateState(StochEvent<P> event) {
+        validateEvent(event);
+
         ++eventCount;
         lastEvent = event;
+
         updateState();
+    }
+
+    private void validateEvent(StochEvent<P> event) {
+        if (event.getTime().compareTo(lastEventTime()) <= 0)
+            throw JamException.runtime("Next event must occur after the previous event.");
+
+        if (!containsProcess(event.getProcess()))
+            throw JamException.runtime("Event occurred outside this system.");
     }
 
     /**

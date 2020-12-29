@@ -8,6 +8,7 @@ public final class TestAgent extends StochAgent {
     public static final TestAgent A = new TestAgent();
     public static final TestAgent B = new TestAgent();
     public static final TestAgent C = new TestAgent();
+    public static final TestAgent D = new TestAgent();
 }
 
                                      

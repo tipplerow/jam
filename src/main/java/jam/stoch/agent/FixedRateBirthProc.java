@@ -15,7 +15,22 @@ public final class FixedRateBirthProc<A extends StochAgent> extends BirthProc<A>
     }
 
     /**
-     * Creates a new birth process with a fixed rate constant.
+     * Creates a new non-mutating birth process with a fixed rate
+     * constant.
+     *
+     * @param agent the replicating agent in the process.
+     *
+     * @param rateConst the fixed rate constant for the process.
+     *
+     * @return a new non-mutating birth process with the specified
+     * parameters.
+     */
+    public static <A extends StochAgent> BirthProc<A> create(A agent, double rateConst) {
+        return new FixedRateBirthProc<A>(agent, agent, rateConst);
+    }
+
+    /**
+     * Creates a new mutation process with a fixed rate constant.
      *
      * @param parent the parent agent for the process.
      *
@@ -23,7 +38,7 @@ public final class FixedRateBirthProc<A extends StochAgent> extends BirthProc<A>
      *
      * @param rateConst the fixed rate constant for the process.
      *
-     * @return a new birth process with the specified parameters.
+     * @return a new mutation process with the specified parameters.
      */
     public static <A extends StochAgent> BirthProc<A> create(A parent, A child, double rateConst) {
         return new FixedRateBirthProc<A>(parent, child, rateConst);
