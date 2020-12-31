@@ -1,6 +1,10 @@
 
 package jam.bravais;
 
+import java.util.Arrays;
+
+import jam.lang.JamException;
+
 /**
  * Defines the discrete absolute position of a unit cell within a
  * Bravais lattice.
@@ -46,6 +50,32 @@ public interface UnitIndex extends Comparable<UnitIndex> {
      */
     public static UnitIndex at(int i, int j, int k) {
         return UnitIndex3D.at(i, j, k);
+    }
+
+    /**
+     * Returns the unit index at a specified location.
+     *
+     * @param coords the integer coordinates of the index.
+     *
+     * @return the unit index at the specified location.
+     *
+     * @throws RuntimeException unless the number of coordinates
+     * is 1, 2, or 3.
+     */
+    public static UnitIndex at(int[] coords) {
+        switch (coords.length) {
+        case 1:
+            return at(coords[0]);
+
+        case 2:
+            return at(coords[0], coords[1]);
+
+        case 3:
+            return at(coords[0], coords[1], coords[2]);
+
+        default:
+            throw JamException.runtime("Invalid index coordinates: [%s].", Arrays.toString(coords));
+        }
     }
 
     /**

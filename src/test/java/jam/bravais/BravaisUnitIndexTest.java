@@ -10,14 +10,20 @@ import static org.junit.Assert.*;
 
 public class BravaisUnitIndexTest {
     @Test public void testAtCoord() {
-        assertEquals(3, UnitIndex.at(3).coord(0));
+        assertCoord(UnitIndex.at(3), 3);
+        assertCoord(UnitIndex.at(3, 5), 3, 5);
+        assertCoord(UnitIndex.at(3, 5, 2), 3, 5, 2);
 
-        assertEquals(3, UnitIndex.at(3, 5).coord(0));
-        assertEquals(5, UnitIndex.at(3, 5).coord(1));
+        assertCoord(UnitIndex.at(new int[] { 3 }), 3);
+        assertCoord(UnitIndex.at(new int[] { 3, 5 }), 3, 5);
+        assertCoord(UnitIndex.at(new int[] { 3, 5, 2 }), 3, 5, 2);
+    }
 
-        assertEquals(3, UnitIndex.at(3, 5, 2).coord(0));
-        assertEquals(5, UnitIndex.at(3, 5, 2).coord(1));
-        assertEquals(2, UnitIndex.at(3, 5, 2).coord(2));
+    private void assertCoord(UnitIndex index, int... coords) {
+        assertEquals(coords.length, index.dimensionality());
+
+        for (int dim = 0; dim < coords.length; ++dim)
+            assertEquals(coords[dim], index.coord(dim));
     }
 
     @Test public void testCompareTo() {
