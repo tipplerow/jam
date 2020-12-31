@@ -2,7 +2,7 @@
 package jam.bravais;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -254,7 +254,7 @@ public final class Lattice {
         List<UnitIndex> indexes = period.enumerate();
 
         Map<UnitIndex, List<UnitIndex>> neighborMap =
-            new HashMap<UnitIndex, List<UnitIndex>>(indexes.size());
+            new LinkedHashMap<UnitIndex, List<UnitIndex>>(indexes.size());
 
         switch (coordType) {
         case ABSOLUTE:
