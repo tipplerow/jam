@@ -30,4 +30,13 @@ public final class LatticeSpace extends AbstractSpace {
 
         return new LatticeSpace(lattice, siteMap, neighborMap);
     }
+
+    /**
+     * Returns the underlying lattice.
+     *
+     * @return the underlying lattice.
+     */
+    public Lattice getLattice() {
+        return lattice;
+    }
 }

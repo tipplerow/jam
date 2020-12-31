@@ -33,7 +33,7 @@ public class SiteMapTest {
     }
 
     private void assertSite(SiteMap siteMap, int ux, int uy, double px, double py) {
-        assertEquals(Point.at(px, py), siteMap.require(UnitIndex.at(ux, uy)).getPoint());
+        assertEquals(Point.at(px, py), siteMap.require(ux, uy).getPoint());
     }
 
     public static void main(String[] args) {

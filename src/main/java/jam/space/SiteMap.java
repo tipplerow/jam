@@ -81,6 +81,21 @@ public final class SiteMap {
     /**
      * Returns the site at a specified location.
      *
+     * @param coords the coordinates of the site.
+     *
+     * @return the site at the specified location ({@code null}
+     * if this map does not contain a site at that location).
+     *
+     * @throws RuntimeException unless the number of coordinates
+     * is valid.
+     */
+    public Site get(int... coords) {
+        return get(UnitIndex.at(coords));
+    }
+
+    /**
+     * Returns the site at a specified location.
+     *
      * @param index the unit index of the site.
      *
      * @return the site at the specified location.
@@ -95,6 +110,20 @@ public final class SiteMap {
             return site;
         else
             throw JamException.runtime("No site at index [%s].", index);
+    }
+
+    /**
+     * Returns the site at a specified location.
+     *
+     * @param coords the coordinates of the site.
+     *
+     * @return the site at the specified location.
+     *
+     * @throws RuntimeException unless this map contains a site at
+     * the specified location.
+     */
+    public Site require(int... coords) {
+        return require(UnitIndex.at(coords));
     }
 
     /**

@@ -16,11 +16,30 @@ public class NeighborMapTest {
         SiteMap siteMap = SiteMap.create(lattice);
         NeighborMap neighborMap = NeighborMap.create(lattice, siteMap);
 
-        System.out.println(neighborMap);
+        assertNeighbors(neighborMap,
+                        siteMap.require(0, 0),
+                        siteMap.require(0, 3),
+                        siteMap.require(4, 0),
+                        siteMap.require(1, 0),
+                        siteMap.require(0, 1));
+
+        assertNeighbors(neighborMap,
+                        siteMap.require(2, 1),
+                        siteMap.require(2, 0),
+                        siteMap.require(1, 1),
+                        siteMap.require(3, 1),
+                        siteMap.require(2, 2));
+
+        assertNeighbors(neighborMap,
+                        siteMap.require(4, 3),
+                        siteMap.require(4, 2),
+                        siteMap.require(3, 3),
+                        siteMap.require(0, 3),
+                        siteMap.require(4, 0));
     }
 
-    private void assertSite(SiteMap siteMap, int ux, int uy, double px, double py) {
-        assertEquals(Point.at(px, py), siteMap.require(UnitIndex.at(ux, uy)).getPoint());
+    private void assertNeighbors(NeighborMap map, Site site, Site... neighbors) {
+        assertEquals(Set.of(neighbors), map.getNeighbors(site));
     }
 
     public static void main(String[] args) {
