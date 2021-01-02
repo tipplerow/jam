@@ -30,7 +30,7 @@ public class FileUtilTest {
     }
 
     @Test public void testEnsureParentDirs() {
-        File dir  = new File("foo");
+        File dir  = new File("foodir");
         File file = new File(dir, "foo.txt");
 
         assertFalse(dir.exists());
