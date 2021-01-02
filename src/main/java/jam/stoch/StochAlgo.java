@@ -8,7 +8,7 @@ import jam.math.JamRandom;
 /**
  * Provides a base class for stochastic simulation algorithms.
  */
-public abstract class StochAlgo<P extends StochProc> {
+public abstract class StochAlgo {
     /**
      * The random number source.
      */
@@ -17,7 +17,7 @@ public abstract class StochAlgo<P extends StochProc> {
     /**
      * The stochastic system being simulated.
      */
-    protected final StochSystem<P> system;
+    protected final StochSystem system;
 
     /**
      * Creates a new stochastic simulation algorithm.
@@ -26,7 +26,7 @@ public abstract class StochAlgo<P extends StochProc> {
      *
      * @param system the stochastic system to simulate.
      */
-    protected StochAlgo(JamRandom random, StochSystem<P> system) {
+    protected StochAlgo(JamRandom random, StochSystem system) {
         this.random = random;
         this.system = system;
     }
@@ -36,7 +36,7 @@ public abstract class StochAlgo<P extends StochProc> {
      *
      * @return the next event in the simulation.
      */
-    protected abstract StochEvent<P> nextEvent();
+    protected abstract StochEvent nextEvent();
 
     /**
      * Updates the internal state of this algorithm after an event
@@ -47,7 +47,7 @@ public abstract class StochAlgo<P extends StochProc> {
      * @param dependents processes whose rates have changed as a
      * result of the event (excluding the process that occurred).
      */
-    protected abstract void updateState(StochEvent<P> event, Collection<P> dependents);
+    protected abstract void updateState(StochEvent event, Collection<? extends StochProc> dependents);
 
     /**
      * Advances the simulation by selecting the next stochastic event
@@ -55,7 +55,7 @@ public abstract class StochAlgo<P extends StochProc> {
      * stochastic system.
      */
     public void advance() {
-        StochEvent<P> event = nextEvent();
+        StochEvent event = nextEvent();
         system.updateState(event);
         updateState(event, system.viewDependents(event.getProcess()));
     }
@@ -74,7 +74,7 @@ public abstract class StochAlgo<P extends StochProc> {
      *
      * @return the stochastic system being simulated.
      */
-    public StochSystem<P> getSystem() {
+    public StochSystem getSystem() {
         return system;
     }
 }

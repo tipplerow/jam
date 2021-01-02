@@ -11,9 +11,9 @@ import java.util.Map;
  * class is undefined if any stochastic processes are added or removed
  * from the system.
  */
-public final class RateManager<P extends StochProc> {
-    private final StochSystem<P> system;
-    private final Map<P, StochRate> rateMap;
+public final class RateManager {
+    private final StochSystem system;
+    private final Map<StochProc, StochRate> rateMap;
 
     private final int ageThreshold;
     private final int procThreshold;
@@ -23,9 +23,9 @@ public final class RateManager<P extends StochProc> {
 
     private static final int MAX_AGE_THRESHOLD = 1000000;
 
-    private RateManager(StochSystem<P> system) {
+    private RateManager(StochSystem system) {
         this.system = system;
-        this.rateMap = new HashMap<P, StochRate>();
+        this.rateMap = new HashMap<StochProc, StochRate>();
 
         this.ageThreshold = computeAgeThreshold(system);
         this.procThreshold = computeProcThreshold(system);
@@ -33,7 +33,7 @@ public final class RateManager<P extends StochProc> {
         updateFull();
     }
 
-    private static int computeAgeThreshold(StochSystem<?> system) {
+    private static int computeAgeThreshold(StochSystem system) {
         //
         // Explicitly recompute the total reaction rate if the number
         // of partial updates exceeds the lesser of MAX_AGE_THRESHOLD
@@ -42,7 +42,7 @@ public final class RateManager<P extends StochProc> {
         return Math.min(MAX_AGE_THRESHOLD, 100 * system.countProcesses());
     }
 
-    private static int computeProcThreshold(StochSystem<?> system) {
+    private static int computeProcThreshold(StochSystem system) {
         //
         // Explicitly recompute the total reaction rate if half or
         // more of the processes have new rates...
@@ -50,7 +50,7 @@ public final class RateManager<P extends StochProc> {
         return system.countProcesses() / 2;
     }
 
-    private boolean allowPartialUpdate(Collection<P> dependents) {
+    private boolean allowPartialUpdate(Collection<? extends StochProc> dependents) {
         return rateAge < ageThreshold && dependents.size() < procThreshold;
     }
 
@@ -58,7 +58,7 @@ public final class RateManager<P extends StochProc> {
         rateAge = 0;
         totalRate = 0.0;
 
-        for (P proc : system.viewProcesses()) {
+        for (StochProc proc : system.viewProcesses()) {
             StochRate rate = proc.getStochRate();
 
             rateMap.put(proc, rate);
@@ -66,15 +66,15 @@ public final class RateManager<P extends StochProc> {
         }
     }
 
-    private void updatePartial(P eventProc, Collection<P> dependents) {
+    private void updatePartial(StochProc eventProc, Collection<? extends StochProc> dependents) {
         ++rateAge;
         updateProc(eventProc);
 
-        for (P dependent : dependents)
+        for (StochProc dependent : dependents)
             updateProc(dependent);
     }
 
-    private void updateProc(P proc) {
+    private void updateProc(StochProc proc) {
         StochRate oldRate = rateMap.get(proc);
         StochRate newRate = proc.getStochRate();
 
@@ -89,8 +89,8 @@ public final class RateManager<P extends StochProc> {
      *
      * @return a new rate manager for the specified system.
      */
-    public static <P extends StochProc> RateManager<P> create(StochSystem<P> system) {
-        return new RateManager<P>(system);
+    public static RateManager create(StochSystem system) {
+        return new RateManager(system);
     }
 
     /**
@@ -114,7 +114,7 @@ public final class RateManager<P extends StochProc> {
      * changed as a result of the latest event (excluding the process
      * that occurred).
      */
-    public void updateTotalRate(P eventProc, Collection<P> dependents) {
+    public void updateTotalRate(StochProc eventProc, Collection<? extends StochProc> dependents) {
         if (allowPartialUpdate(dependents))
             updatePartial(eventProc, dependents);
         else

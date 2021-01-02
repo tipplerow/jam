@@ -11,7 +11,7 @@ import jam.stoch.StochRate;
  * Represents an agent-based process that may occur in a stochastic
  * simulation.
  */
-public abstract class AgentProc<A extends StochAgent> extends StochProc {
+public abstract class AgentProc extends StochProc {
     // The instantaneous rate of this process, updated as the
     // underlying stochastic system evolves...
     private StochRate stochRate = null;
@@ -30,14 +30,14 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      *
      * @return the reactive agents in this process.
      */
-    public abstract Multiset<A> getReactants();
+    public abstract Multiset<StochAgent> getReactants();
 
     /**
      * Returns the agents that are produced when this process occurs.
      *
      * @return the agents that are produced when this process occurs.
      */
-    public abstract Multiset<A> getProducts();
+    public abstract Multiset<StochAgent> getProducts();
 
     /**
      * Returns the instantaneous rate constant for this process, which
@@ -48,7 +48,7 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      * @return the rate constant for this process given the current
      * state of the stochastic system.
      */
-    public abstract double getRateConstant(AgentSystem<A, ?> system);
+    public abstract double getRateConstant(AgentSystem system);
 
     /**
      * Computes the rate of a first-order process from a rate constant
@@ -100,7 +100,7 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      * @return the rate of a first-order process in the specified
      * stochastic system.
      */
-    public static <A extends StochAgent> StochRate computeRate(AgentSystem<A, ?> system, double rateConst, A agent) {
+    public static StochRate computeRate(AgentSystem system, double rateConst, StochAgent agent) {
         return computeRate(rateConst, system.countAgent(agent));
     }
 
@@ -119,7 +119,7 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      * @return the rate of a second-order process in the specified
      * stochastic system.
      */
-    public static <A extends StochAgent> StochRate computeRate(AgentSystem<A, ?> system, double rateConst, A agent1, A agent2) {
+    public static StochRate computeRate(AgentSystem system, double rateConst, StochAgent agent1, StochAgent agent2) {
         return computeRate(rateConst, system.countAgent(agent1), system.countAgent(agent2));
     }
 
@@ -149,11 +149,11 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      * @return the instantaneous rate of this process in the current
      * state of the stochastic system.
      */
-    public StochRate computeRate(AgentSystem<A, ?> system) {
+    public StochRate computeRate(AgentSystem system) {
         double rate = getRateConstant(system);
         validateRateConstant(rate);
 
-        for (A reactant : getReactants())
+        for (StochAgent reactant : getReactants())
             rate *= system.countAgent(reactant);
 
         return StochRate.valueOf(rate);
@@ -166,11 +166,11 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      * @param population the population of stochastic agents prior to
      * the occurrence of this process.
      */
-    public void updatePopulation(AgentPopulation<A> population) {
-        for (A reactant : getReactants())
+    public void updatePopulation(AgentPopulation population) {
+        for (StochAgent reactant : getReactants())
             population.remove(reactant);
 
-        for (A product : getProducts())
+        for (StochAgent product : getProducts())
             population.add(product);
     }
 
@@ -180,7 +180,7 @@ public abstract class AgentProc<A extends StochAgent> extends StochProc {
      *
      * @param system the stochastic system that contains this process.
      */
-    public void updateRate(AgentSystem<A, ?> system) {
+    public void updateRate(AgentSystem system) {
         stochRate = computeRate(system);
     }
 

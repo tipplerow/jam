@@ -11,10 +11,10 @@ import jam.math.JamRandom;
  * Implements the <em>next reaction</em> stochastic simulation method
  * of Gibson and Bruck [J. Phys. Chem. A (2000) 104, 1876-1889]. 
  */
-public final class NextReactionAlgo<P extends StochProc> extends StochAlgo<P> {
-    private final EventQueue<P> eventQueue;
+public final class NextReactionAlgo extends StochAlgo {
+    private final EventQueue eventQueue;
 
-    private NextReactionAlgo(JamRandom random, StochSystem<P> system) {
+    private NextReactionAlgo(JamRandom random, StochSystem system) {
         super(random, system);
         this.eventQueue = EventQueue.create(StochEvent.first(system, random));
     }
@@ -31,20 +31,20 @@ public final class NextReactionAlgo<P extends StochProc> extends StochAlgo<P> {
      * @return a next-reaction simulation algorithm for the specified
      * system.
      */
-    public static <P extends StochProc> NextReactionAlgo<P> create(JamRandom random, StochSystem<P> system) {
-        return new NextReactionAlgo<P>(random, system);
+    public static NextReactionAlgo create(JamRandom random, StochSystem system) {
+        return new NextReactionAlgo(random, system);
     }
 
-    @Override protected StochEvent<P> nextEvent() {
+    @Override protected StochEvent nextEvent() {
         return eventQueue.nextEvent();
     }
 
-    @Override protected void updateState(StochEvent<P> event, Collection<P> dependents) {
+    @Override protected void updateState(StochEvent event, Collection<? extends StochProc> dependents) {
         eventQueue.updateEvent(event.next(random));
 
-        for (P dependent : dependents) {
-            StochEvent<P> prevEvent = eventQueue.findEvent(dependent);
-            StochEvent<P> nextEvent = prevEvent.update(event, random);
+        for (StochProc dependent : dependents) {
+            StochEvent prevEvent = eventQueue.findEvent(dependent);
+            StochEvent nextEvent = prevEvent.update(event, random);
 
             eventQueue.updateEvent(nextEvent);
         }

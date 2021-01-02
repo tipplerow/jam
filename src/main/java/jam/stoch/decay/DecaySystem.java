@@ -15,7 +15,7 @@ import jam.stoch.StochSystem;
  * solution and is provided primarily to test stochastic simulation
  * algorithms.
  */
-public final class DecaySystem extends StochSystem<DecayProc> {
+public final class DecaySystem extends StochSystem {
     private DecaySystem(List<DecayProc> procs) {
         super(procs, List.of());
     }
@@ -53,10 +53,23 @@ public final class DecaySystem extends StochSystem<DecayProc> {
         return procs;
     }
 
+    @Override public DecayProc getProcess(int index) {
+        return (DecayProc) super.getProcess(index);
+    }
+
+    @Override public DecayProc lastEventProcess() {
+        return (DecayProc) super.lastEventProcess();
+    }
+
     @Override public void updateState() {
         //
         // All decay processes are independent...
         //
         lastEventProcess().decay();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public Collection<DecayProc> viewProcesses() {
+        return (Collection<DecayProc>) super.viewProcesses();
     }
 }

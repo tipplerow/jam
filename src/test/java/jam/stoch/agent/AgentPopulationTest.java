@@ -10,14 +10,14 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class AgentPopulationTest {
-    private static void assertPopulation(AgentPopulation<TestAgent> population, int popA, int popB, int popC) {
+    private static void assertPopulation(AgentPopulation population, int popA, int popB, int popC) {
         assertEquals(popA, population.count(TestAgent.A));
         assertEquals(popB, population.count(TestAgent.B));
         assertEquals(popC, population.count(TestAgent.C));
     }
 
-    private static AgentPopulation<TestAgent> createPopulation(int popA, int popB, int popC) {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+    private static AgentPopulation createPopulation(int popA, int popB, int popC) {
+        AgentPopulation population = AgentPopulation.create();
 
         population.add(TestAgent.A, popA);
         population.add(TestAgent.B, popB);
@@ -27,7 +27,7 @@ public class AgentPopulationTest {
     }
 
     @Test public void testAddCount() {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+        AgentPopulation population = AgentPopulation.create();
 
         population.add(TestAgent.A, 5);
         population.add(TestAgent.B, 2);
@@ -38,12 +38,12 @@ public class AgentPopulationTest {
 
     @Test(expected = RuntimeException.class)
     public void testAddCountInvalid() {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+        AgentPopulation population = AgentPopulation.create();
         population.add(TestAgent.A, -2);
     }
 
     @Test public void testAddSingle() {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+        AgentPopulation population = AgentPopulation.create();
 
         population.add(TestAgent.A);
         population.add(TestAgent.A);
@@ -53,7 +53,7 @@ public class AgentPopulationTest {
     }
 
     @Test public void testAddCollection() {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+        AgentPopulation population = AgentPopulation.create();
 
         population.add(List.of(TestAgent.A,
                                TestAgent.A,
@@ -63,7 +63,7 @@ public class AgentPopulationTest {
     }
 
     @Test public void testAddMultiset() {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+        AgentPopulation population = AgentPopulation.create();
 
         population.add(ImmutableMultiset.of(TestAgent.A,
                                             TestAgent.A,
@@ -74,12 +74,12 @@ public class AgentPopulationTest {
     }
 
     @Test public void testCreateEmpty() {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+        AgentPopulation population = AgentPopulation.create();
         assertPopulation(population, 0, 0, 0);
     }
 
     @Test public void testCreateCollection() {
-        AgentPopulation<TestAgent> population =
+        AgentPopulation population =
             AgentPopulation.create(List.of(TestAgent.B,
                                            TestAgent.B,
                                            TestAgent.C));
@@ -88,7 +88,7 @@ public class AgentPopulationTest {
     }
 
     @Test public void testCreateMultiset() {
-        AgentPopulation<TestAgent> population =
+        AgentPopulation population =
             AgentPopulation.create(ImmutableMultiset.of(TestAgent.B,
                                                         TestAgent.C,
                                                         TestAgent.C));
@@ -96,7 +96,7 @@ public class AgentPopulationTest {
     }
 
     @Test public void testRemoveCount() {
-        AgentPopulation<TestAgent> population = createPopulation(3, 5, 10);
+        AgentPopulation population = createPopulation(3, 5, 10);
 
         population.remove(TestAgent.B, 3);
         population.remove(TestAgent.C, 2);
@@ -105,7 +105,7 @@ public class AgentPopulationTest {
     }
 
     @Test public void testRemoveSingle() {
-        AgentPopulation<TestAgent> population = createPopulation(2, 5, 10);
+        AgentPopulation population = createPopulation(2, 5, 10);
 
         population.remove(TestAgent.B);
         population.remove(TestAgent.C);
@@ -117,18 +117,18 @@ public class AgentPopulationTest {
 
     @Test(expected = RuntimeException.class)
     public void testRemoveInvalid1() {
-        AgentPopulation<TestAgent> population = createPopulation(0, 5, 10);
+        AgentPopulation population = createPopulation(0, 5, 10);
         population.remove(TestAgent.A);
     }
 
     @Test(expected = RuntimeException.class)
     public void testRemoveInvalid2() {
-        AgentPopulation<TestAgent> population = createPopulation(0, 5, 10);
+        AgentPopulation population = createPopulation(0, 5, 10);
         population.remove(TestAgent.B, 8);
     }
 
     @Test public void testSet() {
-        AgentPopulation<TestAgent> population = createPopulation(3, 5, 10);
+        AgentPopulation population = createPopulation(3, 5, 10);
 
         population.set(TestAgent.A, 0);
         population.set(TestAgent.B, 9);
@@ -139,7 +139,7 @@ public class AgentPopulationTest {
 
     @Test(expected = RuntimeException.class)
     public void testSetInvalid() {
-        AgentPopulation<TestAgent> population = AgentPopulation.create();
+        AgentPopulation population = AgentPopulation.create();
         population.set(TestAgent.A, -2);
     }
 

@@ -17,8 +17,8 @@ import jam.math.JamRandom;
  * provided primarily as a baseline against which to benchmark more
  * efficient algorithms.
  */
-public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
-    private ReferenceAlgo(JamRandom random, StochSystem<P> system) {
+public final class ReferenceAlgo extends StochAlgo {
+    private ReferenceAlgo(JamRandom random, StochSystem system) {
         super(random, system);
     }
 
@@ -34,16 +34,16 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
      * @return a reference simulation algorithm for the specified
      * stochastic system.
      */
-    public static <P extends StochProc> ReferenceAlgo<P> create(JamRandom random, StochSystem<P> system) {
-        return new ReferenceAlgo<P>(random, system);
+    public static ReferenceAlgo create(JamRandom random, StochSystem system) {
+        return new ReferenceAlgo(random, system);
     }
 
-    @Override protected StochEvent<P> nextEvent() {
+    @Override protected StochEvent nextEvent() {
         StochRate totalRate = StochProc.computeTotalRate(system.viewProcesses());
         return StochEvent.mark(nextProc(totalRate), nextTime(totalRate));
     }
 
-    @Override protected void updateState(StochEvent<P> event, Collection<P> dependents) {
+    @Override protected void updateState(StochEvent event, Collection<? extends StochProc> dependents) {
         //
         // This algorithm does not maintain any internal state
         // variables (the total reaction rate is recomputed at
@@ -51,7 +51,7 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
         //
     }
 
-    private P nextProc(StochRate totalRate) {
+    private StochProc nextProc(StochRate totalRate) {
         //
         // Accumulate the process rates until we find one greater than
         // U * totalRate, where U is a uniform random deviate on [0, 1]...
@@ -59,7 +59,7 @@ public final class ReferenceAlgo<P extends StochProc> extends StochAlgo<P> {
         double procTotal = 0.0;
         double threshold = random.nextDouble() * totalRate.doubleValue();
 
-        for (P proc : system.viewProcesses()) {
+        for (StochProc proc : system.viewProcesses()) {
             procTotal += proc.getStochRate().doubleValue();
 
             if (DoubleComparator.DEFAULT.GE(procTotal, threshold))

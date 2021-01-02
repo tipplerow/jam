@@ -59,14 +59,14 @@ public abstract class AlgoTestBase {
         return DecaySystem.create(pops, rates);
     }
 
-    public abstract StochAlgo<DecayProc> createAlgorithm();
+    public abstract StochAlgo createAlgorithm();
 
     @Test public void testAlgorithm() {
-        StochAlgo<DecayProc> algo = createAlgorithm();
+        StochAlgo algorithm = createAlgorithm();
         Stopwatch stopwatch = Stopwatch.createStarted();
 
         for (int trialIndex = 0; trialIndex < TRIAL_COUNT; ++trialIndex)
-            algo.advance();
+            algorithm.advance();
 
         stopwatch.stop();
 

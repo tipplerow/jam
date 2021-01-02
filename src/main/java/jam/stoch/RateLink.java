@@ -8,11 +8,11 @@ import jam.lang.JamException;
  * predecessor process and a successor process whose rate changes when
  * the predecessor process occurs.
  */
-public final class RateLink<P extends StochProc> {
-    private final P predecessor;
-    private final P successor;
+public final class RateLink {
+    private final StochProc predecessor;
+    private final StochProc successor;
 
-    private RateLink(P predecessor, P successor) {
+    private RateLink(StochProc predecessor, StochProc successor) {
         validate(predecessor, successor);
         this.predecessor = predecessor;
         this.successor = successor;
@@ -32,8 +32,8 @@ public final class RateLink<P extends StochProc> {
      * @throws RuntimeException if the predecessor and successor are
      * the same process.
      */
-    public static <P extends StochProc> RateLink<P> link(P predecessor, P successor) {
-        return new RateLink<P>(predecessor, successor);
+    public static RateLink link(StochProc predecessor, StochProc successor) {
+        return new RateLink(predecessor, successor);
     }
 
     /**
@@ -47,7 +47,7 @@ public final class RateLink<P extends StochProc> {
      * @throws RuntimeException if the predecessor and successor are
      * the same process.
      */
-    public static <P extends StochProc> void validate(P predecessor, P successor) {
+    public static void validate(StochProc predecessor, StochProc successor) {
         if (predecessor.equals(successor))
             throw JamException.runtime("Linked processes must be distinct.");
     }
@@ -58,7 +58,7 @@ public final class RateLink<P extends StochProc> {
      *
      * @return the predecessor process.
      */
-    public P getPredecessor() {
+    public StochProc getPredecessor() {
         return predecessor;
     }
 
@@ -68,7 +68,7 @@ public final class RateLink<P extends StochProc> {
      *
      * @return the successor process.
      */
-    public P getSuccessor() {
+    public StochProc getSuccessor() {
         return successor;
     }
 

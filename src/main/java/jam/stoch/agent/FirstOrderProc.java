@@ -13,18 +13,18 @@ import jam.stoch.StochRate;
  * instances of {@code R}.  After the process occurs, the population of
  * {@code R} decreases by one: {@code nR => nR - 1}.
  */
-public abstract class FirstOrderProc<A extends StochAgent> extends AgentProc<A> {
+public abstract class FirstOrderProc extends AgentProc {
     /**
      * The reactant agent.
      */
-    protected final A reactant;
+    protected final StochAgent reactant;
 
     /**
      * Creates a new first-order process with a fixed reactant.
      *
      * @param reactant the reactant agent for the process.
      */
-    protected FirstOrderProc(A reactant) {
+    protected FirstOrderProc(StochAgent reactant) {
         this.reactant = reactant;
     }
 
@@ -33,19 +33,19 @@ public abstract class FirstOrderProc<A extends StochAgent> extends AgentProc<A> 
      *
      * @return the reactant agent for this process.
      */
-    public A getReactant() {
+    public StochAgent getReactant() {
         return reactant;
     }
 
-    @Override public StochRate computeRate(AgentSystem<A, ?> system) {
+    @Override public StochRate computeRate(AgentSystem system) {
         return computeRate(system, getRateConstant(system), reactant);
     }
 
-    @Override public Multiset<A> getReactants() {
+    @Override public Multiset<StochAgent> getReactants() {
         return ImmutableMultiset.of(reactant);
     }
 
-    @Override public void updatePopulation(AgentPopulation<A> population) {
+    @Override public void updatePopulation(AgentPopulation population) {
         population.remove(reactant);
         population.add(getProducts());
     }

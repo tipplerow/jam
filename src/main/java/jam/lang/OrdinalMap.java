@@ -39,7 +39,7 @@ public final class OrdinalMap<E extends Ordinal> {
      * @return an ordinal map backed by a {@code HashMap}
      * containing the specified objects.
      */
-    public static <E extends Ordinal> OrdinalMap<E> hash(Collection<E> ordinals) {
+    public static <E extends Ordinal> OrdinalMap<E> hash(Collection<? extends E> ordinals) {
         OrdinalMap<E> hashMap = hash();
         hashMap.addAll(ordinals);
         return hashMap;
@@ -63,7 +63,7 @@ public final class OrdinalMap<E extends Ordinal> {
      * @return an ordinal map backed by a {@code TreeMap}
      * containing the specified objects.
      */
-    public static <E extends Ordinal> OrdinalMap<E> tree(Collection<E> ordinals) {
+    public static <E extends Ordinal> OrdinalMap<E> tree(Collection<? extends E> ordinals) {
         OrdinalMap<E> treeMap = tree();
         treeMap.addAll(ordinals);
         return treeMap;
@@ -87,7 +87,7 @@ public final class OrdinalMap<E extends Ordinal> {
      *
      * @param ordinals the ordinal objects to add.
      */
-    public void addAll(Collection<E> ordinals) {
+    public void addAll(Collection<? extends E> ordinals) {
         for (E ordinal : ordinals)
             add(ordinal);
     }

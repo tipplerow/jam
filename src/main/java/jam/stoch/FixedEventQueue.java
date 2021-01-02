@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import jam.lang.JamException;
 
-public final class FixedEventQueue<P extends StochProc> {
+public final class FixedEventQueue {
     //
     // Number of events held in the queue.
     //
@@ -16,7 +16,7 @@ public final class FixedEventQueue<P extends StochProc> {
     // Elements 1 through N of the array "queue" contain the nodes of
     // the complete binary heap; element 0 is unused.
     //
-    private final StochEvent<P>[] queue;
+    private final StochEvent[] queue;
 
     // Element "k" of the array "point" is a pointer to the location
     // of stochastic process with ordinal index "k" in the queue (the
@@ -30,8 +30,7 @@ public final class FixedEventQueue<P extends StochProc> {
     private static final int NULL_NODE = 0;
     private static final int ROOT_NODE = 1;
 
-    @SuppressWarnings("unchecked")
-    private FixedEventQueue(Collection<StochEvent<P>> events) {
+    private FixedEventQueue(Collection<StochEvent> events) {
         this.size = events.size();
         this.point = new int[size];
         this.queue = new StochEvent[size + 1]; // The first element is unused...
@@ -47,9 +46,9 @@ public final class FixedEventQueue<P extends StochProc> {
     // Constructor helpers
     // -------------------
 
-    private void fillQueue(Collection<StochEvent<P>> events) {
+    private void fillQueue(Collection<StochEvent> events) {
         int node = ROOT_NODE;
-        Iterator<StochEvent<P>> iterator = events.iterator();
+        Iterator<StochEvent> iterator = events.iterator();
 
         while (iterator.hasNext()) {
             queue[node] = iterator.next();
@@ -144,7 +143,7 @@ public final class FixedEventQueue<P extends StochProc> {
         return !isParent(node);
     }
 
-    private int find(StochEvent<P> event) {
+    private int find(StochEvent event) {
         return point[event.getProcIndex()];
     }
 
@@ -174,8 +173,8 @@ public final class FixedEventQueue<P extends StochProc> {
     }
 
     private void swap(int i, int j) {
-        StochEvent<P> previ = queue[i];
-        StochEvent<P> prevj = queue[j];
+        StochEvent previ = queue[i];
+        StochEvent prevj = queue[j];
 
         queue[i] = prevj;
         queue[j] = previ;
@@ -208,8 +207,8 @@ public final class FixedEventQueue<P extends StochProc> {
      *
      * @return a new event queue containing the specified events.
      */
-    public static <P extends StochProc> FixedEventQueue<P> create(Collection<StochEvent<P>> events) {
-        return new FixedEventQueue<P>(events);
+    public static FixedEventQueue create(Collection<StochEvent> events) {
+        return new FixedEventQueue(events);
     }
 
     /**
@@ -221,7 +220,7 @@ public final class FixedEventQueue<P extends StochProc> {
      *
      * @return the next event for the specified process.
      */
-    public StochEvent<P> findEvent(P proc) {
+    public StochEvent findEvent(StochProc proc) {
         return queue[point[proc.getProcIndex()]];
     }
 
@@ -232,7 +231,7 @@ public final class FixedEventQueue<P extends StochProc> {
      *
      * @return the next event to occur in the stochastic system.
      */
-    public StochEvent<P> nextEvent() {
+    public StochEvent nextEvent() {
         return queue[ROOT_NODE];
     }
 
@@ -251,7 +250,7 @@ public final class FixedEventQueue<P extends StochProc> {
      *
      * @param event the event to update.
      */
-    public void updateEvent(StochEvent<P> event) {
+    public void updateEvent(StochEvent event) {
         int node = find(event);
         queue[node] = event;
 

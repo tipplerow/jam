@@ -4,10 +4,10 @@ package jam.stoch.agent;
 /**
  * Represents a transition process with a fixed first-order rate constant.
  */
-public final class FixedRateTransitionProc<A extends StochAgent> extends TransitionProc<A> {
+public final class FixedRateTransitionProc extends TransitionProc {
     private final double rateConst;
 
-    private FixedRateTransitionProc(A reactant, A product, double rateConst) {
+    private FixedRateTransitionProc(StochAgent reactant, StochAgent product, double rateConst) {
         super(reactant, product);
 
         validateRateConstant(rateConst);
@@ -25,11 +25,11 @@ public final class FixedRateTransitionProc<A extends StochAgent> extends Transit
      *
      * @return a new transition process with the specified parameters.
      */
-    public static <A extends StochAgent> TransitionProc<A> create(A reactant, A product, double rateConst) {
-        return new FixedRateTransitionProc<A>(reactant, product, rateConst);
+    public static TransitionProc create(StochAgent reactant, StochAgent product, double rateConst) {
+        return new FixedRateTransitionProc(reactant, product, rateConst);
     }
 
-    @Override public double getRateConstant(AgentSystem<A, ?> state) {
+    @Override public double getRateConstant(AgentSystem system) {
         return rateConst;
     }
 }

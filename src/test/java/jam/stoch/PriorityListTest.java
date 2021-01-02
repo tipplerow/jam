@@ -47,10 +47,10 @@ public class PriorityListTest {
 
         long millis = System.currentTimeMillis();
 
-        PriorityList<FixedRateProc> procList = PriorityList.create(procs);
+        PriorityList procList = PriorityList.create(procs);
 
         for (int trialIndex = 0; trialIndex < trialCount; ++trialIndex) {
-            FixedRateProc proc = procList.select(RANDOM, TOTAL_RATE);
+            StochProc proc = procList.select(RANDOM, TOTAL_RATE);
             ++eventCounts[(int) proc.getProcIndex()];
         }
 

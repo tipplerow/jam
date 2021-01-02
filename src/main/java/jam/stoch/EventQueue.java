@@ -10,7 +10,7 @@ import java.util.Map;
 import jam.app.JamLogger;
 import jam.lang.JamException;
 
-public final class EventQueue<P extends StochProc> {
+public final class EventQueue {
 
     // The number of events held in the queue (its logical size,
     // regardless of the physical size of the underlying array).
@@ -18,7 +18,7 @@ public final class EventQueue<P extends StochProc> {
 
     // Elements 1 through "size" of the list "queue" contain the
     // nodes of the complete binary heap; element 0 is unused.
-    private final ArrayList<StochEvent<P>> queue;
+    private final ArrayList<StochEvent> queue;
 
     // A mapping from each stochastic process to its node: the index
     // of the event for that process in the "queue" list...
@@ -31,12 +31,12 @@ public final class EventQueue<P extends StochProc> {
 
     private static final int DEFAULT_CAPACITY = 10;
 
-    private EventQueue(int capacity, Collection<StochEvent<P>> events) {
+    private EventQueue(int capacity, Collection<StochEvent> events) {
         this.size = 0;
-        this.queue = new ArrayList<StochEvent<P>>(capacity);
+        this.queue = new ArrayList<StochEvent>(capacity);
         this.locator = new HashMap<Integer, Integer>(capacity);
 
-        for (StochEvent<P> event : events)
+        for (StochEvent event : events)
             addEvent(event);
     }
 
@@ -53,15 +53,15 @@ public final class EventQueue<P extends StochProc> {
             queue.add(null);
     }
 
-    private StochEvent<P> getNode(int node) {
+    private StochEvent getNode(int node) {
         return queue.get(node);
     }        
 
-    private int findNode(StochEvent<P> event) {
+    private int findNode(StochEvent event) {
         return findNode(event.getProcess());
     }
 
-    private int findNode(P proc) {
+    private int findNode(StochProc proc) {
         Integer pkey = proc.getProcIndex();
         Integer node = locator.get(pkey);
 
@@ -71,7 +71,7 @@ public final class EventQueue<P extends StochProc> {
             throw JamException.runtime("Queue does not contain process [%d].", pkey.intValue());
     }
 
-    private void setNode(int node, StochEvent<P> event) {
+    private void setNode(int node, StochEvent event) {
         ensureCapacity(node);
         queue.set(node, event);
         locator.put(event.getProcIndex(), node);
@@ -159,8 +159,8 @@ public final class EventQueue<P extends StochProc> {
     }
 
     private void swap(int j, int k) {
-        StochEvent<P> prevj = getNode(j);
-        StochEvent<P> prevk = getNode(k);
+        StochEvent prevj = getNode(j);
+        StochEvent prevk = getNode(k);
 
         setNode(j, prevk);
         setNode(k, prevj);
@@ -171,7 +171,7 @@ public final class EventQueue<P extends StochProc> {
      *
      * @return a new empty queue with the default capacity.
      */
-    public static <P extends StochProc> EventQueue<P> create() {
+    public static EventQueue create() {
         return create(DEFAULT_CAPACITY);
     }
 
@@ -183,8 +183,8 @@ public final class EventQueue<P extends StochProc> {
      *
      * @return a new empty queue with the specified capacity.
      */
-    public static <P extends StochProc> EventQueue<P> create(int capacity) {
-        return new EventQueue<P>(capacity, List.of());
+    public static EventQueue create(int capacity) {
+        return new EventQueue(capacity, List.of());
     }
 
     /**
@@ -194,8 +194,8 @@ public final class EventQueue<P extends StochProc> {
      *
      * @return a new event queue containing the specified events.
      */
-    public static <P extends StochProc> EventQueue<P> create(Collection<StochEvent<P>> events) {
-        return new EventQueue<P>(events.size(), events);
+    public static EventQueue create(Collection<StochEvent> events) {
+        return new EventQueue(events.size(), events);
     }
 
     /**
@@ -206,8 +206,8 @@ public final class EventQueue<P extends StochProc> {
      * @throws RuntimeException if this queue already contains an
      * event for the process in the input event.
      */
-    public void addEvent(StochEvent<P> event) {
-        P proc = event.getProcess();
+    public void addEvent(StochEvent event) {
+        StochProc proc = event.getProcess();
 
         if (containsProc(proc))
             throw JamException.runtime("Event queue already contains process [%d].", proc.getProcIndex());
@@ -230,7 +230,7 @@ public final class EventQueue<P extends StochProc> {
      * @return {@code true} iff this queue contains an event for the
      * specified process.
      */
-    public boolean containsProc(P proc) {
+    public boolean containsProc(StochProc proc) {
         return locator.containsKey(proc.getProcIndex());
     }
 
@@ -247,7 +247,7 @@ public final class EventQueue<P extends StochProc> {
      * @throws RuntimeException unless this queue contains an event
      * for the specified process.
      */
-    public StochEvent<P> findEvent(P proc) {
+    public StochEvent findEvent(StochProc proc) {
         return getNode(findNode(proc));
     }
 
@@ -280,7 +280,7 @@ public final class EventQueue<P extends StochProc> {
      *
      * @return the next event to occur in the stochastic system.
      */
-    public StochEvent<P> nextEvent() {
+    public StochEvent nextEvent() {
         return getNode(ROOT_NODE);
     }
 
@@ -292,7 +292,7 @@ public final class EventQueue<P extends StochProc> {
      * @throws RuntimeException unless this queue contains an event
      * for the specified process.
      */
-    public void removeProcess(P proc) {
+    public void removeProcess(StochProc proc) {
         //
         // Swap the corresponding event with the event in the last
         // node (at node index "size"), delete the event and the
@@ -336,7 +336,7 @@ public final class EventQueue<P extends StochProc> {
      * @throws RuntimeException unless this queue contains an older
      * event for the process in the input event.
      */
-    public void updateEvent(StochEvent<P> event) {
+    public void updateEvent(StochEvent event) {
         int node = findNode(event);
         setNode(node, event);
 

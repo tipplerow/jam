@@ -4,10 +4,10 @@ package jam.stoch.agent;
 /**
  * Represents a death process with a fixed first-order rate constant.
  */
-public final class FixedRateDeathProc<A extends StochAgent> extends DeathProc<A> {
+public final class FixedRateDeathProc extends DeathProc {
     private final double rateConst;
 
-    private FixedRateDeathProc(A agent, double rateConst) {
+    private FixedRateDeathProc(StochAgent agent, double rateConst) {
         super(agent);
 
         validateRateConstant(rateConst);
@@ -23,11 +23,11 @@ public final class FixedRateDeathProc<A extends StochAgent> extends DeathProc<A>
      *
      * @return a new death process with the specified parameters.
      */
-    public static <A extends StochAgent> DeathProc<A> create(A agent, double rateConst) {
-        return new FixedRateDeathProc<A>(agent, rateConst);
+    public static DeathProc create(StochAgent agent, double rateConst) {
+        return new FixedRateDeathProc(agent, rateConst);
     }
 
-    @Override public double getRateConstant(AgentSystem<A, ?> state) {
+    @Override public double getRateConstant(AgentSystem system) {
         return rateConst;
     }
 }

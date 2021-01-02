@@ -9,8 +9,8 @@ import com.google.common.collect.Multiset;
 /**
  * Maintains a number count of each agent in a stochastic simulation.
  */
-public final class AgentPopulation<A extends StochAgent> {
-    private final Multiset<A> counts = HashMultiset.create();
+public final class AgentPopulation {
+    private final Multiset<StochAgent> counts = HashMultiset.create();
 
     private AgentPopulation() {
     }
@@ -20,8 +20,8 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @return a new empty agent population.
      */
-    public static <A extends StochAgent> AgentPopulation<A> create() {
-        return new AgentPopulation<A>();
+    public static AgentPopulation create() {
+        return new AgentPopulation();
     }
 
     /**
@@ -31,8 +31,8 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @return a new agent population containing the specified agents.
      */
-    public static <A extends StochAgent> AgentPopulation<A> create(Collection<A> agents) {
-        AgentPopulation<A> population = create();
+    public static AgentPopulation create(Collection<StochAgent> agents) {
+        AgentPopulation population = create();
         population.add(agents);
         return population;
     }
@@ -45,8 +45,8 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @return a new agent population with the specified agent counts.
      */
-    public static <A extends StochAgent> AgentPopulation<A> create(Multiset<A> counts) {
-        AgentPopulation<A> population = create();
+    public static AgentPopulation create(Multiset<StochAgent> counts) {
+        AgentPopulation population = create();
         population.add(counts);
         return population;
     }
@@ -56,7 +56,7 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @param agent the agent to add.
      */
-    public void add(A agent) {
+    public void add(StochAgent agent) {
         counts.add(agent);
     }
 
@@ -69,7 +69,7 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @throws IllegalArgumentException if the count is negative.
      */
-    public void add(A agent, int count) {
+    public void add(StochAgent agent, int count) {
         if (count < 0)
             throw new IllegalArgumentException("Agent count must be non-negative.");
         else
@@ -81,8 +81,8 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @param agents the agents to add.
      */
-    public void add(Collection<A> agents) {
-        for (A agent : agents)
+    public void add(Collection<StochAgent> agents) {
+        for (StochAgent agent : agents)
             add(agent);
     }
 
@@ -91,8 +91,8 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @param agents the agents to add.
      */
-    public void add(Multiset<A> agents) {
-        for (Multiset.Entry<A> entry : agents.entrySet())
+    public void add(Multiset<StochAgent> agents) {
+        for (Multiset.Entry<StochAgent> entry : agents.entrySet())
             add(entry.getElement(), entry.getCount());
     }
 
@@ -104,7 +104,7 @@ public final class AgentPopulation<A extends StochAgent> {
      * @return the number of instances of the specified agent
      * contained in this population.
      */
-    public int count(A agent) {
+    public int count(StochAgent agent) {
         return counts.count(agent);
     }
 
@@ -116,7 +116,7 @@ public final class AgentPopulation<A extends StochAgent> {
      * @throws IllegalArgumentException unless this population
      * contains at least one instance of the specified agent.
      */
-    public void remove(A agent) {
+    public void remove(StochAgent agent) {
         remove(agent, 1);
     }
 
@@ -130,7 +130,7 @@ public final class AgentPopulation<A extends StochAgent> {
      * @throws IllegalArgumentException unless this population
      * contains at least {@code count} instances of the agent.
      */
-    public void remove(A agent, int count) {
+    public void remove(StochAgent agent, int count) {
         if (counts.count(agent) < count)
             throw new IllegalArgumentException("Agent count must remain non-negative.");
         else
@@ -142,8 +142,8 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @param agents the agents to remove.
      */
-    public void remove(Multiset<A> agents) {
-        for (Multiset.Entry<A> entry : agents.entrySet())
+    public void remove(Multiset<StochAgent> agents) {
+        for (Multiset.Entry<StochAgent> entry : agents.entrySet())
             remove(entry.getElement(), entry.getCount());
     }
 
@@ -156,7 +156,7 @@ public final class AgentPopulation<A extends StochAgent> {
      *
      * @throws IllegalArgumentException if the count is negative.
      */
-    public void set(A agent, int count) {
+    public void set(StochAgent agent, int count) {
         if (count < 0)
             throw new IllegalArgumentException("Agent count must be non-negative.");
         else

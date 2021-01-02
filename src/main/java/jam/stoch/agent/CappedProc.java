@@ -1,6 +1,7 @@
 
 package jam.stoch.agent;
 
+import java.util.Collections;
 import java.util.Set;
 
 import com.google.common.collect.Multiset;
@@ -13,12 +14,12 @@ import jam.lang.JamException;
  * stochastic agents reaches a fixed capacity threshold. (The rate
  * is unchanged below the threshold.)
  */
-public final class CappedProc<A extends StochAgent> extends AgentProc<A> {
+public final class CappedProc extends AgentProc {
     private final int capacity;
-    private final Set<A> capped;
-    private final AgentProc<A> baseProc;
+    private final AgentProc baseProc;
+    private final Set<StochAgent> capped;
 
-    private CappedProc(AgentProc<A> baseProc, Set<A> capped, int capacity) {
+    private CappedProc(AgentProc baseProc, Set<StochAgent> capped, int capacity) {
         super();
 
         validateCapacity(capacity);
@@ -41,8 +42,8 @@ public final class CappedProc<A extends StochAgent> extends AgentProc<A> {
      * @return a new capacity-limited process with the specified
      * parameters.
      */
-    public static <A extends StochAgent> CappedProc<A> create(AgentProc<A> baseProc, Set<A> capped, int capacity) {
-        return new CappedProc<A>(baseProc, capped, capacity);
+    public static CappedProc create(AgentProc baseProc, Set<StochAgent> capped, int capacity) {
+        return new CappedProc(baseProc, capped, capacity);
     }
 
     /**
@@ -58,22 +59,33 @@ public final class CappedProc<A extends StochAgent> extends AgentProc<A> {
             throw JamException.runtime("Capacity must be positive.");
     }
 
-    @Override public Multiset<A> getReactants() {
+    /**
+     * Returns a read-only view of the stochastic agents that
+     * contribute to the population limit.
+     *
+     * @return a read-only view of the stochastic agents that
+     * contribute to the population limit.
+     */
+    public Set<StochAgent> viewCapped() {
+        return Collections.unmodifiableSet(capped);
+    }
+
+    @Override public Multiset<StochAgent> getReactants() {
         return baseProc.getReactants();
     }
 
-    @Override public Multiset<A> getProducts() {
+    @Override public Multiset<StochAgent> getProducts() {
         return baseProc.getProducts();
     }
 
-    @Override public double getRateConstant(AgentSystem<A, ?> system) {
+    @Override public double getRateConstant(AgentSystem system) {
         if (system.countAgents(capped) < capacity)
             return baseProc.getRateConstant(system);
         else
             return 0.0;
     }
 
-    @Override public void updatePopulation(AgentPopulation<A> population) {
+    @Override public void updatePopulation(AgentPopulation population) {
         baseProc.updatePopulation(population);
     }
 }

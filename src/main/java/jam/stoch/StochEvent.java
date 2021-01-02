@@ -15,12 +15,12 @@ import jam.math.JamRandom;
  * that <em>will</em> occur sometime in the future in the course of a
  * next-reaction method simulation.
  */
-public final class StochEvent<P extends StochProc> implements Comparable<StochEvent<P>> {
-    private final P proc;
+public final class StochEvent implements Comparable<StochEvent> {
+    private final StochProc proc;
     private final StochRate rate;
     private final StochTime time;
 
-    private StochEvent(P proc, StochTime time) {
+    private StochEvent(StochProc proc, StochTime time) {
         this.proc = proc;
         this.time = time;
         this.rate = proc.getStochRate();
@@ -33,8 +33,8 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      *
      * @param time the (absolute) time when the event occurred.
      */
-    public static <P extends StochProc> StochEvent<P> mark(P proc, StochTime time) {
-        return new StochEvent<P>(proc, time);
+    public static StochEvent mark(StochProc proc, StochTime time) {
+        return new StochEvent(proc, time);
     }
 
     /**
@@ -48,11 +48,11 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      *
      * @return the first event for the specified stochastic process.
      */
-    public static <P extends StochProc> StochEvent<P> first(P proc, JamRandom random) {
+    public static StochEvent first(StochProc proc, JamRandom random) {
         StochRate rate = proc.getStochRate();
         StochTime time = rate.sampleTime(StochTime.ZERO, random);
 
-        return new StochEvent<P>(proc, time);
+        return new StochEvent(proc, time);
     }
 
     /**
@@ -66,11 +66,11 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      * @return the first events for each process in the stochastic
      * system.
      */
-    public static <P extends StochProc> List<StochEvent<P>> first(StochSystem<P> system, JamRandom random) {
-        List<StochEvent<P>> events =
-            new ArrayList<StochEvent<P>>(system.countProcesses());
+    public static List<StochEvent> first(StochSystem system, JamRandom random) {
+        List<StochEvent> events =
+            new ArrayList<StochEvent>(system.countProcesses());
 
-        for (P proc : system.viewProcesses())
+        for (StochProc proc : system.viewProcesses())
             events.add(StochEvent.first(proc, random));
 
         return events;
@@ -86,12 +86,12 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      *
      * @return the next event for the underlying stochastic process.
      */
-    public StochEvent<P> next(JamRandom random) {
+    public StochEvent next(JamRandom random) {
         StochRate newRate = this.proc.getStochRate();
         StochTime oldTime = this.time;
         StochTime newTime = newRate.sampleTime(oldTime, random);
 
-        return new StochEvent<P>(proc, newTime);
+        return new StochEvent(proc, newTime);
     }
 
     /**
@@ -115,7 +115,7 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      * @throws RuntimeException if the linked event occurs after this
      * event.
      */
-    public StochEvent<P> update(StochTime linkedTime, JamRandom random) {
+    public StochEvent update(StochTime linkedTime, JamRandom random) {
         //
         // The stochastic system that contains the underlying process
         // for this event will update its instantaneous rate after the
@@ -155,7 +155,7 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
             newTime = linkedTime.plus(rateRatio * unelapsed);
         }
 
-        return new StochEvent<P>(proc, newTime);
+        return new StochEvent(proc, newTime);
     }
 
     /**
@@ -173,7 +173,7 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      *
      * @return the next event for the underlying stochastic process.
      */
-    public StochEvent<P> update(StochEvent<P> event, JamRandom random) {
+    public StochEvent update(StochEvent event, JamRandom random) {
         if (event.equals(this))
             return next(random);
         else
@@ -194,7 +194,7 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      *
      * @return the underlying stochastic process.
      */
-    public P getProcess() {
+    public StochProc getProcess() {
         return proc;
     }
 
@@ -232,7 +232,7 @@ public final class StochEvent<P extends StochProc> implements Comparable<StochEv
      * according whether this event occurs before, at the same time,
      * or later than the input event.
      */
-    @Override public int compareTo(StochEvent<P> that) {
+    @Override public int compareTo(StochEvent that) {
         int timeCmp = this.time.compareTo(that.time);
 
         if (timeCmp != 0)

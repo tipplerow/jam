@@ -35,9 +35,9 @@ public class AgentSystemTest {
         StochTime time2 = StochTime.valueOf(0.3);
         StochTime time3 = StochTime.valueOf(0.9);
 
-        StochEvent<AgentProc<TestAgent>> event1 = StochEvent.mark(TestSystem.TRANS_PROC, time1);
-        StochEvent<AgentProc<TestAgent>> event2 = StochEvent.mark(TestSystem.DEATH_PROC, time2);
-        StochEvent<AgentProc<TestAgent>> event3 = StochEvent.mark(TestSystem.BIRTH_PROC, time3);
+        StochEvent event1 = StochEvent.mark(TestSystem.TRANS_PROC, time1);
+        StochEvent event2 = StochEvent.mark(TestSystem.DEATH_PROC, time2);
+        StochEvent event3 = StochEvent.mark(TestSystem.BIRTH_PROC, time3);
 
         int initA = TestSystem.INIT_POP_A;
         int initB = TestSystem.INIT_POP_B;

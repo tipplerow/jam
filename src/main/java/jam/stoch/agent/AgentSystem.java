@@ -13,15 +13,16 @@ import com.google.common.collect.Multiset;
 import jam.lang.JamException;
 import jam.lang.OrdinalMap;
 import jam.stoch.RateLink;
+import jam.stoch.StochProc;
 import jam.stoch.StochSystem;
 
 /**
  * Represents a system of coupled stochastic processes involving
  * discrete stochastic agents.
  */
-public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> extends StochSystem<P> {
-    private final OrdinalMap<A> agentMap;
-    private final AgentPopulation<A> agentPop;
+public abstract class AgentSystem extends StochSystem {
+    private final AgentPopulation agentPop;
+    private final OrdinalMap<StochAgent> agentMap;
 
     /**
      * Creates a new coupled stochastic system containing discrete
@@ -40,8 +41,10 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
      * @throws RuntimeException if any rate links refer to processes
      * not contained in the input collection.
      */
-    protected AgentSystem(Collection<A> agents, AgentPopulation<A> agentPop,
-                          Collection<P> procs, Collection<RateLink<P>> links) {
+    protected AgentSystem(Collection<? extends StochAgent> agents,
+                          AgentPopulation agentPop,
+                          Collection<AgentProc> procs,
+                          Collection<RateLink> links) {
         super(procs, links);
 
         this.agentPop = agentPop;
@@ -51,7 +54,7 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
     }
 
     private void initRates() {
-        for (P proc : viewProcesses())
+        for (AgentProc proc : viewProcesses())
             proc.updateRate(this);
     }
 
@@ -64,7 +67,7 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
      *
      * @throws IllegalArgumentException if the count is negative.
      */
-    protected void addAgent(A agent, int count) {
+    protected void addAgent(StochAgent agent, int count) {
         if (count < 0)
             throw new IllegalArgumentException("Agent count must be non-negative.");
 
@@ -114,7 +117,7 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
      * @return the number of instances of the specified agent
      * contained in this system.
      */
-    public int countAgent(A agent) {
+    public int countAgent(StochAgent agent) {
         return agentPop.count(agent);
     }
 
@@ -125,10 +128,10 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
      *
      * @return the total population count across the specified agents.
      */
-    public int countAgents(Set<A> agents) {
+    public int countAgents(Set<StochAgent> agents) {
         int total = 0;
 
-        for (A agent : agents)
+        for (StochAgent agent : agents)
             total += countAgent(agent);
 
         return total;
@@ -144,8 +147,8 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
      * @throws RuntimeException unless this system contains an agent
      * with the specified index.
      */
-    public A getAgent(int index) {
-        A agent = agentMap.get(index);
+    public StochAgent getAgent(int index) {
+        StochAgent agent = agentMap.get(index);
 
         if (agent != null)
             return agent;
@@ -160,18 +163,32 @@ public abstract class AgentSystem<A extends StochAgent, P extends AgentProc<A>> 
      * @return a read-only view of the stochastic agents that
      * compose this system.
      */
-    public Collection<A> viewAgents() {
+    public Collection<StochAgent> viewAgents() {
         return Collections.unmodifiableCollection(agentMap.values());
     }
 
     @Override protected void updateState() {
-        P lastProc = lastEventProcess();
-        Collection<P> dependents = viewDependents(lastProc);
+        AgentProc lastProc = lastEventProcess();
+        Set<? extends AgentProc> dependents = viewDependents(lastProc);
 
         lastProc.updatePopulation(this.agentPop);
         lastProc.updateRate(this);
 
-        for (P dependent : dependents)
+        for (AgentProc dependent : dependents)
             dependent.updateRate(this);
+    }
+
+    @Override public AgentProc lastEventProcess() {
+        return (AgentProc) super.lastEventProcess();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public Set<? extends AgentProc> viewDependents(StochProc proc) {
+        return (Set<? extends AgentProc>) super.viewDependents(proc);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public Collection<? extends AgentProc> viewProcesses() {
+        return (Collection<? extends AgentProc>) super.viewProcesses();
     }
 }

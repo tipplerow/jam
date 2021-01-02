@@ -13,25 +13,25 @@ import com.google.common.collect.SetMultimap;
  * Represents a directed dependency graph for a system of coupled
  * stochastic processes.
  */
-public final class ProcGraph<P extends StochProc> {
+public final class ProcGraph {
     //
     // The forward dependency relationships: Calling
     // forward.get(proc) returns all processes whose
     // rates depend on "proc"...
     //
-    private final SetMultimap<P, P> forward = HashMultimap.create();
+    private final SetMultimap<StochProc, StochProc> forward = HashMultimap.create();
 
     // The reverse dependency relationships: Calling
     // reverse.get(proc) returns all processes that
     // determine the rate of "proc"...
     //
-    private final SetMultimap<P, P> reverse = HashMultimap.create();
+    private final SetMultimap<StochProc, StochProc> reverse = HashMultimap.create();
 
     private ProcGraph() {
     }
 
-    private ProcGraph(Collection<RateLink<P>> links) {
-        for (RateLink<P> link : links)
+    private ProcGraph(Collection<RateLink> links) {
+        for (RateLink link : links)
             link(link.getPredecessor(), link.getSuccessor());
     }
 
@@ -40,8 +40,8 @@ public final class ProcGraph<P extends StochProc> {
      *
      * @return an empty dependency graph.
      */
-    public static <P extends StochProc> ProcGraph<P> create() {
-        return new ProcGraph<P>();
+    public static ProcGraph create() {
+        return new ProcGraph();
     }
 
     /**
@@ -51,8 +51,8 @@ public final class ProcGraph<P extends StochProc> {
      *
      * @return a new graph containing the specified dependencies.
      */
-    public static <P extends StochProc> ProcGraph<P> create(Collection<RateLink<P>> links) {
-        return new ProcGraph<P>(links);
+    public static ProcGraph create(Collection<RateLink> links) {
+        return new ProcGraph(links);
     }
 
     /**
@@ -67,8 +67,7 @@ public final class ProcGraph<P extends StochProc> {
      * @throws RuntimeException unless the predecessor is separate and
      * distinct process from the all successors.
      */
-    @SuppressWarnings("unchecked")
-    public void add(P predecessor, P... successors) {
+    public void add(StochProc predecessor, StochProc... successors) {
         add(predecessor, List.of(successors));
     }
 
@@ -84,8 +83,8 @@ public final class ProcGraph<P extends StochProc> {
      * @throws RuntimeException unless the predecessor is separate and
      * distinct process from the all successors.
      */
-    public void add(P predecessor, Collection<P> successors) {
-        for (P successor : successors)
+    public void add(StochProc predecessor, Collection<? extends StochProc> successors) {
+        for (StochProc successor : successors)
             link(predecessor, successor);
     }
 
@@ -98,7 +97,7 @@ public final class ProcGraph<P extends StochProc> {
      * @return a read-only set containing all direct successors of the
      * specified process.
      */
-    public Set<P> get(P predecessor) {
+    public Set<? extends StochProc> get(StochProc predecessor) {
         return Collections.unmodifiableSet(forward.get(predecessor));
     }
 
@@ -114,7 +113,7 @@ public final class ProcGraph<P extends StochProc> {
      * @throws RuntimeException if the predecessor and successor are
      * the same process.
      */
-    public void link(P predecessor, P successor) {
+    public void link(StochProc predecessor, StochProc successor) {
         RateLink.validate(predecessor, successor);
         forward.put(predecessor, successor);
         reverse.put(successor, predecessor);
@@ -125,7 +124,7 @@ public final class ProcGraph<P extends StochProc> {
      *
      * @param process the process to remove.
      */
-    public void remove(P process) {
+    public void remove(StochProc process) {
         forward.removeAll(process);
         reverse.removeAll(process);
     }
@@ -137,7 +136,7 @@ public final class ProcGraph<P extends StochProc> {
      *
      * @param successor the successor (dependent) process.
      */
-    public void remove(P predecessor, P successor) {
+    public void remove(StochProc predecessor, StochProc successor) {
         forward.remove(predecessor, successor);
         reverse.remove(successor, predecessor);
     }

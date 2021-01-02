@@ -13,21 +13,21 @@ import jam.stoch.StochRate;
  * and {@code nC} is the current number of cells.  After the process
  * occurs, the number of cells decreases by one: {@code nC => nC - 1}.
  */
-public abstract class DeathProc<A extends StochAgent> extends FirstOrderProc<A> {
+public abstract class DeathProc extends FirstOrderProc {
     /**
      * Creates a new death process with a fixed agent.
      *
      * @param agent the target agent for the process.
      */
-    protected DeathProc(A agent) {
+    protected DeathProc(StochAgent agent) {
         super(agent);
     }
 
-    @Override public Multiset<A> getProducts() {
+    @Override public Multiset<StochAgent> getProducts() {
         return ImmutableMultiset.of();
     }
 
-    @Override public void updatePopulation(AgentPopulation<A> population) {
+    @Override public void updatePopulation(AgentPopulation population) {
         population.remove(reactant);
     }
 }

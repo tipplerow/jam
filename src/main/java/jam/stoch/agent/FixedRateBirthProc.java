@@ -4,10 +4,10 @@ package jam.stoch.agent;
 /**
  * Represents a birth process with a fixed first-order rate constant.
  */
-public final class FixedRateBirthProc<A extends StochAgent> extends BirthProc<A> {
+public final class FixedRateBirthProc extends BirthProc {
     private final double rateConst;
 
-    private FixedRateBirthProc(A parent, A child, double rateConst) {
+    private FixedRateBirthProc(StochAgent parent, StochAgent child, double rateConst) {
         super(parent, child);
 
         validateRateConstant(rateConst);
@@ -25,8 +25,8 @@ public final class FixedRateBirthProc<A extends StochAgent> extends BirthProc<A>
      * @return a new non-mutating birth process with the specified
      * parameters.
      */
-    public static <A extends StochAgent> BirthProc<A> create(A agent, double rateConst) {
-        return new FixedRateBirthProc<A>(agent, agent, rateConst);
+    public static BirthProc create(StochAgent agent, double rateConst) {
+        return new FixedRateBirthProc(agent, agent, rateConst);
     }
 
     /**
@@ -40,11 +40,11 @@ public final class FixedRateBirthProc<A extends StochAgent> extends BirthProc<A>
      *
      * @return a new mutation process with the specified parameters.
      */
-    public static <A extends StochAgent> BirthProc<A> create(A parent, A child, double rateConst) {
-        return new FixedRateBirthProc<A>(parent, child, rateConst);
+    public static BirthProc create(StochAgent parent, StochAgent child, double rateConst) {
+        return new FixedRateBirthProc(parent, child, rateConst);
     }
 
-    @Override public double getRateConstant(AgentSystem<A, ?> state) {
+    @Override public double getRateConstant(AgentSystem system) {
         return rateConst;
     }
 }

@@ -19,11 +19,11 @@ import jam.stoch.StochRate;
  * and child agents are identical. (2) The rate constant may change
  * through time and/or be context-dependent.
  */
-public abstract class BirthProc<A extends StochAgent> extends FirstOrderProc<A> {
+public abstract class BirthProc extends FirstOrderProc {
     /**
      * The child agent produced by this process.
      */
-    protected final A child;
+    protected final StochAgent child;
 
     /**
      * Creates a new birth process with a fixed parent and child.
@@ -32,7 +32,7 @@ public abstract class BirthProc<A extends StochAgent> extends FirstOrderProc<A> 
      *
      * @param child the child agent for the process.
      */
-    protected BirthProc(A parent, A child) {
+    protected BirthProc(StochAgent parent, StochAgent child) {
         super(parent);
         this.child = child;
     }
@@ -42,7 +42,7 @@ public abstract class BirthProc<A extends StochAgent> extends FirstOrderProc<A> 
      *
      * @return the parent agent for this birth process.
      */
-    public A getParent() {
+    public StochAgent getParent() {
         return reactant;
     }
 
@@ -51,15 +51,15 @@ public abstract class BirthProc<A extends StochAgent> extends FirstOrderProc<A> 
      *
      * @return the child agent for this birth process.
      */
-    public A getChild() {
+    public StochAgent getChild() {
         return child;
     }
 
-    @Override public Multiset<A> getProducts() {
+    @Override public Multiset<StochAgent> getProducts() {
         return ImmutableMultiset.of(reactant, child);
     }
 
-    @Override public void updatePopulation(AgentPopulation<A> population) {
+    @Override public void updatePopulation(AgentPopulation population) {
         population.add(child);
     }
 }

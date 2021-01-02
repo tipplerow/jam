@@ -7,7 +7,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class NextReactionAlgoTest extends AlgoTestBase {
-    @Override public StochAlgo<DecayProc> createAlgorithm() {
+    @Override public StochAlgo createAlgorithm() {
         return NextReactionAlgo.create(random, system);
     }
 

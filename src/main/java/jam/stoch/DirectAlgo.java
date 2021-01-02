@@ -9,11 +9,11 @@ import jam.math.JamRandom;
  * Implements the direct stochastic simulation method of Gillespie
  * with a few performance optimizations.
  */
-public final class DirectAlgo<P extends StochProc> extends StochAlgo<P> {
-    private final RateManager<P> rateManager;
-    private final PriorityList<P> priorityList;
+public final class DirectAlgo extends StochAlgo {
+    private final RateManager rateManager;
+    private final PriorityList priorityList;
 
-    private DirectAlgo(JamRandom random, StochSystem<P> system) {
+    private DirectAlgo(JamRandom random, StochSystem system) {
         super(random, system);
 
         this.rateManager = RateManager.create(system);
@@ -31,11 +31,11 @@ public final class DirectAlgo<P extends StochProc> extends StochAlgo<P> {
      *
      * @return a direct simulation algorithm for the specified system.
      */
-    public static <P extends StochProc> DirectAlgo<P> create(JamRandom random, StochSystem<P> system) {
-        return new DirectAlgo<P>(random, system);
+    public static DirectAlgo create(JamRandom random, StochSystem system) {
+        return new DirectAlgo(random, system);
     }
 
-    @Override protected StochEvent<P> nextEvent() {
+    @Override protected StochEvent nextEvent() {
         StochRate totalRate =
             rateManager.getTotalRate();
 
@@ -43,7 +43,7 @@ public final class DirectAlgo<P extends StochProc> extends StochAlgo<P> {
                                nextTime(totalRate));
     }
 
-    private P nextProc(StochRate totalRate) {
+    private StochProc nextProc(StochRate totalRate) {
         return priorityList.select(random, totalRate);
     }
 
@@ -51,7 +51,7 @@ public final class DirectAlgo<P extends StochProc> extends StochAlgo<P> {
         return totalRate.sampleTime(system.lastEventTime(), random);
     }
 
-    @Override protected void updateState(StochEvent<P> event, Collection<P> dependents) {
+    @Override protected void updateState(StochEvent event, Collection<? extends StochProc> dependents) {
         rateManager.updateTotalRate(event.getProcess(), dependents);
     }
 }

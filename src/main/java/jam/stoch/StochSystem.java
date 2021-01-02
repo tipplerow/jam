@@ -12,15 +12,15 @@ import jam.lang.JamException;
 /**
  * Provides a base class for systems of coupled stochastic processes.
  */
-public abstract class StochSystem<P extends StochProc> {
-    private final ProcGraph<P> graph = ProcGraph.create();
-    private final Map<Integer, P> procs = new LinkedHashMap<Integer, P>();
+public abstract class StochSystem {
+    private final ProcGraph graph = ProcGraph.create();
+    private final Map<Integer, StochProc> procs = new LinkedHashMap<Integer, StochProc>();
 
     // The number of events that have occurred...
     private long eventCount = 0L;
 
     // The most recent event to occur...
-    private StochEvent<P> lastEvent = null;
+    private StochEvent lastEvent = null;
 
     /**
      * Creates a new coupled stochastic system.
@@ -33,7 +33,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException if any rate links refer to processes
      * not contained in the input collection.
      */
-    protected StochSystem(Collection<P> procs, Collection<RateLink<P>> links) {
+    protected StochSystem(Collection<? extends StochProc> procs, Collection<RateLink> links) {
         addProcesses(procs);
         addLinks(links);
     }
@@ -53,7 +53,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException if this system already contains
      * another process with the same index.
      */
-    protected void addProcess(P proc) {
+    protected void addProcess(StochProc proc) {
         if (containsProcess(proc.getProcIndex()))
             throw JamException.runtime("Duplicate process index: [%d].", proc.getProcIndex());
 
@@ -68,8 +68,8 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException if this system already contains any
      * processes with the same indexes.
      */
-    protected void addProcesses(Collection<P> procs) {
-        for (P proc : procs)
+    protected void addProcesses(Collection<? extends StochProc> procs) {
+        for (StochProc proc : procs)
             addProcess(proc);
     }
 
@@ -81,7 +81,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException unless this system contains both
      * processes in the link.
      */
-    protected void addLink(RateLink<P> link) {
+    protected void addLink(RateLink link) {
         addLink(link.getPredecessor(), link.getSuccessor());
     }
 
@@ -95,7 +95,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException unless this system contains both
      * processes in the link.
      */
-    protected void addLink(P predecessor, P successor) {
+    protected void addLink(StochProc predecessor, StochProc successor) {
         requireProcess(predecessor);
         requireProcess(successor);
 
@@ -110,8 +110,8 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException unless this system contains every
      * process in the links.
      */
-    protected void addLinks(Collection<RateLink<P>> links) {
-        for (RateLink<P> link : links)
+    protected void addLinks(Collection<RateLink> links) {
+        for (RateLink link : links)
             addLink(link);
     }
 
@@ -139,7 +139,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException unless this system contains the
      * specified process.
      */
-    protected void removeProcess(P proc) {
+    protected void removeProcess(StochProc proc) {
         removeProcess(proc.getProcIndex());
     }
 
@@ -185,7 +185,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @return {@code true} iff this system contains the specified
      * process.
      */
-    public boolean containsProcess(P proc) {
+    public boolean containsProcess(StochProc proc) {
         return containsProcess(proc.getProcIndex());
     }
 
@@ -217,8 +217,8 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException unless this system contains a process
      * with the specified index.
      */
-    public P getProcess(int index) {
-        P process = procs.get(index);
+    public StochProc getProcess(int index) {
+        StochProc process = procs.get(index);
 
         if (process != null)
             return process;
@@ -248,7 +248,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @return the most recent event to occur in this system
      * ({@code null} before any events have occurred).
      */
-    public StochEvent<P> lastEvent() {
+    public StochEvent lastEvent() {
         return lastEvent;
     }
 
@@ -258,7 +258,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @return the most recent process to occur ({@code null} before
      * any events have occurred).
      */
-    public P lastEventProcess() {
+    public StochProc lastEventProcess() {
         if (lastEvent != null)
             return lastEvent.getProcess();
         else
@@ -298,7 +298,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @throws RuntimeException unless this system contains the
      * specified process.
      */
-    public void requireProcess(P proc) {
+    public void requireProcess(StochProc proc) {
         requireProcess(proc.getProcIndex());
     }
 
@@ -312,7 +312,7 @@ public abstract class StochSystem<P extends StochProc> {
      * previous event in this system and this system contains the
      * process that occurred.
      */
-    public void updateState(StochEvent<P> event) {
+    public void updateState(StochEvent event) {
         validateEvent(event);
 
         ++eventCount;
@@ -321,7 +321,7 @@ public abstract class StochSystem<P extends StochProc> {
         updateState();
     }
 
-    private void validateEvent(StochEvent<P> event) {
+    private void validateEvent(StochEvent event) {
         if (event.getTime().compareTo(lastEventTime()) <= 0)
             throw JamException.runtime("Next event must occur after the previous event.");
 
@@ -336,7 +336,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @return a read-only view of the stochastic processes that
      * compose this system.
      */
-    public Collection<P> viewProcesses() {
+    public Collection<? extends StochProc> viewProcesses() {
         return Collections.unmodifiableCollection(procs.values());
     }
 
@@ -350,7 +350,7 @@ public abstract class StochSystem<P extends StochProc> {
      * @return a read-only view of the processes whose rates may
      * change after the specified process occurs.
      */
-    public Set<P> viewDependents(P proc) {
+    public Set<? extends StochProc> viewDependents(StochProc proc) {
         return graph.get(proc);
     }
 }

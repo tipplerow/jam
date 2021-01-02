@@ -12,9 +12,9 @@ import static org.junit.Assert.*;
 
 public class EventQueueTest {
     private final JamRandom random = JamRandom.generator(20210501);
-    private final EventQueue<FixedRateProc> queue;
+    private final EventQueue queue;
+    private final List<StochEvent> events = new ArrayList<StochEvent>();
     private final List<FixedRateProc> procs = new ArrayList<FixedRateProc>();
-    private final List<StochEvent<FixedRateProc>> events = new ArrayList<StochEvent<FixedRateProc>>();
 
     private static final int PROC_COUNT = 25;
     private static final int NEXT_COUNT = 1000;
@@ -55,8 +55,8 @@ public class EventQueueTest {
 
         assertEquals(expectedIndex, actualIndex);
 
-        StochEvent<FixedRateProc> actualEvent = queue.nextEvent();
-        StochEvent<FixedRateProc> updatedEvent = actualEvent.next(random);
+        StochEvent actualEvent = queue.nextEvent();
+        StochEvent updatedEvent = actualEvent.next(random);
 
         queue.updateEvent(updatedEvent);
         events.set(0, updatedEvent);

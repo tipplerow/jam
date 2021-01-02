@@ -7,7 +7,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class DirectAlgoTest extends AlgoTestBase {
-    @Override public StochAlgo<DecayProc> createAlgorithm() {
+    @Override public StochAlgo createAlgorithm() {
         return DirectAlgo.create(random, system);
     }
 

@@ -17,11 +17,11 @@ import jam.stoch.StochRate;
  * consumed and one product is produced: {@code nR => nR - 1} and
  * {@code nP => nP + 1}.
  */
-public abstract class TransitionProc<A extends StochAgent> extends FirstOrderProc<A> {
+public abstract class TransitionProc extends FirstOrderProc {
     /**
      * The agent produced by this process.
      */
-    protected final A product;
+    protected final StochAgent product;
 
     /**
      * Creates a new transition process with a fixed reactant and
@@ -34,7 +34,7 @@ public abstract class TransitionProc<A extends StochAgent> extends FirstOrderPro
      * @throws RuntimeException if the reactant and product are
      * identical.
      */
-    protected TransitionProc(A reactant, A product) {
+    protected TransitionProc(StochAgent reactant, StochAgent product) {
         super(reactant);
 
         if (product.equals(reactant))
@@ -48,15 +48,15 @@ public abstract class TransitionProc<A extends StochAgent> extends FirstOrderPro
      *
      * @return the product agent for this process.
      */
-    public A getProduct() {
+    public StochAgent getProduct() {
         return product;
     }
 
-    @Override public Multiset<A> getProducts() {
+    @Override public Multiset<StochAgent> getProducts() {
         return ImmutableMultiset.of(product);
     }
 
-    @Override public void updatePopulation(AgentPopulation<A> population) {
+    @Override public void updatePopulation(AgentPopulation population) {
         population.remove(reactant);
         population.add(product);
     }
