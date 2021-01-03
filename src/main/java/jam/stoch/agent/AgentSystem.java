@@ -82,7 +82,7 @@ public abstract class AgentSystem extends StochSystem {
     }
 
     /**
-     * Adds a new agent to this system.
+     * Adds agent instances to this system.
      *
      * @param agent the agent to add.
      *
@@ -95,9 +95,16 @@ public abstract class AgentSystem extends StochSystem {
             throw new IllegalArgumentException("Agent count must be non-negative.");
 
         agentMap.add(agent);
+        agentPop.add(agent, count);
+    }
 
-        if (count > 0)
-            agentPop.add(agent, count);
+    /**
+     * Adds a new agent to the agent map (with zero population).
+     *
+     * @param agent the agent to add.
+     */
+    protected void mapAgent(StochAgent agent) {
+        agentMap.add(agent);
     }
 
     /**
