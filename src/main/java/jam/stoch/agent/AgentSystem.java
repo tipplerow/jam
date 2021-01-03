@@ -21,14 +21,14 @@ import jam.stoch.StochSystem;
  * discrete stochastic agents.
  */
 public abstract class AgentSystem extends StochSystem {
+    private final AgentMap agentMap;
     private final AgentPopulation agentPop;
-    private final OrdinalMap<StochAgent> agentMap;
 
     /**
      * Creates a new coupled stochastic system containing discrete
      * agents.
      *
-     * @param agents the discrete stochastic agents in the system.
+     * @param agentMap the discrete stochastic agents in the system.
      *
      * @param agentPop the initial population of the stochastic agents
      * in the system.
@@ -41,14 +41,14 @@ public abstract class AgentSystem extends StochSystem {
      * @throws RuntimeException if any rate links refer to processes
      * not contained in the input collection.
      */
-    protected AgentSystem(Collection<? extends StochAgent> agents,
+    protected AgentSystem(AgentMap agentMap,
                           AgentPopulation agentPop,
                           Collection<AgentProc> procs,
                           Collection<RateLink> links) {
         super(procs, links);
 
+        this.agentMap = agentMap;
         this.agentPop = agentPop;
-        this.agentMap = OrdinalMap.hash(agents);
 
         initRates();
     }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public final class TestSystem extends AgentSystem {
     private TestSystem() {
-        super(listAgents(), initialPopulation(), listProcesses(), List.of());
+        super(mapAgents(), initialPopulation(), listProcesses(), List.of());
     }
         
     public static final int INIT_POP_A = 1000;
@@ -25,8 +25,8 @@ public final class TestSystem extends AgentSystem {
     public static final TransitionProc TRANS_PROC =
         FixedRateTransitionProc.create(TestAgent.C, TestAgent.D, C_TRANS_RATE);
 
-    public static List<TestAgent> listAgents() {
-        return List.of(TestAgent.A, TestAgent.B, TestAgent.C, TestAgent.D);
+    public static AgentMap mapAgents() {
+        return AgentMap.create(List.of(TestAgent.A, TestAgent.B, TestAgent.C, TestAgent.D));
     }
 
     public static AgentPopulation initialPopulation() {

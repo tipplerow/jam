@@ -7,17 +7,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Provides a skeletal implementation for classes that are indexed
- * by a long integer.
- *
- * <p>Ordinal objects have a <em>natural ordering</em> imposed by
- * their index, but ordinal objects may only be compared to others
- * with the same runtime class.
+ * Provides a collection of ordinal objects accessed by index.
  */
-public final class OrdinalMap<E extends Ordinal> {
+public class OrdinalMap<E extends Ordinal> {
     private final Map<Long, E> map;
 
-    private OrdinalMap(Map<Long, E> map) {
+    /**
+     * Creates a new map from an existing indexed map.
+     *
+     * @param map a mapping from index to ordinal object.
+     */
+    protected OrdinalMap(Map<Long, E> map) {
         this.map = map;
     }
 
