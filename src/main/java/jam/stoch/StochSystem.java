@@ -23,6 +23,13 @@ public abstract class StochSystem {
     private StochEvent lastEvent = null;
 
     /**
+     * Creates an empty stochastic system; processes and links must be
+     * added after the system is constructed.
+     */
+    protected StochSystem() {
+    }
+
+    /**
      * Creates a new coupled stochastic system.
      *
      * @param procs the stochastic process which compose the system.

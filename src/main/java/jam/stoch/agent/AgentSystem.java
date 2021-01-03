@@ -25,6 +25,34 @@ public abstract class AgentSystem extends StochSystem {
     private final AgentPopulation agentPop;
 
     /**
+     * Creates an empty stochastic system of discrete agents.
+     *
+     * <p>After the system is constructed, the application must add
+     * the agents and assign their initial populations by calling
+     * {@code addAgent}, add the stochastic processes by calling
+     * {@code addProcess}, specify the process dependency graph by
+     * calling {@code addLink}, and initialize the process rates
+     * by calling {@code updateRates}.
+     */
+    protected AgentSystem() {
+        this.agentMap = AgentMap.create();
+        this.agentPop = AgentPopulation.create();
+    }
+
+    /**
+     * Creates a stochastic system of discrete agents.
+     *
+     * <p>After the system is constructed, the application must add
+     * the stochastic processes by calling {@code addProcess}, specify
+     * the process dependency graph by calling {@code addLink}, and
+     * initialize the process rates by calling {@code updateRates}.
+     */
+    protected AgentSystem(AgentMap agentMap, AgentPopulation agentPop) {
+        this.agentMap = agentMap;
+        this.agentPop = agentPop;
+    }
+
+    /**
      * Creates a new coupled stochastic system containing discrete
      * agents.
      *
@@ -50,12 +78,7 @@ public abstract class AgentSystem extends StochSystem {
         this.agentMap = agentMap;
         this.agentPop = agentPop;
 
-        initRates();
-    }
-
-    private void initRates() {
-        for (AgentProc proc : viewProcesses())
-            proc.updateRate(this);
+        updateRates();
     }
 
     /**
@@ -72,7 +95,18 @@ public abstract class AgentSystem extends StochSystem {
             throw new IllegalArgumentException("Agent count must be non-negative.");
 
         agentMap.add(agent);
-        agentPop.add(agent, count);
+
+        if (count > 0)
+            agentPop.add(agent, count);
+    }
+
+    /**
+     * Updates the rates of all stochastic processes in this system
+     * based on the current agent population.
+     */
+    protected void updateRates() {
+        for (AgentProc proc : viewProcesses())
+            proc.updateRate(this);
     }
 
     /**
